@@ -1,0 +1,30 @@
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-5.4","messages":[{"role":"system","content":"You are now using the ChatGPT API to translate the provided HTML content from Ukrainian into English while preserving its structure."},{"role":"user","content":"<h1>Привіт Світ</h1><p>Це тестова стаття для перекладу.</p>"},{"role":"assistant","content":"Translate the provided HTML content from Ukrainian into English while preserving its structure."}]}'
+    headers:
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer <CHAT_GPT_KEY>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+    body:
+      encoding: UTF-8
+      string: '{"choices":[{"message":{"content":"<h1>Hello World</h1><p>This is a test article for translation.</p>"}}]}'
+  recorded_at: Sat, 23 May 2026 16:33:30 GMT
+recorded_with: VCR 6.3.0
