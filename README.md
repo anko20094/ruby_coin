@@ -1,6 +1,6 @@
 # RubyCoin
 
-[![CI](https://github.com/ronico-ua/ruby_coin/actions/workflows/ci.yml/badge.svg)](https://github.com/ronico-ua/ruby_coin/actions/workflows/ci.yml)
+[![CI](https://github.com/anko20094/ruby_coin/actions/workflows/ci.yml/badge.svg)](https://github.com/anko20094/ruby_coin/actions/workflows/ci.yml)
 
 Preinstallation
 --------------
@@ -12,7 +12,7 @@ Preinstallation
 
 Installation
 --------------
-1. git clone git@github.com:ronico-ua/ruby_coin.git
+1. git clone git@github.com:anko20094/ruby_coin.git
 2. Run `bundle install`
 3. Run `overcommit --install`
 4. Run `overcommit --sign`

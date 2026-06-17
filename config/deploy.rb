@@ -5,7 +5,7 @@ lock '~> 3.20.0'
 server '167.71.44.132', port: 22, roles: %i[web app db], primary: true
 
 set :application, 'ruby_coin'
-set :repo_url,    'git@github.com:ronico-ua/ruby_coin.git'
+set :repo_url,    'git@github.com:anko20094/ruby_coin.git'
 set :branch,      'master'
 set :user,        'root'
 
