@@ -31,6 +31,9 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --model opus
+            --allowedTools "Bash,Read,Write,Edit"
           prompt: |
             You are a senior Rails engineer reviewing a PR for a web platform with admin panel.
 
@@ -42,6 +45,8 @@ jobs:
             1. `gh pr diff ${{ github.event.issue.number }}` — to get the diff
             2. `gh pr view ${{ github.event.issue.number }}` — to get PR title/description
             3. `COMMIT_SHA=$(gh pr view ${{ github.event.issue.number }} --json headRefOid -q .headRefOid)` — to get the head commit SHA
+
+            If the diff is very large (e.g. a release/integration PR with 150+ changed files), do NOT review it line by line: focus on the highest-risk files and changes, and note in the summary that the review was limited to a subset of the diff.
 
             Then for EACH issue found, post a SEPARATE inline comment on the exact line:
             `gh api repos/$GITHUB_REPOSITORY/pulls/${{ github.event.issue.number }}/comments --method POST -f body="<comment>" -f commit_id="$COMMIT_SHA" -f path="<file>" -F line=<line> -f side="RIGHT"`
