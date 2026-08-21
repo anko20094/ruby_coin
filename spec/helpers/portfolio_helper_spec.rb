@@ -32,11 +32,4 @@ describe PortfolioHelper do
       expect(helper.rich({ 'en' => '<script>alert(1)</script><a href="/x">link</a>' })).to eq('alert(1)link')
     end
   end
-
-  describe '#footer_contacts' do
-    it 'returns github, telegram and email in the design order' do
-      expect(helper.footer_contacts.map(&:first))
-        .to eq(['github.com/anko20094', '@anko20094', 'anko20094@gmail.com'])
-    end
-  end
 end

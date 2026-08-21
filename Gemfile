@@ -36,6 +36,7 @@ gem 'slim'
 gem 'stimulus-rails'
 gem 'tinymce-rails', '~> 8.3'
 gem 'turbo-rails', '~> 2.0', '>= 2.0.20'
+gem 'view_component'
 
 group :development, :test do
   gem 'bundler-audit', '~> 0.9.1'
@@ -50,6 +51,7 @@ end
 
 group :development do
   gem 'factory_bot_rails', '~> 6.5', '>= 6.5.1'
+  gem 'lookbook'
   gem 'overcommit', '~> 0.69.0'
   gem 'pry-rails'
   gem 'rubocop-factory_bot', require: false

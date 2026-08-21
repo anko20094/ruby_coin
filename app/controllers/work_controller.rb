@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class WorkController < ApplicationController
-  layout 'work'
+  layout 'theme'
 
   def index
     @cv = Portfolio.cv

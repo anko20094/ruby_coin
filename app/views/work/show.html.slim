@@ -23,7 +23,7 @@ article.wk-case
           .wk-metric__label= t_field(metric['label'])
 
   section.wk-case__plain
-    = render 'work/track_tag', label: t('work.case.plain'), tone: 'ruby'
+    = render TrackTagComponent.new(label: t('work.case.plain'), tone: :ruby)
     h2.wk-case__heading= t_field(@case['plain']['heading'])
     .wk-case__columns
       .wk-prose
@@ -39,13 +39,13 @@ article.wk-case
           h3.wk-panel__label= t('work.case.facts')
           div= "#{t('work.case.status')} · #{@case['status']}"
           .wk-panel__label= t('work.case.stack')
-          .wk-chips
+          .rc-chips
             - @case['stack'].each do |item|
-              span.wk-chip.wk-chip--sm= item
+              span.rc-chip.rc-chip--sm= item
 
   section.wk-case__band
     .wk-case__band-inner
-      = render 'work/track_tag', label: t('work.case.engineering'), tone: 'soft'
+      = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
       h2.wk-case__heading.is-small= t_field(@case['engineering']['heading'])
       p.wk-case__sub= t_field(@case['engineering']['sub'])
       .wk-cards

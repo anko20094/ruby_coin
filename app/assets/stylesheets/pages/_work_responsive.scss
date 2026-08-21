@@ -104,29 +104,29 @@
 
 // The chrome is three zones on one line; below this it needs to wrap.
 @media (max-width: 760px) {
-  .wk-nav {
+  .rc-nav {
     flex-wrap: wrap;
     gap: 12px 18px;
     padding: 12px 22px;
   }
 
-  .wk-nav__sections {
+  .rc-nav__sections {
     order: 3;
     flex-basis: 100%;
     gap: 18px;
   }
 
-  .wk-footer {
+  .rc-footer {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     padding: 36px 22px 28px;
   }
 
-  .wk-footer__sections {
+  .rc-footer__sections {
     justify-content: flex-start;
     flex-wrap: wrap;
     gap: 18px;
   }
 
-  .wk-footer__contacts { text-align: left; }
+  .rc-footer__contacts { text-align: left; }
 }

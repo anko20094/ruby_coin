@@ -1,0 +1,11 @@
+/ Lookbook renders components inside this, so previews carry the real theme —
+/ tokens, self-hosted faces and all. A nav without its stylesheet tells you
+/ nothing.
+doctype html
+html lang=I18n.locale
+  head
+    meta charset="utf-8"
+    meta[name="viewport" content="width=device-width,initial-scale=1"]
+    = stylesheet_link_tag 'theme', media: 'all'
+  body.rc-site
+    = yield

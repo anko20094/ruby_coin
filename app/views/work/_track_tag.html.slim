@@ -1,6 +1,0 @@
-/ The device that separates the two registers on a case page, and labels the
-/ sections of the index. On the index the label *is* the section heading, so it
-/ renders as an h2 there; above a case-page h2 it stays a plain span.
-.wk-track class="wk-track--#{tone}"
-  = content_tag(local_assigns.fetch(:heading, :span), label, class: 'wk-track__label')
-  span.wk-track__rule

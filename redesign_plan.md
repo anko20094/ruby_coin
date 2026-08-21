@@ -1,0 +1,265 @@
+# rubyco.in — план повного редизайну
+
+Джерела: `design_handoff_rubycoin_site/README.md` (бандл на робочому столі) + Phase 5 Tech
+Handoff (`phase5-handoff.jsx`). Цей файл — робочий план, не переказ. Оновлено 2026-08-21.
+
+---
+
+## 1. Стан на зараз
+
+Закомічено на `feat/work-portfolio-section` (`48b82b1`, не пушено, не задеплоєно):
+
+- `/work` + `/work/:slug` — обидві мови, специ, a11y, портрет.
+- `/cv` → 301 на `/work`.
+- Токени (`tokens.css` побайтово як у бандлі), окремий layout, окремий CSS-ентрі (SCSS через
+  наявний `cssbundling` пайплайн).
+- Спільні компоненти: track tag, чіпи, навбар (4 пункти), футер із реальними даними з `cv.yml`.
+- Статичний рубін як SVG-партіал (геометрія порахована з `phase3-ruby.jsx`).
+- `Portfolio` — YAML-читач `config/portfolio/{cases,cv}.yml`.
+
+⚠️ Два рішення нижче переписують частину цього: Case/CVBlock стають моделями (`Portfolio`
+йде на злам, YAML стає джерелом сіду), а компоненти переїжджають на ViewComponent.
+
+---
+
+## 2. Ухвалені рішення
+
+| Питання | Рішення |
+| --- | --- |
+| Ідентичність сайту | **A + B разом** — і про власника, і про студію. `/studio` в IA, навбар на чотирьох пунктах |
+| Кейси й CV | **Моделі, не YAML** (`Case`, `CVBlock`) з формами в адмінці. YAML лишається як джерело одноразового імпорту |
+| TeamMember | **Лишається** — реальна команда на сайті |
+| Globalize → Mobility | **Робимо** (див. §4.2 — маршрут із низьким ризиком) |
+| Legacy-редиректи | На мій розсуд → §4.3 |
+| `/faq` | Перестилізувати під нову тему, у навбарі не показувати |
+| `/contact` | Без форми: блок контактів прямими посиланнями |
+| Черги | Solid Queue замість Sidekiq + Redis |
+| Компоненти | ViewComponent + Lookbook |
+| Шрифти | Самохостинг усіх трьох, не Google Fonts у рантаймі |
+| Захист | rack-attack: 5/хв на `/contact`, 10/хв на `/sign-in`; CSP; ревалідація content-type; макс 5 МБ |
+
+### Редактор: Action Text (ухвалено)
+
+Trix + Action Text замінюють TinyMCE. Що це тягне:
+
+1. **Тіло статті переїжджає з колонки в `action_text_rich_texts`.** Дві мови → два іменованих
+   rich text на `Post` (`has_rich_text :description_uk`, `:description_en`) плюс хелпер, який
+   вибирає за локаллю. Прив'язувати rich text до `PostTranslation` можна, але тоді
+   `translates :description` втрачає сенс — не змішуємо два механізми на одному полі.
+2. **`Posts::Translator` переписується.** Зараз він пише напряму в
+   `post.post_translations.description` (`app/services/posts/translator.rb:15,34`). Після
+   переїзду ту саму роль виконує запис у відповідний rich text.
+3. **Active Storage заводиться поруч із CarrierWave.** Trix-вкладення потребують Active
+   Storage; обкладинки постів лишаються на CarrierWave. Два аплоадери в застосунку на
+   невизначений час — свідома ціна.
+4. ⚠️ **Два з трьох `pg_search_scope` доведеться переписати.** `search_everywhere` і
+   `search_by_description` шукають по `post_translations.description`; після переїзду
+   description там немає. Треба `associated_against` по `action_text_rich_texts.body` (rich
+   text зберігає HTML, тож або чистити теги в запиті, або тримати plain-копію для індексу).
+   `search_by_title` виживає — title лишається в `post_translations`.
+
+   Це та сама робота, якою я мотивував Table-бекенд у §4.2: там вона зникала, тут приходить з
+   іншого боку. Table-бекенд усе одно вартий того — він рятує `title`, `Post.best`,
+   `posts_helper` і `ransackable_associations`, — але «жодного переписування пошуку» більше не
+   обіцяю.
+
+5. **Блоки дизайну через attachables:** code block із підсвіткою (rouge, рендер на сервері),
+   embed (URL → Stimulus), callout. Таблиці — партіалом у рідких випадках, KaTeX — у партіалі
+   статті, не в редакторі. Slash-команди (`/image`, `/code`, `/embed`) — Stimulus-контролер.
+
+---
+
+## 3. Схема даних (кейси, CV, команда)
+
+Кейс у `cases.yml` — це не один рядок: сім полів-скалярів, чотири метрики, три абзаци
+`plain.body`, чотири пункти `mine`, шість карток `engineering.items`, чотири `quality`, і
+`stack` масивом. Повністю реляційно це шість таблиць і шість вкладених форм із таб'ами
+UK/EN — форма редагування кейса стає найскладнішим екраном у проєкті.
+
+**Пропозиція: одна таблиця `cases`, колекції в JSONB.**
+
+```
+cases
+  slug, position, mark, own:bool, is_this_site:bool, year, sector, status   -- скаляри
+  stack: jsonb                        -- масив строк, не перекладається
+  metrics: jsonb                      -- [{value, label:{en,uk}}] × 4
+  plain_body: jsonb                   -- [{en,uk}] × 3
+  mine: jsonb                         -- [{en,uk}] × 4, містить <b>
+  engineering_items: jsonb            -- [{title:{en,uk}, body:{en,uk}}] × 6
+  quality: jsonb                      -- [{value, label:{en,uk}}] × 4
+  + Mobility: title, tagline, role, plain_heading, engineering_heading,
+              engineering_sub, scope_note
+```
+
+Форми стають повторюваними філдсетами в одному екрані, а не шістьма nested-ресурсами.
+Форма шейпів фіксована (метрика завжди value+label, картка завжди title+body), тож JSONB тут
+не «скидання даних у мішок», а фіксована структура без окремої таблиці на кожні чотири рядки.
+
+**CV:** `cv_profile` (сінглтон: name, updated + Mobility на role, years, summary, location,
+languages, education; `contact` jsonb) + `cv_blocks` (kind: `experience` / `stack_group` /
+`strength`, position, payload jsonb, `case_slugs` масивом для чіпів у кейси).
+
+**TeamMember:** name, role, position, photo, socials jsonb, `alumni:bool` + Mobility на bio.
+Alumni — той самий рядок із прапорцем, а не друга модель.
+
+**Імпорт.** Рейк-таска, що читає `config/portfolio/*.yml` і створює записи. Хендоф прямо
+забороняє перевводити цифри руками — імпорт це гарантує. YAML лишається в репо як бекап
+перевіреного контенту.
+
+⚠️ Ціна рішення, зафіксована свідомо: контент кейсів більше не рев'ювиться в дифі PR, і
+кожне поле треба провалідувати у формі. Натомість власник править його з UI без деплою.
+
+---
+
+## 4. Виправлення до Phase 5
+
+### 4.1 Порядок: Bootstrap не можна викидати в W1
+
+W1 каже «викинути Bootstrap». Але адмінка (`namespace :management`, шість в'юх постів + теги
++ статистика) переїжджає на нову тему аж у W5–W7, а `chartkick` у статистиці й
+`bootstrap5-toggle` у формах на ньому висять. Викинути Bootstrap у W1 = зламати адмінку на
+чотири тижні.
+
+**Правильно:** у W1 завести новий шар (токени + шрифти + ViewComponent) **поруч** з
+Bootstrap, тримати два CSS-ентрі, і викидати Bootstrap у W7, коли остання сторінка на ньому
+переїде. Це той самий підхід, який уже працює для `/work`.
+
+### 4.2 Mobility без переписування пошуку
+
+Ризик, який я описував (ламаються три `pg_search_scope`, бо вони йдуть
+`associated_against: { post_translations: … }`), знімається вибором бекенда. У Mobility є
+**Table-бекенд із тією самою схемою, що в Globalize**: окрема таблиця
+`<model>_translations` з `locale` + колонками атрибутів. Ім'я асоціації конфігурується.
+
+Тобто маршрут такий:
+
+1. **W6a — swap без міграції даних.** Globalize → Mobility на Table-бекенді, таблиця
+   `post_translations` лишається як є, ім'я асоціації лишається `post_translations`. Три
+   `pg_search_scope`, `posts_helper`, `Posts::Translator`, `ransackable_associations` і
+   `Post.best` продовжують працювати без правок. Ризик — низький, це заміна гема.
+2. **W6b — опційно, окремо.** Table → JSONB. Ось тут ламається пошук: `associated_against`
+   треба міняти на tsvector по JSONB, плюс індекси. Це самостійна задача з власним тестуванням,
+   і вона не мусить блокувати редизайн.
+
+Точні опції Table-бекенда звірити з докою гема на етапі реалізації — я спираюсь на пам'ять
+про його API, а не на прочитаний код.
+
+### 4.3 Редиректи: таблиця не потрібна
+
+`/courses`, `/posts`, `/about`, `/contacts` у роутах не існує — вони з іншого сайту. Реально
+є `root`, `/search`, `/faq`, `/post/:id`, `namespace :management`, `namespace :api`.
+Модель `Redirect` + Rack middleware перед роутером — це інфраструктура під нуль реальних
+записів.
+
+**Рішення:** редиректи в `routes.rb`, три штуки:
+
+- `/cv` → `/work` (301) — **уже зроблено**.
+- `/?page=N`, `/?tag_ids[]=…` → `/journal` з тими ж параметрами (301). Це єдиний реальний
+  legacy: зараз стрічка статей живе на корені, а редизайн віддає корінь головній.
+- `/post/:id` **лишається канонічним** — FriendlyId history уже тримає старі слаги. Своєї
+  таблиці редіректів для цього не треба, і Phase 5 тут дублював би наявну функціональність.
+
+Модель `Redirect` заводимо тоді, коли зʼявиться друга справжня потреба. Sitemap + RSS із W7
+лишаємо — вони корисні.
+
+### 4.4 CSS: Propshaft + звичайний CSS, без Tailwind
+
+Phase 5 лишає вибір відкритим. Дизайн — не утилітарний: це десяток розкладок із точними
+одноразовими значеннями (`grid-template-columns: 42px minmax(0,1fr) 152px`, `font-size: 14.5px`,
+хайрлайни через `color-mix`). Tailwind тут перетворюється на набір arbitrary-values, тобто
+той самий CSS, але через квадратні дужки. `/work` уже написаний звичайним CSS на токенах і
+працює — лишаємо цей підхід, `sass` тримаємо доки не переїде адмінка (§4.1), далі можна
+знімати.
+
+---
+
+### 4.5 Пайплайн: зняти білд-кроки, лишити чистий Propshaft
+
+Propshaft уже стоїть. Що ще можна зняти — це два білд-кроки навколо нього: `sass` для CSS і
+`esbuild` для JS. Кінцева точка — **Propshaft + importmap, без node узагалі**: нема
+`package.json`, `yarn.lock`, `node_modules`, нема `deploy:yarn_install` у капістрано і `yarn
+install` у CI.
+
+Чому це можливо саме після редизайну, а не зараз:
+
+- **CSS.** `sass` потрібен рівно для Bootstrap. Наш шар — це токени + вкладеність, а вкладеність
+  у CSS уже нативна в усіх цільових браузерах. Тобто після §4.1 (викид Bootstrap) `work.scss`
+  переписується у звичайний `.css` майже механічно.
+- **JS.** Зараз через esbuild їдуть turbo, stimulus, bootstrap-js, tom-select,
+  bootstrap5-toggle, activestorage, tinymce, prism. Після редизайну лишаються turbo, stimulus,
+  `hotwire_combobox`, Trix (їде з гемом `actiontext`), rouge (серверний). Усе це доступне через
+  importmap без npm — саме така дефолтна конфігурація Rails 8.
+- **Шрифти.** Самохостинг трьох родин лягає на Propshaft напряму (`app/assets/fonts` +
+  `font_path`) — механізм у репо вже є, там лежить Gilroy старої теми.
+
+Порядок: W7 (разом із викидом Bootstrap) — CSS без sass; після W3, коли TinyMCE зникне —
+importmap замість esbuild. Обидва кроки роблять пайплайн простішим, але жоден не можна робити
+раніше, ніж піде його причина.
+
+## 5. Gemfile
+
+**Прибрати:** `bootstrap`, `bootstrap-icons`, `@fortawesome` (→ інлайн SVG), `globalize`
+(→ `mobility`), `sass`/`cssbundling-rails` + `jsbundling-rails` + `capistrano-yarn` (після §4.1 і §4.5).
+**Замінити:** `tom-select` → `hotwire_combobox`; `sidekiq` + `redis` → Solid Queue;
+`tinymce-rails` → Action Text + Active Storage.
+**Лишити:** `carrierwave` (на Active Storage тільки якщо потрібні варіанти + direct uploads),
+`pundit`, `pg_search`, `friendly_id`, `pagy`, `ahoy`, `chartkick`.
+**Додати:** `view_component`, `lookbook`, `solid_cache`, `solid_cable`, `rack-attack`,
+`importmap-rails` (§4.5).
+
+---
+
+## 6. Роадмап
+
+| Тиждень | Робота | Ризик |
+| --- | --- | --- |
+| **W1** | Токени, самохостинг трьох шрифтів, ViewComponent + Lookbook, новий CSS-ентрі **поруч** із Bootstrap. Перенести наявні партіали `/work` у компоненти | low |
+| **W2** | Лейаут, навбар з активним фасетом, рубін як компонент (Stimulus + SVG): `RubyHero` за курсором і скролом, `RubyAnchor`, плаваючий нагору, гілка `prefers-reduced-motion` | low |
+| **W3** | Журнал: `/journal` індекс + фільтр тегами + `new/best`, сторінка поста (760px). Action Text: міграція `description` обома мовами, переписаний `Posts::Translator`, два pg_search-скоупи, attachables для code/embed/callout, slash-команди | **high** |
+| **W4** | `Case` модель + імпорт із YAML + форма в адмінці; `/work` і кейс переводяться з `Portfolio` на модель | med |
+| **W5** | `/studio` + `TeamMember` CRUD; `CVBlock` + інлайн-редагування (save-on-blur через Turbo Streams) | med |
+| **W6a** | Globalize → Mobility на Table-бекенді, без міграції даних (§4.2) | low |
+| **W6b** | *(опційно, окремо)* Table → JSONB + переписування трьох pg_search-скоупів | high |
+| **W7** | Головна сторінка, `/contact`, `/faq` на новій темі, адмінка, викид Bootstrap → CSS без sass, esbuild → importmap, зняття node/yarn з CI і деплою (§4.5), sitemap + RSS, редиректи §4.3 | low |
+| **W8** | Мобільний прохід, Lighthouse, a11y, rack-attack, опційно passkeys для `/management` | low |
+
+Головна поїхала з W5 у W7 свідомо: її копірайт під A+B ще не написаний, а вона перша
+сторінка сайту — краще робити її, коли решта системи вже стоїть.
+
+---
+
+## 7. Потрібно від власника
+
+- **Команда:** ім'я, роль, біо, фото, соцпосилання. Alumni окремим списком. Без цього
+  `/studio` не стартує — хендоф забороняє плейсхолдерних людей.
+- **Авторство статей:** чи в усіх постів правильний `post.user`.
+- **Копірайт героя** на головній під A+B (і «я», і «студія») — хендоф давав варіанти лише під
+  чистий Option A.
+- **«Not-work»:** підтвердити п'ять пунктів.
+- **`#042`** у журналі: рекомендую прибрати (нема в моделі, по індексу рядка не можна через
+  пагінацію).
+- **Статуси в адмінці:** 4 пілюльки дизайну проти `active/inactive` — мапити чи міграція.
+- **`similar_posts`:** блок «related» у кінці статті чи скоуп лишається невикористаним.
+
+---
+
+## 8. Чеклист перед релізом (з Phase 5, без змін)
+
+A11y: усе доступне Tab, рубін `aria-hidden`, `<button>` для кнопок, reduced-motion — рубін
+робить пів-оберту й спиняється. Перформанс: самохостинг шрифтів, критичний CSS інлайном,
+lazy-load обкладинок. Безпека: rack-attack, CSP, ревалідація content-type, макс 5 МБ.
+Редакційне: краще тиша, ніж філер; uk + en писати разом, не публікувати одне без іншого.
+
+---
+
+## 9. Ризики
+
+1. **`/` перестає бути стрічкою** — єдине місце, де редизайн торкається наявного SEO (§4.3).
+2. **W3 став найризикованішим тижнем, а не W6.** Action Text одночасно міняє сховище тіла
+   статті, AI-переклад, пошук і аплоадери. Міграцію контенту робити на копії бази з
+   перевіркою парності uk/en до і після.
+3. **Форма кейса** — найскладніший екран адмінки навіть із JSONB-підходом (§3).
+4. **Instrument Serif не має кирилиці** — вирішено: українські сторінки беруть EB Garamond
+   цілком, правило діє на всі нові сторінки.
+5. **`sector`/`status` у `cases.yml` англійською** — лишили свідомо; при переїзді в модель
+   вони стають неперекладними колонками.

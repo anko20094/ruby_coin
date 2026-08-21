@@ -2,7 +2,7 @@
 
 .wk-index
   header.wk-index__header
-    .wk-eyebrow= "/#{t('work.index.eyebrow')}"
+    .rc-eyebrow= "/#{t('work.index.eyebrow')}"
     h1.wk-index__title
       = t('work.index.title')
       = ' '
@@ -14,12 +14,12 @@
       p.wk-index__summary= t_field(@cv['summary'])
 
       section.wk-index__section.wk-index__section--projects
-        = render 'work/track_tag', label: t('work.index.tracks.projects'), tone: 'ruby', heading: :h2
+        = render TrackTagComponent.new(label: t('work.index.tracks.projects'), tone: :ruby, heading: :h2)
         p.wk-index__lede= t('work.index.lede')
         = render 'work/project_rows', cases: @cases
 
       section.wk-index__section.wk-index__section--career
-        = render 'work/track_tag', label: t('work.index.tracks.career'), tone: 'soft', heading: :h2
+        = render TrackTagComponent.new(label: t('work.index.tracks.career'), tone: :soft, heading: :h2)
         .wk-career
           - @cv['experience'].each do |entry|
             .wk-career__entry
@@ -40,19 +40,19 @@
                   - entry['cases'].each do |slug|
                     - kase = Portfolio.find(slug)
                     - next if kase.nil?
-                    = link_to work_case_path(slug: slug), class: 'wk-chip wk-chip--link hover-link' do
+                    = link_to work_case_path(slug: slug), class: 'rc-chip rc-chip--link hover-link' do
                       = "#{kase['mark']} #{t_field(kase['title'])} "
                       span aria-hidden="true" →
 
       section.wk-index__section.wk-index__section--stack
-        = render 'work/track_tag', label: t('work.index.tracks.stack'), tone: 'soft', heading: :h2
+        = render TrackTagComponent.new(label: t('work.index.tracks.stack'), tone: :soft, heading: :h2)
         .wk-stack
           - @cv['stacks'].each do |group|
             .wk-stack__group
               .wk-stack__label= t_field(group['label'])
-              .wk-chips
+              .rc-chips
                 - group['items'].each do |item|
-                  span.wk-chip= item
+                  span.rc-chip= item
         .wk-strengths
           - @cv['strengths'].each do |strength|
             .wk-strengths__item= t_field(strength)

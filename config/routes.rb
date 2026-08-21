@@ -2,6 +2,7 @@
 
 Rails.application.routes.draw do
   mount ActionCable.server, at: '/cable'
+  mount Lookbook::Engine, at: '/lookbook' if Rails.env.development?
 
   scope '/(:locale)', locale: /uk|en/ do
     devise_for :users, controllers: {

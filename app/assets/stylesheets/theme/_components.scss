@@ -1,6 +1,6 @@
 // The track tag — the device that separates the two registers on a case page,
 // and labels the sections of the index. Colour is passed in by tone.
-.wk-track {
+.rc-track {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -15,24 +15,24 @@
 }
 
 // The label may be an h2 on the index; keep the type from the container.
-.wk-track__label {
+.rc-track__label {
   font: inherit;
   margin: 0;
 }
 
-.wk-track__rule {
+.rc-track__rule {
   flex: 1;
   height: 1px;
   background: color-mix(in oklab, var(--ink-mute) 40%, transparent);
 }
 
-.wk-chips {
+.rc-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.wk-chip {
+.rc-chip {
   font-family: var(--font-mono);
   font-size: 11.5px;
   padding: 4px 10px;

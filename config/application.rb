@@ -26,5 +26,9 @@ module RubyCoin
       g.test_framework :rspec
       g.fixture_replacement :factory_bot, dir: 'spec/factories'
     end
+    # Component previews live beside the specs, not in the test/ tree the app
+    # does not have.
+    config.view_component.previews.paths = [Rails.root.join('spec', 'components', 'previews').to_s]
+    config.view_component.previews.default_layout = 'component_preview'
   end
 end

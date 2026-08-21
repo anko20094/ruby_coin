@@ -1,0 +1,12 @@
+nav.rc-nav
+  = link_to helpers.root_path, class: 'rc-nav__brand' do
+    = render GemComponent.new(uid: 'nav')
+    span.rc-nav__wordmark rubyco.in
+
+  .rc-nav__sections
+    - sections.each do |section|
+      = link_to section.label, section.path, class: "rc-nav__link #{'is-current' if current?(section)}"
+
+  .rc-nav__locales
+    - locales.each do |locale|
+      = link_to locale.upcase, helpers.url_for(locale: locale), class: "rc-nav__locale #{'is-current' if current_locale?(locale)}"
