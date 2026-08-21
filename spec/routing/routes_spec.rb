@@ -21,6 +21,18 @@ RSpec.describe 'Routes' do
     end
   end
 
+  describe 'GET /work' do
+    it 'routes to work#index' do
+      expect(get: '/work').to route_to('work#index')
+    end
+  end
+
+  describe 'GET /work/:slug' do
+    it 'routes to work#show' do
+      expect(get: '/work/dna').to route_to('work#show', slug: 'dna')
+    end
+  end
+
   describe 'GET /post/1' do
     it 'routes to home#show' do
       expect(get: '/post/1').to route_to('home#show', id: '1')

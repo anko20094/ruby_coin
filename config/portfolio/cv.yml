@@ -1,0 +1,132 @@
+# RubyCoin · /work CV frame
+# Source of truth: uploads/CV_full_new.pdf (read 2026-08-18).
+# `experience[].cases` holds slugs from cases.yml — render them as links to the case pages.
+cv:
+  name: "Danyil Shkoropad"
+  nameUk: "Данило Шкоропад"
+  role:
+    en: "Senior Ruby on Rails Engineer"
+    uk: "Senior Ruby on Rails Engineer"
+  years:
+    en: "6+ years in production"
+    uk: "6+ років у продакшні"
+  updated: "2026·08·18"
+  summary:
+    en: "Six years of Rails in production. Three and a half of them on a US proptech platform — entity resolution, ETL and PostgreSQL at 100M-row scale. In parallel, five products of my own: 3M+ users, paying customers, run single-handed."
+    uk: "Шість років Rails у продакшні. Три з половиною з них — на американській proptech-платформі: entity resolution, ETL і PostgreSQL на масштабі 100 млн рядків. Паралельно — п’ять власних продуктів: 3+ млн користувачів, платні клієнти, веду сам."
+  contact:
+    - - "email"
+      - "anko20094@gmail.com"
+      - "mailto:anko20094@gmail.com"
+    - - "telegram"
+      - "@anko20094"
+      - "https://t.me/anko20094"
+    - - "github"
+      - "github.com/anko20094"
+      - "https://github.com/anko20094"
+    - - "linkedin"
+      - "linkedin.com/in/danyils"
+      - "https://linkedin.com/in/danyils"
+  location:
+    en: "Ukraine · remote"
+    uk: "Україна · віддалено"
+  languages:
+    en: "Ukrainian native · English B2/C1"
+    uk: "Українська — рідна · англійська — B2/C1"
+  education:
+    en: "MSc Computer Science Engineering · Lviv Polytechnic National University · 2021"
+    uk: "MSc Computer Science Engineering · Національний університет «Львівська політехніка» · 2021"
+  experience:
+    - period: "2022 — 2026"
+      org: "myHomeIQ"
+      title:
+        en: "Senior Backend Engineer (Ruby on Rails)"
+        uk: "Senior Backend Engineer (Ruby on Rails)"
+      place:
+        en: "USA · remote"
+        uk: "США · віддалено"
+      note:
+        en: "Two services, overlapping: Leads API (Nov 2022 — Oct 2025) and Intelligence API (May 2023 — Feb 2026)."
+        uk: "Два сервіси, що перетинались: Leads API (лист. 2022 — жовт. 2025) та Intelligence API (трав. 2023 — лют. 2026)."
+      body:
+        en: "On <b>Intelligence</b>: #2 of 15 contributors — entity resolution across dozens of dirty sources, embeddings on pgvector, the Zebra ETL pipeline, RANGE partitioning of the largest tables and read/write splitting in production traffic. On <b>Leads</b>: owned Stripe billing and access control on an eight-year, 486-operation API, plus both sides of the integration between the two services."
+        uk: "На <b>Intelligence</b>: #2 з 15 контриб’юторів — entity resolution по десятках брудних джерел, embeddings на pgvector, ETL-пайплайн Zebra, RANGE-партиціювання найбільших таблиць і розведення читання/запису в продовому трафіку. На <b>Leads</b>: володів біллінгом Stripe і контролем доступу на восьмирічному API з 486 операцій, плюс обидві сторони інтеграції між сервісами."
+      cases:
+        - "intelligence"
+        - "leads"
+    - period: "2022 — now"
+      org:
+        en: "Own products"
+        uk: "Власні продукти"
+      title:
+        en: "Tech lead · architect · devops"
+        uk: "Tech lead · архітектор · devops"
+      place:
+        en: "built from zero · teams up to 14"
+        uk: "з нуля · команди до 14"
+      note:
+        en: "Five products, all still running: DNA, WardyBot, ChatGPT Bot, ImageMaker, RubyCoin."
+        uk: "П’ять продуктів, усі досі працюють: DNA, WardyBot, ChatGPT Bot, ImageMaker, RubyCoin."
+      body:
+        en: "Architecture, product, hiring and production for all five — 3M+ users combined, 10,418 paying customers on DNA, 15,000 paid orders on the AI bot. I made the first commit on each and own the deploys."
+        uk: "Архітектура, продукт, найм і продакшн у всіх п’яти — 3+ млн користувачів разом, 10 418 платних клієнтів у DNA, 15 000 оплат в AI-боті. Перший коміт у кожному — мій, деплої теж."
+      cases:
+        - "dna"
+        - "wardybot"
+        - "chatgpt"
+        - "imagemaker"
+        - "rubycoin"
+    - period: "2021 — 2022"
+      org: "SoftServe"
+      title:
+        en: "Ruby on Rails Engineer"
+        uk: "Ruby on Rails Engineer"
+      place:
+        en: "Lviv, Ukraine"
+        uk: "Львів, Україна"
+    - period: "2017 — 2021"
+      org:
+        en: "Freelance & startups"
+        uk: "Фриланс і стартапи"
+      title:
+        en: "Ruby on Rails Developer"
+        uk: "Ruby on Rails Developer"
+      place:
+        en: "Upwork and direct clients"
+        uk: "Upwork і прямі клієнти"
+  stacks:
+    - label:
+        en: "core stack"
+        uk: "основний стек"
+      items:
+        - "Ruby on Rails"
+        - "PostgreSQL"
+        - "partitioning"
+        - "pgvector"
+        - "Sidekiq"
+        - "RabbitMQ"
+        - "Redis"
+        - "OpenSearch"
+        - "RSpec"
+        - "Docker"
+        - "GitHub Actions"
+    - label:
+        en: "ai engineering"
+        uk: "ai-інженерія"
+      items:
+        - "Claude"
+        - "OpenAI"
+        - "Gemini"
+        - "OpenRouter"
+        - "embeddings & RAG on pgvector"
+        - "cascading model fallback"
+        - "cost-based token billing"
+  strengths:
+    - en: "Systems at 100M-row scale"
+      uk: "Системи на масштабі 100 млн рядків"
+    - en: "Owning a product from architecture to production"
+      uk: "Продукт від архітектури до продакшну"
+    - en: "Leading small teams and the process around them"
+      uk: "Малі команди й процес навколо них"
+    - en: "AI features that are deterministic and cheap enough to ship"
+      uk: "AI-фічі, детерміновані й дешеві настільки, щоб їх випустити"

@@ -1,0 +1,14 @@
+nav.wk-nav
+  = link_to root_path, class: 'wk-nav__brand' do
+    = render 'work/gem', uid: 'nav'
+    span.wk-nav__wordmark rubyco.in
+
+  .wk-nav__sections
+    = link_to t('work.nav.journal'), root_path, class: 'wk-nav__link'
+    = link_to t('work.nav.work'), work_path, class: 'wk-nav__link is-current'
+    = link_to t('work.nav.studio'), studio_path, class: 'wk-nav__link'
+    = link_to t('work.nav.contact'), contact_path, class: 'wk-nav__link'
+
+  .wk-nav__locales
+    - I18nExtended::AVAILABLE_LOCALES.each do |locale|
+      = link_to locale.upcase, url_for(locale: locale), class: "wk-nav__locale #{'is-current' if I18n.locale.to_s == locale}"

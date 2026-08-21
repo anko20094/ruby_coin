@@ -12,6 +12,16 @@ Rails.application.routes.draw do
     root 'home#index'
     get '/search', to: 'home#search'
     get '/faq', to: 'faq#index'
+
+    # /work — portfolio section. The index doubles as the CV, so /cv is gone.
+    get '/work', to: 'work#index', as: 'work'
+    get '/work/:slug', to: 'work#show', as: 'work_case'
+    work = ->(params) { params[:locale].present? ? "/#{params[:locale]}/work" : '/work' }
+    get '/cv', to: redirect(status: 301) { |params, _request| work.call(params) }
+
+    # The redesigned nav carries four sections; these two are not built yet.
+    get '/studio', to: redirect { |params, _request| work.call(params) }, as: 'studio'
+    get '/contact', to: redirect { |params, _request| "#{work.call(params)}#contact" }, as: 'contact'
     get '/post/:id', to: 'home#show', as: 'post'
     get 'set_locale', to: 'application#set_locale'
 

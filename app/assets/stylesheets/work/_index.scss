@@ -1,0 +1,307 @@
+.wk-index {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 56px var(--page-pad) 20px;
+}
+
+.wk-index__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 78px;
+  margin: 6px 0 0;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  max-width: 15ch;
+}
+
+.wk-index__mark {
+  color: var(--ruby);
+  font-style: italic;
+}
+
+.wk-index__identity {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 12px;
+}
+
+.wk-index__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 40px;
+  align-items: start;
+  margin-top: 34px;
+}
+
+.wk-index__main { min-width: 0; }
+
+.wk-index__summary {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 25px;
+  line-height: 1.34;
+  max-width: 54ch;
+}
+
+.wk-index__section {
+  &--projects { margin-top: 26px; }
+  &--career { margin-top: 44px; }
+  &--stack { margin-top: 40px; }
+}
+
+.wk-index__lede {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin: 12px 0 18px;
+  max-width: 640px;
+  line-height: 1.55;
+}
+
+// ── the seven project rows ──────────────────────────────────
+.wk-rows { border-top: var(--rule-strong); }
+
+.wk-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 152px;
+  gap: 18px;
+  align-items: start;
+  padding: 20px 8px;
+  border-bottom: var(--rule-row);
+}
+
+.wk-row__mark {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ruby);
+  font-style: italic;
+  padding-top: 8px;
+}
+
+.wk-row__body { min-width: 0; }
+
+.wk-row__titles {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.wk-row__title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.24;
+}
+
+.wk-row__own {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ruby);
+  letter-spacing: 1px;
+  border: 1px solid color-mix(in oklab, var(--ruby) 27%, transparent);
+  border-radius: var(--radius-chip-sm);
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
+.wk-row__here {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.wk-row__tagline {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  margin-top: 5px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.wk-row__meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-mute);
+  margin-top: 7px;
+}
+
+.wk-row__metric {
+  min-width: 0;
+  text-align: right;
+}
+
+.wk-row__metric-value {
+  font-size: 21px;
+  line-height: 1.1;
+}
+
+.wk-row__metric-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-mute);
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+// ── career ─────────────────────────────────────────────────
+.wk-career { margin-top: 16px; }
+
+.wk-career__entry {
+  padding: 16px 0;
+  border-top: var(--rule-entry);
+}
+
+.wk-career__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: baseline;
+}
+
+.wk-career__org {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.wk-career__title {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.wk-career__when {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-align: right;
+  line-height: 1.5;
+}
+
+.wk-career__note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 6px;
+}
+
+.wk-career__body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+  line-height: 1.6;
+  max-width: 70ch;
+}
+
+.wk-career__cases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+// ── stack + strengths ──────────────────────────────────────
+.wk-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.wk-stack__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 7px;
+}
+
+.wk-strengths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.wk-strengths__item {
+  border-top: var(--rule-strong);
+  padding-top: 9px;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+// ── sticky sidebar ─────────────────────────────────────────
+.wk-index__aside {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wk-portrait {
+  width: 280px;
+  height: 280px;
+  border: var(--rule-strong);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.wk-contact {
+  border: var(--rule-strong);
+  border-top: 2px solid var(--ruby);
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.85;
+}
+
+.wk-contact__label {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-top: 10px;
+
+  &.is-ruby {
+    color: var(--ruby);
+    margin-top: 0;
+  }
+}
+
+.wk-contact__row + .wk-contact__label { margin-top: 12px; }
+
+.wk-contact__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.wk-contact__key { color: var(--ink-mute); }
+
+.wk-contact__value {
+  color: var(--ink);
+  border-bottom: 1px solid var(--ink-mute);
+}
+
+.wk-index__footnote {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-mute);
+  line-height: 1.65;
+}

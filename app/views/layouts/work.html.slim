@@ -1,0 +1,23 @@
+doctype html
+html lang=I18n.locale
+  head
+    meta charset="utf-8"
+    = favicon_link_tag asset_path('favicon.ico')
+    title
+      = content_for?(:title) ? yield(:title) : 'RubyCoin'
+
+    meta[name="viewport" content="width=device-width,initial-scale=1"]
+    = csrf_meta_tags
+    = csp_meta_tag
+    link rel="preconnect" href="https://fonts.googleapis.com"
+    link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""
+    / Instrument Serif covers Latin only, so Ukrainian headlines fall back to
+    / EB Garamond — loaded here so that fallback is deliberate, not Georgia.
+    link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=EB+Garamond:ital@0;1&family=Geist:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+    = stylesheet_link_tag 'work', media: 'all'
+
+  body.wk
+    = render 'work/nav'
+    main.wk-main.page-in
+      = yield
+    = render 'work/footer'

@@ -1,0 +1,123 @@
+.wk-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px var(--page-pad);
+  font-family: var(--font-body);
+  background: color-mix(in oklab, var(--paper) 93%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid color-mix(in oklab, var(--ink-mute) 20%, transparent);
+}
+
+.wk-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .rc-gem {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.wk-nav__wordmark {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.wk-nav__sections {
+  display: flex;
+  gap: 26px;
+  font-size: 14px;
+}
+
+.wk-nav__link {
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.18s, border-color 0.18s;
+
+  &:hover { color: var(--ruby); }
+
+  &.is-current {
+    color: var(--ruby);
+    border-bottom-color: var(--ruby);
+  }
+}
+
+.wk-nav__locales {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.wk-nav__locale {
+  padding: 4px 8px;
+  border-radius: var(--radius-chip);
+  color: var(--ink-soft);
+  transition: color 0.18s, background 0.18s;
+
+  &:hover { color: var(--ruby); }
+
+  &.is-current {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
+
+.wk-footer {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 32px;
+  align-items: flex-end;
+  margin-top: 60px;
+  padding: 48px var(--page-pad) 32px;
+  border-top: 1px solid color-mix(in oklab, var(--ink-mute) 33%, transparent);
+}
+
+.wk-footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  .rc-gem {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.wk-footer__wordmark {
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.wk-footer__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.8;
+}
+
+.wk-footer__sections {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.wk-footer__contacts {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-align: right;
+  line-height: 1.8;
+}

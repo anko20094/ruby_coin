@@ -1,0 +1,132 @@
+// The design is specified for ≥1100px. Everything below is a first pass and
+// wants the owner's review — see the handoff's "Responsive" section.
+
+// ≤1100px — the index drops its sticky sidebar to a single column.
+// ≤1100px — one column, and the contact panel moves up to sit directly under
+// the projects rather than trailing the whole page.
+@media (max-width: 1100px) {
+  // Row gap goes to zero: the sections carry their own top margins, and both
+  // would otherwise stack.
+  .wk-index__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  // Dissolving the wrapper makes the sections and the panel siblings, which is
+  // what lets `order` interleave them.
+  .wk-index__main { display: contents; }
+
+  .wk-index__summary { order: 1; }
+  .wk-index__section--projects { order: 2; }
+  .wk-index__aside { order: 3; }
+  .wk-index__section--career { order: 4; }
+  .wk-index__section--stack { order: 5; }
+
+  .wk-index__aside {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .wk-contact {
+    flex: 0 1 400px;
+    min-width: 0;
+  }
+
+  .wk-index__footnote { flex: 1 1 100%; }
+
+  .wk-index__title { font-size: 62px; }
+}
+
+// ≤900px — case track 1 becomes one column, project rows lose their
+// metric column, headlines scale down.
+@media (max-width: 900px) {
+  .wk-index,
+  .wk-case__header,
+  .wk-case__plain,
+  .wk-case__strip,
+  .wk-case__pager,
+  .wk-case__band-inner { --page-pad: 22px; }
+
+  .wk-index { padding-top: 36px; }
+
+  .wk-index__title { font-size: 48px; }
+
+  .wk-index__summary { font-size: 22px; }
+
+  .wk-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .wk-row__metric {
+    grid-column: 2;
+    text-align: left;
+    margin-top: 7px;
+  }
+
+  .wk-row__title { font-size: 24px; }
+
+  .wk-career__head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .wk-career__when { text-align: left; }
+
+  .wk-case__header { padding-top: 36px; }
+
+  .wk-case__title,
+  .wk-case__title.is-long { font-size: 40px; }
+
+  .wk-case__tagline { font-size: 21px; }
+
+  .wk-case__columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  .wk-prose { font-size: 17px; }
+
+  .wk-case__heading { font-size: 34px; }
+
+  .wk-case__heading.is-small { font-size: 30px; }
+
+  .wk-cards { grid-template-columns: minmax(0, 1fr); }
+
+  .wk-case__pager-cards { grid-template-columns: minmax(0, 1fr); }
+
+  .wk-pager-card--next { text-align: left; }
+}
+
+// The chrome is three zones on one line; below this it needs to wrap.
+@media (max-width: 760px) {
+  .wk-nav {
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    padding: 12px 22px;
+  }
+
+  .wk-nav__sections {
+    order: 3;
+    flex-basis: 100%;
+    gap: 18px;
+  }
+
+  .wk-footer {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 36px 22px 28px;
+  }
+
+  .wk-footer__sections {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  .wk-footer__contacts { text-align: left; }
+}

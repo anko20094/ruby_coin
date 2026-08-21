@@ -1,0 +1,296 @@
+.wk-case__header {
+  max-width: var(--case-max);
+  margin: 0 auto;
+  padding: 56px var(--page-pad) 26px;
+}
+
+.wk-case__breadcrumb {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+}
+
+.wk-case__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 96px;
+  margin: 12px 0 0;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+
+  // Longer localised titles drop a step so they don't wrap badly.
+  &.is-long { font-size: 66px; }
+}
+
+.wk-case__title-mark {
+  color: var(--ruby);
+  font-style: italic;
+  font-size: 0.5em;
+}
+
+.wk-case__tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 25px;
+  color: var(--ink-soft);
+  line-height: 1.32;
+  margin: 14px 0 0;
+  max-width: 800px;
+  text-wrap: pretty;
+}
+
+.wk-case__role {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  margin-top: 16px;
+  letter-spacing: 0.3px;
+}
+
+.wk-case__strip,
+.wk-case__pager {
+  max-width: var(--case-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+}
+
+// ── track 1: in plain words ────────────────────────────────
+.wk-case__plain {
+  max-width: var(--case-max);
+  margin: 0 auto;
+  padding: 48px var(--page-pad) 8px;
+}
+
+.wk-case__heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 46px;
+  margin: 16px 0 0;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  max-width: 900px;
+  text-wrap: balance;
+
+  &.is-small {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+}
+
+.wk-case__columns {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 40px;
+  align-items: start;
+  margin-top: 26px;
+}
+
+.wk-prose {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.65;
+  max-width: 68ch;
+}
+
+.wk-case__panels {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wk-panel {
+  &--mine {
+    border: var(--rule-strong);
+    border-top: 2px solid var(--ruby);
+    border-radius: var(--radius-card);
+    padding: 18px 20px 20px;
+  }
+
+  &--facts {
+    border: var(--rule-row);
+    border-radius: var(--radius-card);
+    padding: 16px 18px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+
+    .wk-chips { gap: 5px; }
+  }
+}
+
+.wk-panel__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+
+  &.is-ruby { color: var(--ruby); }
+}
+
+.wk-panel--facts .wk-panel__label {
+  margin-bottom: 6px;
+}
+
+.wk-panel--facts div + .wk-panel__label { margin-top: 10px; }
+
+// The markers are 8×1px ruby bars, not bullet glyphs.
+.wk-mine {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin-top: 12px;
+}
+
+.wk-mine__item {
+  position: relative;
+  padding-left: 16px;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.55;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 8px;
+    height: 1px;
+    background: var(--ruby);
+  }
+}
+
+// ── track 2: for engineers ─────────────────────────────────
+// The colour change is the only signal that the register changed.
+.wk-case__band {
+  background: var(--paper-warm);
+  margin-top: 48px;
+  padding: 48px 0 52px;
+}
+
+.wk-case__band-inner {
+  max-width: var(--case-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+}
+
+.wk-case__sub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: 10px 0 0;
+  max-width: 760px;
+  line-height: 1.6;
+}
+
+.wk-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.wk-card {
+  background: var(--paper);
+  border: var(--rule-row);
+  border-radius: var(--radius-card);
+  padding: 18px 20px 20px;
+}
+
+.wk-card__title {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ruby);
+}
+
+.wk-card__body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  margin-top: 9px;
+}
+
+.wk-quality {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  margin-top: 26px;
+  border-top: var(--rule-row);
+  border-left: var(--rule-row);
+}
+
+.wk-quality__cell {
+  padding: 13px 15px;
+  border-right: var(--rule-row);
+  border-bottom: var(--rule-row);
+}
+
+.wk-quality__value {
+  font-size: 17px;
+  color: var(--ruby);
+}
+
+.wk-quality__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+// Every case ends with an honest statement of limits.
+.wk-case__scope {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-top: 22px;
+  max-width: 900px;
+}
+
+// ── prev / next ────────────────────────────────────────────
+.wk-case__pager-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: var(--ink-mute);
+  padding: 24px 0 14px;
+}
+
+.wk-case__pager-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-bottom: 12px;
+}
+
+.wk-pager-card {
+  display: block;
+  border: var(--rule-row);
+  border-radius: var(--radius-card);
+  padding: 16px;
+
+  &--next { text-align: right; }
+}
+
+.wk-pager-card__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+}
+
+.wk-pager-card__title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  margin-top: 4px;
+}

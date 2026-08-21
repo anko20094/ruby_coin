@@ -1,0 +1,50 @@
+/ Static ruby, baked from the Phase 3 gem geometry: pointed-top hexagon (outer r46,
+/ table r22), six kite crown facets shaded for a fixed light at (30, 18).
+<svg class="rc-gem" viewBox="-6 -6 112 112" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="rc-gem-table-#{uid}" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="oklch(43.6% 0.182 17.2)"/>
+      <stop offset="60%" stop-color="oklch(32.0% 0.142 18.3)"/>
+      <stop offset="100%" stop-color="oklch(14.8% 0.083 19.9)"/>
+    </radialGradient>
+    <linearGradient id="rc-gem-f0-#{uid}" gradientUnits="userSpaceOnUse" x1="20.51" y1="44.48" x2="79.49" y2="55.52">
+      <stop offset="0%" stop-color="oklch(41.2% 0.174 17.4)"/>
+      <stop offset="60%" stop-color="oklch(29.7% 0.134 18.5)"/>
+      <stop offset="100%" stop-color="oklch(15.6% 0.086 19.8)"/>
+    </linearGradient>
+    <linearGradient id="rc-gem-f1-#{uid}" gradientUnits="userSpaceOnUse" x1="24.81" y1="33.7" x2="75.19" y2="66.3">
+      <stop offset="0%" stop-color="oklch(27.1% 0.125 18.8)"/>
+      <stop offset="60%" stop-color="oklch(15.6% 0.086 19.8)"/>
+      <stop offset="100%" stop-color="oklch(14.0% 0.080 20.0)"/>
+    </linearGradient>
+    <linearGradient id="rc-gem-f2-#{uid}" gradientUnits="userSpaceOnUse" x1="34.49" y1="24.32" x2="65.51" y2="75.68">
+      <stop offset="0%" stop-color="oklch(25.6% 0.120 18.9)"/>
+      <stop offset="60%" stop-color="oklch(14.1% 0.080 20.0)"/>
+      <stop offset="100%" stop-color="oklch(14.0% 0.080 20.0)"/>
+    </linearGradient>
+    <linearGradient id="rc-gem-f3-#{uid}" gradientUnits="userSpaceOnUse" x1="47.26" y1="20.13" x2="52.74" y2="79.87">
+      <stop offset="0%" stop-color="oklch(27.5% 0.126 18.7)"/>
+      <stop offset="60%" stop-color="oklch(16.0% 0.087 19.8)"/>
+      <stop offset="100%" stop-color="oklch(14.0% 0.080 20.0)"/>
+    </linearGradient>
+    <linearGradient id="rc-gem-f4-#{uid}" gradientUnits="userSpaceOnUse" x1="58.49" y1="21.23" x2="41.51" y2="78.77">
+      <stop offset="0%" stop-color="oklch(43.1% 0.180 17.3)"/>
+      <stop offset="60%" stop-color="oklch(31.5% 0.140 18.4)"/>
+      <stop offset="100%" stop-color="oklch(17.5% 0.092 19.7)"/>
+    </linearGradient>
+    <linearGradient id="rc-gem-f5-#{uid}" gradientUnits="userSpaceOnUse" x1="31.09" y1="26.71" x2="68.91" y2="73.29">
+      <stop offset="0%" stop-color="oklch(75.1% 0.290 14.3)"/>
+      <stop offset="60%" stop-color="oklch(63.6% 0.251 15.3)"/>
+      <stop offset="100%" stop-color="oklch(49.5% 0.202 16.7)"/>
+    </linearGradient>
+  </defs>
+  <polygon points="50,4 89.84,27 69.05,39 50,28" fill="url(#rc-gem-f0-#{uid})"/>
+  <polygon points="89.84,27 89.84,73 69.05,61 69.05,39" fill="url(#rc-gem-f1-#{uid})"/>
+  <polygon points="89.84,73 50,96 50,72 69.05,61" fill="url(#rc-gem-f2-#{uid})"/>
+  <polygon points="50,96 10.16,73 30.95,61 50,72" fill="url(#rc-gem-f3-#{uid})"/>
+  <polygon points="10.16,73 10.16,27 30.95,39 30.95,61" fill="url(#rc-gem-f4-#{uid})"/>
+  <polygon points="10.16,27 50,4 50,28 30.95,39" fill="url(#rc-gem-f5-#{uid})"/>
+  <polygon points="50,28 69.05,39 69.05,61 50,72 30.95,61 30.95,39" fill="url(#rc-gem-table-#{uid})"/>
+  <polygon points="26.49,25.38 40.43,17.33 40.43,25.73 33.76,29.58" fill="oklch(96% 0.05 30)" opacity="0.5" style="mix-blend-mode:screen"/>
+  <polygon points="50,4 89.84,27 89.84,73 50,96 10.16,73 10.16,27" fill="none" stroke="currentColor" stroke-width="0.35" stroke-opacity="0.25" stroke-linejoin="miter"/>
+</svg>

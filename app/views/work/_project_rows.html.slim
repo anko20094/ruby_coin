@@ -1,0 +1,18 @@
+.wk-rows
+  - cases.each do |kase|
+    = link_to work_case_path(slug: kase['slug']), class: 'wk-row hover-row' do
+      span.wk-row__mark= kase['mark']
+      .wk-row__body
+        .wk-row__titles
+          span.wk-row__title= t_field(kase['title'])
+          - if kase['own']
+            span.wk-row__own= t('work.index.own')
+          - if kase['is_this_site']
+            span.wk-row__here
+              span aria-hidden="true" ←
+              = " #{t('work.index.you_are_here')}"
+        .wk-row__tagline= t_field(kase['tagline'])
+        .wk-row__meta= "#{kase['year']} · #{kase['sector']}"
+      .wk-row__metric
+        .wk-row__metric-value.num= kase['metrics'].first['value']
+        .wk-row__metric-label= t_field(kase['metrics'].first['label'])

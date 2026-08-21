@@ -1,0 +1,14 @@
+// /work — the portfolio section, and the first page of the site redesign.
+//
+// Deliberately independent of application.bootstrap.scss: this section runs on
+// its own type and colour system (Instrument Serif / Geist / JetBrains Mono on
+// a warm paper palette) and shares no components with the Bootstrap pages.
+// Built to app/assets/builds/work.css by the `build:css` script.
+
+@use 'work/tokens';
+@use 'work/base';
+@use 'work/components';
+@use 'work/chrome';
+@use 'work/index';
+@use 'work/case';
+@use 'work/responsive';

@@ -269,3 +269,42 @@ uk:
       extension_whitelist_error: "Вам заборонено завантажувати файли %{extension}, дозволені типи: %{allowed_types}"
       extension_blacklist_error: "Вам заборонено завантажувати файли %{extension}, заборонені типи: %{prohibited_types}"
       record_invalid: "Невірно"
+
+  work:
+    nav:
+      journal: журнал
+      work: роботи
+      studio: студія
+      contact: контакти
+    footer:
+      journal: rss
+      work: всі кейси
+      studio: команда
+      contact: привітатися
+    index:
+      eyebrow: роботи · cv
+      title: Що я зробив
+      lede: Два комерційні сервіси, п’ять власних продуктів. Кожна цифра знята з продакшну, git і трекерів — не з пам’яті.
+      own: ВЛАСНИЙ
+      you_are_here: ВИ ТУТ
+      contact: контакти
+      location: локація
+      languages: мови
+      education: освіта
+      figures: цифри
+      both_halves: "Дві половини одного доказу: досвід ліворуч, роботи, які його підтверджують — нижче."
+      tracks:
+        projects: проєкти
+        career: досвід
+        stack: стек
+    case:
+      back: РОБОТИ
+      plain: простими словами
+      mine: що було моїм
+      engineering: для інженерів
+      facts: факти
+      status: статус
+      stack: стек
+      pager: ДАЛІ
+      previous: ПОПЕРЕДНІЙ
+      next: ДАЛІ

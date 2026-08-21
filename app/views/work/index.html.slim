@@ -1,0 +1,78 @@
+- content_for :title, full_title(t('work.index.title'))
+
+.wk-index
+  header.wk-index__header
+    .wk-eyebrow= "/#{t('work.index.eyebrow')}"
+    h1.wk-index__title
+      = t('work.index.title')
+      = ' '
+      span.wk-index__mark ·
+    .wk-index__identity= [@cv['name'], t_field(@cv['role']), t_field(@cv['years'])].join(' · ')
+
+  .wk-index__grid
+    .wk-index__main
+      p.wk-index__summary= t_field(@cv['summary'])
+
+      section.wk-index__section.wk-index__section--projects
+        = render 'work/track_tag', label: t('work.index.tracks.projects'), tone: 'ruby', heading: :h2
+        p.wk-index__lede= t('work.index.lede')
+        = render 'work/project_rows', cases: @cases
+
+      section.wk-index__section.wk-index__section--career
+        = render 'work/track_tag', label: t('work.index.tracks.career'), tone: 'soft', heading: :h2
+        .wk-career
+          - @cv['experience'].each do |entry|
+            .wk-career__entry
+              .wk-career__head
+                .wk-career__org
+                  = t_field(entry['org'])
+                  span.wk-career__title= " · #{t_field(entry['title'])}"
+                .wk-career__when
+                  = entry['period']
+                  br
+                  = t_field(entry['place'])
+              - if entry['note'].present?
+                .wk-career__note= t_field(entry['note'])
+              - if entry['body'].present?
+                .wk-career__body= rich(entry['body'])
+              - if entry['cases'].present?
+                .wk-career__cases
+                  - entry['cases'].each do |slug|
+                    - kase = Portfolio.find(slug)
+                    - next if kase.nil?
+                    = link_to work_case_path(slug: slug), class: 'wk-chip wk-chip--link hover-link' do
+                      = "#{kase['mark']} #{t_field(kase['title'])} "
+                      span aria-hidden="true" →
+
+      section.wk-index__section.wk-index__section--stack
+        = render 'work/track_tag', label: t('work.index.tracks.stack'), tone: 'soft', heading: :h2
+        .wk-stack
+          - @cv['stacks'].each do |group|
+            .wk-stack__group
+              .wk-stack__label= t_field(group['label'])
+              .wk-chips
+                - group['items'].each do |item|
+                  span.wk-chip= item
+        .wk-strengths
+          - @cv['strengths'].each do |strength|
+            .wk-strengths__item= t_field(strength)
+
+    aside.wk-index__aside
+      - if Portfolio.portrait
+        .wk-portrait= image_tag Portfolio.portrait, alt: I18n.locale == :uk ? @cv['nameUk'] : @cv['name']
+      #contact.wk-contact
+        .wk-contact__label.is-ruby= t('work.index.contact')
+        - @cv['contact'].each do |key, value, href|
+          .wk-contact__row
+            span.wk-contact__key= key
+            = link_to value, href, class: 'wk-contact__value', target: '_blank', rel: 'noreferrer'
+        .wk-contact__label= t('work.index.location')
+        div= t_field(@cv['location'])
+        .wk-contact__label= t('work.index.languages')
+        div= t_field(@cv['languages'])
+        .wk-contact__label= t('work.index.education')
+        div= t_field(@cv['education'])
+      .wk-index__footnote
+        = "#{t('work.index.figures')} · #{@cv['updated']}"
+        br
+        = t('work.index.both_halves')

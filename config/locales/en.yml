@@ -269,3 +269,42 @@ en:
       carrierwave_download_error: "Couldn't download image."
       extension_whitelist_error: "You are not allowed to upload %{extension} files, allowed types: %{allowed_types}"
       extension_blacklist_error: "You are not allowed to upload %{extension} files, prohibited types: %{prohibited_types}"
+
+  work:
+    nav:
+      journal: journal
+      work: work
+      studio: studio
+      contact: contact
+    footer:
+      journal: rss
+      work: all cases
+      studio: the crew
+      contact: say hi
+    index:
+      eyebrow: work · cv
+      title: What I have shipped
+      lede: Two commercial services, five products of my own. Every figure read from production, git and trackers — not from memory.
+      own: OWN
+      you_are_here: YOU ARE HERE
+      contact: contact
+      location: location
+      languages: languages
+      education: education
+      figures: figures
+      both_halves: "Both halves of the same evidence: the career on the left, the work that backs it below."
+      tracks:
+        projects: the projects
+        career: career
+        stack: stack
+    case:
+      back: WORK
+      plain: in plain words
+      mine: what was mine
+      engineering: for engineers
+      facts: facts
+      status: status
+      stack: stack
+      pager: NEXT
+      previous: PREVIOUS
+      next: NEXT
