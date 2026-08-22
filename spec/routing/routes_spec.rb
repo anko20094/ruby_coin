@@ -33,9 +33,15 @@ RSpec.describe 'Routes' do
     end
   end
 
+  describe 'GET /journal' do
+    it 'routes to journal#index' do
+      expect(get: '/journal').to route_to('journal#index')
+    end
+  end
+
   describe 'GET /post/1' do
-    it 'routes to home#show' do
-      expect(get: '/post/1').to route_to('home#show', id: '1')
+    it 'routes to journal#show' do
+      expect(get: '/post/1').to route_to('journal#show', id: '1')
     end
   end
 

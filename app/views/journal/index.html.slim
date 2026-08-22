@@ -1,0 +1,43 @@
+- content_for :title, full_title(t('journal.index.title'))
+
+.jn-index
+  header.jn-index__header
+    .jn-index__intro
+      .rc-eyebrow
+        = "/#{t('journal.index.eyebrow')} · #{t('journal.index.entries', count: @entries_count)}"
+      h1.jn-index__title
+        = t('journal.index.title')
+        = ' '
+        span.jn-index__mark ·
+      p.jn-index__lede= t('journal.index.lede')
+    .jn-index__anchor
+      = render GemComponent.new(uid: 'journal-anchor', variant: :anchor, size: 90)
+
+  nav.jn-filter aria-label=t('journal.index.filter')
+    span.jn-filter__label= "#{t('journal.index.filter')} ·"
+    .rc-chips
+      = link_to t('journal.index.all'), journal_path(order: @order), class: journal_chip_class(active: @active_tag.nil?)
+      - @tags.each do |tag|
+        = link_to "##{tag.title}", journal_path(tag_id: tag.id, order: @order),
+          class: journal_chip_class(active: @active_tag == tag)
+
+    span.jn-filter__label.jn-filter__label--order= "#{t('journal.index.order.label')} ·"
+    .rc-chips
+      - Post::ORDER_TYPES.each do |order|
+        = link_to t("journal.index.order.#{order}"), journal_path(order:, tag_id: @active_tag&.id),
+          class: journal_chip_class(active: @order == order)
+
+  - if @posts.any?
+    .jn-entries
+      - @posts.each_with_index do |post, index|
+        = render JournalEntryComponent.new(post:, first: index.zero?)
+
+    - if @pagy.pages > 1
+      nav.jn-pager aria-label=t('journal.index.title')
+        - if @pagy.prev
+          = link_to '←', journal_path(page: @pagy.prev, order: @order, tag_id: @active_tag&.id), class: 'jn-pager__step'
+        span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"
+        - if @pagy.next
+          = link_to '→', journal_path(page: @pagy.next, order: @order, tag_id: @active_tag&.id), class: 'jn-pager__step'
+  - else
+    p.jn-empty= t('journal.index.empty', tag: @active_tag&.title)

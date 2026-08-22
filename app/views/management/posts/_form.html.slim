@@ -39,25 +39,15 @@
           = t('.placeholders.select_image')
       = f.file_field :photo, id: 'add-img', accept: "image/*", class: "btn-main", data: { action: "change->image-preview#addImage" }
 
+    / Bodies are Action Text now: one named rich text per locale, posted directly as
+    / post[description_uk] / post[description_en]. The AI translate button copies the
+    / current locale's editor into the other one client-side.
     .row data-controller="aitranslation" data-aitranslation-locale= I18n.locale
       .d-flex
-        .col.me-5 id="basic-description"
-          = f.label :description, t('.description_label'), class: 'standart-label'
-          = f.text_area :description, class: "tinymce standart-input descr", 
-                  id: 'default-editor', rows: 20, cols: 60, placeholder: t('.placeholders.description'),
-                          data: { aitranslation_target: 'inputContainer' }
-          = tinymce
-
-        - I18n.available_locales.each do |locale|
-          - next if locale == I18n.locale
-
-          .col id="localized_description"
-            = f.label :description_localizations, "#{t(".description_label")} (#{t(locale).downcase})", class: 'standart-label', for: "description_#{locale}"
-            = f.text_area "description_localizations][#{locale}", class: "tinymce standart-input descr", 
-                    id: "default-editor", rows: 20, cols: 60,
-                            data: { locale: locale.to_s },
-                                    value: current_data(@post, 'description', locale), placeholder: t('.placeholders.description')
-            = tinymce
+        - ([I18n.locale] + (I18n.available_locales - [I18n.locale])).each do |locale|
+          .col class=(locale == I18n.locale ? 'me-5' : nil)
+            = f.label Post::RICH_TEXT_BODIES.fetch(locale), "#{t('.description_label')} (#{t(locale).downcase})", class: 'standart-label'
+            = f.rich_text_area Post::RICH_TEXT_BODIES.fetch(locale), class: 'standart-input descr'
       .d-flex.justify-content-center.mt-2
         = link_to t('.translation_button'), "javascript:void(0)", data: { action: 'click->aitranslation#fetchData' }, id: 'translation-button', class: 'btn main-btn'
     .form-inner

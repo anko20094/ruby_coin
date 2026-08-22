@@ -422,7 +422,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rails/activestorage@npm:8.1.301":
+"@rails/actiontext@npm:^7.2.302":
+  version: 7.2.302
+  resolution: "@rails/actiontext@npm:7.2.302"
+  dependencies:
+    "@rails/activestorage": "npm:>= 7.2.0-alpha"
+  peerDependencies:
+    trix: ^2.0.0
+  checksum: 10/72dece7787da311fec83cd4c9d5ac2457725d87272ecd50980f8fa2b96a95264d9d4aa13465c77371a58c46553d02a05373390801176e841a807b2018724fb4d
+  languageName: node
+  linkType: hard
+
+"@rails/activestorage@npm:8.1.301, @rails/activestorage@npm:>= 7.2.0-alpha":
   version: 8.1.301
   resolution: "@rails/activestorage@npm:8.1.301"
   dependencies:
@@ -435,6 +446,13 @@ __metadata:
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
   checksum: 10/ad87447820dd3f24825d2d947ebc03072b20a42bfc96cbafec16bff8bbda6c1a81fcb0be56d5b21968560c5359a0af4038a68ba150c3e1694fe4c109a063bed8
+  languageName: node
+  linkType: hard
+
+"@types/trusted-types@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@types/trusted-types@npm:2.0.7"
+  checksum: 10/8e4202766a65877efcf5d5a41b7dd458480b36195e580a3b1085ad21e948bc417d55d6f8af1fd2a7ad008015d4117d5fdfe432731157da3c68678487174e4ba3
   languageName: node
   linkType: hard
 
@@ -715,6 +733,18 @@ __metadata:
   bin:
     detect-libc: ./bin/detect-libc.js
   checksum: 10/3849fe7720feb153e4ac9407086956e073f1ce1704488290ef0ca8aab9430a8d48c8a9f8351889e7cdc64e5b1128589501e4fef48f3a4a49ba92cd6d112d0757
+  languageName: node
+  linkType: hard
+
+"dompurify@npm:^3.2.5":
+  version: 3.4.14
+  resolution: "dompurify@npm:3.4.14"
+  dependencies:
+    "@types/trusted-types": "npm:^2.0.7"
+  dependenciesMeta:
+    "@types/trusted-types":
+      optional: true
+  checksum: 10/e1948f825c9ea5dfc2d2adfdab60d230ccd593091cdf8ac30676b86df6bd1f97ab49e95678a164cbf3aa48d40304ad6dd58a35799261205142d9231aad357dae
   languageName: node
   linkType: hard
 
@@ -1460,6 +1490,7 @@ __metadata:
     "@hotwired/stimulus": "npm:^3.2.2"
     "@hotwired/turbo-rails": "npm:8.0.23"
     "@popperjs/core": "npm:^2.11.8"
+    "@rails/actiontext": "npm:^7.2.302"
     "@rails/activestorage": "npm:8.1.301"
     bootstrap: "npm:^5.3.8"
     bootstrap-icons: "npm:^1.13.1"
@@ -1467,6 +1498,7 @@ __metadata:
     esbuild: "npm:^0.28.2"
     sass: "npm:^1.103.1"
     tom-select: "npm:^2.6.2"
+    trix: "npm:^2.1.19"
   languageName: unknown
   linkType: soft
 
@@ -1679,6 +1711,15 @@ __metadata:
     "@orchidjs/sifter": "npm:^1.1.0"
     "@orchidjs/unicode-variants": "npm:^1.1.2"
   checksum: 10/6dde3a26c1efdad047b0bb8009175244da94426f514aec50abfadc747a274882e715eaf1e74349f376f34bf747984ac3b0d4ebb7b211c8dd008787d2dce36c6c
+  languageName: node
+  linkType: hard
+
+"trix@npm:^2.1.19":
+  version: 2.1.19
+  resolution: "trix@npm:2.1.19"
+  dependencies:
+    dompurify: "npm:^3.2.5"
+  checksum: 10/a7f4b6e50b1d1714eb4d27ce520f958a6225a3bcd6b4a566320efc163e24701599bd0091a9e0b5b0e9302b8400fbf54d027a988f4419639a69f7ae530cd07f06
   languageName: node
   linkType: hard
 

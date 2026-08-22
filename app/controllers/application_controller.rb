@@ -6,16 +6,9 @@ class ApplicationController < ActionController::Base
   include Pagy::Method
 
   protect_from_forgery with: :exception
-  prepend_before_action :set_i18n_locale_from_params
   before_action :set_pagy_locale
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-
-  def set_i18n_locale_from_params
-    return if params[:locale].nil?
-
-    I18n.locale = params[:locale]
-  end
 
   def set_pagy_locale
     # Pagy 43 internal i18n is thread-local; keep it in sync with Rails I18n

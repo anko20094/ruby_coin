@@ -308,3 +308,30 @@ uk:
       pager: ДАЛІ
       previous: ПОПЕРЕДНІЙ
       next: ДАЛІ
+
+  journal:
+    index:
+      eyebrow: журнал
+      entries:
+        one: "%{count} запис"
+        few: "%{count} записи"
+        many: "%{count} записів"
+        other: "%{count} запису"
+      title: Журнал
+      lede: Нотатки з роботи. Кейси, фрагменти коду, речі, які нас майже поламали. Оновлюємо, коли є що сказати.
+      filter: фільтр
+      all: усі
+      order:
+        label: спершу
+        new: нові
+        best: найкращі
+      empty: "немає записів під #%{tag}."
+      new_badge: НОВЕ
+    show:
+      errors:
+        not_found: Пост не знайдено
+    post:
+      back: журнал
+      all_entries: усі записи
+      related: схоже
+    minutes: "%{count} хв"

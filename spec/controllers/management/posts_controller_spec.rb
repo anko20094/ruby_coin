@@ -219,7 +219,8 @@ describe Management::PostsController do
         post: {
           title: test_post.title,
           subtitle: test_post.subtitle,
-          description: test_post.description,
+          description_uk: test_post.rich_body(:uk).body.to_s,
+          description_en: test_post.rich_body(:en).body.to_s,
           status: test_post.status,
           main_post: test_post.main_post,
           photo: test_post.photo,
@@ -233,7 +234,8 @@ describe Management::PostsController do
         post: {
           title: test_post.title,
           subtitle: test_post.subtitle,
-          description: test_post.description,
+          description_uk: test_post.rich_body(:uk).body.to_s,
+          description_en: test_post.rich_body(:en).body.to_s,
           status: test_post.status,
           main_post: test_post.main_post,
           photo: test_post.photo,
@@ -241,8 +243,27 @@ describe Management::PostsController do
         }
       )
 
-      expect(permitted_params).to eq(expected_params.require(:post).permit(:title, :subtitle, :description, :status,
-                                                                           :main_post, :photo, tag_ids: []))
+      expect(permitted_params).to eq(expected_params.require(:post).permit(:title, :subtitle, :description_uk,
+                                                                           :description_en, :status, :main_post,
+                                                                           :photo, tag_ids: []))
+    end
+  end
+
+  # The rest of this file does not render views, so nothing here would have caught the form
+  # still calling the TinyMCE helpers after the gem left.
+  describe 'the post form' do
+    render_views
+
+    before { sign_in(create(:user, role: :admin)) }
+
+    it 'renders one Action Text editor per locale and no TinyMCE' do
+      get :new
+
+      expect(response.body).to include('trix-editor')
+      I18n.available_locales.each do |locale|
+        expect(response.body).to include("post_description_#{locale}")
+      end
+      expect(response.body).not_to include('tinymce')
     end
   end
 end

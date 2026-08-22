@@ -52,6 +52,27 @@
     padding: 2px 7px;
     color: var(--ink);
   }
+
+  // Journal filter chips: the only chips that are a control rather than a label,
+  // so they are the only ones that fill on hover and when selected.
+  &--filter {
+    font-size: 11px;
+    padding: 3px 10px;
+    color: var(--ink-soft);
+    transition: background 150ms, color 150ms, border-color 150ms;
+
+    &:hover {
+      color: var(--paper);
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    &.is-active {
+      color: var(--paper);
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+  }
 }
 
 // Hairline metric grids — the case header strip and the quality strip both

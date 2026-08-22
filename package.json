@@ -5,13 +5,15 @@
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "8.0.23",
     "@popperjs/core": "^2.11.8",
+    "@rails/actiontext": "^7.2.302",
     "@rails/activestorage": "8.1.301",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "bootstrap5-toggle": "^5.4.1",
     "esbuild": "^0.28.2",
     "sass": "^1.103.1",
-    "tom-select": "^2.6.2"
+    "tom-select": "^2.6.2",
+    "trix": "^2.1.19"
   },
   "scripts": {
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=assets",

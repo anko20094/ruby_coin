@@ -8,14 +8,14 @@ RSpec.describe Posts::Translator do
   let!(:localization_params) do
     {
       'title_localizations' => { en: 'English Title' },
-      'description_localizations' => { en: 'English Description' }
+      'subtitle_localizations' => { en: 'English Subtitle' }
     }
   end
 
   let!(:updated_params) do
     {
       'title_localizations' => { en: 'Great Title' },
-      'description_localizations' => { en: 'Great Description' }
+      'subtitle_localizations' => { en: 'Great Subtitle' }
     }
   end
 
@@ -32,7 +32,7 @@ RSpec.describe Posts::Translator do
 
     it 'sets the correct attributes in translations' do
       expect(current_post.title).to eq(localization_params.dig('title_localizations', :en))
-      expect(current_post.description).to eq(localization_params.dig('description_localizations', :en))
+      expect(current_post.subtitle).to eq(localization_params.dig('subtitle_localizations', :en))
     end
   end
 
@@ -45,7 +45,7 @@ RSpec.describe Posts::Translator do
 
     it 'sets the correct attributes in translations' do
       expect(current_post.title).to eq(updated_params.dig('title_localizations', :en))
-      expect(current_post.description).to eq(updated_params.dig('description_localizations', :en))
+      expect(current_post.subtitle).to eq(updated_params.dig('subtitle_localizations', :en))
     end
   end
 end

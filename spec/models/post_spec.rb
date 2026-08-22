@@ -87,4 +87,66 @@ RSpec.describe Post do
       expect(described_class.ordered).to eq([post1, post2, post3])
     end
   end
+
+  describe 'Action Text bodies' do
+    let(:post) { create(:post, description_en: '<p>English body</p>', description_uk: '<p>Українське тіло</p>') }
+
+    it 'keeps one body per locale' do
+      expect(post.rich_body(:en).body.to_plain_text.strip).to eq('English body')
+      expect(post.rich_body(:uk).body.to_plain_text.strip).to eq('Українське тіло')
+    end
+
+    it 'reads and writes the current locale through #description' do
+      I18n.with_locale(:en) { expect(post.description.body.to_plain_text.strip).to eq('English body') }
+      I18n.with_locale(:uk) { expect(post.description.body.to_plain_text.strip).to eq('Українське тіло') }
+    end
+
+    it 'mirrors each body into a stripped column so pg_search never sees HTML' do
+      expect(post.plain_body(:en).strip).to eq('English body')
+      expect(post.plain_body(:en)).not_to include('<p>')
+    end
+
+    it 'keeps the mirror in step with an edit' do
+      post.update!(description_en: '<p>Rewritten entirely</p>')
+
+      expect(post.reload.plain_body(:en).strip).to eq('Rewritten entirely')
+      expect(described_class.search_by_description('Rewritten')).to include(post)
+    end
+  end
+
+  describe 'entry numbers' do
+    it 'numbers new posts from the highest number, so a gap in the middle stays a gap' do
+      first = create(:post)
+      second = create(:post)
+      third = create(:post)
+      second.destroy
+
+      expect(create(:post).entry_number).to eq(third.entry_number + 1)
+      expect(first.entry_number).to eq(third.entry_number - 2)
+    end
+
+    it 'prints the number three digits wide' do
+      expect(create(:post, entry_number: 42).entry_label).to eq('#042')
+    end
+
+    it 'has no label when it has no number' do
+      expect(build(:post, entry_number: nil).entry_label).to be_nil
+    end
+  end
+
+  describe '#reading_minutes' do
+    it 'counts words at READING_SPEED, never below one minute' do
+      post = create(:post, description_en: "<p>#{'word ' * 401}</p>")
+
+      expect(post.reading_minutes(:en)).to eq(3)
+      expect(create(:post, description_en: '<p>one</p>').reading_minutes(:en)).to eq(1)
+    end
+  end
+
+  describe '#recent?' do
+    it 'is true inside RECENT_FOR and false outside it' do
+      expect(create(:post)).to be_recent
+      expect(create(:post, created_at: (Post::RECENT_FOR + 1.day).ago)).not_to be_recent
+    end
+  end
 end

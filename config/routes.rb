@@ -12,6 +12,10 @@ Rails.application.routes.draw do
 
     root 'home#index'
     get '/search', to: 'home#search'
+
+    # /journal is the article stream on the new theme. /post/:id stays the canonical post
+    # URL so indexed links and FriendlyId's slug history keep resolving.
+    get '/journal', to: 'journal#index', as: 'journal'
     get '/faq', to: 'faq#index'
 
     # /work — portfolio section. The index doubles as the CV, so /cv is gone.
@@ -23,7 +27,7 @@ Rails.application.routes.draw do
     # The redesigned nav carries four sections; these two are not built yet.
     get '/studio', to: redirect { |params, _request| work.call(params) }, as: 'studio'
     get '/contact', to: redirect { |params, _request| "#{work.call(params)}#contact" }, as: 'contact'
-    get '/post/:id', to: 'home#show', as: 'post'
+    get '/post/:id', to: 'journal#show', as: 'post'
     get 'set_locale', to: 'application#set_locale'
 
     namespace :management do

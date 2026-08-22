@@ -7,6 +7,9 @@ import 'bootstrap/js/dist/modal'
 import 'bootstrap/js/dist/collapse'
 import { BootstrapToggle } from 'bootstrap5-toggle'
 import * as ActiveStorage from "@rails/activestorage"
+// Trix is the admin body editor; only this bundle loads it.
+import "trix"
+import "@rails/actiontext"
 
 const initBootstrapToggles = () => {
   document

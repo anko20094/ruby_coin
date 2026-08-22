@@ -69,7 +69,10 @@ module Management
     end
 
     def post_params
-      params.expect(post: [:title, :description, :subtitle, :status, :main_post, :photo, :slug, { tag_ids: [] }])
+      params.expect(post: [
+                      :title, :subtitle, :status, :main_post, :photo, :slug,
+                      *Post::RICH_TEXT_BODIES.values, { tag_ids: [] }
+                    ])
     end
 
     def normalize_main_post_param
@@ -78,7 +81,7 @@ module Management
     end
 
     def localization_params
-      params.require(:post).permit(title_localizations: {}, subtitle_localizations: {}, description_localizations: {}) # rubocop:disable Rails/StrongParametersExpect
+      params.require(:post).permit(title_localizations: {}, subtitle_localizations: {}) # rubocop:disable Rails/StrongParametersExpect
     end
 
     def set_post!

@@ -28,10 +28,6 @@ class Posts::Translator < BaseService
     if params.dig('subtitle_localizations', locale).present?
       article.update(subtitle: params.dig('subtitle_localizations', locale))
     end
-
-    return if params.dig('description_localizations', locale).blank?
-
-    article.update(description: params.dig('description_localizations', locale))
   end
 
   def localization_valid?(localization_params)

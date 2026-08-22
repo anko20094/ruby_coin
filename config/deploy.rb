@@ -50,7 +50,8 @@ set :puma_systemctl_user, :system
 # ------------------------------
 append :linked_files, *%w[config/master.key config/database.yml config/credentials.yml.enc .env]
 
-set :linked_dirs, %w[log tmp/pids tmp/cache tmp/sockets vendor/bundle public/uploads public/system node_modules]
+set :linked_dirs, %w[log tmp/pids tmp/cache tmp/sockets vendor/bundle public/uploads public/system node_modules
+                     storage]
 
 # ------------------------------
 # Yarn install before asset precompile

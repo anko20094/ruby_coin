@@ -499,8 +499,6 @@ GEM
     thor (1.5.0)
     tilt (2.7.0)
     timeout (0.6.1)
-    tinymce-rails (8.5.1)
-      railties (>= 3.1.1)
     tsort (0.2.0)
     turbo-rails (2.0.23)
       actionpack (>= 7.1.0)
@@ -571,6 +569,7 @@ DEPENDENCIES
   groupdate
   hotwire-rails
   httparty
+  image_processing (~> 1.14)
   jsbundling-rails
   letter_opener
   lookbook
@@ -590,6 +589,7 @@ DEPENDENCIES
   rails-i18n
   rbs
   redis
+  rouge
   rspec-rails
   rubocop
   rubocop-factory_bot
@@ -603,7 +603,6 @@ DEPENDENCIES
   sidekiq
   slim
   stimulus-rails
-  tinymce-rails (~> 8.3)
   turbo-rails (~> 2.0, >= 2.0.20)
   vcr (~> 6.3)
   view_component

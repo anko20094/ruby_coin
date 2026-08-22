@@ -7,9 +7,9 @@ class NavComponent < ViewComponent::Base
     def label = I18n.t("work.nav.#{key}")
   end
 
-  # Which controller lights which section up. Journal has no controller of its
-  # own yet — the article stream still lives on home#index until W3.
-  SECTION_FOR_CONTROLLER = { 'home' => :journal, 'work' => :work }.freeze
+  # Which controller lights which section up. home#index is still the old article
+  # stream until W7, so it lights journal up too.
+  SECTION_FOR_CONTROLLER = { 'journal' => :journal, 'home' => :journal, 'work' => :work }.freeze
 
   # Passed in where the caller knows; derived from the controller otherwise, so
   # the layout stays dumb.
@@ -24,7 +24,7 @@ class NavComponent < ViewComponent::Base
 
   def sections
     [
-      Section.new(key: :journal, path: helpers.root_path),
+      Section.new(key: :journal, path: helpers.journal_path),
       Section.new(key: :work, path: helpers.work_path),
       Section.new(key: :studio, path: helpers.studio_path),
       Section.new(key: :contact, path: helpers.contact_path)

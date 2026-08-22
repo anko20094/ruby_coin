@@ -1,0 +1,39 @@
+- content_for :title, full_title(@post.title)
+
+article.jn-post
+  .jn-post__breadcrumb
+    = link_to journal_path, class: 'jn-post__back' do
+      span aria-hidden="true" ←
+      = " #{t('journal.post.back')}"
+    - if @post.entry_label.present?
+      = " · #{@post.entry_label}"
+    = " · #{@post.created_at.strftime('%Y·%m·%d')}"
+
+  h1.jn-post__title= @post.title
+  .jn-post__byline= journal_byline(@post)
+
+  - if @post.photo.present?
+    .jn-post__cover
+      = image_tag @post.photo.medium.url, alt: '', loading: 'lazy'
+
+  .jn-body
+    p.jn-body__lede= @post.subtitle
+    = journal_body(@post)
+
+  footer.jn-post__footer
+    = link_to journal_path, class: 'jn-post__back' do
+      span aria-hidden="true" ←
+      = " #{t('journal.post.all_entries')}"
+    span.jn-post__number= @post.entry_label
+
+  - if @related.any?
+    section.jn-related
+      = render TrackTagComponent.new(label: t('journal.post.related'), tone: :soft, heading: :h2)
+      .jn-related__row
+        - @related.each do |post|
+          = link_to post_path(post), class: 'jn-related__card' do
+            - if post.photo.present?
+              .jn-related__cover= image_tag post.photo.small.url, alt: '', loading: 'lazy'
+            .jn-related__date= post.created_at.strftime('%Y·%m·%d')
+            h3.jn-related__title= post.title
+            .jn-related__tags= post.tags.first(3).map { |tag| "##{tag.title}" }.join(' ')

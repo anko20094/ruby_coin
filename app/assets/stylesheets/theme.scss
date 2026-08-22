@@ -6,13 +6,17 @@
 // redesign_plan.md §4.1 for why Bootstrap cannot leave before the admin does.
 //
 // theme/  — the design system: tokens, faces, reset, shared components, chrome.
-// pages/  — one file per screen, prefixed wk- (work), jr- (journal), and so on.
+// pages/  — one file per screen, prefixed wk- (work), jn- (journal), and so on.
 
 @use 'theme/tokens';
 @use 'theme/fonts';
 @use 'theme/base';
 @use 'theme/components';
 @use 'theme/chrome';
+
+@use 'pages/journal_index';
+@use 'pages/journal_post';
+@use 'pages/journal_responsive';
 
 @use 'pages/work_index';
 @use 'pages/work_case';

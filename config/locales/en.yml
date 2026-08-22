@@ -308,3 +308,28 @@ en:
       pager: NEXT
       previous: PREVIOUS
       next: NEXT
+
+  journal:
+    index:
+      eyebrow: journal
+      entries:
+        one: "%{count} entry"
+        other: "%{count} entries"
+      title: Journal
+      lede: Notes from the work. Cases, snippets, things that almost broke us. Updated when there is something to say.
+      filter: filter
+      all: all
+      order:
+        label: show
+        new: new
+        best: best
+      empty: "no entries for #%{tag}."
+      new_badge: NEW
+    show:
+      errors:
+        not_found: Post not found
+    post:
+      back: journal
+      all_entries: all entries
+      related: related
+    minutes: "%{count} min"

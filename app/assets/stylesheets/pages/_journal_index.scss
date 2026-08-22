@@ -1,0 +1,159 @@
+// /journal — the entry list. Max width 1100px, padding 60px 36px, per handoff §5.
+// The maxima live here rather than in theme/_tokens.scss, which stays byte-identical to
+// the bundle's tokens.css.
+$journal-max: 1100px;
+
+.jn-index {
+  max-width: $journal-max;
+  margin: 0 auto;
+  padding: 60px var(--page-pad);
+}
+
+.jn-index__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.jn-index__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 92px;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 4px 0 0;
+}
+
+.jn-index__mark {
+  color: var(--ruby);
+  font-style: italic;
+}
+
+.jn-index__lede {
+  font-size: 17px;
+  color: var(--ink-soft);
+  max-width: 580px;
+  margin: 14px 0 0;
+}
+
+.jn-index__anchor {
+  flex: none;
+}
+
+.jn-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 28px 0 12px;
+}
+
+.jn-filter__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-right: 6px;
+
+  // The second label starts a second control group on the same row.
+  &--order { margin-left: 12px; }
+}
+
+// One row per entry: number · date · title · byline over tags.
+.jn-entry {
+  display: grid;
+  grid-template-columns: 90px 120px 1fr 180px;
+  grid-template-areas: 'number date title meta';
+  align-items: baseline;
+  gap: 18px;
+  padding: 18px 12px;
+  border-bottom: var(--rule-entry);
+  transition: background 150ms;
+
+  // The list opens on the strongest of the three hairlines.
+  &--first { border-top: var(--rule-strong); }
+
+  &:hover { background: var(--paper-warm); }
+}
+
+.jn-entry__number {
+  grid-area: number;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.jn-entry__date {
+  grid-area: date;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.jn-entry__title {
+  grid-area: title;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.jn-entry__badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ruby);
+  letter-spacing: 1px;
+  margin-left: 10px;
+}
+
+.jn-entry__meta {
+  grid-area: meta;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-mute);
+  line-height: 1.6;
+  text-align: right;
+}
+
+.jn-entry__tags { color: var(--ink-soft); }
+
+.jn-empty {
+  padding: 36px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.jn-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 28px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.jn-pager__step {
+  padding: 2px 8px;
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-chip);
+  transition: background 150ms, color 150ms;
+
+  &:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jn-entry,
+  .jn-pager__step { transition: none; }
+}

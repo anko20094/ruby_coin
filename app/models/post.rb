@@ -9,26 +9,44 @@ class Post < ApplicationRecord
   belongs_to :user
   has_many :post_translations, dependent: :destroy
 
-  translates :title, :subtitle, :description
+  translates :title, :subtitle
   extend FriendlyId
 
   friendly_id :slug, use: %i[slugged finders history]
   include PgSearch::Model
 
   ORDER_TYPES = %w[new best].freeze
-  pg_search_scope :search_everywhere, associated_against: { post_translations: [:title, :description] },
+
+  # The body lives in Action Text, one named rich text per locale. Globalize still owns
+  # title and subtitle; post_translations.description is left in place as a dormant backup
+  # of the pre-Action-Text bodies and is no longer read.
+  RICH_TEXT_BODIES = { en: :description_en, uk: :description_uk }.freeze
+  # Words per minute for the "N min" label. Compute, never store — it goes stale on edit.
+  READING_SPEED = 200
+  # How long a post wears the ruby NEW badge on the journal index.
+  RECENT_FOR = 14.days
+
+  has_rich_text :description_en
+  has_rich_text :description_uk
+
+  # Searching action_text_rich_texts.body directly would match HTML tag names, so each body
+  # is mirrored into a stripped column on posts and the scopes stay off the join.
+  pg_search_scope :search_everywhere, against: %i[search_body_en search_body_uk],
+                                      associated_against: { post_translations: [:title] },
                                       using: { tsearch: { prefix: true, any_word: true } }
   pg_search_scope :search_by_title, associated_against: { post_translations: [:title] },
                                     using: { tsearch: { prefix: true, any_word: true } }
-  pg_search_scope :search_by_description, associated_against: { post_translations: [:description] },
+  pg_search_scope :search_by_description, against: %i[search_body_en search_body_uk],
                                           using: { tsearch: { prefix: true, any_word: true } }
 
   mount_uploader :photo, PhotoUploader
   before_save :deactivate_previous_main_post, if: :main_post?
+  before_save :mirror_search_bodies
+  before_create :assign_entry_number
 
   validates :title, presence: true
   validates :subtitle, presence: true
-  validates :description, presence: true
+  validate :description_present
   validates :photo, presence: true
   validates :main_post, inclusion: { in: [true, false] }
 
@@ -55,8 +73,41 @@ class Post < ApplicationRecord
          .limit(LIMIT_COUNT)
   }
 
+  # The body for one locale, as an ActionText::RichText. Reading and writing `description`
+  # without a locale means the current one, which keeps the admin form's param shape
+  # (post[description] for the locale being edited, post[description_localizations] for the
+  # rest) working exactly as it did before the body moved out of Globalize.
+  def rich_body(locale = I18n.locale)
+    public_send(RICH_TEXT_BODIES.fetch(locale.to_sym, :description_en))
+  end
+
+  def description
+    rich_body
+  end
+
+  def description=(value)
+    public_send(:"#{RICH_TEXT_BODIES.fetch(I18n.locale, :description_en)}=", value)
+  end
+
+  def plain_body(locale = I18n.locale)
+    self[:"search_body_#{RICH_TEXT_BODIES.key?(locale.to_sym) ? locale : :en}"].to_s
+  end
+
   def truncated_description
-    description.truncate(100, separator: /\s/)
+    plain_body.truncate(100, separator: /\s/)
+  end
+
+  def reading_minutes(locale = I18n.locale)
+    [(plain_body(locale).split.size.to_f / READING_SPEED).ceil, 1].max
+  end
+
+  def recent?
+    created_at.present? && created_at > RECENT_FOR.ago
+  end
+
+  # #042 — a stored series number, printed the same way everywhere.
+  def entry_label
+    format('#%03d', entry_number) if entry_number.present?
   end
 
   def similar_posts(post)
@@ -78,6 +129,29 @@ class Post < ApplicationRecord
   end
 
   private
+
+  def description_present
+    return if rich_body.body.present?
+
+    errors.add(:description, :blank)
+  end
+
+  # Continues from the highest number in the table rather than the row count, so a gap in the
+  # middle of the series stays a gap. Deleting the newest post does free its number for the
+  # next one — the number is a display label, not an identity, and the unique index is what
+  # keeps two live posts from sharing one.
+  def assign_entry_number
+    self.entry_number ||= (Post.maximum(:entry_number) || 0) + 1
+  end
+
+  # pg_search reads these, so they must track the rich text on every save. The rich text is
+  # still unsaved at this point, but its body is already assigned in memory.
+  def mirror_search_bodies
+    RICH_TEXT_BODIES.each do |locale, field|
+      rich_text = public_send(:"rich_text_#{field}")
+      self[:"search_body_#{locale}"] = rich_text&.body&.to_plain_text
+    end
+  end
 
   def deactivate_previous_main_post
     previous_main_post = Post.find_by(main_post: true)
