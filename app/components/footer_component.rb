@@ -16,11 +16,12 @@ class FooterComponent < ViewComponent::Base
     CONTACT_KEYS.filter_map { |key| rows[key] }
   end
 
+  # The studio row is left out entirely rather than shown greyed: the footer is a list of places
+  # to go, and there is nowhere to go yet.
   def links
     [
       [I18n.t('work.footer.journal'), helpers.root_path],
       [I18n.t('work.footer.work'), helpers.work_path],
-      [I18n.t('work.footer.studio'), helpers.studio_path],
       [I18n.t('work.footer.contact'), helpers.contact_path]
     ]
   end

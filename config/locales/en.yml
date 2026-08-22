@@ -447,6 +447,8 @@ en:
       work: work
       studio: studio
       contact: contact
+      soon: soon
+      soon_title: Not published yet — the crew page needs the team
     footer:
       journal: rss
       work: all cases

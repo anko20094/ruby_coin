@@ -2,9 +2,14 @@
 
 # Sticky site nav: logo · sections · locale. Four sections, per the A+B decision
 # (see redesign_plan.md §2) — cv is gone, it lives inside /work now.
+#
+# A section that is not built yet stays visible — the shape of the site is a decision, not a
+# consequence of build order — but it does not navigate. It used to redirect to /work, which
+# meant two items led to one page and the wrong one lit up.
 class NavComponent < ViewComponent::Base
-  Section = Struct.new(:key, :path, :keyword_init) do
+  Section = Struct.new(:key, :path, :built, keyword_init: true) do
     def label = I18n.t("work.nav.#{key}")
+    def built? = built != false
   end
 
   # Which controller lights which section up. The home page is not one of the four sections —
@@ -26,7 +31,8 @@ class NavComponent < ViewComponent::Base
     [
       Section.new(key: :journal, path: helpers.journal_path),
       Section.new(key: :work, path: helpers.work_path),
-      Section.new(key: :studio, path: helpers.studio_path),
+      # /studio waits on real team data — the handoff forbids placeholder people.
+      Section.new(key: :studio, path: helpers.studio_path, built: false),
       Section.new(key: :contact, path: helpers.contact_path)
     ]
   end

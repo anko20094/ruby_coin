@@ -47,6 +47,25 @@
     color: var(--ruby);
     border-bottom-color: var(--ruby);
   }
+
+  // A section that exists in the IA but has nothing to show yet: still in its place, so the
+  // shape of the site is honest, but plainly not a link.
+  &.is-soon {
+    color: var(--ink-mute);
+    cursor: default;
+
+    &:hover { color: var(--ink-mute); }
+  }
+}
+
+.rc-nav__soon {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  vertical-align: super;
+  margin-left: 3px;
 }
 
 .rc-nav__locales {

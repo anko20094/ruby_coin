@@ -5,7 +5,12 @@ nav.rc-nav
 
   .rc-nav__sections
     - sections.each do |section|
-      = link_to section.label, section.path, class: "rc-nav__link #{'is-current' if current?(section)}"
+      - if section.built?
+        = link_to section.label, section.path, class: "rc-nav__link #{'is-current' if current?(section)}"
+      - else
+        span.rc-nav__link.is-soon title=t('work.nav.soon_title')
+          = "#{section.label} "
+          span.rc-nav__soon= t('work.nav.soon')
 
   .rc-nav__locales
     - locales.each do |locale|
