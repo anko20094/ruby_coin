@@ -40,6 +40,9 @@ Rails.application.routes.draw do
 
       resources :tags
       resources :cases
+      resources :cv_blocks
+      # The CV frame is one row, so it has one screen rather than a collection.
+      resource :cv_profile, only: %i[edit update]
       # The slash menu posts here to mint a block and get its sgid back.
       resources :journal_blocks, only: :create
     end

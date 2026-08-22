@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -121,6 +121,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_130000) do
     t.string "year"
     t.index ["position"], name: "index_cases_on_position"
     t.index ["slug"], name: "index_cases_on_slug", unique: true
+  end
+
+  create_table "cv_blocks", force: :cascade do |t|
+    t.jsonb "case_slugs", default: [], null: false
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.integer "position", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kind", "position"], name: "index_cv_blocks_on_kind_and_position"
+  end
+
+  create_table "cv_profiles", force: :cascade do |t|
+    t.jsonb "contact", default: [], null: false
+    t.datetime "created_at", null: false
+    t.jsonb "education", default: {}, null: false
+    t.jsonb "languages", default: {}, null: false
+    t.jsonb "location", default: {}, null: false
+    t.jsonb "name", default: {}, null: false
+    t.jsonb "role", default: {}, null: false
+    t.jsonb "summary", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.string "updated_on", default: "", null: false
+    t.jsonb "years", default: {}, null: false
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|

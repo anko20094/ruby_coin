@@ -4,10 +4,11 @@ class WorkController < ApplicationController
   layout 'theme'
 
   def index
-    @cv = Portfolio.cv
+    @profile = CVProfile.current
+    @experience = CVBlock.experience
+    @stack_groups = CVBlock.stack_groups
+    @strengths = CVBlock.strengths
     @cases = Case.ordered
-    # The career track links into cases by slug; one lookup beats one query per chip.
-    @cases_by_slug = @cases.index_by(&:slug)
   end
 
   def show

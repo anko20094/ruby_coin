@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 describe FooterComponent, type: :component do
+  include_context 'when the cv is imported'
+
   it 'shows github, telegram and email in the design order' do
     with_request_url '/en/work' do
       render_inline(described_class.new)
@@ -12,9 +14,12 @@ describe FooterComponent, type: :component do
       .to eq(['github.com/anko20094', '@anko20094', 'anko20094@gmail.com'])
   end
 
+  # The name is localised now, so the copyright line reads in whichever language the page is.
   it 'carries the real identity, never the prototype placeholders' do
-    with_request_url '/en/work' do
-      render_inline(described_class.new)
+    I18n.with_locale(:en) do
+      with_request_url '/en/work' do
+        render_inline(described_class.new)
+      end
     end
 
     expect(page).to have_text('Danyil Shkoropad')
@@ -30,5 +35,6 @@ describe FooterComponent, type: :component do
     end
 
     expect(page).to have_text('Україна · віддалено')
+    expect(page).to have_text('Данило Шкоропад')
   end
 end

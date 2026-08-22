@@ -248,8 +248,60 @@ uk:
       destroy:
         success: Кейс видалено
 
+    cv_profiles:
+      edit:
+        title: Рамка CV
+        name: Ім'я
+        role: Роль
+        years: Роки
+        summary: Резюме
+        location: Локація
+        languages: Мови
+        education: Освіта
+        updated_on: Цифри перевірені
+        contact: Рядки контактів
+        contact_key: ключ
+        contact_label: видимий текст
+        contact_href: посилання
+      update:
+        success: Рамку CV оновлено
+
+    cv_blocks:
+      index:
+        title: Блоки CV
+        edit_profile: Редагувати рамку CV
+        add: "Додати: %{kind}"
+        kinds:
+          experience: досвід
+          stack_group: група стеку
+          strength: сильна сторона
+      new:
+        title: Додати блок CV
+      edit:
+        title: Редагувати блок CV
+      form:
+        kind: Тип
+        position: Позиція
+        org: Роботодавець
+        title: Роль
+        place: Місце
+        note: Нотатка
+        body: Опис
+        label: Підпис
+        text: Текст
+        period: Період
+        items: Пункти, по одному в рядок
+        case_slugs: Слаги кейсів, через кому
+      create:
+        success: Блок CV створено
+      update:
+        success: Блок CV оновлено
+      destroy:
+        success: Блок CV видалено
+
     shared:
       admin_left_panel:
+        cv: CV
         cases: Кейси
         admin: Адмін
         posts: Дописи

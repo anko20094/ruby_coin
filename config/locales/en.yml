@@ -247,8 +247,60 @@ en:
       destroy:
         success: Case successfully deleted
 
+    cv_profiles:
+      edit:
+        title: CV frame
+        name: Name
+        role: Role
+        years: Years
+        summary: Summary
+        location: Location
+        languages: Languages
+        education: Education
+        updated_on: Figures checked on
+        contact: Contact rows
+        contact_key: key
+        contact_label: shown text
+        contact_href: link
+      update:
+        success: CV frame updated
+
+    cv_blocks:
+      index:
+        title: CV blocks
+        edit_profile: Edit the CV frame
+        add: "Add %{kind}"
+        kinds:
+          experience: career
+          stack_group: stack group
+          strength: strength
+      new:
+        title: Add a CV block
+      edit:
+        title: Edit the CV block
+      form:
+        kind: Kind
+        position: Position
+        org: Employer
+        title: Role
+        place: Place
+        note: Note
+        body: Body
+        label: Label
+        text: Text
+        period: Period
+        items: Items, one per line
+        case_slugs: Case slugs, comma separated
+      create:
+        success: CV block created
+      update:
+        success: CV block updated
+      destroy:
+        success: CV block deleted
+
     shared:
       admin_left_panel:
+        cv: CV
         cases: Cases
         admin: Admin
         posts: Posts

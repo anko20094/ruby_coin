@@ -11,6 +11,8 @@
 # locale; the raw hash is always available as self[:field], which is what the admin form edits
 # through the generated <field>_<locale> accessors.
 class Case < ApplicationRecord
+  include LocalisedJson
+
   # Fields that are one string per language.
   LOCALISED_SCALARS = %i[
     title tagline role plain_heading engineering_heading engineering_sub scope_note
@@ -128,16 +130,6 @@ class Case < ApplicationRecord
 
   def filled?(value)
     value.is_a?(Hash) ? value.values.any?(&:present?) : value.present?
-  end
-
-  def localised_pair(values)
-    I18n.available_locales.to_h { |locale| [locale.to_s, values[locale.to_s]] }
-  end
-
-  def localised(value)
-    return value unless value.is_a?(Hash)
-
-    value[I18n.locale.to_s].presence || value[I18n.default_locale.to_s]
   end
 
   # The handoff's editorial rule: never one language alone.

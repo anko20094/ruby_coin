@@ -7,11 +7,11 @@
       = t('work.index.title')
       = ' '
       span.wk-index__mark ·
-    .wk-index__identity= [@cv['name'], t_field(@cv['role']), t_field(@cv['years'])].join(' · ')
+    .wk-index__identity= [@profile.name, @profile.role, @profile.years].compact_blank.join(' · ')
 
   .wk-index__grid
     .wk-index__main
-      p.wk-index__summary= t_field(@cv['summary'])
+      p.wk-index__summary= @profile.summary
 
       section.wk-index__section.wk-index__section--projects
         = render TrackTagComponent.new(label: t('work.index.tracks.projects'), tone: :ruby, heading: :h2)
@@ -21,58 +21,56 @@
       section.wk-index__section.wk-index__section--career
         = render TrackTagComponent.new(label: t('work.index.tracks.career'), tone: :soft, heading: :h2)
         .wk-career
-          - @cv['experience'].each do |entry|
+          - @experience.each do |entry|
             .wk-career__entry
               .wk-career__head
                 .wk-career__org
-                  = t_field(entry['org'])
-                  span.wk-career__title= " · #{t_field(entry['title'])}"
+                  = entry.org
+                  span.wk-career__title= " · #{entry.title}"
                 .wk-career__when
-                  = entry['period']
+                  = entry.period
                   br
-                  = t_field(entry['place'])
-              - if entry['note'].present?
-                .wk-career__note= t_field(entry['note'])
-              - if entry['body'].present?
-                .wk-career__body= rich(entry['body'])
-              - if entry['cases'].present?
+                  = entry.place
+              - if entry.note.present?
+                .wk-career__note= entry.note
+              - if entry.body.present?
+                .wk-career__body= rich(entry.body)
+              - if entry.cases.any?
                 .wk-career__cases
-                  - entry['cases'].each do |slug|
-                    - kase = @cases_by_slug[slug]
-                    - next if kase.nil?
-                    = link_to work_case_path(slug: slug), class: 'rc-chip rc-chip--link hover-link' do
+                  - entry.cases.each do |kase|
+                    = link_to work_case_path(slug: kase.slug), class: 'rc-chip rc-chip--link hover-link' do
                       = "#{kase.mark} #{kase.title} "
                       span aria-hidden="true" →
 
       section.wk-index__section.wk-index__section--stack
         = render TrackTagComponent.new(label: t('work.index.tracks.stack'), tone: :soft, heading: :h2)
         .wk-stack
-          - @cv['stacks'].each do |group|
+          - @stack_groups.each do |group|
             .wk-stack__group
-              .wk-stack__label= t_field(group['label'])
+              .wk-stack__label= group.label
               .rc-chips
-                - group['items'].each do |item|
+                - group.items.each do |item|
                   span.rc-chip= item
         .wk-strengths
-          - @cv['strengths'].each do |strength|
-            .wk-strengths__item= t_field(strength)
+          - @strengths.each do |strength|
+            .wk-strengths__item= strength.text
 
     aside.wk-index__aside
-      - if Portfolio.portrait
-        .wk-portrait= image_tag Portfolio.portrait, alt: I18n.locale == :uk ? @cv['nameUk'] : @cv['name']
+      - if @profile.portrait
+        .wk-portrait= image_tag @profile.portrait, alt: @profile.name
       #contact.wk-contact
         .wk-contact__label.is-ruby= t('work.index.contact')
-        - @cv['contact'].each do |key, value, href|
+        - @profile.contact_rows.each do |key, label, href|
           .wk-contact__row
             span.wk-contact__key= key
-            = link_to value, href, class: 'wk-contact__value', target: '_blank', rel: 'noreferrer'
+            = link_to label, href, class: 'wk-contact__value', target: '_blank', rel: 'noreferrer'
         .wk-contact__label= t('work.index.location')
-        div= t_field(@cv['location'])
+        div= @profile.location
         .wk-contact__label= t('work.index.languages')
-        div= t_field(@cv['languages'])
+        div= @profile.languages
         .wk-contact__label= t('work.index.education')
-        div= t_field(@cv['education'])
+        div= @profile.education
       .wk-index__footnote
-        = "#{t('work.index.figures')} · #{@cv['updated']}"
+        = "#{t('work.index.figures')} · #{@profile.updated_on}"
         br
         = t('work.index.both_halves')

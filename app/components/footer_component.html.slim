@@ -4,9 +4,9 @@ footer.rc-footer
       = render GemComponent.new(uid: 'footer')
       span.rc-footer__wordmark rubyco.in
     .rc-footer__meta
-      = "© #{Time.current.year} #{cv['name']}"
+      = "© #{Time.current.year} #{profile.name}"
       br
-      = t_field(cv['location'])
+      = profile.location
 
   .rc-footer__sections
     - links.each do |label, path|

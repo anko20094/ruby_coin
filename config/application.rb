@@ -31,3 +31,14 @@ module RubyCoin
     config.view_component.previews.default_layout = 'component_preview'
   end
 end
+
+# "cv" is an abbreviation everywhere it appears on this site: CVProfile, CVBlock, CV::Importer,
+# Management::CVBlocksController. One acronym covers all of them, because both inflectors that
+# matter here go through camelize — Rails' autoloader inflector and the one routing uses to
+# turn "management/cv_blocks" into a controller class.
+#
+# It has to be declared here rather than in config/initializers/inflections.rb: initializers
+# run after the autoloader has already worked out the constant names for app/models.
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.acronym 'CV'
+end

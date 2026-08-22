@@ -6,6 +6,7 @@ describe WorkController do
   render_views
 
   include_context 'when the cases are imported'
+  include_context 'when the cv is imported'
 
   describe 'GET #index' do
     let(:action) { :index }
@@ -20,13 +21,13 @@ describe WorkController do
     end
 
     it 'renders the CV frame' do
-      get(action, params:)
+      get(action, params: { locale: 'en' })
 
       expect(response.body).to include('Danyil Shkoropad', 'myHomeIQ', 'pgvector')
     end
 
     it 'renders the portrait when one is in place' do
-      allow(Portfolio).to receive(:portrait).and_return('work-portrait.jpg')
+      stub_portrait('work-portrait.jpg')
 
       get(action, params:)
 
@@ -34,7 +35,7 @@ describe WorkController do
     end
 
     it 'leaves the portrait block out when there is none' do
-      allow(Portfolio).to receive(:portrait).and_return(nil)
+      stub_portrait(nil)
 
       get(action, params:)
 
@@ -93,5 +94,13 @@ describe WorkController do
     it 'raises for an unknown slug' do
       expect { get(action, params: { slug: 'nope' }) }.to raise_error(ActiveRecord::RecordNotFound)
     end
+  end
+
+  # The portrait is a repo asset rather than a column, so the only way to say "there isn't
+  # one" is through the profile the page reads.
+  def stub_portrait(filename)
+    profile = CVProfile.current
+    allow(CVProfile).to receive(:current).and_return(profile)
+    allow(profile).to receive(:portrait).and_return(filename)
   end
 end

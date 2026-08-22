@@ -1,0 +1,28 @@
+- provide(:title, full_title(t('.title')))
+.admin-panel
+  .admin-panel__content
+    .admin-panel__inner
+      = render 'management/shared/admin_left_panel'
+      .admin-panel__right
+        .inner-title
+          h1.admin__title= t('.title')
+          = link_to t('.edit_profile'), edit_management_cv_profile_path, class: 'main-btn', data: { turbo: :false }
+        - CVBlock::KINDS.each do |kind|
+          .cv-kind
+            h2.cv-kind__title= t(".kinds.#{kind}")
+            .cases-admin
+              - (@blocks[kind] || []).each do |block|
+                .case-row
+                  span.case-row__mark= block.position
+                  .case-row__body
+                    h4.case-row__title= block.title.presence || block.label.presence || block.text
+                    - if block.kind == 'experience'
+                      p.case-row__meta= "#{block.org} · #{block.period} · #{block.case_slugs_list}"
+                  .post__actions
+                    .delete
+                      = link_to image_tag('delete-icon.svg'), management_cv_block_path(block),
+                        data: { turbo_method: :delete, turbo_confirm: t('global.dialog.you_sure') }
+                    .edit
+                      = link_to image_tag('edit-icon.svg'), edit_management_cv_block_path(block), data: { turbo: :false }
+            = link_to t('.add', kind: t(".kinds.#{kind}")), new_management_cv_block_path(kind: kind),
+              class: 'main-btn not_filled', data: { turbo: :false }
