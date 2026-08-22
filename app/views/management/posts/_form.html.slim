@@ -43,7 +43,7 @@
     / post[description_uk] / post[description_en]. The AI translate button copies the
     / current locale's editor into the other one client-side.
     .row data-controller="aitranslation slash-menu" data-aitranslation-locale= I18n.locale
-      .text-small.text-muted= t('.slash_menu.hint')
+      .text-small.text-muted= t('management.posts.slash_menu.hint')
       .d-flex
         - ([I18n.locale] + (I18n.available_locales - [I18n.locale])).each do |locale|
           .col class=(locale == I18n.locale ? 'me-5' : nil)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -93,6 +93,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_120000) do
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
     t.index ["visitor_token", "started_at"], name: "index_ahoy_visits_on_visitor_token_and_started_at"
+  end
+
+  create_table "cases", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "engineering_heading", default: {}, null: false
+    t.jsonb "engineering_items", default: [], null: false
+    t.jsonb "engineering_sub", default: {}, null: false
+    t.boolean "is_this_site", default: false, null: false
+    t.string "mark", null: false
+    t.jsonb "metrics", default: [], null: false
+    t.jsonb "mine", default: [], null: false
+    t.boolean "own", default: false, null: false
+    t.jsonb "plain_body", default: [], null: false
+    t.jsonb "plain_heading", default: {}, null: false
+    t.integer "position", null: false
+    t.jsonb "quality", default: [], null: false
+    t.jsonb "role", default: {}, null: false
+    t.jsonb "scope_note", default: {}, null: false
+    t.string "sector"
+    t.string "slug", null: false
+    t.jsonb "stack", default: [], null: false
+    t.string "status"
+    t.jsonb "tagline", default: {}, null: false
+    t.jsonb "title", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.string "year"
+    t.index ["position"], name: "index_cases_on_position"
+    t.index ["slug"], name: "index_cases_on_slug", unique: true
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|

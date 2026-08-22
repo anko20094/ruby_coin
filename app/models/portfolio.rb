@@ -1,19 +1,16 @@
 # frozen_string_literal: true
 
-# Content for /work — the seven cases plus the CV frame around them.
+# The CV frame around /work: the career, the stack groups, the strengths, the contact block.
 #
-# It lives in config/portfolio/*.yml rather than in the database: it changes a
-# few times a year and always through a pull request, so YAML gives review in
-# the diff and needs no migration, admin UI or seeding step.
+# The cases themselves moved into the database in W4 (see Case) so they can be edited without
+# a deploy. This half is still YAML because it changes once or twice a year and always through
+# a pull request, which is the cheapest review there is. CVProfile and CVBlock take it over in
+# W5; until then config/portfolio/cv.yml is the source.
 class Portfolio
   PATH = Rails.root.join('config', 'portfolio')
   IMAGES = Rails.root.join('app', 'assets', 'images')
 
   class << self
-    def cases
-      fetch(:cases) { YAML.load_file(PATH.join('cases.yml'))['cases'].freeze }
-    end
-
     def cv
       fetch(:cv) { YAML.load_file(PATH.join('cv.yml'))['cv'].freeze }
     end
@@ -22,24 +19,6 @@ class Portfolio
     # place — the prototype's generated placeholder is not shipped.
     def portrait
       fetch(:portrait) { Dir.glob(IMAGES.join('work-portrait.*')).min&.then { |path| File.basename(path) } }
-    end
-
-    def case!(slug)
-      cases.find { |kase| kase['slug'] == slug } || raise(ActiveRecord::RecordNotFound)
-    end
-
-    def find(slug)
-      cases.find { |kase| kase['slug'] == slug }
-    end
-
-    def position(slug)
-      cases.index { |kase| kase['slug'] == slug }
-    end
-
-    # The list wraps: case 07's next is case 01.
-    def neighbours(slug)
-      index = position(slug)
-      [cases[index - 1], cases[(index + 1) % cases.size]]
     end
 
     private

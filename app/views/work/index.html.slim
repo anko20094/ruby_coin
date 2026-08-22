@@ -38,10 +38,10 @@
               - if entry['cases'].present?
                 .wk-career__cases
                   - entry['cases'].each do |slug|
-                    - kase = Portfolio.find(slug)
+                    - kase = @cases_by_slug[slug]
                     - next if kase.nil?
                     = link_to work_case_path(slug: slug), class: 'rc-chip rc-chip--link hover-link' do
-                      = "#{kase['mark']} #{t_field(kase['title'])} "
+                      = "#{kase.mark} #{kase.title} "
                       span aria-hidden="true" →
 
       section.wk-index__section.wk-index__section--stack

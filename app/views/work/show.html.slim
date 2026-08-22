@@ -1,5 +1,5 @@
-- content_for :title, full_title(t_field(@case['title']))
-- title = t_field(@case['title'])
+- content_for :title, full_title(@case.title)
+- title = @case.title
 
 article.wk-case
   header.wk-case__header
@@ -7,69 +7,69 @@ article.wk-case
       = link_to work_path, class: 'hover-link' do
         span aria-hidden="true" ←
         = " #{t('work.case.back')}"
-      = " · #{@case['mark']} / #{format('%02d', @total)} · #{@case['sector'].upcase} · #{@case['year']}"
+      = " · #{@case.mark} / #{format('%02d', @total)} · #{@case.sector.upcase} · #{@case.year}"
     h1.wk-case__title class=('is-long' if title.length > 14)
       = title
       = ' '
-      span.wk-case__title-mark= @case['mark']
-    p.wk-case__tagline= t_field(@case['tagline'])
-    .wk-case__role= t_field(@case['role'])
+      span.wk-case__title-mark= @case.mark
+    p.wk-case__tagline= @case.tagline
+    .wk-case__role= @case.role
 
   section.wk-case__strip
     .wk-metrics
-      - @case['metrics'].each do |metric|
+      - @case.metrics.each do |metric|
         .wk-metric
-          .wk-metric__value.num= metric['value']
-          .wk-metric__label= t_field(metric['label'])
+          .wk-metric__value.num= metric[:value]
+          .wk-metric__label= metric[:label]
 
   section.wk-case__plain
     = render TrackTagComponent.new(label: t('work.case.plain'), tone: :ruby)
-    h2.wk-case__heading= t_field(@case['plain']['heading'])
+    h2.wk-case__heading= @case.plain_heading
     .wk-case__columns
       .wk-prose
-        - @case['plain']['body'].each do |paragraph|
+        - @case.plain_body.each do |paragraph|
           p= rich(paragraph)
       aside.wk-case__panels
         .wk-panel.wk-panel--mine
           h3.wk-panel__label.is-ruby= t('work.case.mine')
           ul.wk-mine
-            - @case['mine'].each do |item|
+            - @case.mine.each do |item|
               li.wk-mine__item= rich(item)
         .wk-panel.wk-panel--facts
           h3.wk-panel__label= t('work.case.facts')
-          div= "#{t('work.case.status')} · #{@case['status']}"
+          div= "#{t('work.case.status')} · #{@case.status}"
           .wk-panel__label= t('work.case.stack')
           .rc-chips
-            - @case['stack'].each do |item|
+            - @case.stack.each do |item|
               span.rc-chip.rc-chip--sm= item
 
   section.wk-case__band
     .wk-case__band-inner
       = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
-      h2.wk-case__heading.is-small= t_field(@case['engineering']['heading'])
-      p.wk-case__sub= t_field(@case['engineering']['sub'])
+      h2.wk-case__heading.is-small= @case.engineering_heading
+      p.wk-case__sub= @case.engineering_sub
       .wk-cards
-        - @case['engineering']['items'].each do |item|
+        - @case.engineering_items.each do |item|
           .wk-card
-            h3.wk-card__title= t_field(item['title'])
-            .wk-card__body= rich(item['body'])
+            h3.wk-card__title= item[:title]
+            .wk-card__body= rich(item[:body])
       .wk-quality
-        - @case['quality'].each do |metric|
+        - @case.quality.each do |metric|
           .wk-quality__cell
-            .wk-quality__value.num= metric['value']
-            .wk-quality__label= t_field(metric['label'])
-      .wk-case__scope= rich(@case['scope_note'])
+            .wk-quality__value.num= metric[:value]
+            .wk-quality__label= metric[:label]
+      .wk-case__scope= rich(@case.scope_note)
 
   nav.wk-case__pager
     .wk-case__pager-label= t('work.case.pager')
     .wk-case__pager-cards
-      = link_to work_case_path(slug: @previous_case['slug']), class: 'wk-pager-card hover-row' do
+      = link_to work_case_path(slug: @previous_case.slug), class: 'wk-pager-card hover-row' do
         .wk-pager-card__eyebrow
           span aria-hidden="true" ←
           = " #{t('work.case.previous')}"
-        .wk-pager-card__title= t_field(@previous_case['title'])
-      = link_to work_case_path(slug: @next_case['slug']), class: 'wk-pager-card wk-pager-card--next hover-row' do
+        .wk-pager-card__title= @previous_case.title
+      = link_to work_case_path(slug: @next_case.slug), class: 'wk-pager-card wk-pager-card--next hover-row' do
         .wk-pager-card__eyebrow
           = "#{t('work.case.next')} "
           span aria-hidden="true" →
-        .wk-pager-card__title= t_field(@next_case['title'])
+        .wk-pager-card__title= @next_case.title

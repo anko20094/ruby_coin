@@ -4,38 +4,38 @@
   .slash-menu__kinds
     - JournalBlock::KINDS.each do |kind|
       button.slash-menu__kind type="button" data-action="slash-menu#pick" data-kind=kind
-        = t("management.posts.slash_menu.kinds.#{kind}")
+        = t(".kinds.#{kind}")
 
   - JournalBlock::KINDS.each do |kind|
     .slash-menu__fields[data-slash-menu-target="fields" data-kind=kind hidden]
       - case kind
       - when 'code'
         label.slash-menu__label
-          = t('management.posts.slash_menu.fields.language')
+          = t('.fields.language')
           input.slash-menu__input type="text" data-field="language" placeholder="ruby"
         label.slash-menu__label
-          = t('management.posts.slash_menu.fields.source')
+          = t('.fields.source')
           textarea.slash-menu__input rows="6" data-field="source"
       - when 'callout'
         label.slash-menu__label
-          = t('management.posts.slash_menu.fields.tone')
+          = t('.fields.tone')
           select.slash-menu__input data-field="tone"
             - JournalBlock::TONES.each do |tone|
               option[value=tone]= t("journal.blocks.callout.#{tone}")
         label.slash-menu__label
-          = t('management.posts.slash_menu.fields.body')
+          = t('.fields.body')
           textarea.slash-menu__input rows="3" data-field="body"
       - when 'embed'
         label.slash-menu__label
-          = t('management.posts.slash_menu.fields.url')
+          = t('.fields.url')
           input.slash-menu__input type="url" data-field="url" placeholder="https://"
         label.slash-menu__label
-          = t('management.posts.slash_menu.fields.caption')
+          = t('.fields.caption')
           input.slash-menu__input type="text" data-field="caption"
 
       .slash-menu__actions
         button.main-btn.filled type="button" data-action="slash-menu#insert"
-          = t('management.posts.slash_menu.insert')
+          = t('.insert')
         button.main-btn.not_filled type="button" data-action="slash-menu#close"
           = t('global.button.cancel')
 

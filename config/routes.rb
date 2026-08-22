@@ -39,6 +39,7 @@ Rails.application.routes.draw do
       end
 
       resources :tags
+      resources :cases
       # The slash menu posts here to mint a block and get its sgid back.
       resources :journal_blocks, only: :create
     end

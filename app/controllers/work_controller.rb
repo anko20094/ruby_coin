@@ -5,13 +5,15 @@ class WorkController < ApplicationController
 
   def index
     @cv = Portfolio.cv
-    @cases = Portfolio.cases
+    @cases = Case.ordered
+    # The career track links into cases by slug; one lookup beats one query per chip.
+    @cases_by_slug = @cases.index_by(&:slug)
   end
 
   def show
-    @case = Portfolio.case!(params[:slug])
-    @previous_case, @next_case = Portfolio.neighbours(@case['slug'])
-    @position = Portfolio.position(@case['slug']) + 1
-    @total = Portfolio.cases.size
+    @case = Case.find_by!(slug: params.expect(:slug))
+    @previous_case, @next_case = @case.neighbours
+    @position = @case.number
+    @total = Case.count
   end
 end

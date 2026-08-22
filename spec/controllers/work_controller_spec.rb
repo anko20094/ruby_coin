@@ -5,6 +5,8 @@ require 'rails_helper'
 describe WorkController do
   render_views
 
+  include_context 'when the cases are imported'
+
   describe 'GET #index' do
     let(:action) { :index }
     let(:params) { {} }

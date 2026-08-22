@@ -172,20 +172,6 @@ en:
         subtitle_label: Subtitle
         photo_label: Main photo
         description_label: Description
-      slash_menu:
-        hint: Type / in the body for code, callout and embed blocks.
-        insert: Insert block
-        kinds:
-          code: code
-          callout: callout
-          embed: embed
-        fields:
-          language: language
-          source: code
-          tone: tone
-          body: text
-          url: link
-          caption: caption
         status_label: Status active ?
         tag_label: Tags
         placeholders:
@@ -201,6 +187,20 @@ en:
         translation_button: Translate
         main_post: Main post
         translation_notice: "* if there won't be translation post will not displayed in another language version of site"
+      slash_menu:
+        hint: Type / in the body for code, callout and embed blocks.
+        insert: Insert block
+        kinds:
+          code: code
+          callout: callout
+          embed: embed
+        fields:
+          language: language
+          source: code
+          tone: tone
+          body: text
+          url: link
+          caption: caption
       create:
         success: Post successfully created
       update:
@@ -208,8 +208,48 @@ en:
       destroy:
         success: Post successfully deleted
 
+    cases:
+      index:
+        title: Cases
+        own: own
+        this_site: this site
+      new:
+        title: Create a case
+      edit:
+        title: Edit the case
+      form:
+        slug: Slug
+        mark: Mark
+        position: Position
+        year: Years
+        sector: Sector
+        status: Status
+        own: Own project
+        this_site: This very site
+        title: Title
+        tagline: Tagline
+        role: Role
+        plain_heading: Plain-words heading
+        engineering_heading: Engineering heading
+        engineering_sub: Engineering subheading
+        scope_note: Scope note
+        stack: Stack, one per line
+        metrics: Metrics
+        quality: Quality figures
+        engineering_items: Engineering cards
+        plain_body: Plain-words paragraphs
+        mine: What was mine
+        expected: "the design draws %{count}"
+      create:
+        success: Case successfully created
+      update:
+        success: Case successfully updated
+      destroy:
+        success: Case successfully deleted
+
     shared:
       admin_left_panel:
+        cases: Cases
         admin: Admin
         posts: Posts
         tags: Tags

@@ -171,6 +171,22 @@ uk:
         subtitle_label:  Підзаголовок
         photo_label: Головне зображення
         description_label: Опис
+        status_label: Статус Активний ?
+        tag_label: Теги
+        main_post_label: Головна допис ?
+        placeholders:
+          title: Введіть заголовок
+          subtitle: Введіть підзаголовок
+          description: Введіть опис
+          tags: Введіть теги
+          select_image: Виберіть зображення
+        status:
+          label: Статус
+          active: Активний
+          disabled: Неактивний
+        translation_button: Перекласти
+        main_post: Головний допис
+        translation_notice: "* якщо перекладу не буде, публікація не відображатиметься в іншомовній версії сайту"
       slash_menu:
         hint: Натисни / у тілі статті, щоб вставити код, виноску або вставку.
         insert: Вставити блок
@@ -185,21 +201,6 @@ uk:
           body: текст
           url: посилання
           caption: підпис
-        status_label: Статус Активний ?
-        tag_label: Теги
-        main_post_label: Головна допис ?
-        placeholders:
-          title: Введіть заголовок
-          subtitle: Введіть підзаголовок
-          description: Введіть опис
-          tags: Введіть теги
-          select_image: Виберіть зображення
-        status:
-          label: Статус
-          active: Активний
-          disabled: Неактивний
-        main_post: Головний допис
-        translation_notice: "* якщо перекладу не буде, публікація не відображатиметься в іншомовній версії сайту"
         translation_button: Перекласти
       create:
         success: Допис успішно створено
@@ -208,8 +209,48 @@ uk:
       destroy:
         success: Допис успішно видалено
 
+    cases:
+      index:
+        title: Кейси
+        own: власний
+        this_site: цей сайт
+      new:
+        title: Створити кейс
+      edit:
+        title: Редагувати кейс
+      form:
+        slug: Слаг
+        mark: Номер
+        position: Позиція
+        year: Роки
+        sector: Сектор
+        status: Статус
+        own: Власний проєкт
+        this_site: Це саме цей сайт
+        title: Назва
+        tagline: Підзаголовок
+        role: Роль
+        plain_heading: Заголовок «простими словами»
+        engineering_heading: Заголовок «для інженерів»
+        engineering_sub: Підзаголовок «для інженерів»
+        scope_note: Нотатка про межі
+        stack: Стек, по одному в рядок
+        metrics: Метрики
+        quality: Показники якості
+        engineering_items: Інженерні картки
+        plain_body: Абзаци «простими словами»
+        mine: Що було моїм
+        expected: "дизайн малює %{count}"
+      create:
+        success: Кейс створено
+      update:
+        success: Кейс оновлено
+      destroy:
+        success: Кейс видалено
+
     shared:
       admin_left_panel:
+        cases: Кейси
         admin: Адмін
         posts: Дописи
         tags: Теги
