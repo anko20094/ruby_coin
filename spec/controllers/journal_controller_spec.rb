@@ -10,7 +10,9 @@ describe JournalController, type: :request do
   around { |example| I18n.with_locale(:en) { example.run } }
 
   let(:tag) { create(:tag, title: 'rails') }
-  let!(:post_record) { create(:post, status: 'active', tags: [tag]) }
+  # An explicit title, not Faker's: a generated one can contain an apostrophe, which is
+  # HTML-escaped in the rendered body and then does not match the raw string.
+  let!(:post_record) { create(:post, status: 'active', tags: [tag], title: 'A findable entry') }
 
   describe 'GET #index' do
     it 'renders the entry list on the theme layout' do
@@ -29,7 +31,8 @@ describe JournalController, type: :request do
     end
 
     it 'filters by a single tag' do
-      other = create(:post, status: 'active', tags: [create(:tag, title: 'design')])
+      other = create(:post, status: 'active', tags: [create(:tag, title: 'design')],
+                            title: 'An entry under another tag')
 
       get journal_path(locale: 'en', tag_id: tag.id)
 
@@ -87,7 +90,7 @@ describe JournalController, type: :request do
     end
 
     it 'shows a related row when other posts share a tag' do
-      related = create(:post, status: 'active', tags: [tag])
+      related = create(:post, status: 'active', tags: [tag], title: 'A related entry')
 
       get post_path(locale: 'en', id: post_record.slug)
 

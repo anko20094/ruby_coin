@@ -100,4 +100,32 @@ RSpec.describe 'Routes' do
       end
     end
   end
+
+  describe 'routes that are deliberately absent' do
+    # These three screens are a list and its forms; there is no show action behind them, so
+    # there should be no route pretending otherwise.
+    it 'has no show route for the admin lists' do
+      expect(get: '/management/cases/1').not_to be_routable
+      expect(get: '/management/cv_blocks/1').not_to be_routable
+      expect(get: '/management/tags/1').not_to be_routable
+    end
+
+    # ApplicationController#set_locale was removed when the locale handling moved into the
+    # around_action; the route outlived the action by a while.
+    it 'has no set_locale route' do
+      expect(get: '/set_locale').not_to be_routable
+    end
+
+    # Nothing in the app opens a cable connection — no turbo_stream_from anywhere.
+    it 'does not mount ActionCable' do
+      expect(get: '/cable').not_to be_routable
+    end
+  end
+
+  describe 'GET /management/statistics' do
+    it 'routes to management/statistics#index without an /index suffix' do
+      expect(get: '/management/statistics').to route_to('management/statistics#index')
+      expect(get: '/management/statistics/index').not_to be_routable
+    end
+  end
 end

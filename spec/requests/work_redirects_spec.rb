@@ -18,9 +18,13 @@ RSpec.describe 'Work redirects' do
     expect(response).to redirect_to('/uk/work')
   end
 
-  it 'sends /studio to /work' do
+  # 302, not 301: /studio is coming, and a permanent redirect would still be cached in
+  # browsers and search engines on the day it lands. `redirect` defaults to 301, so this is
+  # the assertion that keeps the default from creeping back.
+  it 'sends /studio to /work temporarily' do
     get '/en/studio'
 
+    expect(response).to have_http_status(:found)
     expect(response).to redirect_to('/en/work')
   end
 end

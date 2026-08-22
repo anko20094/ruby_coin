@@ -1,0 +1,17 @@
+/ The preview pane renders the article with the public page's own helper and classes, so what
+/ the editor shows is what the reader gets. It deliberately leaves out the site chrome —
+/ breadcrumb, footer, related row — which is page furniture, not content.
+/
+/ It shows the last saved state; the editor reloads this frame after every successful save.
+= turbo_frame_tag dom_id(post, :preview), class: 'mg-preview__frame' do
+  article.jn-post.mg-preview__article
+    h1.jn-post__title= post.title.presence || t('management.posts.editor.untitled')
+    .jn-post__byline= journal_byline(post)
+
+    - if post.photo.present?
+      .jn-post__cover= image_tag post.photo.medium.url, alt: '', loading: 'lazy'
+
+    .jn-body
+      - if post.subtitle.present?
+        p.jn-body__lede= post.subtitle
+      = journal_body(post)

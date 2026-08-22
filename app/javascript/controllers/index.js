@@ -16,6 +16,9 @@ application.register("image-preview", ImagePreviewController)
 import PasswordVisibilityController from "./password_visibility_controller"
 application.register("password-visibility", PasswordVisibilityController)
 
+import PostEditorController from "./post_editor_controller"
+application.register("post-editor", PostEditorController)
+
 import PrismController from "./prism_controller"
 application.register("prism", PrismController)
 

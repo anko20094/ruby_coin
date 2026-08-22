@@ -206,6 +206,37 @@ en:
         translation_button: Translate
         main_post: Main post
         translation_notice: "* if there won't be translation post will not displayed in another language version of site"
+      editor:
+        untitled: untitled
+        side_by_side: both
+        language: "%{name}"
+        title: title
+        subtitle: lede
+        body: body
+        slug: slug
+        tags: tags
+        author: author
+        status: status
+        main_post: featured on the home page
+        cover: cover
+        og: how a link to this looks
+        created: created
+        preview: preview
+        translate: translate the other language
+        conflict: Someone else saved this post after you opened it. Nothing here has been written.
+        reload: reload theirs
+        state:
+          clean: no changes
+          unsaved: not saved yet
+          dirty: unsaved changes
+          saving: saving…
+          saved: "saved %{at}"
+          invalid: "not saved: %{errors}"
+          conflict: conflict — not saved
+        placeholders:
+          title: What is this about?
+          subtitle: One sentence saying what the piece is about.
+          slug: how-this-reads-in-a-url
       slash_menu:
         hint: Type / in the body for code, callout and embed blocks.
         insert: Insert block

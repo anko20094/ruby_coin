@@ -1,0 +1,125 @@
+/ The edit screen from handoff §8: fields · meta · preview, with the save state and the
+/ language tabs above them.
+/
+/ Field naming is asymmetric and that is not an accident of this screen: the locale being
+/ requested posts post[title], every other locale posts post[title_localizations][xx]. That
+/ shape predates the redesign and Posts::Translator, localization_params and the AI translate
+/ button all read it, so the template bends to it rather than the other way round. Bodies are
+/ already symmetric — post[description_uk] / post[description_en].
+- editing = post.persisted?
+- locales = [I18n.locale] + (I18n.available_locales - [I18n.locale])
+
+= form_with model: [:management, post], data: { controller: 'aitranslation slash-menu post-editor', aitranslation_locale: I18n.locale, post_editor_autosave_url_value: (editing ? autosave_management_post_path(post) : nil), post_editor_preview_url_value: (editing ? preview_management_post_path(post) : nil) } do |f|
+  .mg-editor
+    - if editing
+      = f.hidden_field :lock_version, data: { post_editor_target: 'lockVersion' }
+
+    .mg-editor__bar
+      .mg-tabs
+        - locales.each do |locale|
+          button.mg-tab type="button" data-locale=locale data-action="post-editor#pickLocale" data-post-editor-target="tab"
+            = locale.to_s
+            span.mg-tab__dirty data-locale=locale
+        button.mg-tab type="button" data-action="post-editor#toggleSideBySide" data-post-editor-target="sideBySide"
+          = t('.side_by_side')
+
+      / The wording lives here rather than in the controller, so every state stays translated.
+      .mg-state[data-post-editor-target="state" data-state="clean"
+        data-phrase-clean=t('.state.clean')
+        data-phrase-dirty=t('.state.dirty')
+        data-phrase-saving=t('.state.saving')
+        data-phrase-saved=t('.state.saved', at: '%{at}')
+        data-phrase-invalid=t('.state.invalid', errors: '%{errors}')
+        data-phrase-conflict=t('.state.conflict')]
+        span.mg-state__dot
+        span[data-post-editor-target="stateText"]= editing ? t('.state.clean') : t('.state.unsaved')
+
+    .mg-conflict hidden=true data-post-editor-target="conflict"
+      span= t('.conflict')
+      = link_to t('.reload'), edit_management_post_path(post), class: 'mg-conflict__reload', data: { turbo: false } if editing
+
+    .mg-editor__cols data-post-editor-target="cols"
+      .mg-editor__main
+        - locales.each do |locale|
+          - own = locale == I18n.locale
+          .mg-locale data-locale=locale data-post-editor-target="locale" hidden=(!own)
+            .mg-locale__label= t('.language', name: t(locale))
+
+            .mg-field
+              = label_tag nil, t('.title'), class: 'mg-field__label'
+              - if own
+                = f.text_field :title, class: 'mg-input mg-input--title', placeholder: t('.placeholders.title')
+              - else
+                = f.text_field "title_localizations][#{locale}", id: "title_#{locale}", value: current_data(post, 'title', locale), class: 'mg-input mg-input--title', data: { locale: locale.to_s }, placeholder: t('.placeholders.title')
+
+            .mg-field
+              = label_tag nil, t('.subtitle'), class: 'mg-field__label'
+              - if own
+                = f.text_field :subtitle, class: 'mg-input', placeholder: t('.placeholders.subtitle')
+              - else
+                = f.text_field "subtitle_localizations][#{locale}", id: "subtitle_#{locale}", value: current_data(post, 'subtitle', locale), class: 'mg-input', data: { locale: locale.to_s }, placeholder: t('.placeholders.subtitle')
+
+            .mg-field id=(own ? 'basic-description' : 'localized_description')
+              = label_tag nil, t('.body'), class: 'mg-field__label'
+              = f.rich_text_area Post::RICH_TEXT_BODIES.fetch(locale)
+
+        = render 'management/posts/slash_menu'
+
+        .mg-field
+          = link_to t('.translate'), 'javascript:void(0)', id: 'translation-button', class: 'mg-btn', data: { action: 'click->aitranslation#fetchData' }
+
+      .mg-editor__meta
+        .mg-field
+          = f.label :slug, t('.slug'), class: 'mg-field__label'
+          = f.text_field :slug, class: 'mg-input', placeholder: t('.placeholders.slug')
+
+        .mg-field
+          = f.label :tag_ids, t('.tags'), class: 'mg-field__label'
+          = f.collection_select :tag_ids, (tags || post.tags), :id, :title, { selected: post.tag_ids },
+            { multiple: true, class: 'mg-input js-multiple-select', data: { controller: :tomselect, ajax_url: '/api/tags' } }
+
+        .mg-field
+          = f.label :user_id, t('.author'), class: 'mg-field__label'
+          = f.collection_select :user_id, users, :id, :nickname, { include_blank: false }, { class: 'mg-input' }
+
+        .mg-field
+          = f.label :status, t('.status'), class: 'mg-field__label'
+          = f.select :status, Post.statuses.keys.map { |status| [t("management.posts.index.statuses.#{status}"), status] }, {}, { class: 'mg-input' }
+
+        .mg-field
+          = f.label :main_post, t('.main_post'), class: 'mg-field__label'
+          = f.select :main_post, [[t('buttons.no_text'), false], [t('buttons.yes_text'), true]], {}, { class: 'mg-input' }
+
+        .mg-field
+          = f.label :photo, t('.cover'), class: 'mg-field__label'
+          = f.file_field :photo, accept: 'image/*', class: 'mg-input'
+
+        / What a link to this post looks like elsewhere: the same three things every unfurl shows.
+        .mg-field
+          .mg-field__label= t('.og')
+          .mg-og
+            .mg-og__cover
+              - if post.photo.present?
+                = image_tag post.photo.small.url, alt: ''
+            .mg-og__body
+              .mg-og__host rubyco.in
+              .mg-og__title= post.title.presence || t('.untitled')
+              .mg-og__sub= post.subtitle
+
+        - if editing
+          .mg-field
+            .mg-field__label= t('.created')
+            .mg-cell--mono= post.created_at.strftime('%Y·%m·%d %H:%M')
+
+      - if editing
+        .mg-editor__preview
+          .mg-preview__head
+            span.mg-field__label= t('.preview')
+            button.mg-preview__width.is-current type="button" data-width="desktop" data-action="post-editor#setWidth" desktop
+            button.mg-preview__width type="button" data-width="mobile" data-action="post-editor#setWidth" mobile
+          .mg-preview data-post-editor-target="preview" data-width="desktop"
+            = render 'management/posts/preview', post: post
+
+    .mg-editor__actions
+      = f.submit(editing ? t('global.button.save') : t('global.button.create'), class: 'mg-btn mg-btn--primary')
+      = link_to t('global.button.cancel'), management_posts_path, class: 'mg-btn mg-btn--ghost', data: { turbo: false }

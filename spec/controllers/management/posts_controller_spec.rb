@@ -83,11 +83,11 @@ describe Management::PostsController do
     let(:new_title) { 'Updated Title' }
     let(:params) { { id: test_post.slug, post: { title: new_title } } }
     let(:second_post) { create(:post, main_post: false) }
-    let(:params_status_true_second_post) { { id: second_post.id, post: { main_post: 'active' } } }
-    let(:params_status_false_second_post) { { id: second_post.id, post: { main_post: 'inactive' } } }
+    let(:params_status_true_second_post) { { id: second_post.id, post: { main_post: 'true' } } }
+    let(:params_status_false_second_post) { { id: second_post.id, post: { main_post: 'false' } } }
     let(:third_post) { create(:post, main_post: true) }
-    let(:params_status_true_third_post) { { id: third_post.id, post: { main_post: 'active' } } }
-    let(:params_status_false_third_post) { { id: third_post.id, post: { main_post: 'inactive' } } }
+    let(:params_status_true_third_post) { { id: third_post.id, post: { main_post: 'true' } } }
+    let(:params_status_false_third_post) { { id: third_post.id, post: { main_post: 'false' } } }
 
     context 'when admin is signed in' do
       before do
@@ -269,7 +269,7 @@ describe Management::PostsController do
     it 'offers the slash menu with every block kind' do
       get :new
 
-      expect(response.body).to include('data-controller="aitranslation slash-menu"')
+      expect(response.body).to include('aitranslation', 'slash-menu', 'post-editor')
       JournalBlock::KINDS.each { |kind| expect(response.body).to include(%(data-kind="#{kind}")) }
     end
   end
@@ -354,6 +354,144 @@ describe Management::PostsController do
       get :index, params: { locale: 'en' }
 
       expect(response.body.scan('mg-lang is-present').size).to eq(3)
+    end
+  end
+
+  describe 'autosave' do
+    let(:admin) { create(:user, role: :admin) }
+    let(:post_record) { I18n.with_locale(:en) { create(:post, title: 'A title', subtitle: 'A lede') } }
+
+    def autosave(overrides = {})
+      patch :autosave, params: {
+        locale: 'en', id: post_record.id,
+        post: {
+          lock_version: post_record.lock_version, title: 'A title', subtitle: 'A lede',
+          status: 'active'
+        }.merge(overrides)
+      }
+    end
+
+    before { sign_in(admin) }
+
+    it 'saves and reports the version the editor should keep' do
+      autosave(subtitle: 'A better lede')
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body['status']).to eq('saved')
+      expect(response.parsed_body['lock_version']).to be > post_record.lock_version
+      expect(response.parsed_body['at']).to match(/\A\d{2}:\d{2}:\d{2}\z/)
+      expect(I18n.with_locale(:en) { post_record.reload.subtitle }).to eq('A better lede')
+    end
+
+    # The conflict is detected by the real lock_version, which is why the banner means
+    # something: on 409 nothing has been written.
+    it 'refuses a stale version and writes nothing' do
+      stale = post_record.lock_version
+      I18n.with_locale(:en) { post_record.update!(subtitle: 'saved by someone else') }
+
+      patch :autosave, params: {
+        locale: 'en', id: post_record.id,
+        post: { lock_version: stale, title: 'A title', subtitle: 'mine' }
+      }
+
+      expect(response).to have_http_status(:conflict)
+      expect(response.parsed_body['status']).to eq('conflict')
+      expect(I18n.with_locale(:en) { post_record.reload.subtitle }).to eq('saved by someone else')
+    end
+
+    # A post needs a title, a lede and a body in the locale being edited before it can be
+    # saved at all, so "invalid" is a real state of this screen rather than a failure.
+    it 'says what is missing instead of pretending to save' do
+      autosave(title: '')
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body['status']).to eq('invalid')
+      expect(response.parsed_body['errors']).to be_present
+      expect(I18n.with_locale(:en) { post_record.reload.title }).to eq('A title')
+    end
+
+    it 'is closed to a moderator, like update is' do
+      sign_in(create(:user, role: :moderator))
+
+      expect { autosave(subtitle: 'from a moderator') }
+        .not_to(change { I18n.with_locale(:en) { post_record.reload.subtitle } })
+    end
+  end
+
+  describe 'the slug' do
+    let(:admin) { create(:user, role: :admin) }
+    let(:post_record) { I18n.with_locale(:en) { create(:post, title: 'A title', subtitle: 'A lede') } }
+
+    before { sign_in(admin) }
+
+    # It used to be overwritten from the English title on every save, which made the slug field
+    # in the meta panel a lie.
+    it 'keeps the one the editor wrote' do
+      patch :update, params: {
+        locale: 'en', id: post_record.id,
+        post: { title: 'A title', subtitle: 'A lede', slug: 'chosen-by-hand' }
+      }
+
+      expect(post_record.reload.slug).to eq('chosen-by-hand')
+    end
+
+    it 'derives one from the English title when the field is left empty' do
+      patch :update, params: {
+        locale: 'en', id: post_record.id,
+        post: { title: 'A Brand New Title', subtitle: 'A lede', slug: '' }
+      }
+
+      expect(post_record.reload.slug).to eq('a-brand-new-title')
+    end
+  end
+
+  describe 'the featured flag' do
+    let(:admin) { create(:user, role: :admin) }
+    let(:post_record) { I18n.with_locale(:en) { create(:post, title: 'A title', subtitle: 'A lede') } }
+
+    before { sign_in(admin) }
+
+    # The editor posts true/false. The old comparison was against "active", so this select
+    # could never turn the flag on.
+    it 'turns on from the value the editor posts' do
+      patch :update, params: {
+        locale: 'en', id: post_record.id,
+        post: { title: 'A title', subtitle: 'A lede', main_post: 'true' }
+      }
+
+      expect(post_record.reload.main_post).to be(true)
+    end
+
+    # A request that does not mention the flag must not silently unfeature the post.
+    it 'is left alone by a request that does not mention it' do
+      post_record.update_columns(main_post: true)
+
+      patch :update, params: {
+        locale: 'en', id: post_record.id,
+        post: { title: 'A title', subtitle: 'Another lede' }
+      }
+
+      expect(post_record.reload.main_post).to be(true)
+    end
+  end
+
+  describe 'preview' do
+    render_views
+
+    let(:admin) { create(:user, role: :admin) }
+    let(:post_record) do
+      I18n.with_locale(:en) { create(:post, title: 'A title', subtitle: 'A lede', description_en: '<p>Body copy.</p>') }
+    end
+
+    before { sign_in(admin) }
+
+    # The pane is worth having only if it is the article, so it renders through the public
+    # page's own helper and classes.
+    it 'renders the article with the classes the public page uses' do
+      get :preview, params: { locale: 'en', id: post_record.id }
+
+      expect(response.body).to include('jn-post', 'jn-body', 'jn-body__lede')
+      expect(response.body).to include('Body copy.')
     end
   end
 end

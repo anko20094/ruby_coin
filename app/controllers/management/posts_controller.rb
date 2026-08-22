@@ -14,9 +14,10 @@ module Management
     }.freeze
 
     before_action :authenticate_user!, :authorize_policy, except: :translate
-    before_action :set_post!, only: %i[show destroy edit update]
+    before_action :set_post!, only: %i[show destroy edit update autosave preview]
     before_action :fetch_tags, only: %i[new edit update]
-    before_action :normalize_main_post_param, only: %i[create update]
+    before_action :fetch_users, only: %i[new edit create update]
+    before_action :normalize_main_post_param, only: %i[create update autosave]
 
     def index
       @counts = Post.group(:status).count
@@ -40,7 +41,7 @@ module Management
     end
 
     def update
-      if @post.update(post_params) && Posts::Translator.call(@post, localization_params)
+      if persist
         respond_to do |format|
           format.html do
             flash[:success] = t('.success')
@@ -54,6 +55,39 @@ module Management
       else
         render :edit, status: :unprocessable_content
       end
+    end
+
+    # Autosave. Goes through the same save as #update — one path, so the two cannot drift —
+    # and answers with what the editor's state indicator needs to say.
+    #
+    # One save can raise lock_version by more than one: Mobility's translation rows declare
+    # `belongs_to :translated_model, touch: true`, so writing a title touches the post a second
+    # time. Harmless, but it means the editor must take the version the server reports rather
+    # than incrementing its own.
+    #
+    # A post has to be valid in the locale being edited to be saved at all, so "invalid" is a
+    # real state of this screen and the indicator says which fields are missing rather than
+    # pretending the save worked.
+    def autosave
+      if persist
+        # The time, not the date: this says "your last keystroke is on disk", and it is read
+        # many times a minute.
+        render json: {
+          status: 'saved', lock_version: @post.lock_version,
+          at: Time.current.strftime('%H:%M:%S')
+        }
+      else
+        render json: { status: 'invalid', errors: @post.errors.full_messages },
+               status: :unprocessable_content
+      end
+    rescue ActiveRecord::StaleObjectError
+      # Someone else saved this post since this editor loaded it. Nothing is written.
+      render json: { status: 'conflict', lock_version: @post.reload.lock_version },
+             status: :conflict
+    end
+
+    def preview
+      render partial: 'management/posts/preview', locals: { post: @post }, layout: false
     end
 
     def destroy
@@ -74,6 +108,10 @@ module Management
     end
 
     private
+
+    def persist
+      @post.update(post_params) && Posts::Translator.call(@post, localization_params)
+    end
 
     def listed_posts
       posts = Post.all
@@ -104,13 +142,17 @@ module Management
 
     def post_params
       params.expect(post: [
-                      :title, :subtitle, :status, :main_post, :photo, :slug,
+                      :title, :subtitle, :status, :main_post, :photo, :slug, :lock_version, :user_id,
                       *Post::RICH_TEXT_BODIES.values, { tag_ids: [] }
                     ])
     end
 
+    # The editor posts "true"/"false"; the column is a boolean. Only touched when the key is
+    # actually there, so a request that does not mention main_post cannot silently unfeature a
+    # post — which is what the old comparison against "active" did.
     def normalize_main_post_param
-      params[:post][:main_post] = params[:post][:main_post] == 'active' # rubocop:disable Rails/StrongParametersExpect
+      post = params[:post]
+      post[:main_post] = post[:main_post].to_s == 'true' if post.key?(:main_post)
       slug_param
     end
 
@@ -126,13 +168,22 @@ module Management
       @tags = @post.present? ? @post.tags : []
     end
 
+    def fetch_users
+      @users = User.order(:nickname)
+    end
+
     def authorize_policy
       authorize [:management, Post]
     end
 
+    # The slug is derived from the English title, because that is what reads in a URL — but only
+    # when the editor has not written one. It used to be overwritten on every save, which made
+    # the slug field in the meta panel a lie. FriendlyId keeps the history, so a rename is safe.
     def slug_param
-      slug = I18n.locale == :en ? params.dig('post', 'title') : params.dig('post', 'title_localizations', 'en')
-      params[:post][:slug] = slug&.parameterize # rubocop:disable Rails/StrongParametersExpect
+      return if params.dig('post', 'slug').present?
+
+      english_title = I18n.locale == :en ? params.dig('post', 'title') : params.dig('post', 'title_localizations', 'en')
+      params[:post][:slug] = english_title&.parameterize # rubocop:disable Rails/StrongParametersExpect
     end
   end
 end

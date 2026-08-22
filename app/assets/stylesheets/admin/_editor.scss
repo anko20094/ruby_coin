@@ -1,0 +1,358 @@
+// The edit screen: three columns — fields · meta · preview — with the save state and the
+// language tabs on a bar above them. Handoff §8.
+.mg-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: -22px;
+}
+
+.mg-editor__bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--mg-ink-faint);
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.mg-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.mg-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  color: var(--ink);
+
+  &.is-current {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+// The per-language dirty count: how many fields in that language are unsaved.
+.mg-tab__dirty {
+  font-size: 9.5px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--ruby);
+  color: var(--paper);
+
+  &:empty { display: none; }
+}
+
+.mg-state {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.mg-state__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--ink-mute);
+}
+
+.mg-state[data-state='saving'] .mg-state__dot { background: var(--mg-warn); }
+.mg-state[data-state='saved'] .mg-state__dot { background: var(--mg-ok); }
+.mg-state[data-state='invalid'] .mg-state__dot,
+.mg-state[data-state='conflict'] .mg-state__dot { background: var(--ruby); }
+
+.mg-state[data-state='invalid'],
+.mg-state[data-state='conflict'] { color: var(--ruby); }
+
+// Shown only when another session has saved over this one.
+.mg-conflict {
+  padding: 12px 22px;
+  background: var(--ruby-mute);
+  border-bottom: 1px solid var(--ruby);
+  color: var(--ruby);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mg-conflict__reload {
+  border-bottom: 1px solid var(--ruby);
+}
+
+.mg-editor__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) 300px minmax(0, 1fr);
+  align-items: start;
+}
+
+.mg-editor__main,
+.mg-editor__meta,
+.mg-editor__preview {
+  padding: 20px 22px;
+  min-width: 0;
+}
+
+.mg-editor__meta,
+.mg-editor__preview {
+  border-left: 1px solid var(--mg-ink-faint);
+}
+
+.mg-editor__preview {
+  background: var(--paper-warm);
+  position: sticky;
+  top: var(--mg-topbar);
+}
+
+// One group per language. Hidden groups are display:none rather than removed, so their fields
+// still post — switching tabs never loses what is typed in the other language.
+.mg-locale[hidden] { display: none; }
+
+.mg-locale__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  color: var(--ink-mute);
+  margin-bottom: 10px;
+}
+
+.mg-editor__cols.is-side-by-side {
+  .mg-editor__main {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+.mg-field {
+  margin-bottom: 16px;
+}
+
+.mg-field__label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.mg-input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  font-size: 14px;
+  color: var(--ink);
+
+  &:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+
+  &::placeholder { color: var(--ink-mute); }
+}
+
+.mg-input--title {
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.mg-editor trix-editor {
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  min-height: 220px;
+  font-size: 15px;
+  line-height: 1.6;
+  // Bootstrap is still loaded beside this bundle and colours body copy through its own link
+  // and heading rules; the editor is prose, so it says so explicitly.
+  color: var(--ink);
+
+  a { color: var(--ruby); }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 24px;
+  }
+
+  pre {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--paper-warm);
+    padding: 12px;
+    border-radius: var(--radius-card);
+  }
+}
+
+// The toolbar has more buttons than a 1.3fr column is wide, so it wraps instead of spilling.
+.mg-editor trix-toolbar {
+  .trix-button-row {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .trix-button-group {
+    border-color: var(--ink-mute);
+    margin-bottom: 4px;
+  }
+
+  .trix-button {
+    font-size: 11px;
+  }
+}
+
+// The OG card: the same three things a link preview shows anywhere else.
+.mg-og {
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.mg-og__cover {
+  aspect-ratio: 1200 / 630;
+  background: var(--paper-warm);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.mg-og__body { padding: 10px 12px; }
+
+.mg-og__host {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  color: var(--ink-mute);
+}
+
+.mg-og__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 4px 0 2px;
+}
+
+.mg-og__sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.mg-preview__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mg-preview__width {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 3px 8px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-chip);
+  background: var(--paper);
+
+  &.is-current {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+.mg-preview {
+  transition: opacity 150ms;
+
+  &.is-busy { opacity: 0.45; }
+}
+
+.mg-preview__frame {
+  display: block;
+  background: var(--paper);
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+// The article inside the pane keeps its own measure, just scaled down to fit the column.
+.mg-preview__article {
+  max-width: none;
+  padding: 20px;
+}
+
+.mg-preview[data-width='mobile'] .mg-preview__frame {
+  max-width: 390px;
+  margin: 0 auto;
+}
+
+// The article's own rules (pages/_journal_post.scss) set every margin that matters, so this
+// adds only what theme/_base.scss would have and the admin bundle does not pull in. A blanket
+// `margin: 0` here would land after those rules and flatten the article's spacing — which is
+// exactly what it did the first time.
+.mg-preview__article {
+  ul { list-style: disc; }
+
+  a { color: var(--ruby); }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.mg-editor__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 16px 22px;
+  border-top: 1px solid var(--mg-ink-faint);
+  background: var(--paper);
+}
+
+@media (max-width: 1400px) {
+  .mg-editor__cols { grid-template-columns: minmax(0, 1fr) 280px; }
+
+  .mg-editor__preview {
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid var(--mg-ink-faint);
+    position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  .mg-editor__cols { grid-template-columns: 1fr; }
+
+  .mg-editor__meta {
+    border-left: 0;
+    border-top: 1px solid var(--mg-ink-faint);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-preview { transition: none; }
+}

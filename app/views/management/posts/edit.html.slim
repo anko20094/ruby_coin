@@ -1,3 +1,2 @@
 - provide(:title, full_title(t("titles.edit")))
-.admin-form
-  = render 'form', post: @post, tags: @tags
+= render 'editor', post: @post, tags: @tags, users: @users

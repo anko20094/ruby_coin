@@ -9,6 +9,15 @@ class Management::PostPolicy < ApplicationPolicy
     admin? || moderator?
   end
 
+  # Autosave writes, so it needs what update needs. Preview only reads.
+  def autosave?
+    update?
+  end
+
+  def preview?
+    show?
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user

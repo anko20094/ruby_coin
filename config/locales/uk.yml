@@ -206,6 +206,37 @@ uk:
         translation_button: Перекласти
         main_post: Головний допис
         translation_notice: "* якщо перекладу не буде, публікація не відображатиметься в іншомовній версії сайту"
+      editor:
+        untitled: без заголовка
+        side_by_side: обидві
+        language: "%{name}"
+        title: заголовок
+        subtitle: лід
+        body: тіло
+        slug: слаг
+        tags: теги
+        author: автор
+        status: статус
+        main_post: головний на домашній
+        cover: обкладинка
+        og: як виглядає посилання на це
+        created: створено
+        preview: прев'ю
+        translate: перекласти іншою мовою
+        conflict: Хтось зберіг цей пост після того, як ти його відкрив. Тут нічого не записано.
+        reload: перечитати їхню версію
+        state:
+          clean: без змін
+          unsaved: ще не збережено
+          dirty: незбережені зміни
+          saving: зберігаю…
+          saved: "збережено %{at}"
+          invalid: "не збережено: %{errors}"
+          conflict: конфлікт — не збережено
+        placeholders:
+          title: Про що це?
+          subtitle: Одне речення про те, про що текст.
+          slug: як-це-читається-в-url
       slash_menu:
         hint: Натисни / у тілі статті, щоб вставити код, виноску або вставку.
         insert: Вставити блок

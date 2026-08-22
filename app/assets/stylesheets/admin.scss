@@ -6,6 +6,16 @@
 @use 'theme/tokens';
 @use 'theme/fonts';
 
+// Trix's own stylesheet, inlined. Referenced without the .css extension on purpose: with it,
+// dart-sass emits a literal @import that Propshaft does not resolve — which is how the editor
+// went from W3 to here with no styles at all.
+@use 'actiontext';
+
 @use 'admin/tokens' as admin-tokens;
+
+// The preview pane renders the real article, so it needs the real article's styles. This is
+// the whole point of the pane: being actually identical, not approximately.
+@use 'pages/journal_post';
 @use 'admin/shell';
 @use 'admin/list';
+@use 'admin/editor';
