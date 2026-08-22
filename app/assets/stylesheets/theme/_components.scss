@@ -87,4 +87,10 @@
 .rc-gem {
   display: block;
   overflow: visible;
+
+  // The interactive cuts are repainted every frame while they are on screen.
+  &--hero,
+  &--anchor {
+    will-change: transform;
+  }
 }
