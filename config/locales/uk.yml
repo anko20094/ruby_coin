@@ -35,19 +35,27 @@ uk:
     delete: Ви впевнені, що бажаєте видалити %{item}?
   home:
     index:
-      show_first: Спочатку показувати
-      new: Нові
-      best: Найкращі
-      by_tags: За тегами
-      by_difficulty: За рівнем складності
-      all: Всі
-      easy: Простий
-      middle: Середній
-      hard: Складний
-      search_by_tag: Пошук по тегам
-      reset_filter: Скинути фільтри
-      placeholders:
-        tags: Введіть теги
+      tagline: Системи на Rails і тексти про них
+      eyebrow_craft: RAILS
+      headline:
+        - Я будую системи
+        - на Rails і пишу
+        - про них на
+      headline_mark: RubyCoin.
+      see_work: дивитись роботи
+      read_journal: читати журнал
+      entries:
+        one: "%{count} запис у журналі"
+        few: "%{count} записи в журналі"
+        many: "%{count} записів у журналі"
+        other: "%{count} запису в журналі"
+      move_cursor: ВЕДИ КУРСОРОМ
+      latest: останній запис
+      read_full: читати повністю
+      recent_work: свіжі роботи
+      all_work: усі роботи
+      to_top: Повернутися нагору
+      top: НАГОРУ
     show:
       similar_posts: Схожі публікації
     search:

@@ -1,61 +1,76 @@
-- provide(:title, full_title(t("titles.main")))
-.home__container
-  - if @main_post.present?
-    .intro-block
-      = link_to post_path(@main_post) do
-        .intro-block__img
-          - if @main_post.photo.present?
-            = image_tag(@main_post.photo.medium.url, class: "intro-block__main_img")
+- content_for :title, full_title(t('home.index.tagline'))
+
+.hm-page
+  / Hero. Every value here is real: the eyebrow and the lede come from the CV, the note counts
+  / the journal. The three-line heading is the handoff's own proposed wording (§4) and lives in
+  / the locale files — it is the first sentence on the site and the owner's to confirm.
+  section.hm-hero
+    .hm-hero__copy
+      .hm-hero__eyebrow
+        span.hm-hero__rule
+        / The CV's location carries two parts ("Ukraine · remote"); the eyebrow wants one.
+        = [@profile.name, t('home.index.eyebrow_craft'), @profile.location.to_s.split(' · ').first].compact_blank.join(' · ')
+      h1.hm-hero__title
+        - t('home.index.headline').each_with_index do |line, index|
+          - if index == t('home.index.headline').size - 1
+            = line
+            = ' '
+            span.hm-hero__mark= t('home.index.headline_mark')
           - else
-            = image_tag("intro-img.png", class: "intro-block__main_img")
-          .intro-block__content
-            .flex-admin
-              .admin = @main_post.user.nickname
-              .intro-block__date = l(@main_post.created_at, format: :default)
-            h1.intro-block__title = @main_post.title
-            h6.intro-block__subtitle = @main_post.subtitle
-            .tags-inner
-              - @main_post.tags.first(3).each do |tag|
-                .intro-block__tag = tag.title
+            = line
+            br
+      p.hm-hero__lede= @profile.summary
+      .hm-hero__actions
+        = link_to t('home.index.see_work'), work_path, class: 'rc-button rc-button--primary'
+        = link_to t('home.index.read_journal'), journal_path, class: 'rc-button'
+      .hm-hero__note= t('home.index.entries', count: @entries_count)
 
-  =turbo_frame_tag :home_posts do
-    .accordion-category
-      .accordion-item
-        h2#headingOne.accordion-header
-          button.accordion-button.collapsed[type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"]
-            = t("titles.filters")
+    .hm-hero__gem
+      = render GemComponent.new(uid: 'home-hero', variant: :hero, size: 400)
+      .hm-hero__caption
+        span aria-hidden="true" ↳
+        = " #{t('home.index.move_cursor')}"
 
-        #collapseOne.accordion-collapse.collapse[aria-labelledby="headingOne" data-bs-parent="#accordionExample"]
-          .accordion-body
-            = form_with url: root_path(anchor: 'posts-list'), method: :get do |f|
-              .filter-container.first-container
-                .filter-block
-                  h4.heading-filter.d-inline-block.me-3
-                    = t(".show_first")
-                  .filter-inner.d-inline-block
-                    = link_to t(".new"), root_path(order: :new), class: "filter-item d-inline-block #{ 'active' if params[:order] == 'new' || params[:order].blank? }" 
-                    = link_to t(".best"), root_path(order: :best), class: "filter-item d-inline-block #{ 'active' if params[:order] == 'best' }"
+  / Latest entry — the featured post if one is flagged, otherwise simply the newest.
+  - if @latest.present?
+    section.hm-latest
+      .rc-eyebrow= t('home.index.latest')
+      = link_to post_path(@latest), class: 'hm-latest__entry' do
+        .hm-latest__cover
+          - if @latest.photo.present?
+            = image_tag @latest.photo.medium.url, alt: '', loading: 'lazy'
+        .hm-latest__body
+          .hm-latest__meta= [@latest.created_at.strftime('%Y·%m·%d'), journal_byline(@latest)].compact_blank.join(' · ')
+          h2.hm-latest__title= @latest.title
+          .rc-chips
+            - @latest.tags.first(3).each do |tag|
+              span.rc-chip= "##{tag.title}"
+          .hm-latest__more
+            = "#{t('home.index.read_full')} "
+            span aria-hidden="true" →
 
-              .div
-                .filter-container.second-container.d-inline-block.me-3
-                  .form-inner
-                    .group
-                      = f.label :tags, t('.search_by_tag'), class: 'h5'
-                      = f.collection_select :tag_ids, (@tags || []), :id, :title, { selected: @active_tags },
-                        { multiple: true, class: 'standart-input js-multiple-select d-inline-block',
-                               data: { controller: :tomselect, ajax_url: '/api/tags' }, placeholder:  t('.placeholders.tags') }
+  / Recent work. The design put a crew panel beside this under Option B; there is no team data
+  / yet and the handoff forbids placeholder people, so the cards run the full width — which is
+  / what §4 says to do when the column is not there.
+  - if @cases.any?
+    section.hm-work
+      .rc-eyebrow= t('home.index.recent_work')
+      .hm-cards
+        - @cases.each do |kase|
+          = link_to work_case_path(slug: kase.slug), class: 'hm-card' do
+            .hm-card__cover
+              span.hm-card__glyph= kase.mark
+            h3.hm-card__title== kase.title.to_s.gsub(' · ', '&nbsp;· ')
+            .hm-card__mark= kase.mark
+            .hm-card__meta= "#{kase.sector} · #{kase.year}"
+            .hm-card__tagline= kase.tagline
+      = link_to work_path, class: 'hm-more' do
+        = "#{t('home.index.all_work')} "
+        span aria-hidden="true" →
 
-                .filter-container.d-inline-block
-                  .filter-block
-                    .filter-inner.d-inline-block.mt-2
-                      = f.submit t('buttons.apply'), class: 'filter-item active d-inline-block', name: nil
-                      = link_to t('.reset_filter'), root_path(anchor: 'posts-list'), class: 'filter-item d-inline-block'
-
-    .posts id="posts-list"
-    .posts__inner
-      - @posts.each do |post|
-        = render "home/post", post: post
-        
-      - if @pagy.pages > 1
-          .pagination__inner
-            == pagy_bootstrap_nav(@pagy)
+/ Fades in once the hero ruby has scrolled away, and takes you back to it.
+button.hm-top[data-controller="floating-ruby" data-action="floating-ruby#toTop" hidden=true aria-label=t('home.index.to_top')]
+  = render GemComponent.new(uid: 'home-top', variant: :anchor, size: 72)
+  span.hm-top__label
+    span aria-hidden="true" ↑
+    = " #{t('home.index.top')}"

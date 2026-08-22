@@ -7,9 +7,9 @@ class NavComponent < ViewComponent::Base
     def label = I18n.t("work.nav.#{key}")
   end
 
-  # Which controller lights which section up. home#index is still the old article
-  # stream until W7, so it lights journal up too.
-  SECTION_FOR_CONTROLLER = { 'journal' => :journal, 'home' => :journal, 'work' => :work }.freeze
+  # Which controller lights which section up. The home page is not one of the four sections —
+  # the wordmark is the way back to it — so nothing is current there.
+  SECTION_FOR_CONTROLLER = { 'journal' => :journal, 'work' => :work, 'contact' => :contact }.freeze
 
   # Passed in where the caller knows; derived from the controller otherwise, so
   # the layout stays dumb.

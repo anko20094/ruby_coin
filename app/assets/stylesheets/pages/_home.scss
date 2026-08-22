@@ -1,0 +1,311 @@
+// The front page. Max width 1320px, per handoff §4.
+$home-max: 1320px;
+
+.hm-page {
+  max-width: $home-max;
+  margin: 0 auto;
+}
+
+.hm-hero {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  align-items: center;
+  gap: 48px;
+  padding: 64px var(--page-pad) 80px;
+}
+
+.hm-hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.hm-hero__rule {
+  width: 24px;
+  height: 1px;
+  background: var(--ink-mute);
+}
+
+.hm-hero__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 108px;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  margin: 14px 0 0;
+}
+
+.hm-hero__mark {
+  color: var(--ruby);
+  font-style: italic;
+}
+
+.hm-hero__lede {
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 540px;
+  margin: 22px 0 0;
+}
+
+.hm-hero__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.rc-button {
+  display: inline-block;
+  font-size: 14px;
+  padding: 10px 18px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-button);
+  transition: background 150ms, color 150ms;
+
+  &:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  &--primary {
+    background: var(--ink);
+    color: var(--paper);
+
+    &:hover {
+      background: var(--ruby);
+      border-color: var(--ruby);
+    }
+  }
+
+  &:active { transform: translateY(1px); }
+}
+
+.hm-hero__note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 14px;
+}
+
+.hm-hero__gem {
+  justify-self: center;
+  text-align: center;
+}
+
+.hm-hero__caption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--ink-mute);
+  margin-top: 12px;
+}
+
+// Latest entry.
+.hm-latest,
+.hm-work {
+  padding: 0 var(--page-pad);
+}
+
+.hm-latest__entry {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 36px;
+  align-items: center;
+  padding: 36px 0;
+  margin-top: 12px;
+  border-top: var(--rule-strong);
+  border-bottom: var(--rule-row);
+  transition: background 150ms;
+
+  &:hover { background: var(--paper-warm); }
+}
+
+.hm-latest__cover {
+  height: 300px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--paper-warm);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.hm-latest__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.hm-latest__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 10px 0 16px;
+  text-wrap: balance;
+}
+
+.hm-latest__more,
+.hm-more {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 16px;
+
+  &:hover { color: var(--ruby); }
+}
+
+// Recent work. Full width: there is no crew column, per §4's Option A note.
+.hm-work { margin-top: 56px; }
+
+.hm-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.hm-card {
+  display: block;
+  padding: 16px;
+  border: 1px solid color-mix(in oklab, var(--ink-mute) 53%, transparent);
+  border-radius: var(--radius-button);
+  transition: transform 200ms cubic-bezier(0.2, 0.7, 0.3, 1), border-color 200ms;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--ink);
+  }
+}
+
+.hm-card__cover {
+  height: 130px;
+  border-radius: var(--radius-card);
+  background: var(--paper-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+// The case mark as a large ruby glyph behind the card's head.
+.hm-card__glyph {
+  font-family: var(--font-display);
+  font-size: 72px;
+  color: var(--ruby);
+  opacity: 0.16;
+  line-height: 1;
+}
+
+.hm-card__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.2;
+  text-wrap: balance;
+  margin: 12px 0 0;
+}
+
+.hm-card__mark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ruby);
+}
+
+.hm-card__meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.hm-card__tagline {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+}
+
+// The floating ruby: appears once the hero one has gone, and goes back to it. The overshoot in
+// the transform curve is deliberate (§4).
+.hm-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 0;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.35s, transform 0.45s cubic-bezier(0.2, 1.6, 0.3, 1);
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  &[hidden] { display: none; }
+}
+
+.hm-top__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 1100px) {
+  .hm-hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 48px var(--page-pad) 56px;
+  }
+
+  .hm-hero__title { font-size: 76px; }
+
+  .hm-hero__gem { justify-self: start; }
+
+  .hm-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .hm-hero__title { font-size: 48px; }
+
+  .hm-hero__lede { font-size: 17px; }
+
+  .hm-latest__entry { grid-template-columns: 1fr; }
+
+  .hm-latest__cover { height: 220px; }
+
+  .hm-latest__title { font-size: 34px; }
+
+  .hm-cards { grid-template-columns: 1fr; }
+
+  .hm-top { right: 14px; bottom: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-card,
+  .hm-latest__entry,
+  .rc-button,
+  .hm-top { transition: none; }
+
+  .hm-card:hover { transform: none; }
+}

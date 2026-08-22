@@ -36,19 +36,25 @@ en:
     delete: Are you sure you want to delete %{item}?
   home:
     index:
-      show_first: Show first
-      new: New
-      best: Best
-      by_tags: By tags
-      by_difficulty: By difficulty level
-      all: All
-      easy: Easy
-      middle: Middle
-      hard: Hard
-      search_by_tag: Search by tags
-      reset_filter:  Reset filter
-      placeholders:
-        tags: Enter tags
+      tagline: Rails systems, and writing about them
+      eyebrow_craft: RAILS
+      headline:
+        - I build Rails systems.
+        - I write about them
+        - at
+      headline_mark: RubyCoin.
+      see_work: see the work
+      read_journal: read the journal
+      entries:
+        one: "%{count} entry in the journal"
+        other: "%{count} entries in the journal"
+      move_cursor: MOVE YOUR CURSOR
+      latest: latest entry
+      read_full: read full
+      recent_work: recent work
+      all_work: all work
+      to_top: Back to the top
+      top: TOP
     show:
       similar_posts: Similar posts
     search:

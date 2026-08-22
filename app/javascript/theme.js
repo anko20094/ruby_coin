@@ -6,7 +6,9 @@
 import { Application } from "@hotwired/stimulus";
 import RubyController from "./theme/ruby_controller";
 import EmbedController from "./theme/embed_controller";
+import FloatingRubyController from "./theme/floating_ruby_controller";
 
 const application = Application.start();
 application.register("ruby", RubyController);
 application.register("embed", EmbedController);
+application.register("floating-ruby", FloatingRubyController);
