@@ -14,6 +14,9 @@
 @use 'theme/components';
 @use 'theme/chrome';
 
+@use 'pages/contact';
+@use 'pages/faq';
+
 @use 'pages/journal_index';
 @use 'pages/journal_post';
 @use 'pages/journal_responsive';

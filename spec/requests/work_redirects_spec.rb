@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-# /work doubles as the CV, so /cv is gone for good; studio and contact are nav
-# sections the redesign has not built yet.
+# /work doubles as the CV, so /cv is gone for good. /studio is the one nav section still
+# waiting to be built — it needs real team data.
 RSpec.describe 'Work redirects' do
   it 'sends /cv to /work permanently' do
     get '/cv'
@@ -22,11 +22,5 @@ RSpec.describe 'Work redirects' do
     get '/en/studio'
 
     expect(response).to redirect_to('/en/work')
-  end
-
-  it 'sends /contact to the contact panel on /work' do
-    get '/en/contact'
-
-    expect(response).to redirect_to('/en/work#contact')
   end
 end

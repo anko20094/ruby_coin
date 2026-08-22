@@ -1,0 +1,65 @@
+// /faq — the reading measure, same as an article, because that is what it is: prose answers.
+// The old page was a Bootstrap accordion with every panel forced open, so nothing is lost by
+// dropping the accordion entirely.
+$faq-max: 760px;
+
+.fq-page {
+  max-width: $faq-max;
+  margin: 0 auto;
+  padding: 60px var(--page-pad);
+}
+
+.fq-page__header {
+  margin-bottom: 36px;
+}
+
+.fq-page__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 4px 0 0;
+}
+
+.fq-page__mark {
+  color: var(--ruby);
+  font-style: italic;
+}
+
+.fq-entry {
+  padding: 28px 0;
+  border-top: var(--rule-row);
+}
+
+.fq-entry__question {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+
+.fq-entry__answer {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+
+  p { margin: 0 0 12px; }
+
+  p:last-child { margin-bottom: 0; }
+
+  a {
+    color: var(--ruby);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+@media (max-width: 560px) {
+  .fq-page { padding: 40px 20px; }
+
+  .fq-page__title { font-size: 38px; }
+
+  .fq-entry__question { font-size: 23px; }
+}

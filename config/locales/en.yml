@@ -415,6 +415,12 @@ en:
       previous: PREVIOUS
       next: NEXT
 
+  contact:
+    show:
+      eyebrow: contact
+      title: Say hi
+      lede: A project, an idea, a question, or you just want to talk Rails. Pick a channel — all of them are read.
+
   journal:
     index:
       eyebrow: journal

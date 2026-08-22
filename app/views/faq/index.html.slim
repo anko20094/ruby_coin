@@ -1,56 +1,19 @@
-- provide(:title, full_title(t("titles.faq")))
-.faq__inner
-  h1.faq__title= t("titles.faq_title")
-  .accordion-item
-    h2#headingOne.accordion-header
-      button.accordion-button[type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"]
-        = t("faq.who_am_i.question1")
-    #collapseOne.accordion-collapse.collapse.show[aria-labelledby="headingOne" data-bs-parent="#accordionExample"]
-      .accordion-body
-        .faq__text = t("faq.who_am_i.answer1_1")
-        .faq__text = t("faq.who_am_i.answer1_2")
-        .faq__text = t("faq.who_am_i.answer1_3")
-        .faq__text.last
-          = t("faq.who_am_i.more_info1_html")
-  .accordion-item
-    h2#headingTwo.accordion-header
-      button.accordion-button[type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo"]
-        = t("faq.services.question2")
-    #collapseTwo.accordion-collapse.collapse.show[aria-labelledby="headingTwo" data-bs-parent="#accordionExample"]
-      .accordion-body
-        .faq__text = t("faq.services.answer2_1")
-        .faq__text.last = t("faq.services.more_info2")
-  .accordion-item
-    h2#headingThree.accordion-header
-      button.accordion-button[type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree"]
-        = t("faq.collaboration.question3")
-    #collapseThree.accordion-collapse.collapse.show[aria-labelledby="headingThree" data-bs-parent="#accordionExample"]
-      .accordion-body
-        .faq__text = t("faq.collaboration.answer3_1")
-        .faq__text.last = t("faq.collaboration.more_info3")
-  .accordion-item
-    h2#headingFour.accordion-header
-      button.accordion-button[type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour"]
-        = t("faq.consultation.question4")
-    #collapseFour.accordion-collapse.collapse.show[aria-labelledby="headingFour" data-bs-parent="#accordionExample"]
-      .accordion-body
-        .faq__text = t("faq.consultation.answer4_1")
-        .faq__text
-          = t("faq.consultation.answer4_2_1_html")
-        .faq__text.last = t("faq.consultation.more_info4")
-  .accordion-item
-    h2#headingFive.accordion-header
-      button.accordion-button[type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive"]
-        = t("faq.communication.question5")
-    #collapseFive.accordion-collapse.collapse.show[aria-labelledby="headingFive" data-bs-parent="#accordionExample"]
-      .accordion-body
-        .faq__text = t("faq.communication.answer5_1")
-        .faq__text.last = t("faq.communication.more_info5")
-  .accordion-item
-    h2#headingSix.accordion-header
-      button.accordion-button[type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix"]
-        = t("faq.price.question6")
-    #collapseSix.accordion-collapse.collapse.show[aria-labelledby="headingSix" data-bs-parent="#accordionExample"]
-      .accordion-body
-        .faq__text = t("faq.price.answer6_1")
-        .faq__text.last = t("faq.price.more_info6")
+- content_for :title, full_title(t('titles.faq_title'))
+
+.fq-page
+  header.fq-page__header
+    .rc-eyebrow= "/#{t('titles.faq')}"
+    h1.fq-page__title
+      = t('titles.faq_title')
+      = ' '
+      span.fq-page__mark ·
+
+  - @entries.each do |entry|
+    section.fq-entry
+      h2.fq-entry__question= entry[:question]
+      .fq-entry__answer
+        - entry[:answers].each do |answer|
+          - if answer[:markup]
+            p== answer[:text]
+          - else
+            p= answer[:text]

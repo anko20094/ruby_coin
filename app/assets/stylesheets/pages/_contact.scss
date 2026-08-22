@@ -1,0 +1,147 @@
+// /contact — max width 1080px, padding 60px 36px, per handoff §7. The design drew a form
+// beside a channel list; the decision was no form (redesign_plan.md §2), so the channels are
+// the page rather than its sidebar, and they get the room the form would have had.
+$contact-max: 1080px;
+
+.ct-page {
+  max-width: $contact-max;
+  margin: 0 auto;
+  padding: 60px var(--page-pad);
+}
+
+.ct-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.ct-page__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 104px;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin: 4px 0 0;
+}
+
+.ct-page__mark {
+  color: var(--ruby);
+  font-style: italic;
+}
+
+.ct-page__lede {
+  font-size: 18px;
+  color: var(--ink-soft);
+  max-width: 580px;
+  margin: 0 0 36px;
+}
+
+.ct-page__anchor {
+  flex: none;
+}
+
+.ct-channels {
+  border-top: var(--rule-strong);
+}
+
+.ct-channel {
+  display: grid;
+  grid-template-columns: 140px 1fr 28px;
+  align-items: baseline;
+  gap: 18px;
+  padding: 22px 12px;
+  border-bottom: var(--rule-entry);
+  transition: background 150ms;
+
+  &:hover {
+    background: var(--paper-warm);
+
+    .ct-channel__arrow { color: var(--ruby); }
+  }
+}
+
+.ct-channel__key {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.ct-channel__value {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  word-break: break-word;
+}
+
+.ct-channel__arrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-mute);
+  text-align: right;
+  transition: color 180ms;
+}
+
+.ct-where {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  margin-top: 28px;
+}
+
+.ct-where__row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.ct-where__key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.ct-where__value {
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 900px) {
+  .ct-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ct-page__anchor { order: -1; }
+
+  .ct-page__title { font-size: 64px; }
+}
+
+@media (max-width: 560px) {
+  .ct-page { padding: 40px 20px; }
+
+  .ct-page__title { font-size: 44px; }
+
+  .ct-page__lede { font-size: 16px; }
+
+  .ct-channel {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'key   arrow'
+      'value value';
+    row-gap: 6px;
+  }
+
+  .ct-channel__key { grid-area: key; }
+  .ct-channel__value { grid-area: value; font-size: 15px; }
+  .ct-channel__arrow { grid-area: arrow; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-channel,
+  .ct-channel__arrow { transition: none; }
+}
