@@ -1,0 +1,13 @@
+/ Breadcrumbs on the left, the screen's primary action on the right. A screen supplies its own
+/ by writing content_for :topbar.
+.mg-topbar
+  .mg-crumbs
+    span= t('management.sidebar_component.where').delete_prefix('/')
+    - crumbs.each do |crumb|
+      span.mg-crumbs__sep /
+      span.mg-crumbs__here= crumb
+  .mg-topbar__right
+    - if defined?(note) && note.present?
+      span.mg-topbar__note= note
+    - if defined?(action) && action.present?
+      = action

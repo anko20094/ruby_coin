@@ -160,8 +160,27 @@ uk:
   management:
     posts:
       index:
-        title: Дописи
-        tags: Теги
+        title: Пости
+        new: ＋ новий пост
+        search: шукати в заголовках і тілі…
+        counted: "%{shown} з %{total}"
+        empty: тут ще нічого немає.
+        edit: правити
+        delete: видалити
+        filters:
+          all: усі
+          active: видимі
+          inactive: сховані
+        statuses:
+          active: видимий
+          inactive: схований
+        columns:
+          status: статус
+          title: заголовок
+          langs: мови
+          tags: теги
+          author: автор
+          updated: оновлено
       new:
         title: Новий допис
       edit:
@@ -298,6 +317,15 @@ uk:
         success: Блок CV оновлено
       destroy:
         success: Блок CV видалено
+
+    sidebar_component:
+      where: /management
+      models: МОДЕЛІ
+      system: СИСТЕМА
+      posts_hint: "%{active} видимих · %{inactive} схованих"
+      cases_hint: "%{own} власних"
+      tags_hint: "%{used} у вжитку"
+      statistics_hint: перегляди · візити
 
     shared:
       admin_left_panel:

@@ -188,4 +188,38 @@ RSpec.describe Post do
       expect(described_class.search_by_title('Мобільність')).to include(post)
     end
   end
+
+  describe '#translated_locales' do
+    let(:post) { create(:post) }
+
+    it 'counts a locale as translated only when title, subtitle and body are all there' do
+      I18n.with_locale(:en) { post.update!(title: 'Title', subtitle: 'Lede') }
+      I18n.with_locale(:uk) { post.update!(title: 'Заголовок', subtitle: 'Лід') }
+
+      expect(post.reload.translated_locales).to contain_exactly(:en, :uk)
+    end
+
+    it 'drops a locale that is missing its subtitle' do
+      I18n.with_locale(:en) { post.update!(title: 'Title', subtitle: 'Lede') }
+      I18n.with_locale(:uk) { post.update!(title: 'Заголовок', subtitle: 'Лід') }
+      post.post_translations.find_by(locale: 'en').update!(subtitle: nil)
+
+      expect(post.reload.translated_locales).to eq([:uk])
+    end
+
+    it 'drops a locale that is missing its body' do
+      I18n.with_locale(:en) { post.update!(title: 'Title', subtitle: 'Lede') }
+      I18n.with_locale(:uk) { post.update!(title: 'Заголовок', subtitle: 'Лід') }
+      post.rich_text_description_en.destroy
+
+      expect(post.reload.translated_locales).to eq([:uk])
+    end
+
+    # It reads the association, not the has_rich_text accessor, which would build a row.
+    it 'does not create an empty rich text while checking' do
+      post.rich_text_description_en.destroy
+
+      expect { post.reload.translated_locales }.not_to change(ActionText::RichText, :count)
+    end
+  end
 end

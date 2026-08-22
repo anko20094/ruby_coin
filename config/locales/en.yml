@@ -162,7 +162,26 @@ en:
     posts:
       index:
         title: Post
-        tags: Tags
+        new: ＋ new post
+        search: search titles and bodies…
+        counted: "%{shown} of %{total}"
+        empty: nothing here yet.
+        edit: edit
+        delete: delete
+        filters:
+          all: all
+          active: published
+          inactive: hidden
+        statuses:
+          active: published
+          inactive: hidden
+        columns:
+          status: status
+          title: title
+          langs: langs
+          tags: tags
+          author: author
+          updated: updated
       new:
         title: Create a post
       edit:
@@ -297,6 +316,15 @@ en:
         success: CV block updated
       destroy:
         success: CV block deleted
+
+    sidebar_component:
+      where: /management
+      models: MODELS
+      system: SYSTEM
+      posts_hint: "%{active} published · %{inactive} hidden"
+      cases_hint: "%{own} own"
+      tags_hint: "%{used} in use"
+      statistics_hint: views · visits
 
     shared:
       admin_left_panel:

@@ -1,0 +1,33 @@
+aside.mg-sidebar
+  .mg-sidebar__brand
+    = render GemComponent.new(uid: 'mg-brand', size: 22)
+    div
+      .mg-sidebar__wordmark rubyco.in
+      .mg-sidebar__where= t('.where')
+
+  .mg-sidebar__models
+    .mg-sidebar__label= t('.models')
+    - models.each do |model|
+      = link_to model.path, class: "mg-model #{'is-current' if model.current?(current)}" do
+        span.mg-model__dot
+        .mg-model__body
+          .mg-model__name= model.label
+          .mg-model__hint= model.hint
+        span.mg-model__count= model.total
+
+    .mg-sidebar__label= t('.system')
+    - system_entries.each do |entry|
+      = link_to entry.path, class: "mg-model #{'is-current' if entry.current?(current)}" do
+        span.mg-model__dot
+        .mg-model__body
+          .mg-model__name= entry.label
+          .mg-model__hint= entry.hint
+
+  .mg-sidebar__user
+    .mg-avatar= initial
+    .mg-sidebar__who
+      .mg-sidebar__name= user&.nickname
+      .mg-sidebar__role= user&.role
+    = button_to destroy_user_session_path, method: :delete, class: 'mg-sidebar__out',
+      form: { data: { turbo: false } }, title: t('nav_item.sign_out') do
+      span aria-hidden="true" ↪

@@ -114,6 +114,22 @@ class Post < ApplicationRecord
     created_at.present? && created_at > RECENT_FOR.ago
   end
 
+  # Which locales this post is actually finished in. "Finished" means all three parts are
+  # there — title, subtitle and body — because a post missing any one of them cannot be read
+  # in that language. This is what the admin's language-pair indicator shows, and the most
+  # common editing question it answers: what is missing a translation.
+  def translated_locales
+    I18n.available_locales.select { |locale| translated_in?(locale) }
+  end
+
+  def translated_in?(locale)
+    translation = post_translations.find { |row| row.locale == locale.to_s }
+    return false if translation.nil? || translation.title.blank? || translation.subtitle.blank?
+
+    # The association reader, not the has_rich_text one: that would build an empty record.
+    public_send(:"rich_text_#{RICH_TEXT_BODIES.fetch(locale.to_sym, :description_en)}")&.body.present?
+  end
+
   # #042 — a stored series number, printed the same way everywhere.
   def entry_label
     format('#%03d', entry_number) if entry_number.present?

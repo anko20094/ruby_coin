@@ -1,0 +1,318 @@
+// admin.scss deliberately does not pull in theme/_base.scss — that file styles a reading
+// surface. These are the few resets a tool needs, and they have to beat the Bootstrap bundle
+// still loaded beside this one.
+.mg-shell {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  input,
+  select,
+  textarea { font-family: inherit; }
+
+  table { margin: 0; }
+}
+
+// Flash sits in the pane rather than floating over the top bar, which is where the Bootstrap
+// rule used to put it.
+.mg-flash {
+  &:empty { display: none; }
+
+  .alert {
+    margin: 0;
+    border: 0;
+    border-bottom: 1px solid var(--mg-ink-faint);
+    border-radius: 0;
+    padding: 10px 22px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    background: var(--paper-warm);
+    color: var(--ink);
+  }
+
+  .alert-success { background: color-mix(in oklab, var(--mg-ok) 12%, var(--paper)); }
+  .alert-alert,
+  .alert-error { background: var(--ruby-mute); color: var(--ruby); }
+}
+
+// Sidebar + content pane. Everything is scoped under .mg-shell so it can live beside the
+// Bootstrap bundle the un-reskinned admin screens still use — see redesign_plan.md §4.1.
+.mg-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.mg-sidebar {
+  width: var(--mg-sidebar);
+  flex-shrink: 0;
+  background: var(--paper-warm);
+  border-right: 1px solid var(--mg-ink-faint);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.mg-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--mg-ink-faint);
+}
+
+.mg-sidebar__wordmark {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.mg-sidebar__where {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  letter-spacing: 1.2px;
+  margin-top: 2px;
+}
+
+.mg-sidebar__models {
+  flex: 1;
+  overflow: auto;
+  padding: 6px 8px;
+}
+
+.mg-sidebar__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  color: var(--ink-mute);
+  padding: 12px 10px 6px;
+}
+
+.mg-model {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-card);
+  transition: background 120ms, border-color 120ms;
+
+  &:hover { background: var(--paper); }
+
+  &.is-current {
+    background: var(--paper);
+    border-color: var(--ink);
+  }
+}
+
+.mg-model__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink-mute);
+  flex-shrink: 0;
+
+  .mg-model.is-current & { background: var(--ruby); }
+}
+
+.mg-model__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.mg-model__name {
+  font-size: 13.5px;
+  line-height: 1.2;
+
+  .mg-model.is-current & { font-weight: 500; }
+}
+
+.mg-model__hint {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mg-model__count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+
+  .mg-model.is-current & { color: var(--ink); }
+}
+
+.mg-sidebar__user {
+  border-top: 1px solid var(--mg-ink-faint);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mg-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background: radial-gradient(circle at 30% 30%, var(--paper-warm), oklch(88% 0.05 20));
+  border: 1px solid var(--ink-mute);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ruby);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.mg-sidebar__who {
+  flex: 1;
+  min-width: 0;
+}
+
+.mg-sidebar__name {
+  font-size: 12.5px;
+  line-height: 1.2;
+}
+
+.mg-sidebar__role {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.mg-sidebar__out {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+
+  &:hover { color: var(--ruby); }
+}
+
+.mg-pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mg-topbar {
+  height: var(--mg-topbar);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--mg-ink-faint);
+  background: var(--paper);
+}
+
+.mg-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.mg-crumbs__sep { color: var(--ink-mute); }
+
+.mg-crumbs__here { color: var(--ink); }
+
+.mg-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mg-topbar__note {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  letter-spacing: 0.5px;
+}
+
+// Nested under .mg-shell so these beat the `\.mg-shell a { color: inherit }` reset above —
+// without that, a primary button rendered as a link inherits ink on ink and disappears.
+.mg-shell .mg-btn {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--ink);
+  transition: background 120ms, color 120ms;
+
+  &--primary {
+    background: var(--ink);
+    color: var(--paper);
+
+    &:hover {
+      background: var(--ruby);
+      border-color: var(--ruby);
+      color: var(--paper);
+    }
+  }
+
+  &--ghost {
+    border-color: transparent;
+    background: transparent;
+    color: var(--ink-soft);
+
+    &:hover { color: var(--ink); }
+  }
+}
+
+.mg-content {
+  flex: 1;
+  min-width: 0;
+  padding: 22px;
+}
+
+// The screens that have not been re-skinned yet keep their Bootstrap markup; this just stops
+// it fighting the pane it now sits in.
+.mg-content .admin-panel,
+.mg-content .admin-form {
+  padding: 0;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .mg-shell { flex-direction: column; }
+
+  .mg-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: 0;
+    border-bottom: 1px solid var(--mg-ink-faint);
+  }
+
+  .mg-sidebar__models { max-height: 220px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-model,
+  .mg-btn { transition: none; }
+}

@@ -1,20 +1,28 @@
 doctype html
-html
+html lang=I18n.locale
   head
     = favicon_link_tag asset_path('favicon.ico')
-    meta content=("text/html; charset=UTF-8") http-equiv="Content-Type" /
+    meta charset="utf-8"
     title
-      = content_for?(:title) ? yield(:title) : "RubyCoin"
+      = content_for?(:title) ? yield(:title) : 'RubyCoin'
     meta content="width=device-width,initial-scale=1" name="viewport" /
     = csrf_meta_tags
     = csp_meta_tag
-    = stylesheet_link_tag "application", "data-turbo-track": "reload", media: 'all'
-    = javascript_include_tag "application", "data-turbo-track": "reload", defer: true
-  - css_classes = [controller_path.gsub('/', '-'), action_name].map { |s| s.gsub('_', '-') }
+    - theme_preloaded_faces.each do |face|
+      link rel="preload" href=asset_path("#{face}.woff2") as="font" type="font/woff2" crossorigin=""
+    / Two entries on purpose: application.css is Bootstrap, still needed by the screens that
+    / have not moved over yet; admin.css is the re-skin and loads second so it wins where the
+    / two disagree. See redesign_plan.md §4.1.
+    = stylesheet_link_tag 'application', media: 'all'
+    = stylesheet_link_tag 'admin', media: 'all'
+    = javascript_include_tag 'application', defer: true
+  - css_classes = [controller_path.tr('/', '-'), action_name].map { |name| name.tr('_', '-') }
   body class=css_classes data-lang="#{I18n.locale}"
-    #flash
-      = render 'shared/flash'
-    = render 'shared/navbar'
-    .sticky-footer
-      = yield
-    = render 'shared/footer'
+    .mg-shell
+      = render Management::SidebarComponent.new(user: current_user)
+      .mg-pane
+        = yield(:topbar).presence || render('management/shared/top_bar', crumbs: [controller_name])
+        .mg-flash
+          = render 'shared/flash'
+        .mg-content
+          = yield

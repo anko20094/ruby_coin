@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=assets",
-    "build:css": "sass ./app/assets/stylesheets/application.bootstrap.scss:./app/assets/builds/application.css ./app/assets/stylesheets/theme.scss:./app/assets/builds/theme.css --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import,if-function,global-builtin,color-functions"
+    "build:css": "sass ./app/assets/stylesheets/application.bootstrap.scss:./app/assets/builds/application.css ./app/assets/stylesheets/theme.scss:./app/assets/builds/theme.css ./app/assets/stylesheets/admin.scss:./app/assets/builds/admin.css --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import,if-function,global-builtin,color-functions"
   },
   "packageManager": "yarn@4.18.0"
 }

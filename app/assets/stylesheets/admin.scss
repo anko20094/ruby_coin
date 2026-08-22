@@ -1,0 +1,11 @@
+// /management stylesheet entry — built to app/assets/builds/admin.css.
+//
+// Shares the site's tokens and the three self-hosted families, and adds only what a working
+// tool needs on top (admin/_tokens.scss). It runs beside application.bootstrap.scss while the
+// screens that have not been re-skinned still need Bootstrap; see redesign_plan.md §4.1.
+@use 'theme/tokens';
+@use 'theme/fonts';
+
+@use 'admin/tokens' as admin-tokens;
+@use 'admin/shell';
+@use 'admin/list';
