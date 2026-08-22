@@ -157,6 +157,84 @@ $post-max: 760px;
   .err { color: var(--ruby-bright); }
 }
 
+// Callouts. Two tones, per handoff §5: note carries the ink rule, warn the ruby one.
+.jn-callout {
+  margin: 24px 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--ink-mute);
+  background: var(--paper-warm);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+
+  &--warn {
+    border-left-color: var(--ruby);
+    background: var(--ruby-mute);
+  }
+}
+
+.jn-callout__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+
+  .jn-callout--warn & { color: var(--ruby); }
+}
+
+.jn-callout__body {
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+// Embeds load nothing until clicked, so the facade is what most readers ever see.
+.jn-embed {
+  margin: 24px 0;
+}
+
+.jn-embed__facade {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 24px;
+  background: var(--paper-warm);
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  transition: border-color 180ms, background 180ms;
+
+  &:hover {
+    border-color: var(--ruby);
+    background: var(--ruby-mute);
+  }
+}
+
+.jn-embed__play {
+  font-size: 13px;
+  color: var(--ruby);
+}
+
+.jn-embed__host {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+}
+
+.jn-embed__caption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+}
+
+// Swapped in by the embed controller once the reader has asked for it.
+.jn-embed__frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius-card);
+}
+
 .jn-post__footer {
   display: flex;
   justify-content: space-between;
@@ -172,6 +250,7 @@ $post-max: 760px;
 .jn-related__row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  align-items: start;
   gap: 18px;
   margin-top: 18px;
 }
@@ -183,11 +262,19 @@ $post-max: 760px;
   &:hover { transform: translateY(-2px); }
 }
 
-.jn-related__cover img {
-  width: 100%;
+// The slot holds its own shape, so a cover that fails to load leaves a quiet rectangle
+// instead of collapsing the card and shifting the ones beside it.
+.jn-related__cover {
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  background: var(--paper-warm);
   border-radius: var(--radius-card);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .jn-related__date,
@@ -207,6 +294,7 @@ $post-max: 760px;
 
 @media (prefers-reduced-motion: reduce) {
   .jn-post__back,
+  .jn-embed__facade,
   .jn-related__card { transition: none; }
 
   .jn-related__card:hover { transform: none; }

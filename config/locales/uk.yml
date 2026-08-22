@@ -171,6 +171,20 @@ uk:
         subtitle_label:  Підзаголовок
         photo_label: Головне зображення
         description_label: Опис
+      slash_menu:
+        hint: Натисни / у тілі статті, щоб вставити код, виноску або вставку.
+        insert: Вставити блок
+        kinds:
+          code: код
+          callout: виноска
+          embed: вставка
+        fields:
+          language: мова
+          source: код
+          tone: тон
+          body: текст
+          url: посилання
+          caption: підпис
         status_label: Статус Активний ?
         tag_label: Теги
         main_post_label: Головна допис ?
@@ -330,6 +344,12 @@ uk:
     show:
       errors:
         not_found: Пост не знайдено
+    blocks:
+      callout:
+        note: до відома
+        warn: обережно
+      embed:
+        load: дивитись
     post:
       back: журнал
       all_entries: усі записи

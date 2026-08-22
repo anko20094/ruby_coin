@@ -172,6 +172,20 @@ en:
         subtitle_label: Subtitle
         photo_label: Main photo
         description_label: Description
+      slash_menu:
+        hint: Type / in the body for code, callout and embed blocks.
+        insert: Insert block
+        kinds:
+          code: code
+          callout: callout
+          embed: embed
+        fields:
+          language: language
+          source: code
+          tone: tone
+          body: text
+          url: link
+          caption: caption
         status_label: Status active ?
         tag_label: Tags
         placeholders:
@@ -328,6 +342,12 @@ en:
     show:
       errors:
         not_found: Post not found
+    blocks:
+      callout:
+        note: note
+        warn: careful
+      embed:
+        load: play
     post:
       back: journal
       all_entries: all entries

@@ -39,6 +39,8 @@ Rails.application.routes.draw do
       end
 
       resources :tags
+      # The slash menu posts here to mint a block and get its sgid back.
+      resources :journal_blocks, only: :create
     end
 
     namespace :api do

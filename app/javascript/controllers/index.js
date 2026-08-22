@@ -19,5 +19,8 @@ application.register("password-visibility", PasswordVisibilityController)
 import PrismController from "./prism_controller"
 application.register("prism", PrismController)
 
+import SlashMenuController from "./slash_menu_controller"
+application.register("slash-menu", SlashMenuController)
+
 import TomselectController from "./tomselect_controller"
 application.register("tomselect", TomselectController)

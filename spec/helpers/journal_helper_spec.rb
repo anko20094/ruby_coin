@@ -37,6 +37,45 @@ RSpec.describe JournalHelper do
     end
   end
 
+  describe 'blocks in the body' do
+    def attach(post, block)
+      post.update!(description_en: %(<action-text-attachment sgid="#{block.attachable_sgid}"></action-text-attachment>))
+      helper.journal_body(post, :en)
+    end
+
+    it 'highlights a code block and labels its language' do
+      block = JournalBlock.create!(kind: 'code', payload: { 'language' => 'ruby', 'source' => 'def call; end' })
+
+      body = attach(create(:post), block)
+
+      expect(body).to include('jn-code__lang">ruby')
+      expect(body).to include('<span class="k">def</span>')
+    end
+
+    it 'renders a callout in the tone it was given' do
+      block = JournalBlock.create!(kind: 'callout', payload: { 'tone' => 'warn', 'body' => 'This one bites.' })
+
+      body = attach(create(:post), block)
+
+      expect(body).to include('jn-callout--warn')
+      expect(body).to include('This one bites.')
+    end
+
+    # The sanitiser strips these on the way out of Action Text, so the helper has to put them
+    # back; without this the embed would render as a dead link.
+    it 'puts the embed wiring back after the sanitiser removes it' do
+      block = JournalBlock.create!(kind: 'embed', payload: { 'url' => 'https://x.com/a', 'caption' => 'The talk' })
+
+      body = attach(create(:post), block)
+
+      expect(body).to include('data-controller="embed"')
+      expect(body).to include('data-embed-url-value="https://x.com/a"')
+      expect(body).to include('data-action="embed#load"')
+      expect(body).to include('rel="noreferrer"')
+      expect(body).to include('jn-embed__caption">The talk')
+    end
+  end
+
   describe '#journal_byline' do
     it 'reads author · reading time · tags' do
       post = create(:post)

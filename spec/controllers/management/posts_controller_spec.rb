@@ -265,5 +265,12 @@ describe Management::PostsController do
       end
       expect(response.body).not_to include('tinymce')
     end
+
+    it 'offers the slash menu with every block kind' do
+      get :new
+
+      expect(response.body).to include('data-controller="aitranslation slash-menu"')
+      JournalBlock::KINDS.each { |kind| expect(response.body).to include(%(data-kind="#{kind}")) }
+    end
   end
 end

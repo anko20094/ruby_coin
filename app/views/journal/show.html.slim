@@ -32,8 +32,11 @@ article.jn-post
       .jn-related__row
         - @related.each do |post|
           = link_to post_path(post), class: 'jn-related__card' do
-            - if post.photo.present?
-              .jn-related__cover= image_tag post.photo.small.url, alt: '', loading: 'lazy'
+            / The slot is always drawn: CarrierWave reports a cover as absent when its file is
+            / missing, and one card without one should not shift the row.
+            .jn-related__cover
+              - if post.photo.present?
+                = image_tag post.photo.small.url, alt: '', loading: 'lazy'
             .jn-related__date= post.created_at.strftime('%Y·%m·%d')
             h3.jn-related__title= post.title
             .jn-related__tags= post.tags.first(3).map { |tag| "##{tag.title}" }.join(' ')

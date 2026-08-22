@@ -42,12 +42,14 @@
     / Bodies are Action Text now: one named rich text per locale, posted directly as
     / post[description_uk] / post[description_en]. The AI translate button copies the
     / current locale's editor into the other one client-side.
-    .row data-controller="aitranslation" data-aitranslation-locale= I18n.locale
+    .row data-controller="aitranslation slash-menu" data-aitranslation-locale= I18n.locale
+      .text-small.text-muted= t('.slash_menu.hint')
       .d-flex
         - ([I18n.locale] + (I18n.available_locales - [I18n.locale])).each do |locale|
           .col class=(locale == I18n.locale ? 'me-5' : nil)
             = f.label Post::RICH_TEXT_BODIES.fetch(locale), "#{t('.description_label')} (#{t(locale).downcase})", class: 'standart-label'
             = f.rich_text_area Post::RICH_TEXT_BODIES.fetch(locale), class: 'standart-input descr'
+      = render 'management/posts/slash_menu'
       .d-flex.justify-content-center.mt-2
         = link_to t('.translation_button'), "javascript:void(0)", data: { action: 'click->aitranslation#fetchData' }, id: 'translation-button', class: 'btn main-btn'
     .form-inner

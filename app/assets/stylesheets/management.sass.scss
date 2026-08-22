@@ -752,3 +752,57 @@
     }
   }
 }
+
+// Slash menu inside the article body editors. Deliberately plain: the redesigned edit
+// screen replaces this whole form, and the controller and partials are what carry over.
+.slash-menu {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid #DC143C;
+  border-radius: 4px;
+  background: #FFFFFF;
+
+  &__kinds {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  &__kind {
+    border: 1px solid #CCCCCC;
+    background: #F4F4F4;
+    border-radius: 3px;
+    padding: 4px 12px;
+    font-size: 13px;
+
+    &:hover {
+      border-color: #DC143C;
+    }
+  }
+
+  &__label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  &__input {
+    display: block;
+    width: 100%;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px;
+    padding: 6px 8px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  &__error {
+    margin-top: 10px;
+    color: #DC143C;
+    font-size: 13px;
+  }
+}
