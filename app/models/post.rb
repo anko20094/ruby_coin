@@ -7,9 +7,18 @@ class Post < ApplicationRecord
   PAGY_LIMIT = 6
   has_and_belongs_to_many :tags
   belongs_to :user
+  # Mobility's Table backend also defines Post#translations over these same rows (as
+  # Post::Translation). This association is the one the app uses — pg_search's
+  # associated_against, Posts::Translator and posts_helper all name it — which is what let the
+  # Globalize swap leave every one of them untouched.
   has_many :post_translations, dependent: :destroy
 
+  extend Mobility
+
+  # Table backend, on the table Globalize left: post_translations. See
+  # config/initializers/mobility.rb for what is switched on and what is not.
   translates :title, :subtitle
+
   extend FriendlyId
 
   friendly_id :slug, use: %i[slugged finders history]

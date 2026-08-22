@@ -149,4 +149,43 @@ RSpec.describe Post do
       expect(create(:post, created_at: (Post::RECENT_FOR + 1.day).ago)).not_to be_recent
     end
   end
+
+  # Mobility replaced Globalize in W6a on the same table. Nothing in the suite noticed, which
+  # is the point — these pin the two behaviours a future change could break quietly.
+  describe 'translated title and subtitle' do
+    let(:post) { create(:post) }
+
+    # Saving in a locale needs that locale's title, subtitle and body — the presence
+    # validations read the current locale, which is how the editorial rule is enforced.
+    it 'keeps one row per locale, not one per write' do
+      I18n.with_locale(:en) { post.update!(title: 'English title', subtitle: 'English lede') }
+      I18n.with_locale(:uk) { post.update!(title: 'Український заголовок', subtitle: 'Український лід') }
+
+      expect(post.reload.post_translations.pluck(:locale).sort).to eq(%w[en uk])
+      expect(post.translations.count).to eq(post.post_translations.count)
+    end
+
+    it 'reads each locale back on its own' do
+      I18n.with_locale(:en) { post.update!(title: 'English title', subtitle: 'English lede') }
+      I18n.with_locale(:uk) { post.update!(title: 'Український заголовок', subtitle: 'Український лід') }
+      post.reload
+
+      expect(I18n.with_locale(:en) { post.title }).to eq('English title')
+      expect(I18n.with_locale(:uk) { post.title }).to eq('Український заголовок')
+    end
+
+    # Deliberate: an untranslated post has to render empty so the gap is visible, rather than
+    # quietly showing the other language.
+    it 'does not fall back to another locale' do
+      post.post_translations.where(locale: 'en').delete_all
+
+      expect(I18n.with_locale(:en) { post.reload.title }).to be_nil
+    end
+
+    it 'is still searchable through the association pg_search names' do
+      I18n.with_locale(:uk) { post.update!(title: 'Мобільність', subtitle: 'Підзаголовок') }
+
+      expect(described_class.search_by_title('Мобільність')).to include(post)
+    end
+  end
 end
