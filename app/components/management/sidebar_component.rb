@@ -33,16 +33,23 @@ class Management::SidebarComponent < ViewComponent::Base
     @current || ENTRY_FOR_CONTROLLER[helpers.controller_name]
   end
 
+  # How long the counts may be out of date. The sidebar is orientation, not a report: eight
+  # COUNT queries were running on every single admin page — more than most of those pages ran
+  # for their own content — to keep numbers current to the second that nobody reads that way.
+  COUNTS_TTL = 2.minutes
+
   def models
+    numbers = counts
+
     [
       Model.new(key: :posts, label: 'Post', path: helpers.management_posts_path,
-                total: Post.count, hint: posts_hint),
+                total: numbers[:posts], hint: t('.posts_hint', **numbers[:posts_by_status])),
       Model.new(key: :cases, label: 'Case', path: helpers.management_cases_path,
-                total: Case.count, hint: cases_hint),
+                total: numbers[:cases], hint: t('.cases_hint', own: numbers[:own_cases])),
       Model.new(key: :cv_blocks, label: 'CVBlock', path: helpers.management_cv_blocks_path,
-                total: CVBlock.count, hint: cv_hint),
+                total: numbers[:cv_blocks], hint: numbers[:cv_by_kind]),
       Model.new(key: :tags, label: 'Tag', path: helpers.management_tags_path,
-                total: Tag.count, hint: tags_hint)
+                total: numbers[:tags], hint: t('.tags_hint', used: numbers[:used_tags]))
     ]
   end
 
@@ -59,20 +66,22 @@ class Management::SidebarComponent < ViewComponent::Base
 
   private
 
-  def posts_hint
-    by_status = Post.group(:status).count
-    t('.posts_hint', active: by_status['active'].to_i, inactive: by_status['inactive'].to_i)
-  end
+  # One cache entry for all eight numbers, so a page that only needs its own content pays for
+  # its own content. Written outside the locale key on purpose: they are numbers.
+  def counts
+    Rails.cache.fetch('management/sidebar/counts', expires_in: COUNTS_TTL) do
+      by_status = Post.group(:status).count
 
-  def cases_hint
-    t('.cases_hint', own: Case.where(own: true).count)
-  end
-
-  def cv_hint
-    CVBlock.group(:kind).count.map { |kind, count| "#{count} #{kind.tr('_', ' ')}" }.join(' · ')
-  end
-
-  def tags_hint
-    t('.tags_hint', used: Tag.joins(:posts).distinct.count)
+      {
+        posts: Post.count,
+        posts_by_status: { active: by_status['active'].to_i, inactive: by_status['inactive'].to_i },
+        cases: Case.count,
+        own_cases: Case.where(own: true).count,
+        cv_blocks: CVBlock.count,
+        cv_by_kind: CVBlock.group(:kind).count.map { |kind, count| "#{count} #{kind.tr('_', ' ')}" }.join(' · '),
+        tags: Tag.count,
+        used_tags: Tag.joins(:posts).distinct.count
+      }
+    end
   end
 end

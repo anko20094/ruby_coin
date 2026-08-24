@@ -4,10 +4,16 @@ html lang=I18n.locale
     meta charset="utf-8"
     = favicon_link_tag asset_path('favicon.ico')
     title
-      = content_for?(:title) ? yield(:title) : 'RubyCoin'
+      = content_for?(:title) ? yield(:title) : MetaHelper::SITE_NAME
 
     meta[name="viewport" content="width=device-width,initial-scale=1"]
-    = csrf_meta_tags
+    = render 'shared/meta'
+    / No csrf_meta_tags here on purpose. Nothing on the public theme makes a non-GET request —
+    / the only form is the GET search — and the masked token in that tag changes on every
+    / response, which made the ETag change on every response too. Without it, a reader who
+    / comes back to a page they have already read gets a 304 with no body instead of the whole
+    / page again. Rails' form helpers carry their own token in a hidden field, so a form added
+    / here later still works; only a hand-written fetch() would need the tag back.
     = csp_meta_tag
     / The four faces are self-hosted (theme/_fonts.scss) — no runtime request to
     / Google Fonts. Preload only the slices the first paint actually needs.
@@ -17,7 +23,10 @@ html lang=I18n.locale
     = javascript_include_tag 'theme', defer: true
 
   body.rc-site
+    a.rc-skip href="#main"= t('global.skip_to_content')
     = render NavComponent.new
-    main.rc-main.page-in
+    = render 'shared/theme_flash'
+    main#main.rc-main.page-in tabindex="-1"
       = yield
     = render FooterComponent.new
+    = render 'shared/quote_card'

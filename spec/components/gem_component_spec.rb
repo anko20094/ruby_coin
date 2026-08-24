@@ -54,10 +54,12 @@ describe GemComponent, type: :component do
       expect(page).to have_css('filter#rc-gem-glow-spec')
     end
 
-    it 'takes its size from the caller' do
+    # A ceiling, not a fixed width: a 400px gem in a one-column grid used to pin the home
+    # page's min-content at 400px and push it 61px past a 375px phone.
+    it 'takes its size from the caller as a maximum it may shrink below' do
       render_inline(described_class.new(uid: 'spec', variant: :hero, size: 400))
 
-      expect(page.find('svg')[:style]).to eq('width: 400px; height: 400px')
+      expect(page.find('svg')[:style]).to eq('width: min(400px, 100%); height: auto; aspect-ratio: 1')
     end
   end
 

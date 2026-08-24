@@ -28,6 +28,8 @@ aside.mg-sidebar
     .mg-sidebar__who
       .mg-sidebar__name= user&.nickname
       .mg-sidebar__role= user&.role
+    / title alone is not an accessible name — handoff §11 flags exactly this control.
     = button_to destroy_user_session_path, method: :delete, class: 'mg-sidebar__out',
-      form: { data: { turbo: false } }, title: t('nav_item.sign_out') do
+      form: { data: { turbo: false } }, title: t('nav_item.sign_out'),
+      aria: { label: t('nav_item.sign_out') } do
       span aria-hidden="true" ↪

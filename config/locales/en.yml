@@ -1,16 +1,11 @@
 en:
 
   titles:
-    admin: Admin
     faq: FAQ
-    main: Main
     search: Search
     edit: Edit
     new: New
     tags: Tags
-    posts: Posts
-    categories: Categories
-    filters: Filters
     faq_title: Frequently Asked Questions
   buttons:
     remember_me: Remember me
@@ -25,14 +20,13 @@ en:
     create: Create
     yes_text: 'Yes'
     no_text: 'No'
-    apply: Apply
   labels:
     registration: Registration
     enter_account: Account login
+    show_password: Show the password
     edit_account: Edit account
     create_tag: Create tag
   confirmations:
-    action_confirmation: Action confirmation
     delete: Are you sure you want to delete %{item}?
   home:
     index:
@@ -55,19 +49,6 @@ en:
       all_work: all work
       to_top: Back to the top
       top: TOP
-    show:
-      similar_posts: Similar posts
-    search:
-      search: Search
-      no_results: No results
-      interesting: Maybe you'll be interested
-      placeholder: What is a "gem" in Ruby?
-      advanced: Advanced search
-      radio:
-        all: All fields
-        title: Title
-        description: Description
-      results: 'Results:'
   faq:
     who_am_i:
       question1: Who are you and what services do you provide?
@@ -165,6 +146,23 @@ en:
               translation_missing: translation missing
   
   management:
+    statistics:
+      index:
+        title: Statistics
+        note: what gets read
+        periods:
+          today: today
+          month: this month
+          year: this year
+          all: all time
+        cases: Cases
+        posts: Journal entries
+        columns:
+          case: Case
+          post: Entry
+          views: Views
+        no_case_views: No case has been opened yet.
+        no_post_views: No entry has been opened yet.
     posts:
       index:
         title: Post
@@ -189,29 +187,7 @@ en:
           author: author
           updated: updated
       new:
-        title: Create a post
       edit:
-        title: Edit the post
-      form:
-        title_label: Title
-        subtitle_label: Subtitle
-        photo_label: Main photo
-        description_label: Description
-        status_label: Status active ?
-        tag_label: Tags
-        placeholders:
-          title: Enter title
-          subtitle: Enter subtitle
-          description: Enter description
-          tags: Enter tags
-          select_image: Select image
-        status:
-          label: Status
-          active: Active
-          disabled: Disabled
-        translation_button: Translate
-        main_post: Main post
-        translation_notice: "* if there won't be translation post will not displayed in another language version of site"
       editor:
         untitled: untitled
         side_by_side: both
@@ -244,7 +220,6 @@ en:
           subtitle: One sentence saying what the piece is about.
           slug: how-this-reads-in-a-url
       slash_menu:
-        hint: Type / in the body for code, callout and embed blocks.
         insert: Insert block
         kinds:
           code: code
@@ -270,9 +245,7 @@ en:
         own: own
         this_site: this site
       new:
-        title: Create a case
       edit:
-        title: Edit the case
       form:
         slug: Slug
         mark: Mark
@@ -331,9 +304,7 @@ en:
           stack_group: stack group
           strength: strength
       new:
-        title: Add a CV block
       edit:
-        title: Edit the CV block
       form:
         kind: Kind
         position: Position
@@ -364,60 +335,45 @@ en:
       statistics_hint: views · visits
 
     shared:
-      admin_left_panel:
-        cv: CV
-        cases: Cases
-        admin: Admin
-        posts: Posts
-        tags: Tags
-        statistic: Statistic
-        active-admin: Administrator
-        exit: Exit
-
     tags:
       index:
         tags: Exist tags
-        create: Create a tag
         placeholders:
           name: Enter name
       form:
         title_label: Name of the tag
       edit:
-        title_label: Name of the tag
       create:
         success: Tag successfully created
       update:
         success: Tag successfully updated
       destroy:
         success: Tag successfully deleted
-      placeholders:
-        name: Name
-
   en: English
   uk: Ukrainian
 
   global:
-    errors:
-      invalid_format: has an invalid format
-    user:
-      roles:
-        basic: Basic
-        moderator: Moderator
-        admin: Admin
     button:
       delete: Delete
       cancel: Cancel
       create: Create
       save: Save
       edit: Edit
-      show: Show
-      submit: Submit
     dialog:
       you_sure: Are you sure?
-    text:
-      omission: ... (continuation)
-  main_btn:
-    read_more: Read more
+    dismiss: Dismiss this message
+    reading_progress: reading progress
+    quote:
+      hint: for a card
+      label: The passage as a card
+    palette:
+      open: Search the site
+      placeholder: pages, cases, entries…
+      empty: Type to search the site.
+      move: move
+      open_result: open
+      close: close
+    skip_to_content: Skip to the content
   nav_item:
     sign_in: Sign in
     sign_out: Sign out
@@ -427,19 +383,13 @@ en:
   application_controller:
     alert: You are not authorized to perform this action.
   
-  home_controller:
-    show:
-      errors:
-        not_found: Post not found
-
   errors:
     messages:
-      wrong_posts_name: "This name alreadt exists."
-      carrierwave_processing_error: "Cannot resize image."
-      carrierwave_integrity_error: "Not an image."
-      carrierwave_download_error: "Couldn't download image."
-      extension_whitelist_error: "You are not allowed to upload %{extension} files, allowed types: %{allowed_types}"
-      extension_blacklist_error: "You are not allowed to upload %{extension} files, prohibited types: %{prohibited_types}"
+      processing_error: "Cannot resize image."
+      integrity_error: "Not an image."
+      download_error: "Couldn't download image."
+      extension_allowlist_error: "You are not allowed to upload %{extension} files, allowed types: %{allowed_types}"
+      extension_denylist_error: "You are not allowed to upload %{extension} files, prohibited types: %{prohibited_types}"
 
   work:
     nav:
@@ -448,11 +398,12 @@ en:
       studio: studio
       contact: contact
       soon: soon
+      menu: menu
       soon_title: Not published yet — the crew page needs the team
     footer:
-      journal: rss
+      journal: journal
+      feed: rss
       work: all cases
-      studio: the crew
       contact: say hi
     index:
       eyebrow: work · cv
@@ -481,12 +432,31 @@ en:
       pager: NEXT
       previous: PREVIOUS
       next: NEXT
+      skip: skip to the engineering
+      copied: copied
+      cta: Read the whole thing and want to talk about it?
+      cta_contact: Get in touch
 
   contact:
     show:
       eyebrow: contact
       title: Say hi
       lede: A project, an idea, a question, or you just want to talk Rails. Pick a channel — all of them are read.
+
+  error_pages:
+    not_found:
+      title: This page is not here
+      lede: The address is wrong, or what stood here has moved. Nothing is broken on your side.
+    unacceptable:
+      title: That request could not be accepted
+      lede: Usually a form that sat open too long. Go back and send it again.
+    internal:
+      title: Something on my side broke
+      lede: The error is logged and I will see it. Try again in a minute.
+    actions:
+      work: See the work
+      journal: Read the journal
+    hint: searches the whole site
 
   journal:
     index:
@@ -501,20 +471,40 @@ en:
       order:
         label: show
         new: new
+        oldest: oldest
         best: best
       empty: "no entries for #%{tag}."
+      empty_all: nothing published yet.
       new_badge: NEW
-    show:
-      errors:
-        not_found: Post not found
+      pager:
+        previous: previous page
+        next: next page
+    search:
+      eyebrow: search
+      title: Search
+      lede: Everything in the journal, by title or by body.
+      field: query
+      placeholder: what are you looking for?
+      submit: Search
+      where: look in
+      fields:
+        all: everywhere
+        title: titles
+        description: bodies
+      prompt: Type something and press Search.
+      found:
+        one: "%{count} entry"
+        other: "%{count} entries"
+      none: "Nothing matches “%{query}”."
     blocks:
       callout:
         note: note
         warn: careful
-      embed:
-        load: play
     post:
       back: journal
       all_entries: all entries
       related: related
+      series: the series
+      previous: previous
+      next: next
     minutes: "%{count} min"

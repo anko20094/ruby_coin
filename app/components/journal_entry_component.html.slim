@@ -1,7 +1,7 @@
 = link_to post_path(post, locale: I18n.locale), class: css_classes do
   span.jn-entry__number= post.entry_label
   span.jn-entry__date= date
-  h3.jn-entry__title
+  h2.jn-entry__title
     = post.title
     - if post.recent?
       span.jn-entry__badge= t('journal.index.new_badge')

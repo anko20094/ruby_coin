@@ -1,24 +1,17 @@
+/ Delete used to be a div-as-button opening a Bootstrap modal whose confirm was an <a> nested
+/ inside a <button>, carrying a duplicate `exampleModalLabel` id on every row — and the link
+/ itself relied on data-turbo-method, which does nothing with Turbo Drive off. One form, one
+/ button, one confirmation that works without Turbo.
 = turbo_frame_tag tag, class: 'tag' do
   h3.tag__title = tag.title
   .tag__actions
     .edit
-      = link_to image_tag("edit-icon.svg"), edit_management_tag_path(tag),
-              data: { turbo_frame: dom_id(tag) }
+      = link_to edit_management_tag_path(tag), data: { turbo_frame: dom_id(tag) },
+        aria: { label: t('global.button.edit') } do
+        = image_tag 'edit-icon.svg', alt: ''
     .delete
-      .[type="button" data-bs-toggle="modal" data-bs-target="#exampleModal#{tag.id}"]
-        = image_tag("delete-icon.svg")
-      .modal.fade[tabindex="-1" aria-labelledby="exampleModalLabel#{tag.id}" aria-hidden="true" id="exampleModal#{tag.id}"]
-        .modal-dialog.tags
-          .modal-content
-            .modal-header
-              h1#exampleModalLabel.modal-title.fs-5
-                = t('confirmations.action_confirmation')
-              button.btn-close[type="button" data-bs-dismiss="modal" aria-label="Close"]
-            .modal-body
-              = t('confirmations.delete', item: tag.title)
-            .modal-footer
-              button.main-btn[type="button" data-bs-dismiss="modal"]
-                = link_to t("buttons.yes_text"), management_tag_path(tag),
-                    data: { turbo_method: :delete }
-              button.main-btn.not_filled[type="button" data-bs-dismiss="modal"]
-                = t("buttons.no_text")
+      = button_to management_tag_path(tag), method: :delete,
+        aria: { label: t('global.button.delete') },
+        form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
+                        confirm_message_value: t('confirmations.delete', item: tag.title) } } do
+        = image_tag 'delete-icon.svg', alt: ''

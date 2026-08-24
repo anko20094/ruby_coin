@@ -4,7 +4,6 @@ class Post < ApplicationRecord
   require 'i18n'
 
   LIMIT_COUNT = 3
-  PAGY_LIMIT = 6
   has_and_belongs_to_many :tags
   belongs_to :user
   # Mobility's Table backend also defines Post#translations over these same rows (as
@@ -24,7 +23,9 @@ class Post < ApplicationRecord
   friendly_id :slug, use: %i[slugged finders history]
   include PgSearch::Model
 
-  ORDER_TYPES = %w[new best].freeze
+  # A reader who arrives at a numbered series wants to start at the beginning. The journal
+  # offered "new" and "best" and nothing else, so #001 was only reachable by paging to the end.
+  ORDER_TYPES = %w[new oldest best].freeze
 
   # The body lives in Action Text, one named rich text per locale. Globalize still owns
   # title and subtitle; post_translations.description is left in place as a dormant backup
@@ -62,11 +63,12 @@ class Post < ApplicationRecord
   enum :status, { active: 0, inactive: 1 }
 
   scope :ordered, -> { order(created_at: :desc) }
-  scope :main, -> { where(main_post: true).ordered }
+  # Featured *and* published. Featuring is a display choice, hiding is a publication one, and
+  # the second has to win: a post switched to inactive was still being shown on the home page
+  # because this scope only asked the first question.
+  scope :main, -> { where(main_post: true, status: :active).ordered }
   scope :active, -> { where(status: :active).ordered }
   scope :inactive, -> { where(status: :inactive).ordered }
-  scope :new_regular, -> { where(main_post: false).ordered.limit(3) }
-  scope :new_main, -> { where(main_post: true).ordered.limit(3) }
   # не кращий варіант, оскільки імплементований status: :active
   scope :best, lambda {
     joins("LEFT JOIN ahoy_events ON ahoy_events.properties->>'post_id' = posts.id::text")
@@ -75,6 +77,14 @@ class Post < ApplicationRecord
       .select('posts.*, COUNT(ahoy_events.id) AS views_count')
       .order('COUNT(ahoy_events.id) DESC')
   }
+  scope :oldest, -> { where(status: :active).order(created_at: :asc) }
+
+  # The entry either side of this one, by the series number the site prints. Nothing linked
+  # posts to each other before: the only way out of an entry was back to the index or a
+  # tag-similarity row, so a series could not be read as a series.
+  scope :before, ->(post) { active.where(entry_number: ...post.entry_number).reorder(entry_number: :desc) }
+  scope :after, ->(post) { active.where('entry_number > ?', post.entry_number).reorder(entry_number: :asc) }
+
   scope :similar_posts, lambda { |current_post|
     where.not(id: current_post.id)
          .includes(:tags)
@@ -100,10 +110,6 @@ class Post < ApplicationRecord
 
   def plain_body(locale = I18n.locale)
     self[:"search_body_#{RICH_TEXT_BODIES.key?(locale.to_sym) ? locale : :en}"].to_s
-  end
-
-  def truncated_description
-    plain_body.truncate(100, separator: /\s/)
   end
 
   def reading_minutes(locale = I18n.locale)
@@ -135,22 +141,8 @@ class Post < ApplicationRecord
     format('#%03d', entry_number) if entry_number.present?
   end
 
-  def similar_posts(post)
-    post_tags = post.tags.pluck(:id)
-
-    Post.joins(:tags).where(tags: { id: post_tags }).where.not(id: post.id).distinct.limit(LIMIT_COUNT)
-  end
-
   def similar_tags_titles
     tags.limit(LIMIT_COUNT).pluck(:title)
-  end
-
-  def self.ransackable_attributes(_auth_object = nil)
-    %w[title subtitle description created_at updated_at]
-  end
-
-  def self.ransackable_associations(_auth_object = nil)
-    %w[post_translations tags translations user]
   end
 
   private

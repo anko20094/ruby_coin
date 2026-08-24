@@ -17,6 +17,8 @@
 @use 'pages/home';
 @use 'pages/contact';
 @use 'pages/faq';
+@use 'pages/error';
+@use 'pages/auth';
 
 @use 'pages/journal_index';
 @use 'pages/journal_post';
@@ -25,3 +27,7 @@
 @use 'pages/work_index';
 @use 'pages/work_case';
 @use 'pages/work_responsive';
+
+// Last on purpose: the print rules override page layout, and at equal specificity the last
+// declaration wins. Loaded any earlier, pages/_work_index.scss put the sticky sidebar back.
+@use 'theme/print';

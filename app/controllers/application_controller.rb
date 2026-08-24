@@ -2,8 +2,13 @@
 
 class ApplicationController < ActionController::Base
   include I18nExtended
+  include HttpCaching
   include Pundit::Authorization
   include Pagy::Method
+
+  # The redesign is the site. The old Bootstrap layout survives only inside /management, whose
+  # own controller names it; anything that does not choose gets the theme.
+  layout 'theme'
 
   protect_from_forgery with: :exception
   before_action :set_pagy_locale

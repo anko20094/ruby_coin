@@ -15,11 +15,22 @@ module RubyCoin
 
     config.exceptions_app = routes
 
+    # Nothing on the wire was compressed: no Deflater in the stack, and the deployed nginx
+    # vhost does not gzip either. The theme's stylesheet alone is 42 KB uncompressed and 9 KB
+    # gzipped, and on a 3G connection that difference is most of a second. Inserted before
+    # ActionDispatch::Static so files served out of public/ are compressed too.
+    config.middleware.insert_before ActionDispatch::Static, Rack::Deflater
+
     config.i18n.available_locales = [:en, :uk]
     config.i18n.default_locale = :uk
     config.time_zone = 'Europe/Kyiv'
     # config.active_record.default_timezone = :local
-    config.active_job.queue_adapter = :sidekiq
+    # In-process, because the only jobs this app enqueues are Active Storage's own analyse
+    # and purge housekeeping. It used to say :sidekiq — with no Sidekiq worker in the Procfile
+    # or in any deploy file, so those jobs were queued into nothing and never ran. Solid Queue
+    # is the intended destination (redesign_plan.md §2); it needs a worker process and a
+    # systemd unit on the server, so it is a deploy change rather than a code change.
+    config.active_job.queue_adapter = :async
 
     config.generators do |g|
       g.test_framework :rspec

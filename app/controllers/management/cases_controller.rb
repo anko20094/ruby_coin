@@ -2,7 +2,7 @@
 
 module Management
   class CasesController < ApplicationController
-    before_action :authenticate_user!, :authorize_policy
+    before_action :authorize_policy
     before_action :set_case!, only: %i[edit update destroy]
 
     def index

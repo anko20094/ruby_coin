@@ -4,7 +4,7 @@ html lang=I18n.locale
     = favicon_link_tag asset_path('favicon.ico')
     meta charset="utf-8"
     title
-      = content_for?(:title) ? yield(:title) : 'RubyCoin'
+      = content_for?(:title) ? yield(:title) : MetaHelper::SITE_NAME
     meta content="width=device-width,initial-scale=1" name="viewport" /
     = csrf_meta_tags
     = csp_meta_tag
@@ -15,7 +15,8 @@ html lang=I18n.locale
     / two disagree. See redesign_plan.md §4.1.
     = stylesheet_link_tag 'application', media: 'all'
     = stylesheet_link_tag 'admin', media: 'all'
-    = javascript_include_tag 'application', defer: true
+    / 'admin', not 'application': the editor's bundle belongs to the screens that have one.
+    = javascript_include_tag 'admin', defer: true
   - css_classes = [controller_path.tr('/', '-'), action_name].map { |name| name.tr('_', '-') }
   body class=css_classes data-lang="#{I18n.locale}"
     .mg-shell

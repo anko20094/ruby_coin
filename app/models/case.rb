@@ -90,17 +90,26 @@ class Case < ApplicationRecord
     self[:stack] = value.to_s.split("\n").map(&:strip).compact_blank
   end
 
-  # The list wraps: the last case's next is the first.
-  def neighbours
-    slugs = self.class.slugs
-    index = slugs.index(slug)
-    return [self, self] if index.nil? || slugs.one?
-
-    [self.class.find_by!(slug: slugs[index - 1]), self.class.find_by!(slug: slugs[(index + 1) % slugs.size])]
+  # Where this case sits in the list, and the two either side of it — the list wraps, so the
+  # last case's next is the first.
+  #
+  # Both take the ordered list rather than fetching one, because the caller usually has it:
+  # drawing a case page used to cost `Case.slugs`, two `find_by!(slug:)` and a second
+  # `Case.slugs` for the position — four queries against a seven-row table to render one
+  # pager.
+  def position_in(list = self.class.ordered)
+    list.index { |kase| kase.slug == slug }
   end
 
-  def number
-    self.class.slugs.index(slug).to_i + 1
+  def number(list = self.class.ordered)
+    position_in(list).to_i + 1
+  end
+
+  def neighbours(list = self.class.ordered.to_a)
+    index = position_in(list)
+    return [self, self] if index.nil? || list.one?
+
+    [list[index - 1], list[(index + 1) % list.size]]
   end
 
   private

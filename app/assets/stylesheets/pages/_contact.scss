@@ -79,7 +79,7 @@ $contact-max: 1080px;
 .ct-channel__arrow {
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
   text-align: right;
   transition: color 180ms;
 }
@@ -102,7 +102,7 @@ $contact-max: 1080px;
   font-size: 10px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
 }
 
 .ct-where__value {

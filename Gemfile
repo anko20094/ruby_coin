@@ -10,12 +10,9 @@ gem 'ahoy_matey', '~> 5.4', '>= 5.4.1'
 gem 'blueprinter'
 gem 'bootsnap', require: false
 gem 'carrierwave', '~> 3.1', '>= 3.1.2'
-gem 'chartkick', '~> 5.2', '>= 5.2.1'
 gem 'cssbundling-rails'
 gem 'devise'
 gem 'friendly_id', '~> 5.6'
-gem 'groupdate'
-gem 'hotwire-rails'
 gem 'httparty'
 gem 'image_processing', '~> 1.14'
 gem 'jsbundling-rails'
@@ -28,12 +25,10 @@ gem 'propshaft'
 gem 'puma', '~> 8.0'
 gem 'pundit', '~> 2.5', '>= 2.5.2'
 gem 'pundit-matchers', '~> 4.0'
+gem 'rack-attack', '~> 6.7'
 gem 'rails', '~> 8.1'
 gem 'rails-i18n'
-gem 'rbs'
-gem 'redis'
 gem 'rouge'
-gem 'sidekiq'
 gem 'slim'
 gem 'stimulus-rails'
 gem 'turbo-rails', '~> 2.0', '>= 2.0.20'
@@ -68,14 +63,11 @@ group :development do
   gem 'capistrano-bundler', '~> 2.2', require: false
   gem 'capistrano-rails', '~> 1.7', '~> 1.6', require: false
   gem 'capistrano-rbenv', '~> 2.2', require: false
-  gem 'capistrano-yarn', '~> 2.0', '>= 2.0.2', require: false
 end
 
 group :test do
   gem 'capybara'
-  gem 'database_cleaner'
   gem 'rails-controller-testing'
-  gem 'selenium-webdriver'
   gem 'shoulda-matchers'
   gem 'vcr', '~> 6.3'
   gem 'webmock', '~> 3.26'

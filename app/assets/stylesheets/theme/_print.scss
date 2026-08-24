@@ -1,0 +1,83 @@
+// /work is the CV. The normal next step after "this one looks good" is to print it or attach
+// it to an internal email, and Cmd-P produced the sticky nav, the ruby, the footer and a
+// sidebar that ran off the page. There is no PDF to download and this is most of why there
+// does not need to be one.
+@media print {
+  :root {
+    // Print has no oklch and no colour budget: ink on white, and the accent survives as bold.
+    --paper: #fff;
+    --paper-warm: #fff;
+    --ink: #111;
+    --ink-soft: #333;
+    --ink-mute: #777;
+    --ruby: #000;
+    --page-pad: 0;
+  }
+
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  body {
+    background: #fff;
+    color: #111;
+    font-size: 10.5pt;
+  }
+
+  // Chrome, decoration and anything that cannot be followed on paper.
+  .rc-nav,
+  .rc-footer,
+  .rc-progress,
+  .rc-skip,
+  .rc-flash,
+  .rc-palette,
+  .hm-top,
+  .rc-gem,
+  .wk-portrait,
+  .wk-case__skip,
+  .wk-case__pager,
+  .jn-steps,
+  .jn-related,
+  .jn-filter,
+  .jn-pager,
+  .jn-index__search,
+  .jn-search { display: none !important; }
+
+  .rc-main { animation: none; }
+
+  // The sidebar is sticky on screen; on paper it is simply the last column.
+  .wk-index__grid {
+    display: block;
+  }
+
+  .wk-index__aside {
+    position: static;
+    margin-top: 18pt;
+    break-inside: avoid;
+  }
+
+  .wk-index__title,
+  .ct-page__title { font-size: 26pt; }
+
+  // A career entry or a project row split across a page break is unreadable.
+  .wk-career__entry,
+  .wk-row,
+  .wk-stack__group,
+  .wk-panel,
+  .wk-card { break-inside: avoid; }
+
+  .wk-index__section { break-before: auto; }
+
+  // A link the reader cannot click is a link they cannot follow — print where it went. Only
+  // for the contact column: on a project row the ::after becomes another grid cell and the
+  // URL comes out as a one-character-wide column down the page.
+  .wk-contact__value::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  a { text-decoration: none; }
+}

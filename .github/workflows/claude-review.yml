@@ -37,7 +37,7 @@ jobs:
           prompt: |
             You are a senior Rails engineer reviewing a PR for a web platform with admin panel.
 
-            Stack: Rails 7.2, PostgreSQL, Redis, Sidekiq 7.3, Pundit (authorization), ActiveAdmin 3.4, Devise (auth), Carrierwave (file uploads), Chartkick (charts), Hotwire (Turbo + Stimulus), TinyMCE, Pagy, Globalize (translations), pg_search, Capistrano.
+            Stack: Rails 8.1, PostgreSQL, Pundit (authorization), Devise (auth), Carrierwave (file uploads), Action Text + Trix (article bodies), Hotwire (Turbo Frames + Stimulus; Turbo Drive is deliberately off), ViewComponent, Slim, Propshaft, Mobility (translations), pg_search, Pagy, friendly_id, Rouge, Ahoy, Capistrano.
 
             Do NOT use any skills or slash commands.
 

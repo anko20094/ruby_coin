@@ -19,10 +19,6 @@ class User < ApplicationRecord
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
 
-  def self.ransackable_attributes(_auth_object = nil)
-    %w[nickname email id role unconfirmed_email created_at updated_at confirmed_at current_sign_in_at]
-  end
-
   def confirmed?
     confirmed_at.present?
   end

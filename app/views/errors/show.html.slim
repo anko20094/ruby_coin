@@ -1,0 +1,18 @@
+- key = ErrorsController::COPY_KEYS.fetch(error_status, ErrorsController::COPY_KEYS[404])
+- content_for :title, full_title(t("error_pages.#{key}.title"))
+- page_meta description: t("error_pages.#{key}.lede")
+
+.er-page
+  .er-code.num= error_status
+  h1.er-title= t("error_pages.#{key}.title")
+  p.er-lede= t("error_pages.#{key}.lede")
+
+  .er-actions
+    = link_to t('error_pages.actions.work'), work_path, class: 'rc-button rc-button--primary'
+    = link_to t('error_pages.actions.journal'), journal_path, class: 'rc-button'
+
+  .er-hint
+    span.er-hint__keys
+      kbd ⌘
+      kbd K
+    = " #{t('error_pages.hint')}"

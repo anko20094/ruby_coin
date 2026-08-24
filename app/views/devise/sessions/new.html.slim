@@ -1,33 +1,30 @@
-.log-reg__form
-  .log-reg__form--content
-    h1.title
-      = t("labels.enter_account")
-    = form_for(resource, as: resource_name, url: session_path(resource_name),
-            html: { data: { turbo: false } }) do |f|
-      .group
-        label.standart-label 
-          = f.label :email
-        .input
-          .badge
-            = image_tag "mail-icon.svg"
-          = f.email_field :email, autofocus: true, autocomplete: "email", label: false, class: 'standart-input'
-      .group
-        label.standart-label
-          = f.label :password
-        .input[data-controller="password-visibility"]
-          .badge
-            = image_tag "pass-icon.svg" 
-          = f.password_field :password, label: false, autocomplete: "current-password", class: 'standart-input', data: { password_visibility_target: "input" }
-          .show__password-wrapper.active[data-action="click->password-visibility#toggleVisibility"]
-            .eye-icon
-      - if devise_mapping.rememberable?
-        .remember_me
-          .left
-            = f.check_box :remember_me, data: { toggle: :toggle, onlabel: t('buttons.yes_text'), offlabel: t('buttons.no_text'), onstyle: 'success', offstyle: 'danger' } 
-            .ms-2
-              = t("buttons.remember_me")
-          .right
-            = link_to t("buttons.forgot_password"), new_password_path(resource_name), class: 'text'
-      .actions
-        = f.submit t("buttons.sign_in"), class: 'main-btn'
-        = link_to t("buttons.sign_up"), new_registration_path(resource_name), class: 'main-btn not_filled' 
+- content_for :title, full_title(t('labels.enter_account'))
+- page_meta description: t('labels.enter_account')
+
+.au-page
+  h1.au-page__title= t('labels.enter_account')
+
+  = render 'devise/shared/errors', resource: resource
+
+  = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: 'au-form' }) do |f|
+    .au-field
+      = f.label :email, class: 'au-label'
+      = f.email_field :email, autofocus: true, autocomplete: 'email', class: 'au-input'
+
+    .au-field[data-controller="password-visibility"]
+      = f.label :password, class: 'au-label'
+      .au-input-row
+        = f.password_field :password, autocomplete: 'current-password', class: 'au-input',
+          data: { password_visibility_target: 'input' }
+        button.au-reveal[type="button" data-action="password-visibility#toggleVisibility"
+                         aria-label=t('labels.show_password')]
+          span aria-hidden="true" ◉
+
+    - if devise_mapping.rememberable?
+      .au-row
+        label.au-check
+          = f.check_box :remember_me
+          span= t('buttons.remember_me')
+        = link_to t('buttons.forgot_password'), new_password_path(resource_name), class: 'hover-link'
+
+    = f.submit t('buttons.sign_in'), class: 'rc-button rc-button--primary'

@@ -14,6 +14,12 @@ class Management::PostPolicy < ApplicationPolicy
     update?
   end
 
+  # Translation spends the owner's OpenAI credit, so it is a write in the only sense that
+  # matters here — it costs money per call.
+  def translate?
+    update?
+  end
+
   def preview?
     show?
   end

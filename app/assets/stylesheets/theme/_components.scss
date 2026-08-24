@@ -100,7 +100,7 @@
 .wk-metric__label {
   font-family: var(--font-mono);
   font-size: 10.5px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
   margin-top: 10px;
   line-height: 1.5;
 }
@@ -114,4 +114,81 @@
   &--anchor {
     will-change: transform;
   }
+}
+
+// The site's only button. It moved here from pages/_home.scss when the error pages
+// started using it too — a component with three callers does not belong in one page's file.
+.rc-button {
+  display: inline-block;
+  font-size: 14px;
+  padding: 10px 18px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-button);
+  transition: background 150ms, color 150ms;
+
+  &:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  &--primary {
+    background: var(--ink);
+    color: var(--paper);
+
+    &:hover {
+      background: var(--ruby);
+      border-color: var(--ruby);
+    }
+  }
+
+  &:active { transform: translateY(1px); }
+}
+
+// A metric cell that copies itself. It is a <button> in the markup whatever happens, so the
+// tab order and the semantics are the same with JavaScript off; `is-copyable` is added by the
+// controller, so the affordance only appears where it actually works.
+.wk-metric {
+  position: relative;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: default;
+
+  &.is-copyable {
+    cursor: pointer;
+
+    &::after {
+      content: '⧉';
+      position: absolute;
+      top: 2px;
+      right: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-quiet);
+      opacity: 0;
+      transition: opacity 150ms;
+    }
+
+    &:hover::after,
+    &:focus-visible::after { opacity: 1; }
+  }
+
+  &.is-copied .wk-metric__value { color: var(--ruby); }
+}
+
+.wk-metric__flash {
+  display: block;
+  margin-top: 4px;
+  min-height: 1em;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ruby);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-metric.is-copyable::after { transition: none; }
 }

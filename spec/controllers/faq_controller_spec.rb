@@ -7,7 +7,7 @@ describe FaqController do
 
   describe 'GET #index' do
     let(:action) { :index }
-    let(:params) { {} }
+    let(:params) { { locale: 'uk' } }
 
     it_behaves_like 'has http success'
 

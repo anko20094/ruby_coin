@@ -129,7 +129,7 @@
   font-family: var(--font-mono);
   font-size: 9.5px;
   letter-spacing: 1.4px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
   margin-bottom: 10px;
 }
 
@@ -169,7 +169,7 @@
     border-color: var(--ink);
   }
 
-  &::placeholder { color: var(--ink-mute); }
+  &::placeholder { color: var(--ink-quiet); }
 }
 
 .mg-input--title {
@@ -246,7 +246,7 @@
   font-family: var(--font-mono);
   font-size: 9.5px;
   letter-spacing: 1px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
 }
 
 .mg-og__title {

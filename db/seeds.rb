@@ -1,151 +1,122 @@
 # frozen_string_literal: true
 
-return unless Rails.env.development?
+# What a fresh checkout needs to look like the site: the real portfolio content, a way in,
+# and enough journal entries that the index, the pager and the tag filter have something to
+# do.
+#
+# The previous version could not run at all — it ended in
+# `Rake::Task['after_party:fill_translations'].invoke`, a task deleted with Globalize, so
+# `rails db:seed` (and `cap deploy:seed`) raised on any empty database. It also wrote each
+# post in one language only, which the site renders as blanks in the other.
+#
+# Idempotent: run it twice and nothing doubles.
 
-begin
-  length_of_line = `tput cols`.to_i # width of iTerm2 only
-  length_of_line = [length_of_line, 120].min if length_of_line.present? # Set maximum width to 120
-  length_of_line = 80 if length_of_line.nil? || length_of_line < 80 # Set minimum width to 80
-rescue StandardError
-  length_of_line = 80
+return unless Rails.env.local? || ENV['ALLOW_SEED'].present?
+
+def say(message) = puts("  #{message}")
+
+puts "\nseeding #{Rails.env}"
+
+# --- the portfolio ------------------------------------------------------------------------
+# Cases and the CV are real content, and the handoff forbids retyping any of it by hand, so
+# the same importers the deploy runs are the only way it gets in.
+Cases::Importer.call
+CV::Importer.call
+say "cases: #{Case.count} · cv blocks: #{CVBlock.count} · profile: #{CVProfile.current.name}"
+
+# --- a way in -----------------------------------------------------------------------------
+admin = User.find_or_initialize_by(email: ENV.fetch('SEED_ADMIN_EMAIL', 'admin@rubyco.in'))
+if admin.new_record?
+  admin.password = ENV.fetch('SEED_ADMIN_PASSWORD', 'password123')
+  admin.nickname = 'danyil'
+  admin.role = :admin
+  admin.save!
+end
+say "admin: #{admin.email}"
+
+# --- the journal --------------------------------------------------------------------------
+TAGS = %w[rails hotwire postgres activerecord viewcomponent turbo].freeze
+tags = TAGS.map { |title| Tag.find_or_create_by!(title: title) }
+
+ENTRIES = [
+  [
+    'Solid Queue, and one less service in the deploy',
+    'Solid Queue і на один сервіс менше в деплої'
+  ],
+  [
+    'Mobility on the table Globalize left behind',
+    'Mobility на таблиці, яку лишив Globalize'
+  ],
+  [
+    'Action Text is a storage decision, not an editor',
+    'Action Text — це рішення про сховище, а не редактор'
+  ],
+  [
+    'ViewComponent earns its keep at the third caller',
+    'ViewComponent окупається на третьому виклику'
+  ],
+  [
+    'pg_search and the join you should not make',
+    'pg_search і джойн, якого краще не робити'
+  ],
+  [
+    'A slug history is cheaper than a redirect table',
+    'Історія слагів дешевша за таблицю редиректів'
+  ],
+  [
+    'Counting views without counting yourself',
+    'Рахувати перегляди, не рахуючи себе'
+  ],
+  [
+    'Self-hosting four faces and cutting the subsets',
+    'Самохостинг чотирьох шрифтів і різання сабсетів'
+  ]
+].freeze
+
+BODY = {
+  en: '<p>A short entry, seeded so the journal has shape: an index with more than one page, ' \
+      'a tag filter with something to filter, and a post long enough to read.</p>' \
+      '<p>Replace it from /management as soon as there is something real to say — the ' \
+      'editorial rule on this site is that silence beats filler.</p>',
+  uk: '<p>Короткий запис, засіяний, щоб журнал мав форму: індекс більш ніж на одну сторінку, ' \
+      'фільтр тегів, якому є що фільтрувати, і пост, який можна прочитати.</p>' \
+      '<p>Заміни його з /management, щойно буде що сказати насправді — редакційне правило ' \
+      'цього сайту таке, що краще тиша, ніж філер.</p>'
+}.freeze
+
+LEDE = {
+  en: 'Seeded copy. Not something I actually wrote.',
+  uk: 'Засіяний текст. Це не те, що я справді писав.'
+}.freeze
+
+cover = Rails.root.join('app/assets/images/work-portrait.jpg') # rubocop:disable Rails/FilePath
+
+created = 0
+ENTRIES.each_with_index do |(en_title, uk_title), index|
+  slug = en_title.parameterize
+  next if Post.exists?(slug: slug)
+
+  post = Post.new(user: admin, status: :active, main_post: index.zero?, slug: slug,
+                  created_at: (index * 9).days.ago, tags: tags.sample(3))
+  I18n.with_locale(:en) do
+    post.title = en_title
+    post.subtitle = LEDE[:en]
+  end
+  I18n.with_locale(:uk) do
+    post.title = uk_title
+    post.subtitle = LEDE[:uk]
+  end
+  post.description_en = BODY[:en]
+  post.description_uk = BODY[:uk]
+  post.photo = File.open(cover)
+
+  post.save!
+  created += 1
+rescue CarrierWave::ProcessingError => e
+  # Every post needs a cover, and covers go through ImageMagick. Say so plainly rather than
+  # leaving a half-seeded database behind.
+  abort "  cannot process #{cover.basename}: #{e.message}\n  Install ImageMagick and re-run."
 end
 
-LENGTH_OF_LINE = length_of_line
-TAG_COUNT = 15
-POST_COUNT = 50
-
-# ==== Colorize (monkey patch) ====
-class String
-  def colorize(color_code)
-    "\e[#{color_code}m#{self}\e[0m"
-  end
-
-  def red
-    colorize('1;31')
-  end
-
-  def green
-    colorize('1;32')
-  end
-
-  def orange
-    colorize('1;33')
-  end
-
-  def blue
-    colorize('1;34')
-  end
-
-  def purple
-    colorize('1;35')
-  end
-
-  def light_gray
-    colorize('37')
-  end
-end
-
-def pretty_print(string, color = 'light_gray', method = :puts, element = '=')
-  line = if element.strip.empty?
-           string.center(LENGTH_OF_LINE)
-         else
-           element_size = element.size
-           max_element_count = [((LENGTH_OF_LINE - string.size) / (2 * element_size)).floor, 0].max
-           "#{element * max_element_count} #{string} #{element * max_element_count}"
-         end
-
-  output_line = method == :puts ? "\n\n#{line.public_send(color.to_s)}" : "\r#{line.public_send(color.to_s)}"
-
-  puts output_line if method == :puts
-  print output_line unless method == :puts
-end
-
-# ==== Create User ====
-if User.none?
-  pretty_print('Creating regular user', 'green')
-
-  user = User.create(
-    email: 'test@test.com',
-    password: 'test@test.com',
-    nickname: 'test_user',
-    role: 0,
-    remote_avatar_url: Faker::Avatar.image
-  )
-  pretty_print('1/1', 'green', :print, '')
-
-  # ==== Create Tag ====
-  if Tag.none?
-    pretty_print('Creating tags', 'blue')
-
-    TAG_COUNT.times do |i|
-      Tag.create(title: Faker::Hipster.word)
-
-      pretty_print("#{i + 1}/15", 'blue', :print, '')
-    end
-  end
-
-  # ==== Create Post ====
-  if Post.none?
-    pretty_print('Creating posts', 'purple')
-
-    POST_COUNT.times do |i|
-      title = "#{Faker::Hipster.sentence(word_count: 1)}#{i}"
-      Post.create(title:,
-                  subtitle: Faker::Lorem.paragraph(sentence_count: 3, supplemental: true,
-                                                   random_sentences_to_add: 2),
-                  description: Faker::Lorem.paragraph(sentence_count: 10, supplemental: true,
-                                                      random_sentences_to_add: 4),
-                  status: :active,
-                  user_id: user.id,
-                  tag_ids: Tag.ids.sample(5),
-                  slug: title.parameterize,
-                  created_at: Faker::Time.backward(days: 1000),
-                  remote_photo_url: Faker::Avatar.image)
-
-      pretty_print("#{i + 1}/50", 'purple', :print, '')
-    end
-  end
-
-  # ==== Create translation ====
-  pretty_print('Filling empty translations', 'red')
-
-  Rake::Task['after_party:fill_translations'].invoke
-  pretty_print('Task invoked', 'red', :print, '')
-
-  # ==== Result ====
-  pretty_print('All successfuly done!', 'light_gray', :puts, '')
-end
-
-# start_date = 3.years.ago
-# start_date = 1.week.ago
-# start_date = 1.day.ago
-# end_date = Time.zone.now
-
-# 12.times do
-#   event_time = Faker::Time.between(from: start_date, to: end_date)
-
-#   request = OpenStruct.new(params: {},
-#                            referer: Faker::Internet.url,
-#                            remote_ip: Faker::Internet.public_ip_v4_address,
-#                            user_agent: Faker::Internet.user_agent,
-#                            original_url: Rails.application.routes.url_helpers.root_url(only_path: true))
-
-#   visit_properties = Ahoy::VisitProperties.new(request, api: nil)
-#   properties = visit_properties.generate.select { |_, v| v }
-#   post = Post.all.sample
-
-#   example_visit = Ahoy::Visit.create!(properties.merge(visit_token: SecureRandom.uuid,
-#                                                        visitor_token: SecureRandom.uuid,
-#                                                        started_at: event_time))
-
-#   event_properties = { slug: post.slug,
-#                        title: post.title,
-#                        post_id: post.id,
-#                        started_at: event_time }
-#   Ahoy::Event.create!(
-#     visit: example_visit,
-#     name: 'Viewed Post',
-#     properties: event_properties,
-#     time: event_time
-#   )
-# end
+say "journal: #{created} new, #{Post.count} total"
+puts "done\n\n"

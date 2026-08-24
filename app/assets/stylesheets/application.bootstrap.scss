@@ -1,26 +1,17 @@
+// What is left of the old theme: Bootstrap, and the two sheets the admin screens that have not
+// been re-skinned still need. Everything the public site used — the navbar, the footer, the
+// home page and the auth forms — went with the pages that used it (redesign_plan.md §4.1).
+//
+// The Poppins @import that used to be here fetched a face from Google Fonts at runtime on
+// every page this sheet touched, on a site that self-hosts every other face on purpose.
+@use 'theme/fonts';
+
 
 @import 'bootstrap/scss/bootstrap';
-@import 'bootstrap-icons/font/bootstrap-icons';
 @import 'bootstrap5-toggle/css/bootstrap5-toggle';
 @import 'tom-select/dist/css/tom-select.bootstrap5';
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-@import 'navbar.sass.scss';
-@import 'home.sass.scss';
-@import 'footer.sass.scss';
-@import 'faq.sass.scss';
-@import 'post.sass.scss';
-@import 'search.sass.scss';
-@import 'forms_auth.sass.scss';
 @import 'management.sass.scss';
-@import 'prism.sass.scss';
-@import 'statistic.sass.scss';
-
-$fa-font-path: "./webfonts";
-@import "@fortawesome/fontawesome-free/scss/regular";
-@import "@fortawesome/fontawesome-free/scss/brands";
-@import "@fortawesome/fontawesome-free/scss/solid";
-@import "@fortawesome/fontawesome-free/scss/fontawesome";
 
 @mixin colorgradint {
   background: linear-gradient(94.22deg, #5174FF 0%, #D251FF 100%);
@@ -31,7 +22,7 @@ $fa-font-path: "./webfonts";
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Geist', -apple-system, system-ui, sans-serif;
 }
 
 a {
@@ -140,13 +131,6 @@ input {
   &::focus {
     box-shadow: none;
     border: 1px solid #E91E63;
-  }
-}
-
-#dropzone.dragover {
-  .image__dragging {
-    background-color: #f1f1f1;
-    border-style: solid;
   }
 }
 

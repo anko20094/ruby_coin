@@ -11,7 +11,7 @@
               - if @tags.present?
                 = render @tags
           .tags__left
-            h1.admin__title
+            h2.admin__title
               = t("labels.create_tag")
             = turbo_frame_tag @tag, class: 'create_tag' do
               = form_with model: [:management, Tag.new] do |f|

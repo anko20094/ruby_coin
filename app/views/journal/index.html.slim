@@ -1,4 +1,5 @@
 - content_for :title, full_title(t('journal.index.title'))
+- page_meta description: t('journal.index.lede')
 
 .jn-index
   header.jn-index__header
@@ -12,6 +13,11 @@
       p.jn-index__lede= t('journal.index.lede')
     .jn-index__anchor
       = render GemComponent.new(uid: 'journal-anchor', variant: :anchor, size: 90)
+
+  = form_with url: search_path, method: :get, class: 'jn-index__search' do |f|
+    = f.label :query, t('journal.search.field'), class: 'jn-search__label'
+    = f.search_field :query, class: 'jn-search__input', placeholder: t('journal.search.placeholder')
+    = f.submit t('journal.search.submit'), class: 'rc-button'
 
   nav.jn-filter aria-label=t('journal.index.filter')
     span.jn-filter__label= "#{t('journal.index.filter')} ·"
@@ -35,9 +41,19 @@
     - if @pagy.pages > 1
       nav.jn-pager aria-label=t('journal.index.title')
         - if @pagy.prev
-          = link_to '←', journal_path(page: @pagy.prev, order: @order, tag_id: @active_tag&.id), class: 'jn-pager__step'
+          = link_to journal_path(page: @pagy.prev, order: @order, tag_id: @active_tag&.id),
+            class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') } do
+            span aria-hidden="true" ←
         span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"
         - if @pagy.next
-          = link_to '→', journal_path(page: @pagy.next, order: @order, tag_id: @active_tag&.id), class: 'jn-pager__step'
+          = link_to journal_path(page: @pagy.next, order: @order, tag_id: @active_tag&.id),
+            class: 'jn-pager__step', aria: { label: t('journal.index.pager.next') } do
+            span aria-hidden="true" →
   - else
-    p.jn-empty= t('journal.index.empty', tag: @active_tag&.title)
+    p.jn-empty
+      - if @active_tag
+        = t('journal.index.empty', tag: @active_tag.title)
+        = ' '
+        = link_to t('journal.index.all'), journal_path(order: @order), class: 'hover-link'
+      - else
+        = t('journal.index.empty_all')

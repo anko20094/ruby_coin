@@ -2,13 +2,12 @@
 
 module Management
   class TagsController < ApplicationController
-    before_action :authenticate_user!
     before_action :authorize_policy
     before_action :set_tag!, only: %i[destroy edit update]
 
     def index
       @tag = Tag.new
-      @tags = policy_scope(Tag).order(created_at: :desc)
+      @tags = policy_scope([:management, Tag]).order(created_at: :desc)
       @pagy, @tags = pagy(@tags, limit: 8)
     end
 

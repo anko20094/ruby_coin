@@ -114,7 +114,7 @@ $journal-max: 1100px;
   grid-area: meta;
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
   line-height: 1.6;
   text-align: right;
 }
@@ -153,7 +153,96 @@ $journal-max: 1100px;
   }
 }
 
+// The search screen. Shares the journal index's frame — same header, same entry rows — so
+// searching is the same place as browsing rather than a second design.
+.jn-search {
+  margin: 24px 0 36px;
+  padding: 20px 0 22px;
+  border-top: var(--rule-strong);
+  border-bottom: var(--rule-row);
+}
+
+.jn-search__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.jn-search__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.jn-search__input {
+  flex: 1 1 320px;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 18px;
+  padding: 8px 2px;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ink-mute);
+
+  &::placeholder { color: var(--ink-quiet); }
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--ruby);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 3px;
+  }
+}
+
+.jn-search__fields {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.jn-search__field {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+
+  input { accent-color: var(--ruby); }
+}
+
+.jn-search__count { margin-bottom: 12px; }
+
+.jn-search__fallback {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .jn-search__input { font-size: 16px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .jn-entry,
   .jn-pager__step { transition: none; }
+}
+
+// The index's own search row: one line, above the tag filter.
+.jn-index__search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
 }

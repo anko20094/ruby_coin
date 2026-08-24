@@ -75,13 +75,16 @@ export default class extends Controller {
         this.previewTarget?.classList.remove("is-busy")
 
         if (status === 409) return this.onConflict(data)
+
+        // The version comes back on every answer, success or not, and the form takes it
+        // whichever way the save went. Skipping it on "invalid" is what used to leave the
+        // editor a version behind and turn the next keystroke into a phantom conflict.
+        this.syncLockVersion(data)
+
         if (data.status === "invalid") return this.setState("invalid", { errors: data.errors.join(", ") })
 
         this.dirty.clear()
         this.markTabs()
-        if (this.hasLockVersionTarget && data.lock_version != null) {
-          this.lockVersionTarget.value = data.lock_version
-        }
         this.setState("saved", { at: data.at })
         this.reloadPreview()
       })
@@ -89,6 +92,12 @@ export default class extends Controller {
         this.previewTarget?.classList.remove("is-busy")
         this.setState("invalid", { errors: "network" })
       })
+  }
+
+  syncLockVersion(data) {
+    if (this.hasLockVersionTarget && data.lock_version != null) {
+      this.lockVersionTarget.value = data.lock_version
+    }
   }
 
   onConflict() {

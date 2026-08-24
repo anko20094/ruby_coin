@@ -16,6 +16,8 @@ class NavComponent < ViewComponent::Base
   # the wordmark is the way back to it — so nothing is current there.
   SECTION_FOR_CONTROLLER = { 'journal' => :journal, 'work' => :work, 'contact' => :contact }.freeze
 
+  # /search is the journal's search, so the journal item stays lit while a reader is on it.
+
   # Passed in where the caller knows; derived from the controller otherwise, so
   # the layout stays dumb.
   def initialize(current: nil)

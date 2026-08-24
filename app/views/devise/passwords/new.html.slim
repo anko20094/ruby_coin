@@ -1,11 +1,17 @@
-h2
-  = t("buttons.forgot_password")
-= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
-  = render "devise/shared/error_messages", resource: resource
-  .field
-    = f.label :email
-    br
-    = f.email_field :email, autofocus: true, autocomplete: "email"
-  .actions
-    = f.submit t("buttons.send_reset_password")
-= render "devise/shared/links"
+- content_for :title, full_title(t('buttons.forgot_password'))
+- page_meta description: t('buttons.forgot_password')
+
+.au-page
+  h1.au-page__title= t('buttons.forgot_password')
+
+  = render 'devise/shared/errors', resource: resource
+
+  = form_for(resource, as: resource_name, url: password_path(resource_name),
+             html: { method: :post, class: 'au-form' }) do |f|
+    .au-field
+      = f.label :email, class: 'au-label'
+      = f.email_field :email, autofocus: true, autocomplete: 'email', class: 'au-input'
+
+    = f.submit t('buttons.send_reset_password'), class: 'rc-button rc-button--primary'
+
+  p.au-aside= link_to t('buttons.sign_in'), new_session_path(resource_name), class: 'hover-link'

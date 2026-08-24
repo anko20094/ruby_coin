@@ -1,85 +1,75 @@
 # frozen_string_literal: true
 
+# Post covers. Two sizes, both JPEG, both stripped of metadata.
+#
+# What this used to be: five versions (lite, thumb, medium, small, large) of which three had
+# no reader anywhere in the app, and every one of them `convert`ed to PNG — so a photographic
+# cover came out as a 784 KB lossless PNG at 1356×759 to fill a slot 320 px tall. That is the
+# single heaviest thing the site put on the wire.
 class PhotoUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
-  # Include RMagick or MiniMagick support:
-  # include CarrierWave::RMagick
-  # include CarrierWave::MiniMagick
-
-  # Choose what kind of storage to use for this uploader:
   storage :file
-  # storage :fog
 
-  # Override the directory where uploaded files will be stored.
-  # This is a sensible default for uploaders that are meant to be mounted:
+  # Photographs, not diagrams: JPEG at 80 is indistinguishable here and roughly a tenth of the
+  # bytes. `strip` drops EXIF, which also means a cover cannot carry the photographer's GPS
+  # coordinates onto a public page.
+  COMPRESSION = { quality: 80, strip: true, interlace: 'Plane' }.freeze
+
+  # Wide enough for a 2× screen at the widest the cover is ever drawn (1100 px on /journal),
+  # in the 16:9 the CSS already crops to.
+  MEDIUM = [1200, 675].freeze
+  # The related-entry cards and the admin list thumbnail.
+  SMALL = [520, 293].freeze
+
+  # Nothing on this site needs a 20 MB camera original, and an unbounded upload is an
+  # unbounded ImageMagick job. nginx's own limit is separate and much larger.
+  MAX_BYTES = 8.megabytes
+
   def store_dir
     "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id}"
   end
 
+  # The old one was `"#{Time.zone.now} - #{original_filename}"`, which produced paths like
+  # "2026-08-24 21:11:31 +0300 - cover.jpg": spaces, colons and a plus sign inside a URL, and
+  # a collision for two uploads in the same second. This is sortable, safe in a path, and
+  # unique.
+  # Memoised, and deliberately not guarded with `if original_filename` — CarrierWave 3 asks
+  # for this again after the file is stored, when original_filename is gone, and a nil answer
+  # there is what its own warning is about.
   def filename
-    "#{Time.zone.now} - #{original_filename}"
-  end
-
-  version :lite do
-    process resize_to_fit: [50, 50]
-    process convert: 'jpg'
-  end
-
-  version :thumb do
-    process resize_to_fit: [102, 120]
-    process convert: 'png'
+    @filename ||= "#{Time.zone.now.strftime('%Y%m%d%H%M%S')}-#{SecureRandom.hex(4)}.#{stored_extension}"
   end
 
   version :medium do
-    process resize_to_fill: [1356, 759]
-    process convert: 'png'
+    process resize_to_fill: [*MEDIUM, 'Center', { combine_options: COMPRESSION }]
+    process convert: 'jpg'
   end
 
   version :small do
-    process resize_to_fill: [400, 225]
-    process convert: 'png'
-  end
-
-  version :large do
-    process resize_to_fill: [1920, 1080]
-    process convert: 'png'
+    process resize_to_fill: [*SMALL, 'Center', { combine_options: COMPRESSION }]
+    process convert: 'jpg'
   end
 
   def extension_allowlist
-    %w[jpg jpeg gif png]
+    %w[jpg jpeg gif png webp]
   end
 
-  # Provide a default URL as a default if there hasn't been a file uploaded:
-  # def default_url(*args)
-  #   # For Rails 3.1+ asset pipeline compatibility:
-  # rubocop skip:
-  #   # ActionController::Base.helpers.asset_path("fallback/" + [version_name, "default.png"].compact.join('_'))
-  #
-  #   "/images/fallback/" + [version_name, "default.png"].compact.join('_')
-  # end
+  # The extension is what the uploader claims; this is what the bytes actually are. Without
+  # it, "payload.php" renamed to "payload.jpg" reached ImageMagick on the strength of its name.
+  def content_type_allowlist
+    [%r{\Aimage/}]
+  end
 
-  # Process files as they are uploaded:
-  # process scale: [200, 300]
-  #
-  # def scale(width, height)
-  #   # do something
-  # end
+  def size_range
+    1..MAX_BYTES
+  end
 
-  # Create different versions of your uploaded files:
-  # version :thumb do
-  #   process resize_to_fit: [50, 50]
-  # end
+  private
 
-  # Add an allowlist of extensions which are allowed to be uploaded.
-  # For images you might use something like this:
-  # def extension_allowlist
-  #   %w(jpg jpeg gif png)
-  # end
-
-  # Override the filename of the uploaded files:
-  # Avoid using model.id or version_name here, see uploader/store.rb for details.
-  # def filename
-  #   "something.jpg" if original_filename
-  # end
+  def stored_extension
+    source = original_filename.presence || file&.extension
+    extension = File.extname(source.to_s).delete('.').presence || source.to_s
+    extension.downcase.presence || 'jpg'
+  end
 end

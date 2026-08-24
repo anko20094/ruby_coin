@@ -8,7 +8,7 @@ import Translations from '../i18n/aitranslation'
 // rather than the iframes the old TinyMCE editor used.
 export default class extends Controller {
   editorFor(locale) {
-    return this.element.querySelector(`trix-editor[input="post_description_${locale}"]`)
+    return this.element.querySelector(`trix-editor#post_description_${locale}`)
   }
 
   fetchData() {

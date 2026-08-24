@@ -1,15 +1,10 @@
 uk:
   titles:
-    admin: Адмін
     faq: FAQ
-    main: Головна
     search: Пошук
     edit: Редагування
     new: Новий
     tags: Теги
-    posts: Дописи
-    categories: Категорії
-    filters: Фільтри
     faq_title: Часті запитання
   buttons:
     remember_me: Запам'ятати мене
@@ -24,14 +19,13 @@ uk:
     create: Створити
     yes_text: Так
     no_text: Ні
-    apply: Застосувати
   labels:
     registration: Реєстрація
     enter_account: Вхід в акаунт
+    show_password: Показати пароль
     edit_account: Змінити акаунт
     create_tag: Створити тег
   confirmations:
-    action_confirmation: Підтвердження дії
     delete: Ви впевнені, що бажаєте видалити %{item}?
   home:
     index:
@@ -56,19 +50,6 @@ uk:
       all_work: усі роботи
       to_top: Повернутися нагору
       top: НАГОРУ
-    show:
-      similar_posts: Схожі публікації
-    search:
-      search: Пошук
-      no_results: Немає результатів
-      interesting: Можливо Вам буде цікаво
-      placeholder: Що таке gem в мові Ruby?
-      advanced: Розширений пошук
-      radio:
-        all: Всі поля
-        title: Назва
-        description: Опис
-      results: 'Результати:'
   faq:
     who_am_i:
       question1: Хто ви і які послуги надаєте?
@@ -166,6 +147,23 @@ uk:
               translation_missing: відсутній переклад
 
   management:
+    statistics:
+      index:
+        title: Статистика
+        note: що читають
+        periods:
+          today: сьогодні
+          month: цього місяця
+          year: цього року
+          all: за весь час
+        cases: Кейси
+        posts: Записи журналу
+        columns:
+          case: Кейс
+          post: Запис
+          views: Перегляди
+        no_case_views: Жоден кейс ще не відкривали.
+        no_post_views: Жоден запис ще не відкривали.
     posts:
       index:
         title: Пости
@@ -190,30 +188,7 @@ uk:
           author: автор
           updated: оновлено
       new:
-        title: Новий допис
       edit:
-        title: Редагування допису
-      form:
-        title_label: Заголовок
-        subtitle_label:  Підзаголовок
-        photo_label: Головне зображення
-        description_label: Опис
-        status_label: Статус Активний ?
-        tag_label: Теги
-        main_post_label: Головна допис ?
-        placeholders:
-          title: Введіть заголовок
-          subtitle: Введіть підзаголовок
-          description: Введіть опис
-          tags: Введіть теги
-          select_image: Виберіть зображення
-        status:
-          label: Статус
-          active: Активний
-          disabled: Неактивний
-        translation_button: Перекласти
-        main_post: Головний допис
-        translation_notice: "* якщо перекладу не буде, публікація не відображатиметься в іншомовній версії сайту"
       editor:
         untitled: без заголовка
         side_by_side: обидві
@@ -246,7 +221,6 @@ uk:
           subtitle: Одне речення про те, про що текст.
           slug: як-це-читається-в-url
       slash_menu:
-        hint: Натисни / у тілі статті, щоб вставити код, виноску або вставку.
         insert: Вставити блок
         kinds:
           code: код
@@ -259,7 +233,6 @@ uk:
           body: текст
           url: посилання
           caption: підпис
-        translation_button: Перекласти
       create:
         success: Допис успішно створено
       update:
@@ -273,9 +246,7 @@ uk:
         own: власний
         this_site: цей сайт
       new:
-        title: Створити кейс
       edit:
-        title: Редагувати кейс
       form:
         slug: Слаг
         mark: Номер
@@ -334,9 +305,7 @@ uk:
           stack_group: група стеку
           strength: сильна сторона
       new:
-        title: Додати блок CV
       edit:
-        title: Редагувати блок CV
       form:
         kind: Тип
         position: Позиція
@@ -367,26 +336,14 @@ uk:
       statistics_hint: перегляди · візити
 
     shared:
-      admin_left_panel:
-        cv: CV
-        cases: Кейси
-        admin: Адмін
-        posts: Дописи
-        tags: Теги
-        statistic: Статистика
-        active-admin: Адміністратор
-        exit: Вихід
-
     tags:
       index:
         tags: Існуючі теги
-        create: Створити тег
         placeholders:
           name: Введіть назву
       form:
         title_label: Назва тегу
       edit:
-        title_label: Назва тегу
       create:
         success: Тег успішно створено
       update:
@@ -399,27 +356,27 @@ uk:
   uk: Українська
 
   global:
-    errors:
-      invalid_format: має недійсний формат
-    user:
-      roles:
-        basic: Базовий
-        moderator: Модератор
-        admin: Адмін
     button:
       delete: Видалити
       cancel: Скасувати
       create: Створити
       save: Зберегти
       edit: Редагувати
-      show: Показти
-      submit: Надіслати
     dialog:
       you_sure: Ви впевнені?
-    text:
-      omission: ... (продовження)
-  main_btn:
-    read_more: Читати далі
+    dismiss: Сховати це повідомлення
+    reading_progress: прогрес читання
+    quote:
+      hint: — картка
+      label: Уривок карткою
+    palette:
+      open: Пошук по сайту
+      placeholder: сторінки, кейси, записи…
+      empty: Почни писати, щоб шукати.
+      move: рухатись
+      open_result: відкрити
+      close: закрити
+    skip_to_content: Перейти до вмісту
   nav_item:
     sign_in: Увійти
     sign_out: Вихід
@@ -429,21 +386,13 @@ uk:
   application_controller:
     alert: Ви не авторизовані для виконання цього екшену.
 
-  home_controller:
-    show:
-      errors:
-        not_found: Пост не знайдено
-
   errors:
     messages:
-      wrong_posts_name: "Це ім'я вже зайняте"
-      carrierwave_processing_error: Неможливо змінити розмір зображення
-      carrierwave_integrity_error: Не зображення
-      carrierwave_download_error: Не вдалося завантажити зображення
-      extension_whitelist_error: "Вам заборонено завантажувати файли %{extension}, дозволені типи: %{allowed_types}"
-      extension_blacklist_error: "Вам заборонено завантажувати файли %{extension}, заборонені типи: %{prohibited_types}"
-      record_invalid: "Невірно"
-
+      processing_error: Неможливо змінити розмір зображення
+      integrity_error: Не зображення
+      download_error: Не вдалося завантажити зображення
+      extension_allowlist_error: "Вам заборонено завантажувати файли %{extension}, дозволені типи: %{allowed_types}"
+      extension_denylist_error: "Вам заборонено завантажувати файли %{extension}, заборонені типи: %{prohibited_types}"
   work:
     nav:
       journal: журнал
@@ -451,11 +400,12 @@ uk:
       studio: студія
       contact: контакти
       soon: скоро
+      menu: меню
       soon_title: Ще не опубліковано — сторінці команди потрібні дані
     footer:
-      journal: rss
+      journal: журнал
+      feed: rss
       work: всі кейси
-      studio: команда
       contact: привітатися
     index:
       eyebrow: роботи · cv
@@ -484,12 +434,31 @@ uk:
       pager: ДАЛІ
       previous: ПОПЕРЕДНІЙ
       next: ДАЛІ
+      skip: одразу до інженерної частини
+      copied: скопійовано
+      cta: Прочитав до кінця і хочеш поговорити?
+      cta_contact: Написати
 
   contact:
     show:
       eyebrow: контакти
       title: Привітатися
       lede: Проєкт, ідея, питання — або просто хочеться поговорити про Rails. Вибирай канал, усі вони читаються.
+
+  error_pages:
+    not_found:
+      title: Цієї сторінки тут немає
+      lede: Адреса неправильна, або те, що тут стояло, переїхало. З твого боку все гаразд.
+    unacceptable:
+      title: Запит не вдалося прийняти
+      lede: Зазвичай це форма, яка надто довго була відкрита. Повернись і надішли ще раз.
+    internal:
+      title: Щось зламалося на моєму боці
+      lede: Помилка записана в лог, я її побачу. Спробуй за хвилину.
+    actions:
+      work: Подивитися роботи
+      journal: Читати журнал
+    hint: шукає по всьому сайту
 
   journal:
     index:
@@ -506,20 +475,42 @@ uk:
       order:
         label: спершу
         new: нові
+        oldest: найдавніші
         best: найкращі
       empty: "немає записів під #%{tag}."
+      empty_all: тут поки нічого не опубліковано.
       new_badge: НОВЕ
-    show:
-      errors:
-        not_found: Пост не знайдено
+      pager:
+        previous: попередня сторінка
+        next: наступна сторінка
+    search:
+      eyebrow: пошук
+      title: Пошук
+      lede: Усе в журналі — за заголовком або за текстом.
+      field: запит
+      placeholder: що шукаємо?
+      submit: Шукати
+      where: шукати в
+      fields:
+        all: усюди
+        title: заголовках
+        description: текстах
+      prompt: Введи щось і натисни «Шукати».
+      found:
+        one: "%{count} запис"
+        few: "%{count} записи"
+        many: "%{count} записів"
+        other: "%{count} запису"
+      none: "Нічого не знайшлося за «%{query}»."
     blocks:
       callout:
         note: до відома
         warn: обережно
-      embed:
-        load: дивитись
     post:
       back: журнал
       all_entries: усі записи
       related: схоже
+      series: серія
+      previous: попередній
+      next: наступний
     minutes: "%{count} хв"

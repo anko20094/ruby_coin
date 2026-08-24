@@ -1,4 +1,9 @@
 - content_for :title, full_title(@post.title)
+/ The handoff asks journal posts to unfurl with their own cover; only where there is none
+/ does the site card stand in.
+- page_meta description: @post.subtitle, image: (@post.photo.presence && @post.photo.medium.url), type: 'article', published_at: @post.created_at, updated_at: @post.updated_at
+
+= render 'shared/reading_progress'
 
 article.jn-post
   .jn-post__breadcrumb
@@ -19,6 +24,26 @@ article.jn-post
   .jn-body
     p.jn-body__lede= @post.subtitle
     = journal_body(@post)
+
+  / The entries either side, by series number. The journal is a numbered series and had no way
+  / to read it as one: every entry's only exits were back to the index and a tag-similarity row.
+  - if @previous_entry || @next_entry
+    nav.jn-steps aria-label=t('journal.post.series')
+      - if @previous_entry
+        = link_to post_path(@previous_entry), class: 'jn-step hover-row' do
+          .jn-step__eyebrow
+            span aria-hidden="true" ←
+            = " #{t('journal.post.previous')} #{@previous_entry.entry_label}"
+          .jn-step__title= @previous_entry.title
+      - else
+        span
+
+      - if @next_entry
+        = link_to post_path(@next_entry), class: 'jn-step jn-step--next hover-row' do
+          .jn-step__eyebrow
+            = "#{t('journal.post.next')} #{@next_entry.entry_label} "
+            span aria-hidden="true" →
+          .jn-step__title= @next_entry.title
 
   footer.jn-post__footer
     = link_to journal_path, class: 'jn-post__back' do

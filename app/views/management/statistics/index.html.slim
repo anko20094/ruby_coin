@@ -1,35 +1,51 @@
-.admin-panel
-  .admin-panel__content
-    .admin-panel__inner
-      .admin-panel__right
-        .container-wrapper
-          .container_first
-            h3 Views Statistics
-            table
-              tr
-                th Period
-                th Views
-              tr
-                td All Time
-                td #{@total_views}
-              tr
-                td Daily
-                td #{@daily_views}
-              tr
-                td Monthly
-                td #{@monthly_views}
-              tr
-                td Yearly
-                td #{@yearly_views}
+- provide(:title, full_title(t('.title')))
 
-          .container_second
-            h3 Post Views
-            table
+- content_for :topbar do
+  = render 'management/shared/top_bar', crumbs: ['Statistics'], note: t('.note')
+
+.mg-stats
+  .mg-stats__totals
+    - @totals.each do |period, views|
+      .mg-stat
+        .mg-stat__value.num= number_with_delimiter(views)
+        .mg-stat__label= t(".periods.#{period}")
+
+  / Cases first: this is the list that decides what belongs at the top of /work, and it is the
+  / one the screen was missing entirely.
+  section.mg-stats__section
+    h2.mg-stats__heading= t('.cases')
+    - if @case_views.any? { |_, views| views.positive? }
+      .mg-table-scroll
+        table.mg-table
+          thead
+            tr
+              th= t('.columns.case')
+              th= t('.columns.views')
+          tbody
+            - @case_views.sort_by { |_, views| -views }.each do |kase, views|
               tr
-                th Title
-                th Views
-              - @post_views.each do |properties, view_count|
-                tr
-                  td
-                    = link_to properties['title'], post_path(properties['slug'])
-                  td= view_count
+                td
+                  = link_to kase.title, work_case_path(slug: kase.slug), data: { turbo: false }
+                  .mg-title__path= "/work/#{kase.slug}"
+                td.mg-cell--mono.num= number_with_delimiter(views)
+    - else
+      .mg-empty= t('.no_case_views')
+
+  section.mg-stats__section
+    h2.mg-stats__heading= t('.posts')
+    - if @post_views.any?
+      .mg-table-scroll
+        table.mg-table
+          thead
+            tr
+              th= t('.columns.post')
+              th= t('.columns.views')
+          tbody
+            - @post_views.each do |post, views|
+              tr
+                td
+                  = link_to post.title.presence || post.slug, post_path(post), data: { turbo: false }
+                  .mg-title__path= "/post/#{post.slug}"
+                td.mg-cell--mono.num= number_with_delimiter(views)
+    - else
+      .mg-empty= t('.no_post_views')

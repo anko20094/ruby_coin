@@ -4,7 +4,7 @@
       span.wk-row__mark= kase.mark
       .wk-row__body
         .wk-row__titles
-          span.wk-row__title= kase.title
+          h3.wk-row__title= kase.title
           - if kase.own?
             span.wk-row__own= t('work.index.own')
           - if kase.is_this_site?

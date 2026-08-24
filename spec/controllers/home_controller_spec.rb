@@ -106,13 +106,4 @@ describe HomeController, type: :request do
       expect(response).to have_http_status(:success)
     end
   end
-
-  describe 'GET #search' do
-    it 'still answers on the old layout, which the handoff does not cover' do
-      get search_path(locale: 'en')
-
-      expect(response).to be_successful
-      expect(response.body).to include('search-page')
-    end
-  end
 end

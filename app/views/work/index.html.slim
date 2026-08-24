@@ -1,4 +1,5 @@
 - content_for :title, full_title(t('work.index.title'))
+- page_meta description: @profile.summary, image: "/og/site-#{I18n.locale}.png", type: 'profile'
 
 .wk-index
   header.wk-index__header
@@ -24,7 +25,9 @@
           - @experience.each do |entry|
             .wk-career__entry
               .wk-career__head
-                .wk-career__org
+                / A heading, not a div: these are the sections of a CV, and heading navigation
+                / is how a screen-reader user skims one.
+                h3.wk-career__org
                   = entry.org
                   span.wk-career__title= " · #{entry.title}"
                 .wk-career__when
@@ -71,6 +74,6 @@
         .wk-contact__label= t('work.index.education')
         div= @profile.education
       .wk-index__footnote
-        = "#{t('work.index.figures')} · #{@profile.updated_on}"
+        = "#{t('work.index.figures')} · #{@profile.figures_as_of}"
         br
         = t('work.index.both_halves')

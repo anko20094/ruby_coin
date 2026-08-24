@@ -1,6 +1,9 @@
 / One form for all three kinds: which fields it draws comes from CVBlock::SHAPES, so adding a
 / key to a shape adds it here too.
-- shape = CVBlock::SHAPES.fetch(block.kind)
+/ A rejected create re-renders this form with whatever kind was submitted, and #create does
+/ not normalise it the way #new does — an unknown kind used to raise KeyError here and turn a
+/ validation failure into a 500.
+- shape = CVBlock::SHAPES.fetch(block.kind) { CVBlock::SHAPES.fetch(CVBlock::KINDS.first) }
 = form_with model: [:management, block], scope: :cv_block do |f|
   .admin-form__content
     = render 'shared/errors', object: block

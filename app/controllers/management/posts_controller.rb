@@ -13,8 +13,8 @@ module Management
       'created' => :created_at
     }.freeze
 
-    before_action :authenticate_user!, :authorize_policy, except: :translate
-    before_action :set_post!, only: %i[show destroy edit update autosave preview]
+    before_action :authorize_policy
+    before_action :set_post!, only: %i[destroy edit update autosave preview]
     before_action :fetch_tags, only: %i[new edit update]
     before_action :fetch_users, only: %i[new edit create update]
     before_action :normalize_main_post_param, only: %i[create update autosave]
@@ -77,7 +77,13 @@ module Management
           at: Time.current.strftime('%H:%M:%S')
         }
       else
-        render json: { status: 'invalid', errors: @post.errors.full_messages },
+        # The version goes out with the failure too: the editor has to stay in step with the
+        # record even when nothing was written, or its next save reports a conflict that is
+        # not one.
+        render json: {
+                 status: 'invalid', errors: @post.errors.full_messages,
+                 lock_version: @post.reload.lock_version
+               },
                status: :unprocessable_content
       end
     rescue ActiveRecord::StaleObjectError
@@ -109,8 +115,20 @@ module Management
 
     private
 
+    # One transaction, because these are two writes to the same post and the second can fail:
+    # the update lands first and the translator only then rejects a blank other-language
+    # title. Without the rollback, autosave answered "invalid" on a post it had already
+    # rewritten — and left the editor holding a stale lock_version, so the save after that
+    # reported a conflict against itself.
     def persist
-      @post.update(post_params) && Posts::Translator.call(@post, localization_params)
+      saved = false
+
+      ActiveRecord::Base.transaction do
+        saved = @post.update(post_params) && Posts::Translator.call(@post, localization_params)
+        raise ActiveRecord::Rollback unless saved
+      end
+
+      saved
     end
 
     def listed_posts
@@ -118,8 +136,10 @@ module Management
       posts = posts.where(status: params[:status]) if Post.statuses.key?(params[:status])
       posts = posts.search_everywhere(params[:query]) if params[:query].present?
       posts = posts.reorder(sort_column => sort_direction) unless rank_ordered?
-      posts.includes(:tags, :user, :post_translations, :rich_text_description_en,
-                     :rich_text_description_uk)
+      # Both translation associations: `post.title` reads Mobility's :translations, while
+      # `translated_locales` reads the app's own :post_translations.
+      posts.includes(:tags, :user, :translations, :post_translations,
+                     :rich_text_description_en, :rich_text_description_uk)
     end
 
     # While searching without an explicit sort, pg_search's own relevance order is the useful
@@ -156,6 +176,13 @@ module Management
       slug_param
     end
 
+    # Only a post that does not have a URL yet gets one derived. This used to run on every
+    # save including autosave, so typing a title into a published post moved its canonical
+    # URL once per debounce tick and left a FriendlyId history row behind each time.
+    def new_record?
+      action_name == 'create'
+    end
+
     def localization_params
       params.require(:post).permit(title_localizations: {}, subtitle_localizations: {}) # rubocop:disable Rails/StrongParametersExpect
     end
@@ -177,10 +204,17 @@ module Management
     end
 
     # The slug is derived from the English title, because that is what reads in a URL — but only
-    # when the editor has not written one. It used to be overwritten on every save, which made
-    # the slug field in the meta panel a lie. FriendlyId keeps the history, so a rename is safe.
+    # for a post being created, and only when the editor has not written one. Renaming an
+    # existing post is the editor's decision, made in the slug field; FriendlyId keeps the
+    # history, so a deliberate rename is safe.
     def slug_param
       return if params.dig('post', 'slug').present?
+
+      # An existing post keeps the URL it already has. An empty slug box means "leave it
+      # alone", not "make me a new one from whatever is half-typed in the title" — that is
+      # what used to move a published post's canonical URL once per autosave tick and mint a
+      # FriendlyId history row for each keystroke.
+      return params[:post].delete(:slug) unless new_record?
 
       english_title = I18n.locale == :en ? params.dig('post', 'title') : params.dig('post', 'title_localizations', 'en')
       params[:post][:slug] = english_title&.parameterize # rubocop:disable Rails/StrongParametersExpect

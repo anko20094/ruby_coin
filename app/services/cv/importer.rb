@@ -37,7 +37,7 @@ class CV::Importer < BaseService
       languages: source['languages'],
       education: source['education'],
       contact: source['contact'],
-      updated_on: source['updated']
+      figures_as_of: source['updated']
     }
 
     profile = CVProfile.first || CVProfile.new

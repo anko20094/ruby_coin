@@ -3,9 +3,7 @@
 # The front door. Everything on it is real content: the hero reads from the CV, the latest
 # entry from the journal, the three cards from the cases.
 class HomeController < ApplicationController
-  # The home page is on the redesigned theme. /search is the last public page that is not, and
-  # the handoff's IA does not cover it, so it keeps the old layout until it does.
-  layout -> { action_name == 'search' ? 'application' : 'theme' }
+  layout 'theme'
 
   RECENT_CASES = 3
 
@@ -18,15 +16,10 @@ class HomeController < ApplicationController
 
   def index
     @profile = CVProfile.current
-    @latest = Post.main.first || Post.active.first
+    @latest = Post.main.includes(:tags, :user, :translations).first ||
+              Post.active.includes(:tags, :user, :translations).first
     @cases = Case.ordered.limit(RECENT_CASES)
     @entries_count = Post.active.count
-  end
-
-  def search
-    @posts = Posts::Filter.call(active_collection, { order: 'RANDOM()' }).limit(Post::LIMIT_COUNT)
-    @results = Posts::Search.call(search_params)
-    @results = Posts::Filter.call(@results, params) if @results.present?
   end
 
   private
@@ -39,13 +32,5 @@ class HomeController < ApplicationController
       order: params[:order].presence,
       page: params[:page].presence
     ), status: :moved_permanently
-  end
-
-  def search_params
-    params.permit(:query, :search_in)
-  end
-
-  def active_collection
-    Post.active
   end
 end

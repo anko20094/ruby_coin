@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class BaseService
-  def self.call(*)
-    service = new(*)
+  # Keywords pass through too — Search::Palette takes the route helpers that way.
+  def self.call(*, **)
+    service = new(*, **)
 
     service.__send__(:call) if service.respond_to?(:call)
   end

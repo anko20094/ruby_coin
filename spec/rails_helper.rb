@@ -12,7 +12,6 @@ require 'devise'
 require 'factory_bot_rails'
 require 'shoulda/matchers'
 require 'faker'
-require 'database_cleaner'
 require 'pundit/rspec'
 require 'pundit/matchers'
 
@@ -37,6 +36,11 @@ RSpec.configure do |config|
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :system
   config.include Devise::Test::IntegrationHelpers, type: :request
+
+  # Ahoy no longer counts bots, and a request without a User-Agent is a bot as far as the
+  # browser gem is concerned — which is every rack-test request. A request spec stands in for
+  # a person with a browser, so it carries a browser's header.
+
   config.include ActiveSupport::Testing::TimeHelpers
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

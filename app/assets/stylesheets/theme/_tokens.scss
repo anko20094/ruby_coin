@@ -12,6 +12,14 @@
   --ink-soft:    oklch(45% 0.01 30);
   --ink-mute:    oklch(72% 0.008 30);
 
+  /* The one addition to the handoff's tokens, and the reason is the handoff's own §11: it
+     claims "all listed pairings clear 4.5:1", and --ink-mute on paper measures 2.35:1 — it
+     is a hairline colour that thirty rules were also setting 9-11px mono text in. --ink-mute
+     keeps every border and rule it draws; text that wants to be quieter than --ink-soft uses
+     this instead, at 5.00:1 on paper and 4.57:1 on paper-warm. Same hue, same chroma, the
+     lightest it can be and still be read. */
+  --ink-quiet:   oklch(53% 0.008 30);
+
   /* accent */
   --ruby:        oklch(45% 0.18 18);
   --ruby-bright: oklch(58% 0.22 18);

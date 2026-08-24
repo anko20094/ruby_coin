@@ -129,7 +129,7 @@
   font-weight: 400;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
 
   &.is-ruby { color: var(--ruby); }
 }
@@ -262,7 +262,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 1.2px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
   padding: 24px 0 14px;
 }
 
@@ -293,4 +293,66 @@
   font-family: var(--font-display);
   font-size: 26px;
   margin-top: 4px;
+}
+
+// "↓ skip to the engineering" — the affordance that makes /work/:slug#engineers a link worth
+// sending. Sits under the role line, quiet until it is wanted.
+.wk-case__skip {
+  display: inline-block;
+  margin-top: 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid color-mix(in oklab, var(--ink-mute) 50%, transparent);
+  padding-bottom: 2px;
+  transition: color 180ms, border-color 180ms;
+
+  &:hover {
+    color: var(--ruby);
+    border-bottom-color: var(--ruby);
+  }
+}
+
+// The band is a scroll target now, so it needs room above it for the sticky nav.
+.wk-case__band { scroll-margin-top: 56px; }
+
+// One line and two links between the last figure and the pager: the page argues for two
+// thousand words and then has to say what to do about it.
+.wk-case__cta {
+  max-width: var(--case-max);
+  margin: 0 auto;
+  padding: 44px var(--page-pad) 0;
+  border-top: var(--rule-strong);
+  margin-top: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.wk-case__cta-line {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 0;
+  max-width: 560px;
+}
+
+.wk-case__cta-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .wk-case__cta { padding-top: 32px; margin-top: 40px; }
+
+  .wk-case__cta-line { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-case__skip { transition: none; }
 }

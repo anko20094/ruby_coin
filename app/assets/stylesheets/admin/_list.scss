@@ -76,7 +76,7 @@
   font-size: 13px;
   color: var(--ink);
 
-  &::placeholder { color: var(--ink-mute); }
+  &::placeholder { color: var(--ink-quiet); }
 }
 
 .mg-table {
@@ -204,7 +204,7 @@
   padding: 2px 6px;
   border-radius: 3px;
   border: 1px solid var(--mg-ink-faint);
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
 
   &.is-present {
     background: var(--ink);
@@ -231,7 +231,7 @@
 .mg-tags__more {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
 }
 
 .mg-actions {
@@ -291,4 +291,45 @@
 @media (prefers-reduced-motion: reduce) {
   .mg-filter,
   .mg-table tbody tr { transition: none; }
+}
+
+// The statistics screen. It was a Bootstrap table inside .container-wrapper from the old
+// theme; this is the same information on the admin's own type and rules.
+.mg-stats { display: flex; flex-direction: column; gap: 36px; }
+
+.mg-stats__totals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--mg-ink-faint);
+  border: 1px solid var(--mg-ink-faint);
+}
+
+.mg-stat {
+  background: var(--paper);
+  padding: 18px 20px;
+}
+
+.mg-stat__value { font-size: 30px; letter-spacing: -0.02em; }
+
+.mg-stat__label {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.mg-stats__heading {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+
+@media (max-width: 700px) {
+  .mg-stats__totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

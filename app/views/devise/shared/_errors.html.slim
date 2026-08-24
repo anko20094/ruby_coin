@@ -1,0 +1,8 @@
+/ Devise's own error partial, on the theme. role=alert so a failed sign-in is announced rather
+/ than only shown.
+- return if resource.errors.empty?
+
+.au-errors[role="alert"]
+  ul
+    - resource.errors.full_messages.each do |message|
+      li= message

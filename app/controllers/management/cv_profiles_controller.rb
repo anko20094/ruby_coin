@@ -3,7 +3,7 @@
 module Management
   # The CV frame is a singleton, so there is one screen and no index: edit and update.
   class CVProfilesController < ApplicationController
-    before_action :authenticate_user!, :authorize_policy
+    before_action :authorize_policy
 
     def edit
       @profile = CVProfile.current
@@ -23,7 +23,7 @@ module Management
     private
 
     def profile_params
-      params.expect(cv_profile: [:updated_on, *localised_keys, { contact_rows: {} }])
+      params.expect(cv_profile: [:figures_as_of, *localised_keys, { contact_rows: {} }])
     end
 
     def localised_keys

@@ -1,0 +1,72 @@
+// The designed error page (handoff §9a). Not a 9-byte "Not Found" from the middleware:
+// the reader is still on the site, so the page looks like the site and offers the two
+// places worth going.
+
+.er-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 120px var(--page-pad) 140px;
+  text-align: center;
+}
+
+.er-code {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--ruby);
+  margin-bottom: 28px;
+}
+
+.er-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 76px;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 20px;
+}
+
+.er-lede {
+  font-size: 18px;
+  color: var(--ink-soft);
+  margin: 0 auto 40px;
+  max-width: 520px;
+}
+
+.er-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.er-hint {
+  margin-top: 52px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+}
+
+.er-hint__keys {
+  display: inline-flex;
+  gap: 4px;
+  margin-right: 4px;
+
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    padding: 4px 6px;
+    border: 1px solid color-mix(in oklab, var(--ink-mute) 60%, transparent);
+    border-radius: var(--radius-chip-sm);
+    color: var(--ink);
+  }
+}
+
+@media (max-width: 700px) {
+  .er-page { padding: 72px 20px 96px; }
+
+  .er-title { font-size: 46px; }
+
+  .er-lede { font-size: 16px; }
+}

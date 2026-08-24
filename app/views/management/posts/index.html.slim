@@ -22,39 +22,44 @@
     = f.search_field :query, value: params[:query], placeholder: t('.search'), class: 'mg-search__input', id: nil
 
 - if @posts.any?
-  table.mg-table
-    thead
-      tr
-        th= mg_sort_link('#', 'number', path: sort_path)
-        th= mg_sort_link(t('.columns.status'), 'status', path: sort_path)
-        th= t('.columns.title')
-        th= t('.columns.langs')
-        th= t('.columns.tags')
-        th= t('.columns.author')
-        th= mg_sort_link(t('.columns.updated'), 'updated', path: sort_path)
-        th
-    tbody
-      - @posts.each do |post|
+  / The table is a working list with eight columns; on a phone it used to push the whole page
+  / sideways by 273px. It scrolls inside its own box instead, so the page does not.
+  .mg-table-scroll
+    table.mg-table
+      thead
         tr
-          td.mg-cell--mono= post.entry_label
-          td= mg_status_pill(post.status)
-          td
-            .mg-title= post.title.presence || post.post_translations.map(&:title).compact_blank.first
-            .mg-title__path= "/post/#{post.slug}"
-          td= mg_language_pair(post.translated_locales)
-          td
-            .mg-tags
-              - post.tags.first(3).each do |tag|
-                span.mg-tag= "##{tag.title}"
-              - if post.tags.size > 3
-                span.mg-tags__more= "+#{post.tags.size - 3}"
-          td.mg-cell--mono= post.user&.nickname
-          td.mg-cell--mono= post.updated_at.strftime('%Y·%m·%d')
-          td.mg-cell--right
-            .mg-actions
-              = link_to t('.edit'), edit_management_post_path(post), class: 'mg-action', data: { turbo: false }
-              = link_to t('.delete'), management_post_path(post), class: 'mg-action mg-action--danger',
-                data: { turbo_method: :delete, turbo_confirm: t('global.dialog.you_sure') }
+          th= mg_sort_link('#', 'number', path: sort_path)
+          th= mg_sort_link(t('.columns.status'), 'status', path: sort_path)
+          th= t('.columns.title')
+          th= t('.columns.langs')
+          th= t('.columns.tags')
+          th= t('.columns.author')
+          th= mg_sort_link(t('.columns.updated'), 'updated', path: sort_path)
+          th
+      tbody
+        - @posts.each do |post|
+          tr
+            td.mg-cell--mono= post.entry_label
+            td= mg_status_pill(post.status)
+            td
+              .mg-title= post.title.presence || post.post_translations.map(&:title).compact_blank.first
+              .mg-title__path= "/post/#{post.slug}"
+            td= mg_language_pair(post.translated_locales)
+            td
+              .mg-tags
+                - post.tags.first(3).each do |tag|
+                  span.mg-tag= "##{tag.title}"
+                - if post.tags.size > 3
+                  span.mg-tags__more= "+#{post.tags.size - 3}"
+            td.mg-cell--mono= post.user&.nickname
+            td.mg-cell--mono= post.updated_at.strftime('%Y·%m·%d')
+            td.mg-cell--right
+              .mg-actions
+                = link_to t('.edit'), edit_management_post_path(post), class: 'mg-action', data: { turbo: false }
+                = button_to t('.delete'), management_post_path(post), method: :delete,
+                  class: 'mg-action mg-action--danger',
+                  form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
+                                  confirm_message_value: t('global.dialog.you_sure') } }
 
   - if @pagy.pages > 1
     nav.mg-pager

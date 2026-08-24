@@ -5,8 +5,6 @@ module Management
   # it: the signed global id, and the same partial the public page renders so the editor
   # shows the real thing rather than a placeholder.
   class JournalBlocksController < ApplicationController
-    before_action :authenticate_user!
-
     def create
       authorize [:management, JournalBlock]
 

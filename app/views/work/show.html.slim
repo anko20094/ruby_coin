@@ -1,7 +1,12 @@
-- content_for :title, full_title(@case.title)
+/ The title on its own is a mark ('DNA'), which says nothing in a search result or a tab —
+/ the sector is the shortest thing that makes it a sentence.
+- content_for :title, full_title([@case.title, @case.sector].compact_blank.join(' · '))
 - title = @case.title
+- page_meta description: @case.tagline, image: "/og/#{@case.slug}-#{I18n.locale}.png", type: 'article', updated_at: @case.updated_at
 
-article.wk-case
+= render 'shared/reading_progress'
+
+article.wk-case data-controller="track-jump"
   header.wk-case__header
     .wk-case__breadcrumb
       = link_to work_path, class: 'hover-link' do
@@ -15,12 +20,26 @@ article.wk-case
     p.wk-case__tagline= @case.tagline
     .wk-case__role= @case.role
 
+    / The link that makes the two-track shape mean something: one URL for the recruiter, this
+    / one for the CTO. Rendered as a real anchor so it works with JavaScript off and can be
+    / copied out of the context menu; the controller only upgrades the scroll and keeps the
+    / address bar honest.
+    = link_to '#engineers', class: 'wk-case__skip', data: { action: 'track-jump#jump' } do
+      span aria-hidden="true" ↓
+      = " #{t('work.case.skip')}"
+
   section.wk-case__strip
     .wk-metrics
+      / Each figure is a button that copies "2.14M — users across 2,488 chats". Recruiters
+      / retype these into notes and messages by hand; this is the cheapest thing on the page
+      / and the one most likely to be used.
       - @case.metrics.each do |metric|
-        .wk-metric
+        button.wk-metric[type="button" data-controller="copy" data-action="copy#copy"
+                         data-copy-text-value="#{metric[:value]} — #{metric[:label]}"
+                         data-copy-done-value=t('work.case.copied')]
           .wk-metric__value.num= metric[:value]
           .wk-metric__label= metric[:label]
+          span.wk-metric__flash[aria-live="polite" data-copy-target="flash"]
 
   section.wk-case__plain
     = render TrackTagComponent.new(label: t('work.case.plain'), tone: :ruby)
@@ -43,7 +62,7 @@ article.wk-case
             - @case.stack.each do |item|
               span.rc-chip.rc-chip--sm= item
 
-  section.wk-case__band
+  section#engineers.wk-case__band
     .wk-case__band-inner
       = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
       h2.wk-case__heading.is-small= @case.engineering_heading
@@ -59,6 +78,16 @@ article.wk-case
             .wk-quality__value.num= metric[:value]
             .wk-quality__label= metric[:label]
       .wk-case__scope= rich(@case.scope_note)
+
+  / The page whose job is to convince someone ended at "here is the next case". A reader who
+  / has just read 2,000 words of evidence should not have to go looking for the way to say so.
+  section.wk-case__cta
+    p.wk-case__cta-line= t('work.case.cta')
+    .wk-case__cta-links
+      = link_to t('work.case.cta_contact'), contact_path, class: 'rc-button rc-button--primary'
+      - email = CVProfile.current.contact_rows.find { |key, _, _| key == 'email' }
+      - if email
+        = link_to email[1], email[2], class: 'rc-button'
 
   nav.wk-case__pager
     .wk-case__pager-label= t('work.case.pager')

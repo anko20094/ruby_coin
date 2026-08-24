@@ -77,7 +77,8 @@ class CVBlock < ApplicationRecord
   # The cases a career entry points at, in the order the list holds them, skipping any slug
   # whose case has since been deleted.
   def cases
-    Case.where(slug: Array(self[:case_slugs])).index_by(&:slug).values_at(*Array(self[:case_slugs])).compact
+    @cases ||= Case.where(slug: Array(self[:case_slugs]))
+                   .index_by(&:slug).values_at(*Array(self[:case_slugs])).compact
   end
 
   private

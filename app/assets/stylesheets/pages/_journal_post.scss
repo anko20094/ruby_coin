@@ -128,7 +128,7 @@ $post-max: 760px;
   font-size: 10px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
 }
 
 .jn-code__body {
@@ -147,7 +147,7 @@ $post-max: 760px;
 
   // Rouge token classes, kept on the site palette rather than a shipped theme:
   // structure in ink, anything quoted or literal in ruby, asides muted.
-  .c, .c1, .cm, .cs { color: var(--ink-mute); font-style: italic; }
+  .c, .c1, .cm, .cs { color: var(--ink-quiet); font-style: italic; }
   .k, .kd, .kn, .kp, .kr, .kt, .kc { color: var(--ruby); }
   .s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sx, .sr, .ss { color: var(--ruby); }
   .m, .mf, .mh, .mi, .mo, .il { color: var(--ruby); }
@@ -298,4 +298,45 @@ $post-max: 760px;
   .jn-related__card { transition: none; }
 
   .jn-related__card:hover { transform: none; }
+}
+
+// The two entries either side. Same shape as the case pager, because it is the same idea.
+.jn-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 56px;
+  background: color-mix(in oklab, var(--ink-mute) 35%, transparent);
+  border: 1px solid color-mix(in oklab, var(--ink-mute) 35%, transparent);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.jn-step {
+  display: block;
+  background: var(--paper);
+  padding: 18px 20px;
+
+  &--next { text-align: right; }
+}
+
+.jn-step__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.jn-step__title {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+@media (max-width: 560px) {
+  .jn-steps { grid-template-columns: 1fr; }
+
+  .jn-step--next { text-align: left; }
 }

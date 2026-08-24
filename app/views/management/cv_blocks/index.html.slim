@@ -19,9 +19,14 @@
                       p.case-row__meta= "#{block.org} · #{block.period} · #{block.case_slugs_list}"
                   .post__actions
                     .delete
-                      = link_to image_tag('delete-icon.svg'), management_cv_block_path(block),
-                        data: { turbo_method: :delete, turbo_confirm: t('global.dialog.you_sure') }
+                      = button_to management_cv_block_path(block), method: :delete,
+                        aria: { label: t('global.button.delete') },
+                        form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
+                                        confirm_message_value: t('global.dialog.you_sure') } } do
+                        = image_tag('delete-icon.svg', alt: '')
                     .edit
-                      = link_to image_tag('edit-icon.svg'), edit_management_cv_block_path(block), data: { turbo: :false }
+                      = link_to edit_management_cv_block_path(block), data: { turbo: :false },
+                        aria: { label: t('global.button.edit') } do
+                        = image_tag 'edit-icon.svg', alt: ''
             = link_to t('.add', kind: t(".kinds.#{kind}")), new_management_cv_block_path(kind: kind),
               class: 'main-btn not_filled', data: { turbo: :false }

@@ -10,4 +10,7 @@ Ahoy.api = false
 # we recommend configuring local geocoding as well
 # see https://github.com/ankane/ahoy#geocoding
 Ahoy.geocode = false
-Ahoy.track_bots = true
+# Crawlers are not readers. Counting them wrote a visit row on every crawl — synchronously,
+# in the request — and put their traffic into the same numbers the owner reads to decide what
+# to write next.
+Ahoy.track_bots = false

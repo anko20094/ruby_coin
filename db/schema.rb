@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,13 +137,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_160000) do
     t.jsonb "contact", default: [], null: false
     t.datetime "created_at", null: false
     t.jsonb "education", default: {}, null: false
+    t.string "figures_as_of", default: "", null: false
     t.jsonb "languages", default: {}, null: false
     t.jsonb "location", default: {}, null: false
     t.jsonb "name", default: {}, null: false
     t.jsonb "role", default: {}, null: false
     t.jsonb "summary", default: {}, null: false
     t.datetime "updated_at", null: false
-    t.string "updated_on", default: "", null: false
     t.jsonb "years", default: {}, null: false
   end
 
@@ -172,7 +172,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_160000) do
     t.string "subtitle"
     t.string "title"
     t.datetime "updated_at", null: false
-    t.index ["locale"], name: "index_post_translations_on_locale"
+    t.index ["post_id", "locale"], name: "index_post_translations_on_post_id_and_locale", unique: true
     t.index ["post_id"], name: "index_post_translations_on_post_id"
   end
 
@@ -193,6 +193,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_160000) do
     t.bigint "user_id", null: false
     t.index ["entry_number"], name: "index_posts_on_entry_number", unique: true
     t.index ["slug"], name: "index_posts_on_slug", unique: true
+    t.index ["status", "created_at"], name: "index_posts_on_status_and_created_at"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 

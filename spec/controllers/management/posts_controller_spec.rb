@@ -5,26 +5,7 @@ require 'rails_helper'
 describe Management::PostsController do
   describe 'GET #index' do
     let(:action) { :index }
-    let(:params) { {} }
-
-    context 'when admin is signed in' do
-      before do
-        admin_user = create(:user, role: :admin)
-        sign_in(admin_user)
-      end
-
-      it_behaves_like 'has http success'
-    end
-
-    context 'when admin is not signed in' do
-      it_behaves_like 'redirects to new_user_session_path'
-    end
-  end
-
-  describe 'GET #show' do
-    let(:test_post) { create(:post) }
-    let(:action) { :show }
-    let(:params) { { id: test_post.id } }
+    let(:params) { { locale: 'uk' } }
 
     context 'when admin is signed in' do
       before do
@@ -42,7 +23,7 @@ describe Management::PostsController do
 
   describe 'GET #new' do
     let(:action) { :new }
-    let(:params) { {} }
+    let(:params) { { locale: 'uk' } }
 
     context 'when admin is signed in' do
       before do
@@ -61,7 +42,7 @@ describe Management::PostsController do
   describe 'GET #edit' do
     let(:test_post) { create(:post) }
     let(:action) { :edit }
-    let(:params) { { id: test_post.id } }
+    let(:params) { { locale: 'uk', id: test_post.id } }
 
     context 'when admin is signed in' do
       before do
@@ -81,13 +62,13 @@ describe Management::PostsController do
     let(:test_post) { create(:post) }
     let(:action) { :update }
     let(:new_title) { 'Updated Title' }
-    let(:params) { { id: test_post.slug, post: { title: new_title } } }
+    let(:params) { { locale: 'uk', id: test_post.slug, post: { title: new_title } } }
     let(:second_post) { create(:post, main_post: false) }
-    let(:params_status_true_second_post) { { id: second_post.id, post: { main_post: 'true' } } }
-    let(:params_status_false_second_post) { { id: second_post.id, post: { main_post: 'false' } } }
+    let(:params_status_true_second_post) { { locale: 'uk', id: second_post.id, post: { main_post: 'true' } } }
+    let(:params_status_false_second_post) { { locale: 'uk', id: second_post.id, post: { main_post: 'false' } } }
     let(:third_post) { create(:post, main_post: true) }
-    let(:params_status_true_third_post) { { id: third_post.id, post: { main_post: 'true' } } }
-    let(:params_status_false_third_post) { { id: third_post.id, post: { main_post: 'false' } } }
+    let(:params_status_true_third_post) { { locale: 'uk', id: third_post.id, post: { main_post: 'true' } } }
+    let(:params_status_false_third_post) { { locale: 'uk', id: third_post.id, post: { main_post: 'false' } } }
 
     context 'when admin is signed in' do
       before do
@@ -146,7 +127,7 @@ describe Management::PostsController do
   describe 'DELETE #destroy' do
     let(:test_post) { create(:post) }
     let(:action) { :destroy }
-    let(:params) { { id: test_post.id } }
+    let(:params) { { locale: 'uk', id: test_post.id } }
 
     context 'when admin is signed in' do
       before do
@@ -169,7 +150,7 @@ describe Management::PostsController do
     let(:valid_attributes) { attributes_for(:post) }
     let(:invalid_attributes) { attributes_for(:post, title: nil) }
     let(:action) { :create }
-    let(:params) { { post: valid_attributes } }
+    let(:params) { { locale: 'uk', post: valid_attributes } }
 
     context 'when admin is signed in' do
       before do
@@ -257,7 +238,7 @@ describe Management::PostsController do
     before { sign_in(create(:user, role: :admin)) }
 
     it 'renders one Action Text editor per locale and no TinyMCE' do
-      get :new
+      get :new, params: { locale: 'uk' }
 
       expect(response.body).to include('trix-editor')
       I18n.available_locales.each do |locale|
@@ -267,7 +248,7 @@ describe Management::PostsController do
     end
 
     it 'offers the slash menu with every block kind' do
-      get :new
+      get :new, params: { locale: 'uk' }
 
       expect(response.body).to include('aitranslation', 'slash-menu', 'post-editor')
       JournalBlock::KINDS.each { |kind| expect(response.body).to include(%(data-kind="#{kind}")) }
@@ -416,6 +397,36 @@ describe Management::PostsController do
       expect { autosave(subtitle: 'from a moderator') }
         .not_to(change { I18n.with_locale(:en) { post_record.reload.subtitle } })
     end
+
+    # The post write and the translation write are one save. They used to be two: the post
+    # landed, the translator then rejected a blank other-language title, and autosave answered
+    # "invalid" about a post it had already rewritten.
+    it 'writes nothing when the other language fails validation' do
+      before_title = I18n.with_locale(:en) { post_record.title }
+
+      autosave(title: 'A renamed title', title_localizations: { uk: '' })
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body['status']).to eq('invalid')
+      expect(I18n.with_locale(:en) { post_record.reload.title }).to eq(before_title)
+    end
+
+    # ...and the version goes out with the failure, so the editor's next keystroke is not
+    # reported as a conflict with itself.
+    it 'reports the record version even when it refuses the save' do
+      autosave(title: 'A renamed title', title_localizations: { uk: '' })
+
+      expect(response.parsed_body['lock_version']).to eq(post_record.reload.lock_version)
+    end
+
+    it 'does not move the slug of a published post while it is being typed' do
+      original = post_record.slug
+
+      autosave(title: 'Halfway through a re', slug: '')
+      autosave(title: 'Halfway through a rename', slug: '')
+
+      expect(post_record.reload.slug).to eq(original)
+    end
   end
 
   describe 'the slug' do
@@ -435,13 +446,26 @@ describe Management::PostsController do
       expect(post_record.reload.slug).to eq('chosen-by-hand')
     end
 
-    it 'derives one from the English title when the field is left empty' do
+    it 'derives one from the English title for a post being created' do
+      attributes = attributes_for(:post).merge(title: 'A Brand New Title', slug: '')
+
+      expect { post :create, params: { locale: 'en', post: attributes } }.to change(Post, :count).by(1)
+
+      expect(Post.order(:created_at).last.slug).to eq('a-brand-new-title')
+    end
+
+    # An empty slug box on an existing post means "leave the URL alone". It used to mean
+    # "regenerate from the title", which moved the canonical URL of a published post on every
+    # autosave tick.
+    it 'leaves a published post at the URL it already has when the field is emptied' do
+      original = post_record.slug
+
       patch :update, params: {
         locale: 'en', id: post_record.id,
         post: { title: 'A Brand New Title', subtitle: 'A lede', slug: '' }
       }
 
-      expect(post_record.reload.slug).to eq('a-brand-new-title')
+      expect(post_record.reload.slug).to eq(original)
     end
   end
 

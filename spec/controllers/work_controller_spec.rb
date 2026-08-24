@@ -10,7 +10,7 @@ describe WorkController do
 
   describe 'GET #index' do
     let(:action) { :index }
-    let(:params) { {} }
+    let(:params) { { locale: 'uk' } }
 
     it_behaves_like 'has http success'
 
@@ -51,7 +51,7 @@ describe WorkController do
 
   describe 'GET #show' do
     let(:action) { :show }
-    let(:params) { { slug: 'intelligence' } }
+    let(:params) { { locale: 'uk', slug: 'intelligence' } }
 
     it_behaves_like 'has http success'
 
@@ -86,13 +86,46 @@ describe WorkController do
     end
 
     it 'wraps the pager at the end of the list' do
-      get(action, params: { slug: 'rubycoin' })
+      get(action, params: { locale: 'uk', slug: 'rubycoin' })
 
       expect(response.body).to include(work_case_path(slug: 'intelligence'))
     end
 
     it 'raises for an unknown slug' do
-      expect { get(action, params: { slug: 'nope' }) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { get(action, params: { locale: 'uk', slug: 'nope' }) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  # "Which cases do recruiters actually open" is the number the handoff says should decide the
+  # order of /work (§9a), and nothing was counting it.
+  describe 'view tracking', type: :request do
+    include_context 'when carrierwave cleanup'
+
+    it 'records one view per case' do
+      expect { get work_case_path(slug: 'dna', locale: 'en'), headers: browser_headers }
+        .to change { Ahoy::Event.where(name: 'Viewed Case').count }.by(1)
+    end
+
+    it 'stores the case id, so a renamed case keeps its history' do
+      get work_case_path(slug: 'dna', locale: 'en'), headers: browser_headers
+
+      event = Ahoy::Event.where(name: 'Viewed Case').last
+      expect(event.properties['case_id']).to eq(Case.find_by!(slug: 'dna').id)
+      expect(event.properties['slug']).to eq('dna')
+    end
+
+    it 'does not count the same reader twice inside the window' do
+      get work_case_path(slug: 'dna', locale: 'en'), headers: browser_headers
+
+      expect { get work_case_path(slug: 'dna', locale: 'en'), headers: browser_headers }
+        .not_to(change { Ahoy::Event.where(name: 'Viewed Case').count })
+    end
+
+    it 'counts a different case in the same session' do
+      get work_case_path(slug: 'dna', locale: 'en'), headers: browser_headers
+
+      expect { get work_case_path(slug: 'leads', locale: 'en'), headers: browser_headers }
+        .to change { Ahoy::Event.where(name: 'Viewed Case').count }.by(1)
     end
   end
 

@@ -19,28 +19,22 @@ RSpec.describe Management::StatisticsController, type: :controller do
       allow(Statistics::YearlyViewsQuery).to receive(:new).and_return(yearly_views_query)
       allow(Statistics::TotalViewsQuery).to receive(:new).and_return(total_views_query)
       allow(Statistics::PostViewsQuery).to receive(:new).and_return(post_views_query)
+      allow(Statistics::CaseViewsQuery).to receive(:new).and_return(instance_double(Statistics::CaseViewsQuery,
+                                                                                    count: []))
 
-      get :index
+      get :index, params: { locale: 'uk' }
     end
 
-    it 'assigns @post_views' do
+    it 'assigns the per-post counts' do
       expect(assigns(:post_views)).to eq(60)
     end
 
-    it 'assigns @daily_views' do
-      expect(assigns(:daily_views)).to eq(42)
+    it 'assigns the per-case counts — the question the screen exists to answer' do
+      expect(assigns(:case_views)).to eq([])
     end
 
-    it 'assigns @monthly_views' do
-      expect(assigns(:monthly_views)).to eq(100)
-    end
-
-    it 'assigns @yearly_views' do
-      expect(assigns(:yearly_views)).to eq(1000)
-    end
-
-    it 'assigns @total_views' do
-      expect(assigns(:total_views)).to eq(10_000)
+    it 'assigns the four periods as one hash' do
+      expect(assigns(:totals)).to eq(today: 42, month: 100, year: 1000, all: 10_000)
     end
 
     it 'renders the index template' do
@@ -53,7 +47,7 @@ RSpec.describe Management::StatisticsController, type: :controller do
       user = create(:user)
       sign_in(user)
 
-      get :index
+      get :index, params: { locale: 'uk' }
     end
 
     it 'redirects to the root page' do

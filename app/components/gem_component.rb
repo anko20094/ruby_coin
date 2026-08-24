@@ -47,8 +47,12 @@ class GemComponent < ViewComponent::Base
   def glow? = interactive?
   def light = LIGHTS.fetch(variant)
 
+  # The size is a ceiling, not a fixed width. It used to be `width: #{size}px`, and a 400px
+  # hero gem inside a one-column grid pinned that column's min-content at 400px: the home page
+  # was 436px wide on a 375px phone, with the lede clipped mid-word. `min()` keeps the
+  # designed size wherever there is room for it and gives it up where there is not.
   def style
-    "width: #{size}px; height: #{size}px" if size
+    "width: min(#{size}px, 100%); height: auto; aspect-ratio: 1" if size
   end
 
   def facets

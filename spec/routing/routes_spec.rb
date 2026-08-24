@@ -10,8 +10,8 @@ RSpec.describe 'Routes' do
   end
 
   describe 'GET /search' do
-    it 'routes to home#search' do
-      expect(get: '/search').to route_to('home#search')
+    it 'routes to journal#search — search is the journal searching itself' do
+      expect(get: '/search').to route_to('journal#search')
     end
   end
 
@@ -69,6 +69,8 @@ RSpec.describe 'Routes' do
     end
   end
 
+  # Users::SessionsController was 100% commented-out boilerplate, so the devise_for override
+  # pointed at a class that added nothing. Devise's own controller answers now.
   describe 'Devise routes' do
     describe 'GET /users/sign_up' do
       it 'routes to users/registrations#new' do
@@ -84,19 +86,19 @@ RSpec.describe 'Routes' do
 
     describe 'GET /users/sign_in' do
       it 'routes to users/sessions#new' do
-        expect(get: '/users/sign_in').to route_to('users/sessions#new')
+        expect(get: '/users/sign_in').to route_to('devise/sessions#new')
       end
     end
 
     describe 'POST /users/sign_in' do
       it 'routes to users/sessions#create' do
-        expect(post: '/users/sign_in').to route_to('users/sessions#create')
+        expect(post: '/users/sign_in').to route_to('devise/sessions#create')
       end
     end
 
     describe 'DELETE /users/sign_out' do
       it 'routes to users/sessions#destroy' do
-        expect(delete: '/users/sign_out').to route_to('users/sessions#destroy')
+        expect(delete: '/users/sign_out').to route_to('devise/sessions#destroy')
       end
     end
   end

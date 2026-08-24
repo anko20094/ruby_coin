@@ -1,22 +1,23 @@
-h2
-  | Change your password
-= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f|
-  = render "devise/shared/error_messages", resource: resource
-  = f.hidden_field :reset_password_token
-  .field
-    = f.label :password, "New password"
-    br
-    - if @minimum_password_length
-      em
-        | (
-        = @minimum_password_length
-        |  characters minimum)
-      br
-    = f.password_field :password, autofocus: true, autocomplete: "new-password"
-  .field
-    = f.label :password_confirmation, "Confirm new password"
-    br
-    = f.password_field :password_confirmation, autocomplete: "new-password"
-  .actions
-    = f.submit "Change my password"
-= render "devise/shared/links"
+- content_for :title, full_title(t('.title'))
+- page_meta description: t('.title')
+
+.au-page
+  h1.au-page__title= t('.title')
+
+  = render 'devise/shared/errors', resource: resource
+
+  = form_for(resource, as: resource_name, url: password_path(resource_name),
+             html: { method: :put, class: 'au-form' }) do |f|
+    = f.hidden_field :reset_password_token
+
+    .au-field
+      = f.label :password, t('.new_password'), class: 'au-label'
+      - if @minimum_password_length
+        .au-hint= t('.minimum', count: @minimum_password_length)
+      = f.password_field :password, autofocus: true, autocomplete: 'new-password', class: 'au-input'
+
+    .au-field
+      = f.label :password_confirmation, t('.confirm_password'), class: 'au-label'
+      = f.password_field :password_confirmation, autocomplete: 'new-password', class: 'au-input'
+
+    = f.submit t('.submit'), class: 'rc-button rc-button--primary'

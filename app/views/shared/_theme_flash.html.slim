@@ -1,0 +1,12 @@
+/ The redesign had no flash region at all, so every redirect that carried a message — a
+/ removed post, a Pundit denial — arrived silently and the reader was left guessing why they
+/ were somewhere else. One live region, announced, dismissible by hand: nothing here
+/ disappears on a timer, because a message that vanishes is a message the reader may not have
+/ read yet.
+.rc-flash[aria-live="polite" aria-atomic="true"]
+  - flash.each do |type, message|
+    - next if message.blank?
+    .rc-flash__item class="rc-flash__item--#{flash_tone(type)}" role=(flash_tone(type) == 'alert' ? 'alert' : 'status')
+      span.rc-flash__text= message
+      button.rc-flash__close type="button" data-controller="dismiss" data-action="dismiss#close" aria-label=t('global.dismiss')
+        span aria-hidden="true" ×

@@ -95,7 +95,7 @@
   font-family: var(--font-mono);
   font-size: 9.5px;
   letter-spacing: 1.4px;
-  color: var(--ink-mute);
+  color: var(--ink-quiet);
   padding: 12px 10px 6px;
 }
 
@@ -234,7 +234,7 @@
   color: var(--ink-soft);
 }
 
-.mg-crumbs__sep { color: var(--ink-mute); }
+.mg-crumbs__sep { color: var(--ink-quiet); }
 
 .mg-crumbs__here { color: var(--ink); }
 
@@ -298,6 +298,15 @@
   margin: 0;
 }
 
+// An eight-column working list will not fit a phone and should not try to. It scrolls in its
+// own box so the page around it does not, which is the difference between a table you can read
+// sideways and a site that is 273px too wide.
+.mg-table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (max-width: 900px) {
   .mg-shell { flex-direction: column; }
 
@@ -309,7 +318,33 @@
     border-bottom: 1px solid var(--mg-ink-faint);
   }
 
-  .mg-sidebar__models { max-height: 220px; }
+  // The sidebar used to take 348px at the top of every screen — half the first viewport, with
+  // its own 220px scroller nested inside. It is a summary here: the models stay, the counts
+  // and hints go, and it stops being taller than the content it introduces.
+  .mg-sidebar__models {
+    max-height: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .mg-model {
+    flex: 1 1 auto;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mg-model__hint { display: none; }
+
+  .mg-sidebar__label { flex: 1 0 100%; }
+
+  .mg-sidebar__where { display: none; }
+
+  .mg-sidebar,
+  .mg-sidebar__brand,
+  .mg-sidebar__user { padding-top: 10px; padding-bottom: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

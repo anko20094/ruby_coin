@@ -70,6 +70,14 @@ end
 before 'deploy:assets:precompile', 'deploy:yarn_install'
 
 # ------------------------------
+# Data tasks, after the new release is live
+# ------------------------------
+# after_party was a task you had to remember to invoke by hand, so a deploy could ship code
+# that depended on a data migration and never run it. The importers and the cover rebuild are
+# all idempotent, which is what makes running them every deploy safe.
+after 'deploy:published', 'after_party'
+
+# ------------------------------
 # Upload credentials automatically
 # ------------------------------
 namespace :deploy do

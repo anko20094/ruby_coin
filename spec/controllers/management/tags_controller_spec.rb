@@ -5,7 +5,7 @@ require 'rails_helper'
 describe Management::TagsController do
   describe 'GET #index' do
     let(:action) { :index }
-    let(:params) { {} }
+    let(:params) { { locale: 'uk' } }
 
     context 'when admin is signed in' do
       before do
@@ -23,7 +23,7 @@ describe Management::TagsController do
 
   describe 'GET #new' do
     let(:action) { :new }
-    let(:params) { {} }
+    let(:params) { { locale: 'uk' } }
 
     context 'when admin is signed in' do
       before do
@@ -42,7 +42,7 @@ describe Management::TagsController do
   describe 'GET #edit' do
     let(:tag) { create(:tag) }
     let(:action) { :edit }
-    let(:params) { { id: tag.id } }
+    let(:params) { { locale: 'uk', id: tag.id } }
 
     context 'when admin is signed in' do
       before do
@@ -62,7 +62,7 @@ describe Management::TagsController do
     let(:valid_attributes) { attributes_for(:tag) }
     let(:invalid_attributes) { attributes_for(:tag, title: nil) }
     let(:action) { :create }
-    let(:params) { { tag: valid_attributes } }
+    let(:params) { { locale: 'uk', tag: valid_attributes } }
 
     context 'with valid parameters' do
       before do
@@ -96,7 +96,7 @@ describe Management::TagsController do
     let(:tag) { create(:tag) }
     let(:new_title) { 'Updated Title' }
     let(:action) { :update }
-    let(:params) { { id: tag.id, tag: { title: new_title } } }
+    let(:params) { { locale: 'uk', id: tag.id, tag: { title: new_title } } }
 
     context 'with valid parameters' do
       before do
@@ -125,7 +125,7 @@ describe Management::TagsController do
   describe 'DELETE #destroy' do
     let(:tag) { create(:tag) }
     let(:action) { :destroy }
-    let(:params) { { id: tag.id } }
+    let(:params) { { locale: 'uk', id: tag.id } }
 
     context 'when admin is signed in' do
       before do

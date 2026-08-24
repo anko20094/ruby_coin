@@ -34,11 +34,11 @@ RSpec.describe CV::Importer do
   it 'puts a drifted field back' do
     described_class.call
     profile = CVProfile.current
-    profile.update_columns(updated_on: '1999·01·01')
+    profile.update_columns(figures_as_of: '1999·01·01')
 
     described_class.call
 
-    expect(profile.reload.updated_on).not_to eq('1999·01·01')
+    expect(profile.reload.figures_as_of).not_to eq('1999·01·01')
   end
 
   it 'carries the case links on the career entries that have them' do

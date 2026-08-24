@@ -1,0 +1,75 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+# The locale segment is optional in the routes, so every page also answered at an address
+# without one — always in Ukrainian, whoever asked. That is the URL /cv redirects to and the
+# one a printed CV carries, so an English-speaking recruiter landed on a Ukrainian page.
+describe 'locale negotiation', type: :request do
+  include_context 'when the cases are imported'
+  include_context 'when the cv is imported'
+
+  it 'sends a browser that prefers English to the English page' do
+    get '/work', headers: { 'Accept-Language' => 'en-GB,en;q=0.9' }
+
+    expect(response).to redirect_to('/en/work')
+  end
+
+  it 'sends a browser that prefers Ukrainian to the Ukrainian page' do
+    get '/work', headers: { 'Accept-Language' => 'uk,en-US;q=0.8' }
+
+    expect(response).to redirect_to('/uk/work')
+  end
+
+  it 'honours quality values rather than header order' do
+    get '/work', headers: { 'Accept-Language' => 'uk;q=0.3,en;q=0.9' }
+
+    expect(response).to redirect_to('/en/work')
+  end
+
+  it 'falls back to the default locale for a language the site does not have' do
+    get '/work', headers: { 'Accept-Language' => 'de-DE,de;q=0.9' }
+
+    expect(response).to redirect_to("/#{I18n.default_locale}/work")
+  end
+
+  it 'falls back to the default locale when the browser says nothing' do
+    get '/work'
+
+    expect(response).to redirect_to("/#{I18n.default_locale}/work")
+  end
+
+  it 'carries the query string across' do
+    get '/journal?tag_id=3&order=best', headers: { 'Accept-Language' => 'en' }
+
+    expect(response).to redirect_to('/en/journal?tag_id=3&order=best')
+  end
+
+  it 'leaves a page that already names its locale alone' do
+    get '/en/work'
+
+    expect(response).to have_http_status(:success)
+  end
+
+  # One piece of content, one URL that returns 200 — which is also what ends the duplicate
+  # content a crawler used to find at /work and /uk/work.
+  it 'no longer serves the same page at two addresses' do
+    get '/work'
+    expect(response).to have_http_status(:found)
+
+    get '/uk/work'
+    expect(response).to have_http_status(:success)
+  end
+
+  it 'takes an English reader from /cv to the English portfolio' do
+    english = { 'Accept-Language' => 'en' }
+
+    get '/cv', headers: english
+    expect(response).to have_http_status(:moved_permanently)
+    expect(response).to redirect_to('/work')
+
+    # Followed by hand rather than with follow_redirect!, which does not carry the header on.
+    get response.location, headers: english
+    expect(response).to redirect_to('/en/work')
+  end
+end
