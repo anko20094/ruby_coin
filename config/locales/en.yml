@@ -170,7 +170,6 @@ en:
         search: search titles and bodies…
         counted: "%{shown} of %{total}"
         empty: nothing here yet.
-        edit: edit
         delete: delete
         filters:
           all: all
@@ -190,6 +189,7 @@ en:
       edit:
       editor:
         untitled: untitled
+        meta: publication
         side_by_side: both
         language: "%{name}"
         title: title
@@ -204,6 +204,7 @@ en:
         og: how a link to this looks
         created: created
         preview: preview
+        open: open ↗
         translate: translate the other language
         conflict: Someone else saved this post after you opened it. Nothing here has been written.
         reload: reload theirs
@@ -219,25 +220,40 @@ en:
           title: What is this about?
           subtitle: One sentence saying what the piece is about.
           slug: how-this-reads-in-a-url
-      slash_menu:
-        insert: Insert block
-        kinds:
-          code: code
-          callout: callout
-          embed: embed
-        fields:
-          language: language
-          source: code
-          tone: tone
-          body: text
-          url: link
-          caption: caption
       create:
         success: Post successfully created
       update:
         success: Post successfully updated
+        conflict: Someone else saved this post while you were saving it. Nothing has been written — your work is still here, and Save will take it now.
       destroy:
         success: Post successfully deleted
+
+    editor:
+      tinymce:
+        inline_code: inline code
+        blocks: Block
+        insert: Insert
+        cancel: Cancel
+        language: language
+        source: code
+        tone: tone
+        tone_note: note
+        tone_warn: warning
+        body: text
+        url: link
+        caption: caption
+        load_error: "The editor could not load. The field below still holds the body and still saves."
+        block_error: The block could not be inserted.
+        upload_error: The image could not be uploaded.
+        kinds:
+          code: Code listing…
+          callout: Callout…
+          embed: Embed…
+    editor_images:
+      create:
+        missing: no file
+        type: that file is not an image
+        size: "an image may be at most %{limit} MB"
 
     cases:
       index:
@@ -276,23 +292,6 @@ en:
       destroy:
         success: Case successfully deleted
 
-    cv_profiles:
-      edit:
-        title: CV frame
-        name: Name
-        role: Role
-        years: Years
-        summary: Summary
-        location: Location
-        languages: Languages
-        education: Education
-        updated_on: Figures checked on
-        contact: Contact rows
-        contact_key: key
-        contact_label: shown text
-        contact_href: link
-      update:
-        success: CV frame updated
 
     cv_blocks:
       index:
@@ -326,7 +325,10 @@ en:
         success: CV block deleted
 
     sidebar_component:
+      home: back to the post list
       where: /management
+      collapse: collapse the sidebar
+      expand: expand the sidebar
       models: MODELS
       system: SYSTEM
       posts_hint: "%{active} published · %{inactive} hidden"
@@ -335,6 +337,22 @@ en:
       statistics_hint: views · visits
 
     shared:
+      structure_row:
+        add: add a row
+        expected: "the design draws %{count}"
+        move_up: move up
+        move_down: move down
+        remove: remove this row
+        value: figure
+        label: label
+        title: title
+        body: text
+        org: employer
+        place: place
+        period: period
+        note: note
+        case_slugs: case slugs, one per line
+        items: items, one per line
     tags:
       index:
         tags: Exist tags

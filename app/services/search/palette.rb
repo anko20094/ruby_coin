@@ -14,6 +14,10 @@ module Search
       def as_json(*) = { kind: kind, title: title, hint: hint, url: url }
     end
 
+    # Case fields are TinyMCE markup. The palette answers in JSON and the browser prints the
+    # result as text, so a bolded word would arrive as a literal <b>.
+    def self.plain(value) = ActionController::Base.helpers.strip_tags(value.to_s).strip
+
     def initialize(query, routes:, locale: I18n.locale)
       @query = query.to_s.strip
       @routes = routes
@@ -47,14 +51,15 @@ module Search
 
     def cases
       Case.ordered.select { |kase| matches_case?(kase) }.map do |kase|
-        Result.new(kind: 'case', title: kase.title, hint: kase.tagline,
+        Result.new(kind: 'case', title: self.class.plain(kase.title), hint: self.class.plain(kase.tagline),
                    url: routes.work_case_path(slug: kase.slug, locale: locale))
       end
     end
 
     def matches_case?(kase)
       needle = query.downcase
-      [kase.title, kase.tagline, kase.sector, kase.slug].compact.any? { |field| field.downcase.include?(needle) }
+      [self.class.plain(kase.title), self.class.plain(kase.tagline), kase.sector, kase.slug]
+        .compact.any? { |field| field.downcase.include?(needle) }
     end
 
     def posts

@@ -47,8 +47,9 @@ describe 'content security policy', type: :request do
     expect(policy).not_to include("'nonce-'")
   end
 
-  # Trix appends its own stylesheet as an inline <style> when it loads and offers no way to
-  # turn that off. Relaxed for the admin only, which is behind a password.
+  # TinyMCE writes its skin into the page as inline <style> elements as the editor builds
+  # itself and offers no way to turn that off. Relaxed for the admin only, which is behind a
+  # password.
   it 'gives the admin the one exception it needs, and the public site none' do
     sign_in create(:user, role: :admin)
     get '/en/management/posts'
@@ -57,5 +58,26 @@ describe 'content security policy', type: :request do
     get '/en/journal'
     expect(policy).to include("style-src-elem 'self'")
     expect(policy).not_to include("style-src-elem 'self' 'unsafe-inline'")
+  end
+
+  # The other half of the same override, and it goes the other way. The public policy names two
+  # video hosts because a reader can click an embed open; nothing under /management does, and
+  # the editor only ever frames its own document.
+  it 'narrows frame-src in the admin rather than widening it' do
+    sign_in create(:user, role: :admin)
+    get '/en/management/posts'
+
+    expect(policy).to include("frame-src 'self'")
+    expect(policy).not_to include('youtube-nocookie')
+  end
+
+  # TinyMCE is served out of public/tinymce — same origin, so script-src 'self' covers it and
+  # the editor needs no exception of its own. This is the assertion that fails if it is ever
+  # swapped for the Tiny Cloud CDN.
+  it 'keeps script-src at self on both sides, editor included' do
+    sign_in create(:user, role: :admin)
+    get '/en/management/posts/new'
+    expect(policy).to include("script-src 'self'")
+    expect(response.body).to include('data-tinymce-base-url-value="/tinymce"')
   end
 end

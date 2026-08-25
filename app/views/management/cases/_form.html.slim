@@ -1,3 +1,11 @@
+/ The case form. The hardest screen in the project: one case is seven translated scalars, a
+/ stack list and five structured fields, each of those a list of rows and each row up to four
+/ values across two languages.
+/
+/ Two things it did not use to do. Every text field is a real editor now — the /work page
+/ renders these strings as markup (ProseHelper#rich), so an author needs a way to make the
+/ markup. And the structured fields are no longer fixed: Case::STRUCTURES#count says what the
+/ design draws, not how many rows may exist, and rows are added, removed and reordered here.
 = form_with model: [:management, kase], scope: :case do |f|
   .admin-form__content
     = render 'shared/errors', object: kase
@@ -30,41 +38,24 @@
     / One field per language for every translated scalar. Both are required — the handoff's
     / editorial rule is that a case is never published in one language alone.
     - Case::LOCALISED_SCALARS.each do |field|
-      .case-field
+      .mg-structure
         .standart-label= t(".#{field}")
-        .row
+        .mg-cells
           - I18n.available_locales.each do |locale|
-            .col
-              = f.label :"#{field}_#{locale}", t(locale).downcase, class: 'standart-label'
-              - if field == :scope_note
-                = f.text_area :"#{field}_#{locale}", rows: 3, class: 'standart-input'
-              - else
-                = f.text_field :"#{field}_#{locale}", class: 'standart-input'
+            .mg-cell
+              label.mg-cell__label[for="case_#{field}_#{locale}"]= t(locale).downcase
+              = f.text_area :"#{field}_#{locale}", rows: 2, class: 'standart-input mg-cell__rich', data: tinymce_data(profile: 'case', lazy: true)
 
-    .case-field
+    .mg-structure
       = f.label :stack_list, t('.stack'), class: 'standart-label'
       = f.text_area :stack_list, rows: 8, class: 'standart-input'
 
-    / Structured content. The row count comes from Case::STRUCTURES, so the form and the
-    / design never drift apart; an empty row is dropped on save.
+    / Structured content. Each field is its own little list, drawn by the shared widget the CV
+    / uses too — see app/views/management/shared/_structure_section.html.slim.
     - Case::STRUCTURES.each do |field, spec|
-      .case-field
-        .standart-label
-          = t(".#{field}")
-          span.case-field__hint= " · #{t('.expected', count: spec[:count])}"
-        - case_rows_count(kase, field).times do |index|
-          .case-row-fields
-            - if spec[:fields].nil?
-              - I18n.available_locales.each do |locale|
-                = case_field_tag("case[#{field}_rows][#{index}][#{locale}]", case_row_value(kase, field, index, locale), long: true)
-            - else
-              - spec[:fields].each do |key, kind|
-                - if kind == :localised
-                  - I18n.available_locales.each do |locale|
-                    = case_field_tag("case[#{field}_rows][#{index}][#{key}][#{locale}]", case_row_value(kase, field, index, key, locale), long: key == :body)
-                - else
-                  = case_field_tag("case[#{field}_rows][#{index}][#{key}]", case_row_value(kase, field, index, key))
+      = render 'management/shared/structure_section', record: kase, scope: :case, field: field, spec: spec, label: t(".#{field}")
 
     .actions
       = link_to t('global.button.cancel'), management_cases_path, class: 'main-btn not_filled'
-      = f.submit(kase.new_record? ? t('global.button.create') : t('global.button.edit'), class: 'main-btn filled')
+      / "Save", not "Edit". The button writes the form; edit is what you were already doing.
+      = f.submit(kase.new_record? ? t('global.button.create') : t('global.button.save'), class: 'main-btn filled')

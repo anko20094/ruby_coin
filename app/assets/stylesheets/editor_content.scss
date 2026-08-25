@@ -1,0 +1,78 @@
+// What TinyMCE loads inside its own editing area, on top of theme.css.
+//
+// Editor-only, and a separate file for that reason: theme.css goes to every reader of the
+// public site, and none of them needs Prism's token classes. It is a few hundred bytes, but
+// the whole point of the bad-connection pass was not shipping bytes nobody reads.
+//
+// Everything here is the other half of a pairing. The page highlights with Rouge, server-side;
+// the editor highlights with Prism, in the browser, because that is what the code-sample plugin
+// carries. They were two different palettes — Prism's stock theme against the site's — so a
+// listing looked one way while you wrote it and another way once it was published. Both map
+// onto the eight roles in theme/_tokens.scss now.
+// The tokens come along rather than being borrowed from theme.css, which TinyMCE also loads:
+// both are generated from the same partial, so they cannot drift, and this sheet stays
+// readable on its own.
+@use 'theme/tokens';
+
+// The code-sample block itself, so it reads as the same object it will be on the page.
+pre[class*='language-'] {
+  background: var(--paper-warm);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  overflow-x: auto;
+}
+
+code[class*='language-'] {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.token {
+  &.comment,
+  &.prolog,
+  &.cdata,
+  &.doctype {
+    color: var(--code-comment);
+    font-style: italic;
+  }
+
+  &.keyword,
+  &.atrule,
+  &.important,
+  &.selector { color: var(--code-keyword); }
+
+  &.string,
+  &.char,
+  &.regex,
+  &.attr-value,
+  &.inserted { color: var(--code-string); }
+
+  &.number,
+  &.boolean { color: var(--code-number); }
+
+  &.class-name,
+  &.constant,
+  &.symbol,
+  &.tag,
+  &.property { color: var(--code-type); }
+
+  &.function,
+  &.builtin { color: var(--code-name); }
+
+  &.variable,
+  &.attr-name { color: var(--code-var); }
+
+  &.operator,
+  &.punctuation,
+  &.entity,
+  &.url { color: var(--code-punct); }
+
+  &.deleted { color: var(--ruby-bright); }
+  &.bold { font-weight: 600; }
+  &.italic { font-style: italic; }
+  &.namespace { opacity: 0.7; }
+}

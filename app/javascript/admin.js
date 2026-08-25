@@ -22,20 +22,26 @@ application.register("confirm", ConfirmController)
 import PostEditorController from "./controllers/post_editor_controller"
 application.register("post-editor", PostEditorController)
 
-import SlashMenuController from "./controllers/slash_menu_controller"
-application.register("slash-menu", SlashMenuController)
-
 import TomselectController from "./controllers/tomselect_controller"
 application.register("tomselect", TomselectController)
+
+import TinymceController from "./controllers/tinymce_controller"
+application.register("tinymce", TinymceController)
+
+import StructureRowsController from "./controllers/structure_rows_controller"
+application.register("structure-rows", StructureRowsController)
+
+import SidebarController from "./controllers/sidebar_controller"
+application.register("sidebar", SidebarController)
 
 import "bootstrap/js/dist/dropdown"
 import "bootstrap/js/dist/collapse"
 import "bootstrap/js/dist/modal"
 import { BootstrapToggle } from "bootstrap5-toggle"
-import * as ActiveStorage from "@rails/activestorage"
-// Trix is the admin body editor; only this bundle loads it.
-import "trix"
-import "@rails/actiontext"
+
+// No editor import here. TinyMCE is self-hosted under public/tinymce and loads itself — core,
+// theme, icons, plugins and skin — the first time a screen on the page has a textarea asking
+// for it. Bundling it would put 500 KB of editor into every admin screen, list pages included.
 
 const initBootstrapToggles = () => {
   document
@@ -48,5 +54,3 @@ const initBootstrapToggles = () => {
 
 document.addEventListener("DOMContentLoaded", initBootstrapToggles)
 document.addEventListener("turbo:load", initBootstrapToggles)
-
-ActiveStorage.start()

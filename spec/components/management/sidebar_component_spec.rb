@@ -18,7 +18,8 @@ RSpec.describe Management::SidebarComponent, type: :component do
     render_inline(described_class.new(user: user, current: :posts))
 
     names = page.all('.mg-model__name').map(&:text)
-    expect(names).to eq(%w[Post Case CVBlock Tag Statistics])
+    # No CV: it has no screen. It is config/portfolio/cv.yml, imported by `rake cv:import`.
+    expect(names).to eq(%w[Post Case Tag Statistics])
     expect(page).to have_css('.mg-model__count', text: Post.count.to_s)
     expect(page).to have_css('.mg-model__count', text: Case.count.to_s)
   end
@@ -55,5 +56,27 @@ RSpec.describe Management::SidebarComponent, type: :component do
     expect(page).to have_css('.mg-avatar', text: user.nickname.first.upcase)
     expect(page).to have_css('.mg-sidebar__name', text: user.nickname)
     expect(page).to have_css('.mg-sidebar__role', text: 'admin')
+  end
+
+  # The rail. 232px of navigation you are not reading while you write, and no way to get it
+  # back until now.
+  it 'offers a toggle that names what it controls' do
+    render_inline(described_class.new(user: user, current: :posts))
+
+    toggle = page.find('.mg-sidebar__toggle')
+    expect(toggle['aria-controls']).to eq('mg-sidebar-nav')
+    expect(toggle['aria-expanded']).to eq('true')
+    # title alone is not an accessible name, which is the exact defect handoff §11 flags.
+    expect(toggle['aria-label']).to eq(I18n.t('management.sidebar_component.collapse'))
+    expect(page).to have_css('#mg-sidebar-nav')
+  end
+
+  # Collapsed, the names are hidden with CSS rather than dropped, so a screen reader and a
+  # hover tooltip both still say which screen each dot is.
+  it 'keeps every entry nameable when the rail is shut' do
+    render_inline(described_class.new(user: user, current: :posts))
+
+    titles = page.all('.mg-model').pluck('title')
+    expect(titles).to eq(%w[Post Case Tag Statistics])
   end
 end

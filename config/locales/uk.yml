@@ -171,7 +171,6 @@ uk:
         search: шукати в заголовках і тілі…
         counted: "%{shown} з %{total}"
         empty: тут ще нічого немає.
-        edit: правити
         delete: видалити
         filters:
           all: усі
@@ -191,6 +190,7 @@ uk:
       edit:
       editor:
         untitled: без заголовка
+        meta: публікація
         side_by_side: обидві
         language: "%{name}"
         title: заголовок
@@ -205,6 +205,7 @@ uk:
         og: як виглядає посилання на це
         created: створено
         preview: прев'ю
+        open: відкрити ↗
         translate: перекласти іншою мовою
         conflict: Хтось зберіг цей пост після того, як ти його відкрив. Тут нічого не записано.
         reload: перечитати їхню версію
@@ -220,25 +221,40 @@ uk:
           title: Про що це?
           subtitle: Одне речення про те, про що текст.
           slug: як-це-читається-в-url
-      slash_menu:
-        insert: Вставити блок
-        kinds:
-          code: код
-          callout: виноска
-          embed: вставка
-        fields:
-          language: мова
-          source: код
-          tone: тон
-          body: текст
-          url: посилання
-          caption: підпис
       create:
         success: Допис успішно створено
       update:
         success: Допис успішно оновлено
+        conflict: Хтось зберіг цей допис, поки ти зберігав свій. Нічого не записано — твоя робота на місці, тепер «Зберегти» пройде.
       destroy:
         success: Допис успішно видалено
+
+    editor:
+      tinymce:
+        inline_code: код у рядку
+        blocks: Блок
+        insert: Вставити
+        cancel: Скасувати
+        language: мова
+        source: код
+        tone: тон
+        tone_note: нотатка
+        tone_warn: попередження
+        body: текст
+        url: посилання
+        caption: підпис
+        load_error: "Редактор не завантажився. Поле нижче все ще тримає текст і зберігається."
+        block_error: Не вдалося вставити блок.
+        upload_error: Не вдалося завантажити зображення.
+        kinds:
+          code: Лістинг коду…
+          callout: Виноска…
+          embed: Вставка…
+    editor_images:
+      create:
+        missing: файл відсутній
+        type: цей файл не є зображенням
+        size: "зображення має бути не більшим за %{limit} МБ"
 
     cases:
       index:
@@ -277,23 +293,6 @@ uk:
       destroy:
         success: Кейс видалено
 
-    cv_profiles:
-      edit:
-        title: Рамка CV
-        name: Ім'я
-        role: Роль
-        years: Роки
-        summary: Резюме
-        location: Локація
-        languages: Мови
-        education: Освіта
-        updated_on: Цифри перевірені
-        contact: Рядки контактів
-        contact_key: ключ
-        contact_label: видимий текст
-        contact_href: посилання
-      update:
-        success: Рамку CV оновлено
 
     cv_blocks:
       index:
@@ -327,7 +326,10 @@ uk:
         success: Блок CV видалено
 
     sidebar_component:
+      home: до списку дописів
       where: /management
+      collapse: згорнути бічну панель
+      expand: розгорнути бічну панель
       models: МОДЕЛІ
       system: СИСТЕМА
       posts_hint: "%{active} видимих · %{inactive} схованих"
@@ -336,6 +338,22 @@ uk:
       statistics_hint: перегляди · візити
 
     shared:
+      structure_row:
+        add: додати рядок
+        expected: "дизайн малює %{count}"
+        move_up: вище
+        move_down: нижче
+        remove: прибрати рядок
+        value: число
+        label: підпис
+        title: заголовок
+        body: текст
+        org: роботодавець
+        place: місце
+        period: період
+        note: нотатка
+        case_slugs: слаги кейсів, по одному в рядок
+        items: пункти, по одному в рядок
     tags:
       index:
         tags: Існуючі теги

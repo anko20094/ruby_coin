@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 // The designed error page (handoff §9a). Not a 9-byte "Not Found" from the middleware:
 // the reader is still on the site, so the page looks like the site and offers the two
 // places worth going.

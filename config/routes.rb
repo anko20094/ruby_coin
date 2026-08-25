@@ -67,13 +67,16 @@ Rails.application.routes.draw do
       # generated either.
       resources :tags, except: :show
       resources :cases, except: :show
-      resources :cv_blocks, except: :show
 
-      # The CV frame is one row, so it has one screen rather than a collection.
-      resource :cv_profile, only: %i[edit update]
+      # No CV route. The CV is config/portfolio/cv.yml, imported by `rake cv:import` — the
+      # one piece of content here whose history matters, and git keeps that better than a
+      # JSONB column. See redesign_plan.md §12.5.
 
-      # The slash menu posts here to mint a block and get its sgid back.
+      # The editor's block menu posts here to mint a block and get its sgid back.
       resources :journal_blocks, only: :create
+
+      # TinyMCE's image button uploads here and gets a URL back.
+      resources :editor_images, only: :create
     end
 
     # Read by the tag pickers in the admin forms.

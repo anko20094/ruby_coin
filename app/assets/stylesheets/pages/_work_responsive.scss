@@ -102,31 +102,3 @@
   .wk-pager-card--next { text-align: left; }
 }
 
-// The chrome is three zones on one line; below this it needs to wrap.
-@media (max-width: 760px) {
-  .rc-nav {
-    flex-wrap: wrap;
-    gap: 12px 18px;
-    padding: 12px 22px;
-  }
-
-  .rc-nav__sections {
-    order: 3;
-    flex-basis: 100%;
-    gap: 18px;
-  }
-
-  .rc-footer {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-    padding: 36px 22px 28px;
-  }
-
-  .rc-footer__sections {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 18px;
-  }
-
-  .rc-footer__contacts { text-align: left; }
-}

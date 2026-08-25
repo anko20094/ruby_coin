@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { REVEAL_EVENT } from "./tinymce_controller"
 
 // Connects to data-controller="post-editor"
 //
@@ -16,27 +17,56 @@ import { Controller } from "@hotwired/stimulus"
 //      conflict nothing has been written, so the banner offers to reload theirs.
 export default class extends Controller {
   static targets = ["state", "stateText", "conflict", "locale", "tab", "sideBySide", "cols",
-                    "preview", "lockVersion"]
+                    "preview", "lockVersion", "previewLocale", "openLink"]
   static values = { autosaveUrl: String, previewUrl: String, debounce: { type: Number, default: 1200 } }
 
   connect() {
     this.dirty = new Set()
     this.timer = null
+    // The autosave currently in the air, if there is one, and whether a real submit is on its
+    // way. Between them they are what stops the two racing — see onSubmit.
+    this.saving = null
+    this.submitting = false
     this.locale = this.localeTargets[0]?.dataset.locale
     this.markTabs()
+    this.markPreviewLocale()
     this.element.addEventListener("input", this.onInput)
-    this.element.addEventListener("trix-change", this.onInput)
+    this.element.addEventListener("submit", this.onSubmit)
   }
 
   disconnect() {
     clearTimeout(this.timer)
     this.element.removeEventListener("input", this.onInput)
-    this.element.removeEventListener("trix-change", this.onInput)
+    this.element.removeEventListener("submit", this.onSubmit)
+  }
+
+  // Pressing Save while an autosave is in the air is how this screen used to 500.
+  //
+  // The autosave lands first and raises lock_version. The submit is already built, holding the
+  // number from before it, and Active Record calls that a stale object — so an editor who
+  // typed and then reached for Save inside the debounce window got a backtrace with their
+  // whole article in it.
+  //
+  // Two things, in order: the pending autosave is cancelled, because the submit is about to
+  // write everything anyway. And if one is already in flight, the submit waits for it and goes
+  // afterwards, by which time syncLockVersion has taken the version the server reports.
+  onSubmit = (event) => {
+    clearTimeout(this.timer)
+
+    if (this.submitting || !this.saving) {
+      this.submitting = true
+      return
+    }
+
+    event.preventDefault()
+    this.submitting = true
+    this.setState("saving")
+    this.saving.finally(() => this.element.requestSubmit())
   }
 
   onInput = (event) => {
     const field = event.target
-    if (!field || field.type === "submit") return
+    if (!field || field.type === "submit" || this.submitting) return
 
     this.dirty.add(this.fieldKey(field))
     this.setState("dirty")
@@ -56,13 +86,17 @@ export default class extends Controller {
   }
 
   save() {
+    // A submit is on its way and will write everything; one more PATCH would only move
+    // lock_version out from under it.
+    if (this.submitting) return
+
     this.setState("saving")
     this.previewTarget?.classList.add("is-busy")
 
     const body = new FormData(this.element)
     body.delete("_method")
 
-    fetch(this.autosaveUrlValue, {
+    this.saving = fetch(this.autosaveUrlValue, {
       method: "PATCH",
       headers: {
         "X-CSRF-Token": document.querySelector("meta[name=csrf-token]")?.getAttribute("content"),
@@ -92,6 +126,9 @@ export default class extends Controller {
         this.previewTarget?.classList.remove("is-busy")
         this.setState("invalid", { errors: "network" })
       })
+      .finally(() => { this.saving = null })
+
+    return this.saving
   }
 
   syncLockVersion(data) {
@@ -105,12 +142,25 @@ export default class extends Controller {
     if (this.hasConflictTarget) this.conflictTarget.hidden = false
   }
 
+  // The preview is of one language, and it has to be the one the tab is on. It used to render
+  // in whatever language the admin's own chrome was in — so writing Ukrainian showed an
+  // English preview, with nothing on the pane saying which was which.
   reloadPreview() {
     if (!this.hasPreviewTarget || !this.hasPreviewUrlValue) return
 
     const frame = this.previewTarget.querySelector("turbo-frame")
-    if (frame) frame.src = this.previewUrlValue
-    if (frame) frame.reload()
+    if (!frame) return
+
+    const url = new URL(this.previewUrlValue, window.location.origin)
+    url.searchParams.set("preview_locale", this.locale)
+    frame.src = url.pathname + url.search
+    frame.reload()
+  }
+
+  // The badge on the pane, and the link out to the real page, both follow the tab.
+  markPreviewLocale() {
+    if (this.hasPreviewLocaleTarget) this.previewLocaleTarget.textContent = this.locale
+    this.openLinkTargets.forEach(link => { link.hidden = link.dataset.locale !== this.locale })
   }
 
   setState(name, interpolations = {}) {
@@ -150,6 +200,9 @@ export default class extends Controller {
     this.colsTarget?.classList.remove("is-side-by-side")
     this.localeTargets.forEach(group => { group.hidden = group.dataset.locale !== this.locale })
     this.markTabs()
+    this.markPreviewLocale()
+    this.reloadPreview()
+    this.announceReveal()
   }
 
   toggleSideBySide() {
@@ -160,6 +213,13 @@ export default class extends Controller {
       group.hidden = this.sideBySide ? false : group.dataset.locale !== this.locale
     })
     this.markTabs()
+    this.announceReveal()
+  }
+
+  // The editors grow with their content, and one built inside a hidden tab had nothing to
+  // measure and settled at its floor. Switching tabs is the moment it can see the page.
+  announceReveal() {
+    document.dispatchEvent(new CustomEvent(REVEAL_EVENT))
   }
 
   setWidth(event) {

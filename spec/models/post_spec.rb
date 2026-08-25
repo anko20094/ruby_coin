@@ -222,4 +222,40 @@ RSpec.describe Post do
       expect { post.reload.translated_locales }.not_to change(ActionText::RichText, :count)
     end
   end
+
+  # "Best" said LEFT JOIN and then filtered on the joined table, which makes it an inner join:
+  # the list showed only entries somebody had already opened, so a new one could never appear
+  # in it. Counting views should not decide whether a post exists.
+  describe '.best' do
+    include_context 'when carrierwave cleanup'
+
+    let!(:read) { create(:post, status: 'active') }
+    let!(:unread) { create(:post, status: 'active') }
+    let!(:hidden) { create(:post, status: 'inactive') }
+
+    before do
+      2.times { create(:ahoy_event, name: 'Viewed Post', properties: { post_id: read.id }) }
+      create(:ahoy_event, name: 'Viewed Case', properties: { case_id: read.id })
+    end
+
+    it 'puts the most-read first' do
+      expect(described_class.best.first).to eq(read)
+    end
+
+    it 'still lists an entry nobody has opened' do
+      expect(described_class.best).to include(unread)
+    end
+
+    it 'never lists a hidden one' do
+      expect(described_class.best).not_to include(hidden)
+    end
+
+    it 'counts post views only' do
+      expect(described_class.best.first.attributes['views_count']).to eq(2)
+    end
+
+    it 'can be counted for the pager' do
+      expect(described_class.best.except(:select, :order).distinct.count(:id)).to eq(2)
+    end
+  end
 end

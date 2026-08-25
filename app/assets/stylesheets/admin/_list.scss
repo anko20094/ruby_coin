@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 // The list screen: filter rail, then a sortable table. Handoff §8.
 .mg-rail {
   display: flex;
@@ -15,6 +17,8 @@
 }
 
 .mg-filter {
+  @include controls.hit-row(32px);
+
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -106,6 +110,11 @@
 }
 
 .mg-table__sort {
+  @include controls.hit-row(32px);
+
+  // A header like "#" is seven pixels of text. The box is wider than the word; the word stays
+  // where the column puts it.
+  min-width: 32px;
   color: inherit;
   font: inherit;
   letter-spacing: inherit;
@@ -234,20 +243,48 @@
   color: var(--ink-quiet);
 }
 
+// The whole title block is the link to the editor, so the row has one obvious target instead
+// of a button hiding at the far edge.
+.mg-title-link {
+  display: block;
+  color: inherit;
+
+  &:hover .mg-title { color: var(--ruby); }
+}
+
 .mg-actions {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   justify-content: flex-end;
   font-family: var(--font-mono);
   font-size: 11px;
 }
 
+// Edit was bare text and delete was a bordered button, so the pair read as two different kinds
+// of thing and neither was a target you could hit: 26×23 and 56×23. They are one shape now,
+// and the shape is a button.
 .mg-action {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
+  min-width: 62px;
+  padding-inline: 10px;
   color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-chip);
+  transition: color 150ms, border-color 150ms, background 150ms;
 
-  &:hover { color: var(--ruby); }
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--ruby);
+  }
 
-  &--danger:hover { color: var(--ruby-bright); }
+  &--danger:hover {
+    color: var(--paper);
+    background: var(--ruby);
+    border-color: var(--ruby);
+  }
 }
 
 .mg-empty {

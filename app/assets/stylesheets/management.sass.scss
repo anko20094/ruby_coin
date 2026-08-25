@@ -1,3 +1,5 @@
+@use 'theme/controls';
+
 .admin__title {
   font-weight: 700;
   font-size: 32px;
@@ -291,13 +293,19 @@
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
     border-radius: 8px;
   }
+  // A field label, set like every other label in this admin: mono, small, quiet. It used to
+  // be 24px bold black — the size of a page title — on every one of them, so "Name" above a
+  // one-line input shouted louder than the screen it was on. Section headings are a separate
+  // thing now and say so; see .mg-section__title.
   .standart-label {
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 29px;
-    color: #000000;
-    margin-bottom: 12px;
-    margin-top: 12px;
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    line-height: 1.4;
+    color: var(--ink-quiet);
+    margin: 0 0 5px;
   }
   .group {
     margin-bottom: 40px;
@@ -808,7 +816,7 @@
   }
 }
 
-.case-field {
+.mg-structure {
   margin-top: 18px;
 
   &__hint {
@@ -825,4 +833,250 @@
   .standart-input {
     flex: 1;
   }
+}
+
+// A section of an admin form — the frame of the CV, its contact rows, one structured list.
+// Quiet, because the content is what should be loud: the screen's own type is mono labels
+// everywhere else and these are labels too, just one level up.
+.mg-section {
+  margin-top: 30px;
+
+  &:first-child { margin-top: 0; }
+
+  &__title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--mg-ink-faint);
+  }
+
+  &__hint {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ink-quiet);
+    text-transform: none;
+  }
+
+  &__count {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ruby);
+  }
+}
+
+// A structured field: the rows, the inputs inside them, and the three controls that make the
+// list a list. Shared by the case form and the CV — see app/views/management/shared/.
+//
+// The count beside the heading is what the design expects; the one after it is what the record
+// actually has. They used to be the same number by construction, because the form drew exactly
+// as many rows as STRUCTURES declared and there was no way to have any other number.
+.mg-structure {
+  margin-top: 22px;
+}
+
+.mg-structure__hint {
+  font-size: 12px;
+  color: #777777;
+}
+
+.mg-structure__count {
+  font-size: 12px;
+  color: #DC143C;
+}
+
+.mg-structure__rows {
+  display: grid;
+  gap: 8px;
+}
+
+// Nested under .mg-structure so it beats the Bootstrap .main-btn rules it sits inside; on its
+// own it lost and came out as the loudest thing in the section.
+.mg-structure .mg-structure__add {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
+  margin-top: 10px;
+  padding: 0 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  font-weight: 400;
+  text-transform: none;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px dashed var(--ink-mute);
+  border-radius: var(--radius-chip);
+
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--ruby);
+    border-style: solid;
+  }
+}
+
+.mg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #EFEFEF;
+  border-radius: 4px;
+
+  // A grid, not one flex line. A career entry is thirteen fields across two languages, and in
+  // a single row each of them came out ninety pixels wide with the text cut off. Auto-fill
+  // means two fields on a narrow pane and six on a wide one without a breakpoint for each
+  // step between.
+  &__inputs {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    // auto-fit, not auto-fill. auto-fill keeps the empty tracks, so a row of two fields sat
+    // at 230px each with two thirds of the pane blank beside it.
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 10px 12px;
+  }
+
+  // Across, not down. Three 32px boxes stacked would add a hundred pixels to every row; in a
+  // line they fit beside the inputs and each one is a real target.
+  &__controls {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__control {
+    @include controls.hit-square(32px, 44px);
+
+    line-height: 1;
+    font-size: 12px;
+    color: #777777;
+    background: #FFFFFF;
+    border: 1px solid #E4E4E4;
+    border-radius: 3px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { border-color: #DC143C; color: #DC143C; }
+    &:disabled { opacity: 0.3; cursor: default; }
+    &.is-remove:hover { background: #DC143C; color: #FFFFFF; }
+  }
+}
+
+// A list of items — a stack group, a career entry's case slugs — is taller than one line and
+// earns two columns when there is room for them.
+.mg-cell--list {
+  grid-column: span 2;
+}
+
+.mg-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px 14px;
+}
+
+.mg-cell {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+
+  &__label {
+    font-size: 11px;
+    color: #777777;
+  }
+
+  // Every input in a row reads as the same kind of thing. The Bootstrap default gave the
+  // plain ones a ruby border, which on a form reads as "you got this wrong". The only
+  // difference that means anything here is the dashed edge mg-tinymce-idle draws: that field
+  // becomes an editor when you click it.
+  .standart-input {
+    width: 100%;
+    min-width: 0;
+    // Bootstrap fixes every input at 50px, which is a lot of chrome for one line of a CV.
+    height: auto;
+    padding: 8px 10px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--ink-mute);
+    border-radius: var(--radius-card);
+
+    &:focus {
+      outline: none;
+      border-color: var(--ruby);
+    }
+  }
+
+  // Nested here on purpose: the rule above is two classes deep and would otherwise beat the
+  // single-class .mg-tinymce-idle and flatten the one distinction on this form that carries
+  // meaning — dashed means "click and this becomes an editor".
+  .mg-tinymce-idle {
+    border-style: dashed;
+
+    &:hover { border-color: var(--ruby); }
+  }
+}
+
+// The icon actions on the two screens still wearing the Bootstrap layer — the case list and
+// the tag list. Measured at 22×21 for edit and 34×30 for delete: two different shapes, and
+// both of them under the target. One shape, one size, and the icon keeps its own dimensions.
+.post__actions,
+.tag__actions {
+  a,
+  button {
+    @include controls.hit-square(32px, 44px);
+
+    padding: 0;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-chip);
+    transition: border-color 150ms, background 150ms;
+
+    &:hover {
+      border-color: var(--ruby);
+      background: var(--paper);
+    }
+  }
+
+  img {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+// Rows of a report are links across a whole line; the line is the target.
+.mg-stats a {
+  @include controls.hit-row(32px);
+
+  min-width: 32px;
+}
+
+// The case form is four thousand pixels tall and has no autosave, so the only way to keep
+// seventy fields of work was to scroll to the bottom and find a button. It follows you now.
+.admin-form .actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  gap: 12px;
+  margin-top: 28px;
+  padding: 14px 0;
+  background: var(--paper);
+  border-top: 1px solid var(--mg-ink-faint);
+  box-shadow: 0 -8px 20px color-mix(in oklab, var(--ink) 5%, transparent);
+
+  // A bar that is always on screen has to be proportionate to the form behind it, not to a
+  // landing page. Bootstrap's .main-btn is built for the latter.
+  .main-btn {
+    min-height: 38px;
+    padding: 0 22px;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+  }
+
+  .main-btn.filled { margin-left: 0; }
 }

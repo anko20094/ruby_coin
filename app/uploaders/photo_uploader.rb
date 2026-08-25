@@ -42,13 +42,43 @@ class PhotoUploader < CarrierWave::Uploader::Base
   end
 
   version :medium do
-    process resize_to_fill: [*MEDIUM, 'Center', { combine_options: COMPRESSION }]
+    process crop_to_aspect: MEDIUM
+    process resize_to_limit: [*MEDIUM, { combine_options: COMPRESSION }]
     process convert: 'jpg'
   end
 
   version :small do
-    process resize_to_fill: [*SMALL, 'Center', { combine_options: COMPRESSION }]
+    process crop_to_aspect: SMALL
+    process resize_to_limit: [*SMALL, { combine_options: COMPRESSION }]
     process convert: 'jpg'
+  end
+
+  # Crop to the version's shape, then shrink to fit it — never enlarge.
+  #
+  # This was one `resize_to_fill`, which does enlarge: a 560×560 source came out as a
+  # 1200×675 file, blown up 2.14× and soft, and then the CSS cropped that again to the
+  # 2.375:1 banner. A cover that is smaller than the slot should be a smaller sharp file, not
+  # a bigger blurry one — the slot is `width: 100%` either way, and a browser upscaling once
+  # beats ImageMagick upscaling first and the browser upscaling the result.
+  #
+  # Two passes rather than one: the crop fixes the shape at full resolution, and
+  # resize_to_limit is shrink-only by definition, so a small source simply stops early.
+  def crop_to_aspect(width, height)
+    manipulate! do |image|
+      ratio = width.to_f / height
+      crop_width = [image.width, (image.height * ratio).round].min
+      crop_height = [(crop_width / ratio).round, image.height].min
+
+      image.combine_options do |options|
+        options.gravity 'Center'
+        options.crop "#{crop_width}x#{crop_height}+0+0"
+        # -crop leaves the original canvas geometry in the header; without this the JPEG is
+        # the right pixels on a page the old size, and every later step reads the old size.
+        options.repage.+
+      end
+
+      image
+    end
   end
 
   def extension_allowlist

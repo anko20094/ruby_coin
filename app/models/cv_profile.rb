@@ -1,13 +1,39 @@
 # frozen_string_literal: true
 
-# The CV frame on /work: who this is, the summary, the contact column, the footnote date.
+# The CV: who this is, the summary, the contact column, and the three ordered lists /work
+# prints — career, stack groups, strengths.
+#
+# All of it is one row. The lists used to be a `cv_blocks` table with its own model,
+# controller, policy and CRUD screens, which made a CV of ten lines behave like a collection
+# you browse: changing two words was a page navigation, and reordering was typing a number
+# into a field. It is one document, edited whole a few times a year, so it is stored and
+# edited as one. See redesign_plan.md §11.16.
 #
 # A singleton. Everything reads it through .current, which builds an unsaved row when the
 # table is empty so the page renders on a fresh database instead of raising.
 class CVProfile < ApplicationRecord
-  include LocalisedJson
+  include StructuredJson
 
   LOCALISED_SCALARS = %i[name role years summary location languages education].freeze
+
+  # `count` is what the CV has today and what a blank form starts from; it is a hint beside
+  # the heading, not a limit.
+  STRUCTURES = {
+    experience: {
+      count: 4,
+      # `body` is the only one /work prints through ProseHelper#rich; the rest are escaped,
+      # so an editor on them would put a literal <b> on the page.
+      fields: {
+        org: :localised, title: :localised, place: :localised, period: :plain,
+        note: :localised, body: :rich, case_slugs: :list
+      }
+    },
+    stack_groups: { count: 2, fields: { label: :localised, items: :list } },
+    # A strength is one sentence, so the row is that sentence rather than a hash holding it.
+    strengths: { count: 4, fields: nil }
+  }.freeze
+
+  structured_json STRUCTURES
 
   validate :scalars_carry_both_languages
 

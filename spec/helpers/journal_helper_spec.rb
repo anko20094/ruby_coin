@@ -17,6 +17,25 @@ RSpec.describe JournalHelper do
       expect(body).to include('<span class="k">def</span>')
     end
 
+    # TinyMCE's code-sample puts the class on the <pre>, not on the <code> inside it. Reading
+    # only the <code> meant a listing inserted from the toolbar was highlighted in the editor,
+    # by the editor's own copy of Prism, and arrived on the page grey — the one place the
+    # difference does not show up until it is published.
+    it 'reads the language off the <pre> as well, which is where the toolbar puts it' do
+      post = create(:post, description_en: '<pre class="language-ruby"><code>def call; end</code></pre>')
+
+      body = helper.journal_body(post, :en)
+
+      expect(body).to include('jn-code__lang">ruby')
+      expect(body).to include('<span class="k">def</span>')
+    end
+
+    it 'accepts the other spelling of the same class' do
+      post = create(:post, description_en: '<pre class="lang-ruby"><code>def call; end</code></pre>')
+
+      expect(helper.journal_body(post, :en)).to include('jn-code__lang">ruby')
+    end
+
     it 'leaves a code block with no language plain rather than guessing' do
       post = create(:post, description_en: '<pre>just some text</pre>')
 

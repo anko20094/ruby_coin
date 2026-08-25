@@ -1,0 +1,21 @@
+/ A whole structured field: its heading, its rows, the template the add button clones, and the
+/ button. The row controller keeps the indexes in step with what is on the screen, because the
+/ server reads a structured field in index order and an empty row is dropped on save.
+- rows = structure_rows(record, field)
+.mg-section.mg-structure data-controller="structure-rows" data-structure-rows-next-value=rows.size
+  h2.mg-section__title
+    = label
+    span.mg-section__hint= t('management.shared.structure_row.expected', count: spec[:count])
+    span.mg-section__count[data-structure-rows-target="count"]
+
+  .mg-structure__rows[data-structure-rows-target="rows"]
+    - rows.each_with_index do |row, index|
+      = render 'management/shared/structure_row', scope: scope, field: field, spec: spec, index: index, row: row
+
+  / Inert until cloned: Stimulus does not connect controllers inside a <template>, which is
+  / what keeps a screenful of idle editors from booting on page load.
+  template[data-structure-rows-target="template"]
+    = render 'management/shared/structure_row', scope: scope, field: field, spec: spec, index: StructuredRowsHelper::ROW_INDEX, row: {}
+
+  button.main-btn.not_filled.mg-structure__add type="button" data-action="structure-rows#add"
+    = t('management.shared.structure_row.add')

@@ -117,4 +117,36 @@ RSpec.describe Case do
       expect { described_class.find_by!(slug: 'nope') }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  # StructuredJson's form-facing half, exercised here because Case is the model that still has
+  # a form. The CV reads structured fields but no longer writes them: it has no screen — it is
+  # config/portfolio/cv.yml, imported by `rake cv:import`.
+  describe 'the structured rows a form posts' do
+    let(:kase) { described_class.ordered.first }
+
+    it 'takes the indexed rows in index order, not in the order they arrive' do
+      kase.mine_rows = {
+        '1' => { 'en' => 'second', 'uk' => 'друге' },
+        '0' => { 'en' => 'first', 'uk' => 'перше' }
+      }
+
+      expect(kase.mine_rows.pluck('en')).to eq(%w[first second])
+    end
+
+    it 'drops a row the author left empty, and keeps one that has anything at all' do
+      kase.mine_rows = {
+        '0' => { 'en' => '', 'uk' => '' },
+        '1' => { 'en' => 'kept', 'uk' => '' }
+      }
+
+      expect(kase.mine_rows).to eq([{ 'en' => 'kept', 'uk' => '' }])
+    end
+
+    it 'keeps only the keys the shape declares' do
+      row = { 'value' => '2.14M', 'label' => { 'en' => 'users', 'uk' => 'юзерів' }, 'salary' => 'none' }
+      kase.metrics_rows = { '0' => row }
+
+      expect(kase.metrics_rows.first.keys).to match_array(%w[value label])
+    end
+  end
 end

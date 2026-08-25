@@ -55,6 +55,15 @@ module Management
       else
         render :edit, status: :unprocessable_content
       end
+    rescue ActiveRecord::StaleObjectError
+      # #autosave has always handled this; #update never did, so a Save that raced its own
+      # autosave — the autosave lands, lock_version goes up, the submit arrives holding the
+      # number from before it — came out as a 500 with the whole article in the backtrace.
+      # Nothing has been written, so the editor gets its work back with the version that is
+      # actually current, and can press Save again.
+      @post.reload
+      flash.now[:alert] = t('.conflict')
+      render :edit, status: :conflict
     end
 
     # Autosave. Goes through the same save as #update — one path, so the two cannot drift —
@@ -92,8 +101,14 @@ module Management
              status: :conflict
     end
 
+    # The preview follows the language tab, not the language of the admin's own chrome. It
+    # used to render in I18n.locale whichever tab was open, so an editor writing Ukrainian
+    # watched an English preview and had no way to see the page they were actually changing.
     def preview
-      render partial: 'management/posts/preview', locals: { post: @post }, layout: false
+      I18n.with_locale(preview_locale) do
+        render partial: 'management/posts/preview',
+               locals: { post: @post, locale: preview_locale }, layout: false
+      end
     end
 
     def destroy
@@ -154,6 +169,12 @@ module Management
 
     def sort_direction
       params[:direction] == 'asc' ? :asc : :desc
+    end
+
+    def preview_locale
+      requested = params[:preview_locale].to_s.to_sym
+
+      I18n.available_locales.include?(requested) ? requested : I18n.locale
     end
 
     def ai_translation_params

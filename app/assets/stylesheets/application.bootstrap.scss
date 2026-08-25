@@ -44,7 +44,6 @@ input {
   padding: 12px 18px;
   border-radius: 8px;
   margin: 0 20px 0 0;
-  animation: fade-in-out 3.2s infinite;
   &-success, &-notice {
     border: 1px solid #4caf50;
     background: rgba(234, 246, 235, 0.9);
@@ -55,29 +54,6 @@ input {
     background: rgb(254, 247, 249, 0.8);
     border: 1px solid #E91E63;
   }
-}
-
-@keyframes fade-in-out {
-  0% {
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-#flash {
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 323232;
 }
 
 .main-btn {

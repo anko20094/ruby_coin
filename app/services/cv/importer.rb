@@ -1,14 +1,21 @@
 # frozen_string_literal: true
 
-# Copies config/portfolio/cv.yml into cv_profiles and cv_blocks, then reads it back and
-# compares, the same way Cases::Importer does. The YAML came from a PDF CV by hand once; it is
-# not going to be retyped a second time.
+# Copies config/portfolio/cv.yml into cv_profiles, then reads it back and compares, the same
+# way Cases::Importer does. The YAML came from a PDF CV by hand once; it is not going to be
+# retyped a second time.
+#
+# The three lists used to import into a cv_blocks table, one row each. They are structured
+# fields on the profile now, so the whole CV is one write and one comparison.
 class CV::Importer < BaseService
   SOURCE = Rails.root.join('config', 'portfolio', 'cv.yml')
 
-  Result = Struct.new(:profile, :blocks, :mismatches, keyword_init: true) do
+  Result = Struct.new(:profile, :mismatches, keyword_init: true) do
     def clean? = mismatches.empty?
   end
+
+  # The YAML calls a career entry's linked cases `cases`; the column is `case_slugs`, because
+  # that is what they are — slugs, resolved against Case when the page is drawn.
+  EXPERIENCE_KEYS = %w[org title place period note body].freeze
 
   def initialize(path = SOURCE)
     @path = path
@@ -17,10 +24,7 @@ class CV::Importer < BaseService
   def call
     source = YAML.load_file(@path)['cv']
 
-    profile = import_profile(source)
-    blocks = import_blocks(source)
-
-    Result.new(profile: profile, blocks: blocks, mismatches: @mismatches.to_a)
+    Result.new(profile: import_profile(source), mismatches: @mismatches.to_a)
   end
 
   private
@@ -37,7 +41,12 @@ class CV::Importer < BaseService
       languages: source['languages'],
       education: source['education'],
       contact: source['contact'],
-      figures_as_of: source['updated']
+      figures_as_of: source['updated'],
+      experience: experience_rows(source['experience']),
+      stack_groups: stack_rows(source['stacks']),
+      # A strength is a bare {en, uk} in the YAML and the row is that value, so it copies over
+      # untouched.
+      strengths: Array(source['strengths'])
     }
 
     profile = CVProfile.first || CVProfile.new
@@ -49,46 +58,14 @@ class CV::Importer < BaseService
     profile
   end
 
-  def import_blocks(source)
-    blocks = []
-    blocks.concat(import_kind('experience', source['experience']) { |e, i| experience_attributes(e, i) })
-    blocks.concat(import_kind('stack_group', source['stacks']) { |e, i| stack_attributes(e, i) })
-    blocks.concat(import_kind('strength', source['strengths']) { |e, i| strength_attributes(e, i) })
-    blocks
-  end
-
-  # Blocks have no natural key in the YAML, so the position within its kind is the identity.
-  # Re-importing therefore overwrites in place instead of piling up duplicates.
-  def import_kind(kind, entries)
-    Array(entries).each_with_index.map do |entry, index|
-      attributes = yield(entry, index)
-      block = CVBlock.find_or_initialize_by(kind: kind, position: attributes[:position])
-      block.assign_attributes(attributes)
-      block.save!
-      block.reload
-
-      record_mismatches(block, "#{kind}[#{index}]", attributes)
-      block
+  def experience_rows(entries)
+    Array(entries).map do |entry|
+      entry.slice(*EXPERIENCE_KEYS).merge('case_slugs' => Array(entry['cases']))
     end
   end
 
-  def experience_attributes(entry, index)
-    {
-      kind: 'experience',
-      position: index + 1,
-      payload: entry.slice('period', 'org', 'title', 'place', 'note', 'body'),
-      case_slugs: Array(entry['cases'])
-    }
-  end
-
-  def stack_attributes(entry, index)
-    { kind: 'stack_group', position: index + 1, payload: entry.slice('label', 'items'), case_slugs: [] }
-  end
-
-  # A strength is a bare {en, uk} in the YAML; wrapping it under one key keeps every block's
-  # payload shaped the same way.
-  def strength_attributes(entry, index)
-    { kind: 'strength', position: index + 1, payload: { 'text' => entry }, case_slugs: [] }
+  def stack_rows(entries)
+    Array(entries).map { |entry| entry.slice('label', 'items') }
   end
 
   def record_mismatches(record, label, attributes)

@@ -41,9 +41,13 @@
           tr
             td.mg-cell--mono= post.entry_label
             td= mg_status_pill(post.status)
+            / The title is the way in. It was inert — seven hundred pixels of the thing your eye
+            / lands on doing nothing — while the way to the editor was a sixty-pixel button at
+            / the far edge of the row. The separate `edit` button has gone with it.
             td
-              .mg-title= post.title.presence || post.post_translations.map(&:title).compact_blank.first
-              .mg-title__path= "/post/#{post.slug}"
+              = link_to edit_management_post_path(post), class: 'mg-title-link', data: { turbo: false } do
+                .mg-title= post.title.presence || post.post_translations.map(&:title).compact_blank.first
+                .mg-title__path= "/post/#{post.slug}"
             td= mg_language_pair(post.translated_locales)
             td
               .mg-tags
@@ -55,7 +59,6 @@
             td.mg-cell--mono= post.updated_at.strftime('%Y·%m·%d')
             td.mg-cell--right
               .mg-actions
-                = link_to t('.edit'), edit_management_post_path(post), class: 'mg-action', data: { turbo: false }
                 = button_to t('.delete'), management_post_path(post), method: :delete,
                   class: 'mg-action mg-action--danger',
                   form: { data: { controller: 'confirm', action: 'submit->confirm#guard',

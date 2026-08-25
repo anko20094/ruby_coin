@@ -25,6 +25,24 @@
   --ruby-bright: oklch(58% 0.22 18);
   --ruby-mute:   oklch(94% 0.04 18);
 
+  /* Code. One palette, two highlighters: Rouge renders the page and the preview, Prism
+     renders inside the editor, and they used to disagree — the editor was informative and the
+     page collapsed keywords, strings and numbers into a single red, which is three kinds of
+     token wearing one colour. These are the eight roles both of them map onto.
+
+     Hues are spaced far enough apart to be told apart at 14px mono and close enough in
+     lightness and chroma that none of them shouts. Every one clears 4.5:1 on --paper-warm,
+     which is what a code block is set on: comment 4.57, number 5.30, variable 5.31, string
+     5.84, type 6.59, punctuation 6.45, keyword 7.08, name 16.25. */
+  --code-comment: var(--ink-quiet);
+  --code-keyword: var(--ruby);
+  --code-string:  oklch(46% 0.11 150);
+  --code-number:  oklch(50% 0.12 70);
+  --code-type:    oklch(45% 0.14 265);
+  --code-name:    var(--ink);
+  --code-var:     oklch(48% 0.10 215);
+  --code-punct:   var(--ink-soft);
+
   /* type: three families, no exceptions —
      large = display, prose = body, every number/label = mono */
   --font-display: "Instrument Serif", "EB Garamond", Georgia, serif;

@@ -5,12 +5,12 @@ class WorkController < ApplicationController
 
   def index
     @profile = CVProfile.current
-    @experience = CVBlock.experience
-    @stack_groups = CVBlock.stack_groups
-    @strengths = CVBlock.strengths
     @cases = Case.ordered.to_a
+    # The career entries name their cases by slug. The list is already loaded, so the lookup
+    # is a hash rather than a query per entry.
+    @cases_by_slug = @cases.index_by(&:slug)
 
-    cache_publicly([@profile, CVBlock.maximum(:updated_at), @cases])
+    cache_publicly([@profile, @cases])
   end
 
   def show

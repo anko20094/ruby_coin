@@ -52,8 +52,7 @@ module JournalHelper
   # Anything Rouge does not have a lexer for stays plain rather than being guessed at.
   def highlight_code_block(node)
     code = node.at_css('code') || node
-    language = code['class'].to_s[/language-([\w+-]+)/, 1]
-    lexer = language && Rouge::Lexer.find(language)
+    lexer = lexer_for(code) || lexer_for(node)
     return if lexer.nil?
 
     node.replace(<<~HTML)
@@ -62,5 +61,20 @@ module JournalHelper
         <pre class="jn-code__body"><code>#{journal_highlight(code.text, lexer.tag)}</code></pre>
       </div>
     HTML
+  end
+
+  # Which language a listing claims to be in, off either element.
+  #
+  # It used to read the <code> alone, and TinyMCE's code-sample writes the class on the <pre>
+  # around it — `<pre class="language-ruby"><code>`. So a listing inserted from the toolbar was
+  # highlighted inside the editor, by the editor's own copy of Prism, and arrived on the page
+  # grey: the one place the difference is invisible until it is published.
+  #
+  # `lang-` as well as `language-`, because that is the other spelling in the wild and costs a
+  # single alternation to accept.
+  def lexer_for(node)
+    language = node['class'].to_s[/(?:language|lang)-([\w+-]+)/, 1]
+
+    language && Rouge::Lexer.find(language)
   end
 end

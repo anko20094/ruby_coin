@@ -10,7 +10,7 @@
             .case-row
               span.case-row__mark= kase.mark
               .case-row__body
-                h4.case-row__title= kase.title
+                h4.case-row__title= rich(kase.title)
                 p.case-row__meta= "#{kase.slug} · #{kase.year} · #{kase.sector}"
               .case-row__flags
                 - if kase.own?

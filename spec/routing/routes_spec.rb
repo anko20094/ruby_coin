@@ -108,6 +108,8 @@ RSpec.describe 'Routes' do
     # there should be no route pretending otherwise.
     it 'has no show route for the admin lists' do
       expect(get: '/management/cases/1').not_to be_routable
+      expect(get: '/management/cv_blocks').not_to be_routable
+      expect(get: '/management/cv_profile/edit').not_to be_routable
       expect(get: '/management/cv_blocks/1').not_to be_routable
       expect(get: '/management/tags/1').not_to be_routable
     end

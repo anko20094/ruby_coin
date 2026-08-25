@@ -1,0 +1,18 @@
+/ One input inside a structured row, or one language of a localised scalar.
+/
+/ data-name-prefix and data-name-suffix are what let the row controller rebuild the field's
+/ name after a row is added, removed or moved: everything but the row index is fixed, so the
+/ controller only has to put the row's new position between the two. A <label for> rather than
+/ a wrapping one, because a TinyMCE editor is an iframe and a label must not contain it.
+.mg-cell class=("mg-cell--list" if kind == :list)
+  - if label.present?
+    label.mg-cell__label[for=id]= label
+  - if kind == :rich
+    / An editor only where the page renders markup. Everywhere else it would produce a <b>
+    / that arrives on the site as four visible characters.
+    = text_area_tag name, value, id: id, rows: 2, class: 'standart-input mg-cell__rich', data: tinymce_data(profile: 'case', lazy: true, name_prefix: prefix, name_suffix: suffix)
+  - elsif kind == :list
+    / A list is edited one item per line. These are stack names and case slugs.
+    = text_area_tag name, value, id: id, rows: 5, class: 'standart-input', data: { name_prefix: prefix, name_suffix: suffix }
+  - else
+    = text_field_tag name, value, id: id, class: 'standart-input', data: { name_prefix: prefix, name_suffix: suffix }

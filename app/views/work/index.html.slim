@@ -22,41 +22,44 @@
       section.wk-index__section.wk-index__section--career
         = render TrackTagComponent.new(label: t('work.index.tracks.career'), tone: :soft, heading: :h2)
         .wk-career
-          - @experience.each do |entry|
+          - @profile.experience.each do |entry|
+            / The cases this entry names, in the order it names them, skipping any that has
+            / since been deleted. Picked out of the list the page already loaded.
+            - entry_cases = entry[:case_slugs].filter_map { |slug| @cases_by_slug[slug] }
             .wk-career__entry
               .wk-career__head
                 / A heading, not a div: these are the sections of a CV, and heading navigation
                 / is how a screen-reader user skims one.
                 h3.wk-career__org
-                  = entry.org
-                  span.wk-career__title= " · #{entry.title}"
+                  = entry[:org]
+                  span.wk-career__title= " · #{entry[:title]}"
                 .wk-career__when
-                  = entry.period
+                  = entry[:period]
                   br
-                  = entry.place
-              - if entry.note.present?
-                .wk-career__note= entry.note
-              - if entry.body.present?
-                .wk-career__body= rich(entry.body)
-              - if entry.cases.any?
+                  = entry[:place]
+              - if entry[:note].present?
+                .wk-career__note= entry[:note]
+              - if entry[:body].present?
+                .wk-career__body= rich(entry[:body])
+              - if entry_cases.any?
                 .wk-career__cases
-                  - entry.cases.each do |kase|
+                  - entry_cases.each do |kase|
                     = link_to work_case_path(slug: kase.slug), class: 'rc-chip rc-chip--link hover-link' do
-                      = "#{kase.mark} #{kase.title} "
+                      = "#{kase.mark} #{plain(kase.title)} "
                       span aria-hidden="true" →
 
       section.wk-index__section.wk-index__section--stack
         = render TrackTagComponent.new(label: t('work.index.tracks.stack'), tone: :soft, heading: :h2)
         .wk-stack
-          - @stack_groups.each do |group|
+          - @profile.stack_groups.each do |group|
             .wk-stack__group
-              .wk-stack__label= group.label
+              .wk-stack__label= group[:label]
               .rc-chips
-                - group.items.each do |item|
+                - group[:items].each do |item|
                   span.rc-chip= item
         .wk-strengths
-          - @strengths.each do |strength|
-            .wk-strengths__item= strength.text
+          - @profile.strengths.each do |strength|
+            .wk-strengths__item= strength
 
     aside.wk-index__aside
       - if @profile.portrait

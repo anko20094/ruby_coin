@@ -6,8 +6,12 @@ module ApplicationHelper
     pagy.series_nav(:bootstrap, classes:, **).html_safe # rubocop:disable Rails/OutputSafety
   end
 
-  def prepend_flash
-    turbo_stream.prepend 'flash', partial: 'shared/flash'
+  # Replace, not prepend, and aimed at the frame that actually exists. This used to target
+  # id="flash", which is rendered nowhere in the app — Turbo drops a stream whose target is
+  # missing, silently, so every tag create/update/destroy and every post destroy acknowledged
+  # nothing. `shared/flash` *is* the frame, so it replaces itself rather than nesting.
+  def flash_stream
+    turbo_stream.replace 'flash_message', partial: 'shared/flash'
   end
 
   # The brand in a document title is the wordmark the site actually shows — "rubyco.in", not

@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 // admin.scss deliberately does not pull in theme/_base.scss — that file styles a reading
 // surface. These are the few resets a tool needs, and they have to beat the Bootstrap bundle
 // still loaded beside this one.
@@ -53,6 +55,7 @@
 
 .mg-sidebar {
   width: var(--mg-sidebar);
+  transition: width 180ms ease;
   flex-shrink: 0;
   background: var(--paper-warm);
   border-right: 1px solid var(--mg-ink-faint);
@@ -69,6 +72,61 @@
   gap: 10px;
   padding: 18px 18px 16px;
   border-bottom: 1px solid var(--mg-ink-faint);
+}
+
+.mg-sidebar__name-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.mg-sidebar__toggle {
+  @include controls.hit-square(32px);
+
+  flex-shrink: 0;
+  line-height: 1;
+  font-size: 13px;
+  color: var(--ink-quiet);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-chip);
+  transition: color 150ms, border-color 150ms, transform 200ms;
+
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--mg-ink-faint);
+  }
+}
+
+// The rail. Everything that is words gets out of the way; the dots, the counts and the ruby
+// stay, so which screen you are on is still readable at 56px.
+.mg-shell.is-sidebar-collapsed {
+  --mg-sidebar: 56px;
+
+  .mg-sidebar__name-block,
+  .mg-sidebar__label,
+  .mg-model__body,
+  .mg-sidebar__who { display: none; }
+
+  .mg-sidebar__brand,
+  .mg-sidebar__user { padding-inline: 0; justify-content: center; }
+
+  .mg-sidebar__brand { flex-direction: column-reverse; gap: 12px; }
+
+  .mg-sidebar__toggle { transform: rotate(180deg); }
+
+  .mg-sidebar__models { padding-inline: 4px; }
+
+  .mg-model {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+  }
+
+  // The count is the one number worth keeping: it is how you notice a draft you left behind.
+  .mg-model__count {
+    font-size: 9px;
+    margin-left: 3px;
+  }
 }
 
 .mg-sidebar__wordmark {
@@ -199,11 +257,30 @@
 }
 
 .mg-sidebar__out {
+  @include controls.hit-square(32px);
+
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--ink-soft);
+  border-radius: var(--radius-chip);
 
-  &:hover { color: var(--ruby); }
+  &:hover {
+    color: var(--ruby);
+    background: var(--paper);
+  }
+}
+
+// The brand is a link home now — it looked like one and did nothing.
+.mg-sidebar__home {
+  @include controls.hit-row(38px);
+
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-chip);
+  transition: color 150ms;
+
+  &:hover .mg-sidebar__wordmark { color: var(--ruby); }
 }
 
 .mg-pane {
@@ -345,9 +422,30 @@
   .mg-sidebar,
   .mg-sidebar__brand,
   .mg-sidebar__user { padding-top: 10px; padding-bottom: 10px; }
+
+  // Below 900px the sidebar is already a horizontal strip, so there is no rail to collapse to
+  // and nothing the toggle could usefully do. It, and the collapsed state, step aside.
+  .mg-sidebar__toggle { display: none; }
+
+  .mg-shell.is-sidebar-collapsed {
+    --mg-sidebar: 100%;
+
+    .mg-sidebar__name-block,
+    .mg-sidebar__label,
+    .mg-model__body,
+    .mg-sidebar__who { display: revert; }
+
+    .mg-model__hint { display: none; }
+
+    .mg-sidebar__brand { flex-direction: row; }
+
+    .mg-model { justify-content: flex-start; gap: 8px; padding-inline: 10px; }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .mg-model,
-  .mg-btn { transition: none; }
+  .mg-btn,
+  .mg-sidebar,
+  .mg-sidebar__toggle { transition: none; }
 }

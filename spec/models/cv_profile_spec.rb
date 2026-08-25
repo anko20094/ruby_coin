@@ -55,4 +55,29 @@ RSpec.describe CVProfile do
       expect(described_class.current.portrait).to eq('work-portrait.jpg')
     end
   end
+
+  # The career, the stack groups and the strengths. They were a cv_blocks table with a model,
+  # a controller and CRUD screens, which made a ten-line document behave like a collection you
+  # browse; they are StructuredJson fields on this row now. See redesign_plan.md §11.16.
+  describe 'the three lists' do
+    it 'reads a row as a ready-to-print hash in the current locale' do
+      entry = I18n.with_locale(:en) { described_class.current.experience.first }
+
+      expect(entry[:org]).to eq('myHomeIQ')
+      expect(entry[:title]).to include('Senior Backend Engineer')
+      expect(entry[:case_slugs]).to eq(%w[intelligence leads])
+    end
+
+    # A proper noun is written once in the YAML rather than as a pair, and reads the same in
+    # both languages.
+    it 'lets a plain string stand for both languages' do
+      %i[en uk].each do |locale|
+        expect(I18n.with_locale(locale) { described_class.current.experience.first[:org] }).to eq('myHomeIQ')
+      end
+    end
+
+    it 'reads a strength as the string it is, not a hash of one' do
+      expect(I18n.with_locale(:en) { described_class.current.strengths.first }).to be_a(String)
+    end
+  end
 end

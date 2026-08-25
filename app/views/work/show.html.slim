@@ -1,8 +1,8 @@
 / The title on its own is a mark ('DNA'), which says nothing in a search result or a tab —
 / the sector is the shortest thing that makes it a sentence.
-- content_for :title, full_title([@case.title, @case.sector].compact_blank.join(' · '))
-- title = @case.title
-- page_meta description: @case.tagline, image: "/og/#{@case.slug}-#{I18n.locale}.png", type: 'article', updated_at: @case.updated_at
+- content_for :title, full_title([plain(@case.title), @case.sector].compact_blank.join(' · '))
+- title = plain(@case.title)
+- page_meta description: plain(@case.tagline), image: "/og/#{@case.slug}-#{I18n.locale}.png", type: 'article', updated_at: @case.updated_at
 
 = render 'shared/reading_progress'
 
@@ -14,11 +14,11 @@ article.wk-case data-controller="track-jump"
         = " #{t('work.case.back')}"
       = " · #{@case.mark} / #{format('%02d', @total)} · #{@case.sector.upcase} · #{@case.year}"
     h1.wk-case__title class=('is-long' if title.length > 14)
-      = title
+      = rich(@case.title)
       = ' '
       span.wk-case__title-mark= @case.mark
-    p.wk-case__tagline= @case.tagline
-    .wk-case__role= @case.role
+    p.wk-case__tagline= rich(@case.tagline)
+    .wk-case__role= rich(@case.role)
 
     / The link that makes the two-track shape mean something: one URL for the recruiter, this
     / one for the CTO. Rendered as a real anchor so it works with JavaScript off and can be
@@ -35,15 +35,15 @@ article.wk-case data-controller="track-jump"
       / and the one most likely to be used.
       - @case.metrics.each do |metric|
         button.wk-metric[type="button" data-controller="copy" data-action="copy#copy"
-                         data-copy-text-value="#{metric[:value]} — #{metric[:label]}"
+                         data-copy-text-value="#{plain(metric[:value])} — #{plain(metric[:label])}"
                          data-copy-done-value=t('work.case.copied')]
-          .wk-metric__value.num= metric[:value]
-          .wk-metric__label= metric[:label]
+          .wk-metric__value.num= rich(metric[:value])
+          .wk-metric__label= rich(metric[:label])
           span.wk-metric__flash[aria-live="polite" data-copy-target="flash"]
 
   section.wk-case__plain
     = render TrackTagComponent.new(label: t('work.case.plain'), tone: :ruby)
-    h2.wk-case__heading= @case.plain_heading
+    h2.wk-case__heading= rich(@case.plain_heading)
     .wk-case__columns
       .wk-prose
         - @case.plain_body.each do |paragraph|
@@ -65,18 +65,18 @@ article.wk-case data-controller="track-jump"
   section#engineers.wk-case__band
     .wk-case__band-inner
       = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
-      h2.wk-case__heading.is-small= @case.engineering_heading
-      p.wk-case__sub= @case.engineering_sub
+      h2.wk-case__heading.is-small= rich(@case.engineering_heading)
+      p.wk-case__sub= rich(@case.engineering_sub)
       .wk-cards
         - @case.engineering_items.each do |item|
           .wk-card
-            h3.wk-card__title= item[:title]
+            h3.wk-card__title= rich(item[:title])
             .wk-card__body= rich(item[:body])
       .wk-quality
         - @case.quality.each do |metric|
           .wk-quality__cell
-            .wk-quality__value.num= metric[:value]
-            .wk-quality__label= metric[:label]
+            .wk-quality__value.num= rich(metric[:value])
+            .wk-quality__label= rich(metric[:label])
       .wk-case__scope= rich(@case.scope_note)
 
   / The page whose job is to convince someone ended at "here is the next case". A reader who
@@ -96,9 +96,9 @@ article.wk-case data-controller="track-jump"
         .wk-pager-card__eyebrow
           span aria-hidden="true" ←
           = " #{t('work.case.previous')}"
-        .wk-pager-card__title= @previous_case.title
+        .wk-pager-card__title= rich(@previous_case.title)
       = link_to work_case_path(slug: @next_case.slug), class: 'wk-pager-card wk-pager-card--next hover-row' do
         .wk-pager-card__eyebrow
           = "#{t('work.case.next')} "
           span aria-hidden="true" →
-        .wk-pager-card__title= @next_case.title
+        .wk-pager-card__title= rich(@next_case.title)

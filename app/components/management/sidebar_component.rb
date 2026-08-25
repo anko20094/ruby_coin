@@ -6,6 +6,9 @@
 # The design also drew a ⌘K search, and Settings / Users / Audit / Redirect entries. None of
 # those exist in this application, and a sidebar that lists screens which are not there is
 # worse than a shorter one — so they are not here. When they exist, they belong in this list.
+#
+# The CV is not here either, and that is the same rule: it has no screen. It is
+# config/portfolio/cv.yml, imported by `rake cv:import` — redesign_plan.md §12.5.
 class Management::SidebarComponent < ViewComponent::Base
   Model = Struct.new(:key, :label, :path, :total, :hint, keyword_init: true) do
     def current?(key_in_view) = key == key_in_view
@@ -15,8 +18,6 @@ class Management::SidebarComponent < ViewComponent::Base
   ENTRY_FOR_CONTROLLER = {
     'posts' => :posts,
     'cases' => :cases,
-    'cv_blocks' => :cv_blocks,
-    'cv_profiles' => :cv_blocks,
     'tags' => :tags,
     'statistics' => :statistics
   }.freeze
@@ -46,8 +47,6 @@ class Management::SidebarComponent < ViewComponent::Base
                 total: numbers[:posts], hint: t('.posts_hint', **numbers[:posts_by_status])),
       Model.new(key: :cases, label: 'Case', path: helpers.management_cases_path,
                 total: numbers[:cases], hint: t('.cases_hint', own: numbers[:own_cases])),
-      Model.new(key: :cv_blocks, label: 'CVBlock', path: helpers.management_cv_blocks_path,
-                total: numbers[:cv_blocks], hint: numbers[:cv_by_kind]),
       Model.new(key: :tags, label: 'Tag', path: helpers.management_tags_path,
                 total: numbers[:tags], hint: t('.tags_hint', used: numbers[:used_tags]))
     ]
@@ -64,6 +63,13 @@ class Management::SidebarComponent < ViewComponent::Base
     user&.nickname.to_s.first.to_s.upcase.presence || '·'
   end
 
+  # Whether the rail starts shut. Read from the request rather than restored by JavaScript on
+  # connect: the admin bundle is deferred, so that would flash the sidebar open on every page
+  # load. See app/javascript/controllers/sidebar_controller.js.
+  def collapsed?
+    helpers.management_sidebar_collapsed?
+  end
+
   private
 
   # One cache entry for all eight numbers, so a page that only needs its own content pays for
@@ -77,8 +83,6 @@ class Management::SidebarComponent < ViewComponent::Base
         posts_by_status: { active: by_status['active'].to_i, inactive: by_status['inactive'].to_i },
         cases: Case.count,
         own_cases: Case.where(own: true).count,
-        cv_blocks: CVBlock.count,
-        cv_by_kind: CVBlock.group(:kind).count.map { |kind, count| "#{count} #{kind.tr('_', ' ')}" }.join(' · '),
         tags: Tag.count,
         used_tags: Tag.joins(:posts).distinct.count
       }

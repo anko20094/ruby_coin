@@ -19,7 +19,7 @@ html lang=I18n.locale
     = javascript_include_tag 'admin', defer: true
   - css_classes = [controller_path.tr('/', '-'), action_name].map { |name| name.tr('_', '-') }
   body class=css_classes data-lang="#{I18n.locale}"
-    .mg-shell
+    .mg-shell class=('is-sidebar-collapsed' if management_sidebar_collapsed?)
       = render Management::SidebarComponent.new(user: current_user)
       .mg-pane
         = yield(:topbar).presence || render('management/shared/top_bar', crumbs: [controller_name])

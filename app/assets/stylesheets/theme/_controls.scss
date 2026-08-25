@@ -1,0 +1,41 @@
+// Hit areas.
+//
+// Everything that stands on its own and can be clicked gets a target you can actually hit:
+// 32px on a pointer, 44px on touch — the size the mobile pass already settled on for the
+// public nav. Measured across every screen of the site, most controls were 14–30px tall,
+// because they were drawn as text and text has no padding.
+//
+// Two rules, and the difference between them matters:
+//
+//   hit-row     grows a control vertically only. For anything sitting in a horizontal line
+//               with its neighbours — a nav, a footer column, a row of tabs — because growing
+//               it sideways would either change the spacing the design sets or let one
+//               control steal a click meant for the next.
+//   hit-square  a fixed box, for a control whose whole content is one glyph.
+//
+// Inline links inside running prose are deliberately left out of all of this. A 32px box
+// around a word in a sentence would wreck the measure, and a reader following a link in a
+// paragraph is not aiming at a button.
+
+@mixin hit-row($height: 32px, $touch: 44px) {
+  display: inline-flex;
+  align-items: center;
+  min-height: $height;
+
+  @media (pointer: coarse) {
+    min-height: $touch;
+  }
+}
+
+@mixin hit-square($size: 32px, $touch: 44px) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: $size;
+  min-height: $size;
+
+  @media (pointer: coarse) {
+    min-width: $touch;
+    min-height: $touch;
+  }
+}

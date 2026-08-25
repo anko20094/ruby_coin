@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 .wk-index {
   max-width: var(--page-max);
   margin: 0 auto;
@@ -299,6 +301,8 @@
 .wk-contact__key { color: var(--ink-quiet); }
 
 .wk-contact__value {
+  @include controls.hit-row(32px);
+
   color: var(--ink);
   border-bottom: 1px solid var(--ink-mute);
 }

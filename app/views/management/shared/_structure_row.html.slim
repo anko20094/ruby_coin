@@ -1,0 +1,32 @@
+/ One row of a structured field. Rendered twice: once per row the record holds, and once more
+/ inside the <template> the add button clones — that copy carries ROW_INDEX in place of a
+/ number and no values.
+- path = StructuredRowsHelper::RowPath.new(scope, field, index)
+.mg-row[data-structure-rows-target="row"]
+  .mg-row__inputs
+    - if spec[:fields].nil?
+      / The row is one string per language and nothing else. `row:` says whether the page
+      / prints it as markup; without it, a strength would get an editor it has no use for.
+      - I18n.available_locales.each do |locale|
+        = structure_row_field(path, keys: [locale], kind: spec.fetch(:row, :localised),
+                              label: t(locale).downcase, value: structure_row_value(row, locale))
+    - else
+      - spec[:fields].each do |key, kind|
+        / Both kinds that hold a language pair split into one box per language. Checking only
+        / for :localised here collapsed every :rich field into a single un-localised value.
+        - if StructuredJson::LOCALISED_KINDS.include?(kind)
+          - I18n.available_locales.each do |locale|
+            = structure_row_field(path, keys: [key, locale], kind: kind,
+                                  label: "#{t(".#{key}")} · #{t(locale).downcase}",
+                                  value: structure_row_value(row, key, locale))
+        - else
+          = structure_row_field(path, keys: [key], kind: kind,
+                                label: t(".#{key}"), value: structure_row_value(row, key))
+
+  .mg-row__controls
+    button.mg-row__control type="button" data-action="structure-rows#moveUp" title=t('.move_up') aria-label=t('.move_up')
+      | ↑
+    button.mg-row__control type="button" data-action="structure-rows#moveDown" title=t('.move_down') aria-label=t('.move_down')
+      | ↓
+    button.mg-row__control.is-remove type="button" data-action="structure-rows#remove" title=t('.remove') aria-label=t('.remove')
+      | ✕

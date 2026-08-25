@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 // The sign-in and password screens.
 //
 // They were the last public pages on the old Bootstrap layout, which meant every visitor who
@@ -87,6 +89,10 @@
 }
 
 .au-row {
+  // The way to the password reset is the only link on this screen; it was eighteen pixels
+  // tall.
+  .hover-link { @include controls.hit-row(32px); }
+
   width: 100%;
   display: flex;
   align-items: center;

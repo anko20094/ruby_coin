@@ -25,7 +25,7 @@
             - @case_views.sort_by { |_, views| -views }.each do |kase, views|
               tr
                 td
-                  = link_to kase.title, work_case_path(slug: kase.slug), data: { turbo: false }
+                  = link_to plain(kase.title), work_case_path(slug: kase.slug), data: { turbo: false }
                   .mg-title__path= "/work/#{kase.slug}"
                 td.mg-cell--mono.num= number_with_delimiter(views)
     - else

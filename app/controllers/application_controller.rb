@@ -20,8 +20,13 @@ class ApplicationController < ActionController::Base
     Pagy::I18n.locale = I18n.locale.to_s
   end
 
-  def user_not_authorized(error_message = nil)
-    flash[:alert] = error_message&.message || t('application_controller.alert')
+  # Pundit's own message names the policy class and the query — "not allowed to
+  # Management::PostPolicy#index? this Symbol". It went straight into the flash, so the
+  # translated string below was unreachable and the reader saw Ruby. The exception belongs in
+  # the log, not on the page.
+  def user_not_authorized(error = nil)
+    Rails.logger.info { "Pundit denied: #{error.message}" } if error
+    flash[:alert] = t('application_controller.alert')
     redirect_to(root_path)
   end
 end

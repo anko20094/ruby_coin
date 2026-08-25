@@ -32,6 +32,13 @@ module RubyCoin
     # systemd unit on the server, so it is a deploy change rather than a code change.
     config.active_job.queue_adapter = :async
 
+    # ImageMagick, not libvips. Rails 8 defaults to :vips, and this app has never needed it:
+    # post covers go through CarrierWave and MiniMagick, so ImageMagick is already a hard
+    # dependency of the deploy and libvips would be a second one for the same job. Left on the
+    # default, an editor's image upload failed to make a variant and quietly served the
+    # untouched original — several megabytes into a 760px measure.
+    config.active_storage.variant_processor = :mini_magick
+
     config.generators do |g|
       g.test_framework :rspec
       g.fixture_replacement :factory_bot, dir: 'spec/factories'
@@ -43,8 +50,8 @@ module RubyCoin
   end
 end
 
-# "cv" is an abbreviation everywhere it appears on this site: CVProfile, CVBlock, CV::Importer,
-# Management::CVBlocksController. One acronym covers all of them, because both inflectors that
+# "cv" is an abbreviation everywhere it appears on this site: CVProfile, CV::Importer,
+# Management::CVProfilesController. One acronym covers all of them, because both inflectors that
 # matter here go through camelize — Rails' autoloader inflector and the one routing uses to
 # turn "management/cv_blocks" into a controller class.
 #

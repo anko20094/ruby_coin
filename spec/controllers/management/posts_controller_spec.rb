@@ -231,27 +231,39 @@ describe Management::PostsController do
   end
 
   # The rest of this file does not render views, so nothing here would have caught the form
-  # still calling the TinyMCE helpers after the gem left.
+  # still calling an editor helper the app no longer has.
   describe 'the post form' do
     render_views
 
     before { sign_in(create(:user, role: :admin)) }
 
-    it 'renders one Action Text editor per locale and no TinyMCE' do
+    it 'renders one TinyMCE editor per locale, on the Action Text field' do
       get :new, params: { locale: 'uk' }
 
-      expect(response.body).to include('trix-editor')
+      # A plain textarea named after the rich text, not a <trix-editor>: the storage did not
+      # move when the editor did, so every body written under Trix is still the same row.
       I18n.available_locales.each do |locale|
+        field = Post::RICH_TEXT_BODIES.fetch(locale)
+        expect(response.body).to match(/<textarea[^>]+name="post\[#{field}\]"/)
         expect(response.body).to include("post_description_#{locale}")
       end
-      expect(response.body).not_to include('tinymce')
+
+      expect(response.body).to include('data-tinymce-profile-value="post"')
+      expect(response.body).not_to include('trix-editor')
     end
 
-    it 'offers the slash menu with every block kind' do
+    it 'points the editor at the block and upload endpoints, in the reader\'s language' do
       get :new, params: { locale: 'uk' }
 
-      expect(response.body).to include('aitranslation', 'slash-menu', 'post-editor')
-      JournalBlock::KINDS.each { |kind| expect(response.body).to include(%(data-kind="#{kind}")) }
+      expect(response.body).to include('data-tinymce-blocks-url-value="/uk/management/journal_blocks"')
+      expect(response.body).to include('data-tinymce-upload-url-value="/uk/management/editor_images"')
+      expect(response.body).to include('aitranslation', 'post-editor')
+
+      # The dialogs are built in JavaScript, so their wording has to be handed over with them
+      # or the editor is English on a Ukrainian screen.
+      labels = JSON.parse(response.body[/data-tinymce-labels-value="([^"]+)"/, 1].then { CGI.unescapeHTML(it) })
+      expect(labels.keys).to include(*JournalBlock::KINDS)
+      expect(labels['insert']).to eq(I18n.t('management.editor.tinymce.insert', locale: :uk))
     end
   end
 
@@ -516,6 +528,48 @@ describe Management::PostsController do
 
       expect(response.body).to include('jn-post', 'jn-body', 'jn-body__lede')
       expect(response.body).to include('Body copy.')
+    end
+  end
+
+  # Pressing Save inside the autosave's debounce window used to reach the user as a 500 with
+  # the whole article in the backtrace. The editor no longer lets the two race — see
+  # onSubmit in post_editor_controller.js — but a second person editing the same post can
+  # still make it happen, and a conflict is a thing this screen knows how to say.
+  describe 'a save that arrives with a stale version' do
+    render_views
+
+    let(:post_record) { create(:post) }
+
+    before { sign_in(create(:user, role: :admin)) }
+
+    it 'answers with the conflict rather than raising' do
+      stale = post_record.lock_version
+      post_record.update!(subtitle: 'saved by somebody else')
+
+      raced = lambda do
+        patch :update, params: {
+          locale: 'en', id: post_record.id,
+          post: { title: 'A title', subtitle: 'mine', lock_version: stale }
+        }
+      end
+
+      expect(&raced).not_to raise_error
+
+      expect(response).to have_http_status(:conflict)
+      expect(response.body).to include(I18n.t('management.posts.update.conflict', locale: :en))
+    end
+
+    it 'leaves the record alone and gives the editor the version that is current' do
+      stale = post_record.lock_version
+      post_record.update!(subtitle: 'saved by somebody else')
+
+      patch :update, params: {
+        locale: 'en', id: post_record.id,
+        post: { title: 'A title', subtitle: 'mine', lock_version: stale }
+      }
+
+      expect(post_record.reload.subtitle).to eq('saved by somebody else')
+      expect(response.body).to include(%(value="#{post_record.lock_version}"))
     end
   end
 end

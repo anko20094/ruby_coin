@@ -9,10 +9,15 @@
 - editing = post.persisted?
 - locales = [I18n.locale] + (I18n.available_locales - [I18n.locale])
 
-= form_with model: [:management, post], data: { controller: 'aitranslation slash-menu post-editor', aitranslation_locale: I18n.locale, post_editor_autosave_url_value: (editing ? autosave_management_post_path(post) : nil), post_editor_preview_url_value: (editing ? preview_management_post_path(post) : nil) } do |f|
+= form_with model: [:management, post], data: { controller: 'aitranslation post-editor', aitranslation_locale: I18n.locale, post_editor_autosave_url_value: (editing ? autosave_management_post_path(post) : nil), post_editor_preview_url_value: (editing ? preview_management_post_path(post) : nil) } do |f|
   .mg-editor
     - if editing
       = f.hidden_field :lock_version, data: { post_editor_target: 'lockVersion' }
+
+    / A failed Save used to re-render this screen unchanged — no message anywhere, while the
+    / state indicator above still read "no changes". The autosave path reported errors; the
+    / submit path did not.
+    = render 'shared/errors', object: post
 
     .mg-editor__bar
       .mg-tabs
@@ -26,8 +31,11 @@
       / The wording lives here rather than in the controller, so every state stays translated.
       / Announced: the whole point of an autosave indicator is telling you what happened, and
       / a sighted reader was the only one it told.
+      / A re-render after a failed submit is not "no changes" — it was the one moment the
+      / indicator was guaranteed to be wrong, and it was the only thing on screen.
+      - failed = post.errors.any?
       .mg-state[role="status" aria-live="polite" aria-atomic="true"
-        data-post-editor-target="state" data-state="clean"
+        data-post-editor-target="state" data-state=(failed ? 'invalid' : 'clean')
         data-phrase-clean=t('.state.clean')
         data-phrase-dirty=t('.state.dirty')
         data-phrase-saving=t('.state.saving')
@@ -35,7 +43,8 @@
         data-phrase-invalid=t('.state.invalid', errors: '%{errors}')
         data-phrase-conflict=t('.state.conflict')]
         span.mg-state__dot
-        span[data-post-editor-target="stateText"]= editing ? t('.state.clean') : t('.state.unsaved')
+        - clean_phrase = editing ? t('.state.clean') : t('.state.unsaved')
+        span[data-post-editor-target="stateText"]= failed ? t('.state.invalid', errors: post.errors.full_messages.to_sentence) : clean_phrase
 
     .mg-conflict[role="alert" hidden=true data-post-editor-target="conflict"]
       span= t('.conflict')
@@ -67,16 +76,46 @@
               - else
                 = f.text_field "subtitle_localizations][#{locale}", id: subtitle_id, value: current_data(post, 'subtitle', locale), class: 'mg-input', data: { locale: locale.to_s }, placeholder: t('.placeholders.subtitle')
 
+            / TinyMCE, on a plain textarea. The value is not the raw stored body: journal
+            / blocks are stored as an empty <action-text-attachment> and would be an invisible
+            / gap in a WYSIWYG editor, so editor_html fills each one in. See EditorHelper.
+            - body_field = Post::RICH_TEXT_BODIES.fetch(locale)
             .mg-field id=(own ? 'basic-description' : 'localized_description')
-              = label_tag "post_#{Post::RICH_TEXT_BODIES.fetch(locale)}", t('.body'), class: 'mg-field__label'
-              = f.rich_text_area Post::RICH_TEXT_BODIES.fetch(locale)
-
-        = render 'management/posts/slash_menu'
+              = label_tag "post_#{body_field}", t('.body'), class: 'mg-field__label'
+              = f.text_area body_field, value: editor_html(post.public_send(:"rich_text_#{body_field}")), class: 'mg-editor__body', data: tinymce_post_data
 
         .mg-field
           = link_to t('.translate'), 'javascript:void(0)', id: 'translation-button', class: 'mg-btn', data: { action: 'click->aitranslation#fetchData' }
 
-      .mg-editor__meta
+      - if editing
+        .mg-editor__preview
+          .mg-preview__head
+            span.mg-field__label= t('.preview')
+            / Which language this is a preview of. It used to be whatever the admin's own
+            / chrome was in, whichever tab was open — so writing Ukrainian showed an English
+            / preview, and there was no way to tell.
+            span.mg-preview__locale[data-post-editor-target="previewLocale"]= I18n.locale.to_s
+            button.mg-preview__width.is-current type="button" data-width="desktop" data-action="post-editor#setWidth" desktop
+            button.mg-preview__width type="button" data-width="mobile" data-action="post-editor#setWidth" mobile
+
+            / The real page, in the language being edited. A new tab, because leaving the
+            / editor mid-write to look at the article is not the thing anybody wants.
+            - locales.each do |locale|
+              = link_to t('.open'), post_path(id: post.slug, locale: locale), class: 'mg-preview__open',
+                target: '_blank', rel: 'noopener',
+                hidden: (locale != I18n.locale),
+                data: { locale: locale, post_editor_target: 'openLink', turbo: false }
+          .mg-preview data-post-editor-target="preview" data-width="desktop"
+            = render 'management/posts/preview', post: post, locale: I18n.locale
+
+    / Below the two columns, not beside them.
+    /
+    / These are set-once fields — the slug, the author, the status, the cover — and they were
+    / taking a fixed 300px out of the middle of the screen for the whole time you were writing.
+    / Across the bottom they cost nothing while the body and the preview get half the pane each.
+    .mg-editor__meta
+      .mg-editor__meta-label= t('.meta')
+      .mg-editor__meta-grid
         .mg-field
           = f.label :slug, t('.slug'), class: 'mg-field__label'
           = f.text_field :slug, class: 'mg-input', placeholder: t('.placeholders.slug')
@@ -119,14 +158,6 @@
             .mg-field__label= t('.created')
             .mg-cell--mono= post.created_at.strftime('%Y·%m·%d %H:%M')
 
-      - if editing
-        .mg-editor__preview
-          .mg-preview__head
-            span.mg-field__label= t('.preview')
-            button.mg-preview__width.is-current type="button" data-width="desktop" data-action="post-editor#setWidth" desktop
-            button.mg-preview__width type="button" data-width="mobile" data-action="post-editor#setWidth" mobile
-          .mg-preview data-post-editor-target="preview" data-width="desktop"
-            = render 'management/posts/preview', post: post
 
     .mg-editor__actions
       = f.submit(editing ? t('global.button.save') : t('global.button.create'), class: 'mg-btn mg-btn--primary')

@@ -13,13 +13,18 @@ module Management
     before_action :authenticate_user!
     after_action :verify_authorized
 
-    # The one place the site-wide policy has to give. Trix appends its default stylesheet as an
-    # inline <style> element when it loads, and offers no way to turn that off — a style
-    # element cannot carry a nonce it was never given, and hashing it would break on every Trix
-    # release. Relaxed here and only here: these screens are behind a password, and the public
-    # site keeps `style-src-elem 'self'` with no exceptions.
+    # The one place the site-wide policy has to give. TinyMCE writes its skin into the page as
+    # inline <style> elements as the editor builds itself, and offers no way to turn that off —
+    # a style element cannot carry a nonce it was never given, and hashing them would break on
+    # every TinyMCE release. Relaxed here and only here: these screens are behind a password,
+    # and the public site keeps `style-src-elem 'self'` with no exceptions.
+    #
+    # frame-src is narrowed rather than relaxed. The site-wide policy names two video hosts,
+    # because a reader can click an embed open; nothing under /management does, and the editor
+    # only ever frames its own srcdoc document.
     content_security_policy do |policy|
       policy.style_src_elem :self, :unsafe_inline
+      policy.frame_src :self
     end
   end
 end

@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 // The edit screen: three columns — fields · meta · preview — with the save state and the
 // language tabs on a bar above them. Handoff §8.
 .mg-editor {
@@ -26,6 +28,9 @@
 }
 
 .mg-tab {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -97,28 +102,48 @@
   border-bottom: 1px solid var(--ruby);
 }
 
+// Two columns, not three. The meta fields used to take a fixed 300px out of the middle for
+// the whole time you were writing; they are a strip under the fold now, so the body and the
+// preview — the two things you actually look at together — get half the pane each.
 .mg-editor__cols {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) 300px minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
 }
 
 .mg-editor__main,
-.mg-editor__meta,
 .mg-editor__preview {
   padding: 20px 22px;
   min-width: 0;
 }
 
-.mg-editor__meta,
 .mg-editor__preview {
   border-left: 1px solid var(--mg-ink-faint);
-}
-
-.mg-editor__preview {
   background: var(--paper-warm);
   position: sticky;
   top: var(--mg-topbar);
+}
+
+// The strip. auto-fill rather than a fixed count, so it is four across on a wide screen and
+// one across on a narrow one without a breakpoint for each step in between.
+.mg-editor__meta {
+  border-top: 1px solid var(--mg-ink-faint);
+  padding: 18px 22px 4px;
+}
+
+.mg-editor__meta-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  color: var(--ink-quiet);
+  margin-bottom: 12px;
+}
+
+.mg-editor__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0 22px;
+  align-items: start;
 }
 
 // One group per language. Hidden groups are display:none rather than removed, so their fields
@@ -131,6 +156,10 @@
   letter-spacing: 1.4px;
   color: var(--ink-quiet);
   margin-bottom: 10px;
+}
+
+.mg-editor__cols:not(:has(.mg-editor__preview)) {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .mg-editor__cols.is-side-by-side {
@@ -177,48 +206,49 @@
   font-size: 24px;
 }
 
-.mg-editor trix-editor {
+// TinyMCE. The editor draws its own chrome from the oxide skin under public/tinymce; what is
+// set here is only where it meets the screen around it — the border, the width, and the fact
+// that a toolbar with this many buttons has to wrap rather than push the meta column off.
+.mg-editor .tox-tinymce {
   border: 1px solid var(--ink-mute);
   border-radius: var(--radius-card);
-  background: var(--paper);
-  min-height: 220px;
-  font-size: 15px;
-  line-height: 1.6;
-  // Bootstrap is still loaded beside this bundle and colours body copy through its own link
-  // and heading rules; the editor is prose, so it says so explicitly.
-  color: var(--ink);
-
-  a { color: var(--ruby); }
-
-  h1 {
-    font-family: var(--font-display);
-    font-size: 24px;
-  }
-
-  pre {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    background: var(--paper-warm);
-    padding: 12px;
-    border-radius: var(--radius-card);
-  }
 }
 
-// The toolbar has more buttons than a 1.3fr column is wide, so it wraps instead of spilling.
-.mg-editor trix-toolbar {
-  .trix-button-row {
-    flex-wrap: wrap;
-    gap: 4px;
-  }
+.mg-editor .tox .tox-editor-header {
+  box-shadow: none;
+  border-bottom: 1px solid var(--mg-ink-faint);
+}
 
-  .trix-button-group {
-    border-color: var(--ink-mute);
-    margin-bottom: 4px;
-  }
+// Before TinyMCE has loaded — and if it never does — the textarea is the editor. It has to
+// look like a field either way rather than like a broken one.
+.mg-editor__body,
+.mg-cell__rich {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  padding: 10px 12px;
+}
 
-  .trix-button {
-    font-size: 11px;
-  }
+.mg-editor__body { min-height: 220px; }
+
+// A case form has sixty-odd fields and boots an editor on the one being used. The cue that a
+// field is about to become one belongs on the field, not in a sentence above the form.
+.mg-tinymce-idle {
+  cursor: text;
+  border-style: dashed;
+
+  &:hover { border-color: var(--ruby); }
+}
+
+.mg-field__error {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--ruby);
 }
 
 // The OG card: the same three things a link preview shows anywhere else.
@@ -269,6 +299,9 @@
 }
 
 .mg-preview__width {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
   font-family: var(--font-mono);
   font-size: 10.5px;
   padding: 3px 8px;
@@ -324,35 +357,60 @@
   }
 }
 
+// Sticky, because the editor grows with the article: a long piece put Save three thousand
+// pixels below where you are typing. It stays at the bottom of the DOM — the tab order still
+// ends where the form does — and at the bottom of the screen, where a primary action belongs.
 .mg-editor__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
   display: flex;
   gap: 10px;
   align-items: center;
   padding: 16px 22px;
   border-top: 1px solid var(--mg-ink-faint);
   background: var(--paper);
+  box-shadow: 0 -8px 20px color-mix(in oklab, var(--ink) 5%, transparent);
 }
 
-@media (max-width: 1400px) {
-  .mg-editor__cols { grid-template-columns: minmax(0, 1fr) 280px; }
+// This used to stack at 1400px, because a third column had to fit between the editor and the
+// preview. With the meta fields moved out, half a pane is still a readable measure well below
+// that; the preview goes under the editor only when neither would be wide enough to read.
+@media (max-width: 1200px) {
+  .mg-editor__cols { grid-template-columns: minmax(0, 1fr); }
 
   .mg-editor__preview {
-    grid-column: 1 / -1;
     border-left: 0;
     border-top: 1px solid var(--mg-ink-faint);
     position: static;
   }
 }
 
-@media (max-width: 900px) {
-  .mg-editor__cols { grid-template-columns: 1fr; }
-
-  .mg-editor__meta {
-    border-left: 0;
-    border-top: 1px solid var(--mg-ink-faint);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .mg-preview { transition: none; }
+}
+
+// Which language the pane is a preview of, and the way out to the real page in it. Both used
+// to be missing, so an editor writing Ukrainian watched an English preview with no way to tell
+// and no link to the page they were actually changing.
+.mg-preview__locale {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  border-radius: var(--radius-chip);
+  background: var(--ruby-mute);
+  color: var(--ruby);
+}
+
+.mg-preview__open {
+  @include controls.hit-row(32px);
+
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+
+  &:hover { color: var(--ruby); }
+  &[hidden] { display: none; }
 }

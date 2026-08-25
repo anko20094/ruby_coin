@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 // The front page. Max width 1320px, per handoff §4.
 $home-max: 1320px;
 
@@ -131,6 +133,8 @@ $home-max: 1320px;
 
 .hm-latest__more,
 .hm-more {
+  @include controls.hit-row(32px);
+
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 11px;

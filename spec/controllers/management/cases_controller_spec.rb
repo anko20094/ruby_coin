@@ -28,14 +28,49 @@ describe Management::CasesController, type: :request do
       expect(response.body.index('intelligence')).to be < response.body.index('rubycoin')
     end
 
-    it 'renders the form with one field per language and the declared row counts' do
+    it 'renders one field per language, and a row per row the case actually has' do
       get edit_management_case_path(kase, locale: 'en')
 
       expect(response.body).to include('case[title_en]', 'case[title_uk]')
       expect(response.body).to include('case[metrics_rows][0][value]', 'case[metrics_rows][0][label][en]')
-      # Four drawn by the design, plus a spare row to add one.
-      expect(response.body.scan(/case\[metrics_rows\]\[\d+\]\[value\]/).size).to eq(5)
-      expect(response.body.scan(/case\[engineering_items_rows\]\[\d+\]\[title\]\[en\]/).size).to eq(7)
+
+      # What the case holds — not Case::STRUCTURES[:count] and not that plus a spare. The form
+      # used to draw a fixed number of rows and there was no way to have any other number; the
+      # count is a hint beside the heading now, and the rows are added and removed on screen.
+      # The <template> row is not counted here: its index is StructuredRowsHelper::ROW_INDEX, not a
+      # number, which is exactly what tells the two apart.
+      expect(response.body.scan(/case\[metrics_rows\]\[\d+\]\[value\]/).size).to eq(kase.metrics_rows.size)
+      expect(response.body).to include('data-controller="structure-rows"')
+    end
+
+    it 'draws the design\'s row count for a case that has none yet' do
+      get new_management_case_path(locale: 'en')
+
+      # Plus one: the <template> the add button clones carries a row of its own.
+      expected = Case::STRUCTURES.fetch(:metrics).fetch(:count)
+      expect(response.body.scan(/case\[metrics_rows\]\[\d+\]\[value\]/).size).to eq(expected)
+      expect(response.body).to include(StructuredRowsHelper::ROW_INDEX)
+    end
+
+    it 'gives every localised field an editor and every plain one a plain input' do
+      get edit_management_case_path(kase, locale: 'en')
+
+      form = response.parsed_body
+
+      # The /work page renders these strings through ProseHelper#rich, so an author needs a way
+      # to make markup. A metric's figure is not one of them: it is printed as a number and
+      # copied to the clipboard as one.
+      title = form.at_css('#case_title_en')
+      expect(title.name).to eq('textarea')
+      expect(title['data-controller']).to eq('tinymce')
+      # Lazily, or a case form boots sixty editors to type in one.
+      expect(title['data-tinymce-lazy-value']).to eq('true')
+
+      expect(form.at_css('[name="case[metrics_rows][0][value]"]').name).to eq('input')
+
+      # Every cloned row needs an id of its own or TinyMCE will not start on the second one.
+      template_ids = form.css('template [id]').pluck('id')
+      expect(template_ids).to all(include(StructuredRowsHelper::ROW_INDEX))
     end
 
     it 'creates a case' do

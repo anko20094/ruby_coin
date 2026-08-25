@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 .wk-case__header {
   max-width: var(--case-max);
   margin: 0 auto;
@@ -5,6 +7,9 @@
 }
 
 .wk-case__breadcrumb {
+  // The way back out of a case. Fourteen pixels tall, at the very top of the page.
+  .hover-link { @include controls.hit-row(32px); }
+
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--ink-soft);
@@ -298,6 +303,8 @@
 // "↓ skip to the engineering" — the affordance that makes /work/:slug#engineers a link worth
 // sending. Sits under the role line, quiet until it is wanted.
 .wk-case__skip {
+  @include controls.hit-row(36px);
+
   display: inline-block;
   margin-top: 18px;
   font-family: var(--font-mono);

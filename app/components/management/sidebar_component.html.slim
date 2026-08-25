@@ -1,14 +1,31 @@
-aside.mg-sidebar
+aside.mg-sidebar data-controller="sidebar"
   .mg-sidebar__brand
-    = render GemComponent.new(uid: 'mg-brand', size: 22)
-    div
-      .mg-sidebar__wordmark rubyco.in
-      .mg-sidebar__where= t('.where')
+    / A link, not decoration. It reads like the way home on every other site and did nothing
+    / here, which is the worst of both.
+    = link_to helpers.management_root_path, class: 'mg-sidebar__home', title: t('.home'), data: { turbo: false } do
+      = render GemComponent.new(uid: 'mg-brand', size: 22)
+      div.mg-sidebar__name-block
+        .mg-sidebar__wordmark rubyco.in
+        .mg-sidebar__where= t('.where')
 
-  .mg-sidebar__models
+    / Collapses the rail. aria-expanded rather than a pressed state: what the button controls
+    / is whether the navigation is showing, which is what a reader of the label wants to know.
+    button.mg-sidebar__toggle[type="button" data-action="sidebar#toggle"
+      data-sidebar-target="toggle"
+      aria-controls="mg-sidebar-nav"
+      aria-expanded=(collapsed? ? 'false' : 'true')
+      aria-label=(collapsed? ? t('.expand') : t('.collapse'))
+      title=(collapsed? ? t('.expand') : t('.collapse'))
+      data-label-collapse=t('.collapse')
+      data-label-expand=t('.expand')]
+      span aria-hidden="true" ⟨
+
+  / The rail hides the names with CSS rather than dropping them, so the accessible name of
+    / each link is the same whether the sidebar is open or shut.
+  #mg-sidebar-nav.mg-sidebar__models
     .mg-sidebar__label= t('.models')
     - models.each do |model|
-      = link_to model.path, class: "mg-model #{'is-current' if model.current?(current)}" do
+      = link_to model.path, class: "mg-model #{'is-current' if model.current?(current)}", title: model.label do
         span.mg-model__dot
         .mg-model__body
           .mg-model__name= model.label
@@ -17,7 +34,7 @@ aside.mg-sidebar
 
     .mg-sidebar__label= t('.system')
     - system_entries.each do |entry|
-      = link_to entry.path, class: "mg-model #{'is-current' if entry.current?(current)}" do
+      = link_to entry.path, class: "mg-model #{'is-current' if entry.current?(current)}", title: entry.label do
         span.mg-model__dot
         .mg-model__body
           .mg-model__name= entry.label

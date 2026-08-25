@@ -1,3 +1,5 @@
+@use 'controls';
+
 // The track tag — the device that separates the two registers on a case page,
 // and labels the sections of the index. Colour is passed in by tone.
 .rc-track {
@@ -40,7 +42,13 @@
   border-radius: var(--radius-chip);
   white-space: nowrap;
 
-  // Career chips pointing into a case.
+  // Career chips pointing into a case. A chip you can click is a control; a chip that is a
+  // label — a stack name, a tag on a card — is not, and stays the size the design draws.
+  &--link,
+  &--filter {
+    @include controls.hit-row(32px);
+  }
+
   &--link {
     font-size: 10.5px;
     padding: 3px 8px;

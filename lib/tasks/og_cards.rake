@@ -56,9 +56,9 @@ namespace :og do
     {
       mark: kase.mark,
       eyebrow: [kase.sector, kase.year].compact_blank.join(' · '),
-      title: kase.title,
-      tagline: kase.tagline,
-      metric: kase.metrics.first
+      title: strip_case_markup(kase.title),
+      tagline: strip_case_markup(kase.tagline),
+      metric: kase.metrics.first&.transform_values { |value| strip_case_markup(value) }
     }
   end
 
@@ -72,6 +72,13 @@ namespace :og do
       tagline: profile.summary,
       metric: nil
     }
+  end
+
+  # A case field is TinyMCE markup now. The card is baked to a PNG by a browser that would
+  # happily render a <b> — but the title also sizes itself by character count, and an OG card
+  # is not the place for a bolded word. The words go on, the markup does not.
+  def strip_case_markup(value)
+    ActionController::Base.helpers.strip_tags(value.to_s).strip
   end
 
   # --- rendering ----------------------------------------------------------------------------
