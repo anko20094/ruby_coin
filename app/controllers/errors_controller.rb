@@ -41,7 +41,13 @@ class ErrorsController < ApplicationController
     I18n.with_locale(locale_from_original_path, &)
   end
 
+  # The address the reader asked for is the first answer, and an explicit ?locale= is the
+  # second: these pages are dispatched outside the /:locale scope, so the switcher in the nav
+  # can only offer a query parameter — and without this it offered one that did nothing.
   def locale_from_original_path
+    asked = params.permit(:locale)[:locale]
+    return asked if I18nExtended::AVAILABLE_LOCALES.include?(asked)
+
     segment = request.headers[ORIGINAL_PATH].to_s.split('/')[1]
     I18nExtended::AVAILABLE_LOCALES.include?(segment) ? segment : I18n.default_locale
   end

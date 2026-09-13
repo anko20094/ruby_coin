@@ -1,0 +1,86 @@
+// /studio — the same roster as /team at a lower density, and the way into it from the nav.
+.st-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px var(--page-pad);
+}
+
+.st-crew {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+  gap: 22px;
+  margin-top: 36px;
+}
+
+.st-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 20px;
+  border: var(--rule-row);
+  border-radius: var(--radius-button);
+  transition: border-color 150ms;
+
+  &:hover { border-color: var(--ink); }
+}
+
+.st-card__body { min-width: 0; }
+
+.st-card__name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.st-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.st-card__role {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.st-card__blurb {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-top: 10px;
+  text-wrap: pretty;
+}
+
+.st-card__link {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  color: var(--ruby);
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .st-page { padding: 36px var(--page-pad); }
+}
+
+// Same reasoning as the roster card: an 88px stone next to a 100px column of prose.
+@media (max-width: 480px) {
+  .st-card {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  // Not --monogram-size: the component sets that inline, and an inline custom property
+  // beats a rule. `width` is what reads it, so `width` is what overrides it.
+  .st-card .rc-monogram { width: 64px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-card { transition: none; }
+}

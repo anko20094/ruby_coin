@@ -91,6 +91,24 @@ LEDE = {
 
 cover = Rails.root.join('app/assets/images/work-portrait.jpg') # rubocop:disable Rails/FilePath
 
+# Every post needs a cover and covers go through ImageMagick, so ask it to read one image up
+# front rather than finding out nine rows in. This replaces a `rescue CarrierWave::Processing\
+# Error` around `save!` that could never fire: CarrierWave turns a processing failure into a
+# validation error on :photo, so what actually reached it was ActiveRecord::RecordInvalid and
+# the friendly message below never printed.
+#
+# #validate! rather than #open, because MiniMagick 5's #open only copies bytes into a tempfile
+# — #validate! is what runs `magick identify`. And MiniMagick::Invalid is not a
+# MiniMagick::Error, the gem hangs it straight off StandardError, so both have to be named.
+begin
+  MiniMagick::Image.open(cover.to_s).validate!
+rescue MiniMagick::Invalid, MiniMagick::Error, Errno::ENOENT => e
+  # #squish because the reason a broken install gives — "cannot open shared object file" —
+  # is on the second line of what MiniMagick raises.
+  abort "  ImageMagick cannot read #{cover.basename}: #{e.message.squish}\n  " \
+        'Install ImageMagick and re-run.'
+end
+
 created = 0
 ENTRIES.each_with_index do |(en_title, uk_title), index|
   slug = en_title.parameterize
@@ -112,11 +130,21 @@ ENTRIES.each_with_index do |(en_title, uk_title), index|
 
   post.save!
   created += 1
-rescue CarrierWave::ProcessingError => e
-  # Every post needs a cover, and covers go through ImageMagick. Say so plainly rather than
-  # leaving a half-seeded database behind.
-  abort "  cannot process #{cover.basename}: #{e.message}\n  Install ImageMagick and re-run."
 end
 
-say "journal: #{created} new, #{Post.count} total"
+# A post seeded before the uploader was rewritten still carries the old versions on disk —
+# `medium_cover.png` where PhotoUploader now asks for `medium_cover.jpg`. The row looks fine
+# and the file the column names is there, so nothing notices until a cover renders as a
+# broken image. Re-attaching the source rebuilds the versions under the names in force now.
+repaired = 0
+Post.where(slug: ENTRIES.map { |en, _uk| en.parameterize }).find_each do |post|
+  next if post.photo.blank?
+  next if File.exist?(post.photo.medium.path.to_s)
+
+  post.photo = File.open(cover)
+  post.save!
+  repaired += 1
+end
+
+say "journal: #{created} new, #{repaired} covers rebuilt, #{Post.count} total"
 puts "done\n\n"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_13_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -111,14 +111,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_120000) do
     t.jsonb "quality", default: [], null: false
     t.jsonb "role", default: {}, null: false
     t.jsonb "scope_note", default: {}, null: false
-    t.string "sector"
+    t.jsonb "sector", default: {}, null: false
     t.string "slug", null: false
     t.jsonb "stack", default: [], null: false
-    t.string "status"
+    t.jsonb "status", default: {}, null: false
     t.jsonb "tagline", default: {}, null: false
     t.jsonb "title", default: {}, null: false
     t.datetime "updated_at", null: false
-    t.string "year"
+    t.jsonb "year", default: {}, null: false
     t.index ["position"], name: "index_cases_on_position"
     t.index ["slug"], name: "index_cases_on_slug", unique: true
   end

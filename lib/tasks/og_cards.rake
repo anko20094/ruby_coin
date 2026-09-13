@@ -11,7 +11,8 @@
 #
 # The generated PNGs are committed. Cases change a few times a year and the images are ~40 KB
 # each, so a file in the repo is both cheaper and more reliable than assuming a browser exists
-# on the deploy target. Re-run this after editing a case title, tagline or first metric:
+# on the deploy target. Re-run this after editing a case title, tagline or first metric — or the
+# home page's eyebrow, headline or lede, which are what the site card prints:
 #
 #     bundle exec rake og:cards
 #
@@ -62,14 +63,20 @@ namespace :og do
     }
   end
 
+  # Everything that is not a case unfurls with this one: the home page, /work, /team, a person
+  # page, /studio, /cv. It used to be built from the CV, so a link to the roster — six people —
+  # arrived in a chat under one person's name and his first-person summary. It says what the
+  # site says instead, in the site's own words.
   def site_card(locale)
-    profile = CVProfile.current
+    headline = %w[headline_lead headline_join headline_mark]
+               .map { |key| I18n.t("home.index.#{key}", locale: locale) }
+               .compact_blank.join(' ')
 
     {
       mark: nil,
-      eyebrow: I18n.t('work.index.eyebrow', locale: locale),
-      title: profile.name,
-      tagline: profile.summary,
+      eyebrow: I18n.t('home.index.eyebrow', locale: locale),
+      title: "#{headline}.",
+      tagline: I18n.t('home.index.lede_2', locale: locale),
       metric: nil
     }
   end

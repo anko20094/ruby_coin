@@ -30,23 +30,23 @@ en:
     delete: Are you sure you want to delete %{item}?
   home:
     index:
-      tagline: Rails systems, and writing about them
-      eyebrow_craft: RAILS
-      headline:
-        - I build Rails systems.
-        - I write about them
-        - at
-      headline_mark: RubyCoin.
+      tagline: Rails products, built and run
+      eyebrow: RUBYCOIN · RAILS STUDIO · KYIV
+      headline_lead: We build Rails products,
+      headline_join: then
+      headline_mark: run them for years
+      lede_1: "%{count} of them are in this portfolio — Telegram products at 2.8M+ users, a US proptech platform eight years deep."
+      lede_2: Every figure on every case page was read from production, not from memory. Including the outage that lasted eleven hours.
+      work_with_us: work with us
       see_work: see the work
-      read_journal: read the journal
-      entries:
-        one: "%{count} entry in the journal"
-        other: "%{count} entries in the journal"
+      stats: "%{products} · %{people} of us · shipping since %{year}"
       move_cursor: MOVE YOUR CURSOR
       latest: latest entry
       read_full: read full
       recent_work: recent work
       all_work: all work
+      crew: crew (currently)
+      crew_note: "%{people} of us · %{humans}"
       to_top: Back to the top
       top: TOP
   faq:
@@ -55,7 +55,7 @@ en:
       answer1_1: I am a programmer with experience in Ruby and Ruby on Rails.
       answer1_2: I create Ukrainian-language content, including tutorials and instructions, especially on programming.
       answer1_3: I also develop websites for practical learning and storing created information.
-      more_info1_html: You can read more about this in the post <a href="https://t.me/rubychatua">Meet the author of the channel</a>
+      more_info1_html: You can read more about this in the post <a href="https://t.me/rubychatua" target="_blank" rel="noreferrer">Meet the author of the channel</a>
     services:
       question2: What services do you offer for beginners?
       answer2_1: For beginners, I offer various educational materials, including programming lessons in Ruby and Ruby on Rails that I create myself or have studied.
@@ -67,7 +67,7 @@ en:
     consultation:
       question4: Do you provide mentoring or consulting services?
       answer4_1: Yes, I offer mentoring and consulting services upon prior acquaintance through skype/discord.
-      answer4_2_1_html: I am ready to answer your questions and help you solve programming tasks in Ruby and Ruby on Rails as much as possible in the <a href="https://t.me/rubychatua"> telegram group.</a>
+      answer4_2_1_html: I am ready to answer your questions and help you solve programming tasks in Ruby and Ruby on Rails as much as possible in the <a href="https://t.me/rubychatua" target="_blank" rel="noreferrer"> telegram group.</a>
       more_info4: I also provide the first job in this field upon successful completion of the internship.
     communication:
       question5: How can I contact you for more information or consultation?
@@ -370,6 +370,24 @@ en:
   en: English
   uk: Ukrainian
 
+  # Every count on the site goes through one of these. English needs two forms and Ukrainian
+  # three, and the naive version prints "2 людей", which is wrong.
+  counts:
+    projects:
+      one: "%{count} project"
+      other: "%{count} projects"
+    products:
+      one: "%{count} product"
+      other: "%{count} products"
+    # Not "people": one of the six on the roster is a machine, and it is credited on four of the
+    # seven projects. The home page counts the humans separately for the same reason.
+    contributors:
+      one: "%{count} contributor"
+      other: "%{count} contributors"
+    humans:
+      one: "%{count} of them human"
+      other: "%{count} of them human"
+
   global:
     button:
       delete: Delete
@@ -388,6 +406,11 @@ en:
       open: Search the site
       placeholder: pages, cases, entries…
       empty: Type to search the site.
+      kinds:
+        page: page
+        case: case
+        person: person
+        entry: entry
       move: move
       open_result: open
       close: close
@@ -415,30 +438,23 @@ en:
       work: work
       studio: studio
       contact: contact
-      soon: soon
       menu: menu
-      soon_title: Not published yet — the crew page needs the team
+      cv: CV
+      cv_title: Curriculum vitae
     footer:
       journal: journal
       feed: rss
       work: all cases
+      team: the crew
+      cv: cv
       contact: say hi
     index:
-      eyebrow: work · cv
-      title: What I have shipped
-      lede: Two commercial services, five products of my own. Every figure read from production, git and trackers — not from memory.
+      eyebrow: work
+      title: The work
+      lede: In the order we would put them in front of you. That order is a judgement, not a sort — it changes when the work does.
       own: OWN
       you_are_here: YOU ARE HERE
-      contact: contact
-      location: location
-      languages: languages
-      education: education
-      figures: figures
-      both_halves: "Both halves of the same evidence: the career on the left, the work that backs it below."
-      tracks:
-        projects: the projects
-        career: career
-        stack: stack
+      solo: solo
     case:
       back: WORK
       plain: in plain words
@@ -452,8 +468,60 @@ en:
       next: NEXT
       skip: skip to the engineering
       copied: copied
+      copy: Copy
       cta: Read the whole thing and want to talk about it?
       cta_contact: Get in touch
+      team: who worked on it
+      team_solo: Solo — the whole stack
+      open_cv: open CV
+
+  # The labels /cv and /team/:person share, because they render the same document.
+  profile:
+    summary: summary
+    career: career
+    stack: stack
+    contact: contact
+    location: location
+    languages: languages
+    education: education
+    updated: cv updated
+    draft: CV DRAFT
+    placeholder_chip: PLACEHOLDER
+    placeholder: PLACEHOLDER DATA · layout preview only — replace before launch
+    worked_on: worked on
+    not_work: not-work
+    open_case: read the case
+    solo_project: solo project
+    pending:
+      title: This CV is not filled in yet
+      body: The contributions above are written by the project lead and are accurate. The career, stack and education sections are the person's own to write — until they do, this page shows nothing rather than guessing.
+
+  cv:
+    show:
+      eyebrow: cv
+      title: Curriculum vitae
+      lede: Two commercial services, five products of my own. Every figure read from production, git and trackers — not from memory.
+      projects: the projects
+      print: save as pdf
+      pending_body: The projects below are the portfolio and are accurate. The career, the stack and the contact details come from config/portfolio/cv.yml, which this database has not imported yet.
+      figures: figures
+      both_halves: "Both halves of the same evidence: the career on the left, the work that backs it below."
+
+  team:
+    index:
+      eyebrow: team
+      title: Who is here
+      lede: Every project page names the people who worked on it and what each of them did — this is the same list from the other direction.
+    show:
+      back: TEAM
+      on_case: "on"
+
+  studio:
+    show:
+      eyebrow: studio
+      title: The studio
+      lede: A small Rails studio. The crew below is who is here today — open anyone for their CV and the projects they took part in.
+      cv_link: cv & projects
 
   contact:
     show:

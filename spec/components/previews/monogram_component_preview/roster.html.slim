@@ -1,0 +1,3 @@
+div style="display: flex; gap: 16px; flex-wrap: wrap"
+  - people.each do |person|
+    = render MonogramComponent.of(person, size: 120, ring: :mute)

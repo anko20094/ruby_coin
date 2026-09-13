@@ -56,10 +56,15 @@ describe GemComponent, type: :component do
 
     # A ceiling, not a fixed width: a 400px gem in a one-column grid used to pin the home
     # page's min-content at 400px and push it 61px past a 375px phone.
+    #
+    # max-width rather than min(), because a width computed from a percentage leaves the SVG an
+    # indefinitely-sized replaced element, whose max-content contribution is the 300px an SVG
+    # falls back to. The floating back-to-top button is shrink-to-fit around one of these: it
+    # came out 312px wide and covered the footer's contact links with its invisible half.
     it 'takes its size from the caller as a maximum it may shrink below' do
       render_inline(described_class.new(uid: 'spec', variant: :hero, size: 400))
 
-      expect(page.find('svg')[:style]).to eq('width: min(400px, 100%); height: auto; aspect-ratio: 1')
+      expect(page.find('svg')[:style]).to eq('width: 400px; max-width: 100%; height: auto; aspect-ratio: 1')
     end
   end
 

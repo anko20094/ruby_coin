@@ -20,7 +20,11 @@ module ProseHelper
   # The same string with the markup taken back off, for the places that cannot render it: a
   # <title>, a meta description, an OG card baked to PNG, the text a metric copies to the
   # clipboard. Without this the reader gets "<b>2.14M</b>" in their paste buffer.
+  #
+  # Unescaped, because strip_tags escapes what it keeps and every one of those call sites
+  # escapes again on the way out: a role reading "product & clients" arrived in the browser tab
+  # as "product &amp; clients", and in a share card as "&amp;amp;".
   def plain(value)
-    strip_tags(value.to_s).strip
+    CGI.unescapeHTML(strip_tags(value.to_s)).strip
   end
 end

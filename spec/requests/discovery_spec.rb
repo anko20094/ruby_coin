@@ -35,9 +35,13 @@ describe 'discovery', type: :request do
       expect(response.body).not_to include('<loc>http://www.example.com/en/</loc>')
     end
 
-    it 'leaves out the pages that are redirects' do
-      expect(response.body).not_to include('/studio')
-      expect(response.body).not_to include('/cv<')
+    # /cv and /studio are pages now, and every person has one of their own.
+    it 'lists the pages that used to be redirects, and the roster' do
+      expect(response.body).to include('<loc>http://www.example.com/en/cv</loc>')
+      expect(response.body).to include('<loc>http://www.example.com/en/studio</loc>')
+      expect(response.body).to include('<loc>http://www.example.com/uk/team</loc>')
+      expect(response.body).to include('<loc>http://www.example.com/en/team/danyil</loc>')
+      expect(response.body).to include('<loc>http://www.example.com/en/faq</loc>')
     end
 
     it 'never lists a hidden post' do

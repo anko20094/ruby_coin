@@ -19,7 +19,7 @@
 #
 # The difference between :localised and :rich is only ever about the form. It is here because
 # the admin was giving an editor to every localised field, and the CV screen booted eighty of
-# them for the one field /work actually renders as markup — the rest are escaped, so a bolded
+# them for the one field the CV actually renders as markup — the rest are escaped, so a bolded
 # word would have reached the page as a literal <b>.
 #
 # `fields: nil` means the row *is* one value rather than a hash of them; `row:` says which of

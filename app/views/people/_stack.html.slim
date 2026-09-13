@@ -1,0 +1,13 @@
+section.pf-block.pf-block--stack
+  = render TrackTagComponent.new(label: t('profile.stack'), tone: :soft, heading: :h2)
+  .pf-stack
+    - cv.stack_groups.each do |group|
+      .pf-stack__group
+        .pf-stack__label= group[:label]
+        .rc-chips
+          - group[:items].each do |item|
+            span.rc-chip= item
+  - if cv.strengths.any?
+    .pf-strengths
+      - cv.strengths.each do |strength|
+        .pf-strengths__item= rich(strength)

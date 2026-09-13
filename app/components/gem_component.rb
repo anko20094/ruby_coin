@@ -47,12 +47,17 @@ class GemComponent < ViewComponent::Base
   def glow? = interactive?
   def light = LIGHTS.fetch(variant)
 
-  # The size is a ceiling, not a fixed width. It used to be `width: #{size}px`, and a 400px
-  # hero gem inside a one-column grid pinned that column's min-content at 400px: the home page
-  # was 436px wide on a 375px phone, with the lede clipped mid-word. `min()` keeps the
-  # designed size wherever there is room for it and gives it up where there is not.
+  # The size is a ceiling, not a fixed width: a 400px hero gem inside a one-column grid used to
+  # pin that column's min-content at 400px, and the home page came out 436px wide on a 375px
+  # phone with the lede clipped mid-word.
+  #
+  # `max-width` rather than `min()`, though. A width computed from a percentage makes this a
+  # replaced element of indefinite size, so its max-content contribution is the 300px default an
+  # SVG falls back to — not the 72px it draws at. The floating back-to-top button is shrink-to-
+  # fit around exactly this gem: it came out 312px wide, and the invisible three-quarters of it
+  # covered the footer's contact links.
   def style
-    "width: min(#{size}px, 100%); height: auto; aspect-ratio: 1" if size
+    "width: #{size}px; max-width: 100%; height: auto; aspect-ratio: 1" if size
   end
 
   def facets

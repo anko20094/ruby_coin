@@ -10,13 +10,18 @@ module Search
   class Palette < BaseService
     LIMIT = 8
 
+    # `kind` stays the machine word the tests and any future styling read; `label` is what the
+    # row prints, and it is translated — the badge said PAGE and PERSON on a Ukrainian page.
     Result = Struct.new(:kind, :title, :hint, :url, keyword_init: true) do
-      def as_json(*) = { kind: kind, title: title, hint: hint, url: url }
+      def as_json(*) = { kind: kind, label: I18n.t("global.palette.kinds.#{kind}"), title: title, hint: hint, url: url }
     end
 
     # Case fields are TinyMCE markup. The palette answers in JSON and the browser prints the
-    # result as text, so a bolded word would arrive as a literal <b>.
-    def self.plain(value) = ActionController::Base.helpers.strip_tags(value.to_s).strip
+    # result with textContent, so a bolded word would arrive as a literal <b> — and an escaped
+    # ampersand as a literal &amp;, which is what "cofounder · product & clients" did.
+    def self.plain(value)
+      CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(value.to_s)).strip
+    end
 
     def initialize(query, routes:, locale: I18n.locale)
       @query = query.to_s.strip
@@ -27,7 +32,7 @@ module Search
     def call
       return { query: @query, results: [] } if @query.blank?
 
-      { query: @query, results: (pages + cases + posts).first(LIMIT).map(&:as_json) }
+      { query: @query, results: (pages + people + cases + posts).first(LIMIT).map(&:as_json) }
     end
 
     private
@@ -36,17 +41,55 @@ module Search
 
     # Pages first: someone typing "con" almost always wants /contact, not an article that
     # happens to contain the word.
+    #
+    # Matched on the address as well as the title, because the two do not always share a word:
+    # the CV page is called "Curriculum vitae", and "cv" is what a reader types — it is what the
+    # nav chip and the URL both say.
+    # A row is [what the result reads as, other names the site prints for the same page, path].
+    # The roster's heading is "Who is here" and the footer calls it "the crew"; in Ukrainian both
+    # the footer and the eyebrow call it `команда`, which is the word a reader types.
     def pages
       [
-        [I18n.t('work.nav.journal'), routes.journal_path(locale: locale)],
-        [I18n.t('work.nav.work'), routes.work_path(locale: locale)],
-        [I18n.t('work.nav.contact'), routes.contact_path(locale: locale)],
-        [I18n.t('titles.faq'), routes.faq_path(locale: locale)]
-      ].filter_map do |title, path|
-        next unless title.to_s.downcase.include?(query.downcase)
+        [I18n.t('work.nav.journal'), [], routes.journal_path(locale: locale)],
+        [I18n.t('work.nav.work'), [], routes.work_path(locale: locale)],
+        [I18n.t('work.nav.studio'), [], routes.studio_path(locale: locale)],
+        [
+          I18n.t('team.index.title'), [I18n.t('work.footer.team'), I18n.t('team.index.eyebrow')],
+          routes.team_path(locale: locale)
+        ],
+        [I18n.t('cv.show.title'), [I18n.t('work.nav.cv')], routes.cv_path(locale: locale)],
+        [I18n.t('work.nav.contact'), [], routes.contact_path(locale: locale)],
+        [I18n.t('titles.faq'), [], routes.faq_path(locale: locale)]
+      ].filter_map do |title, aliases, path|
+        next unless matches_page?([title, *aliases], path)
 
         Result.new(kind: 'page', title: title, hint: path, url: path)
       end
+    end
+
+    # The address is the other name every page has, and for /cv it is the only one a reader
+    # would type — the page is called "Curriculum vitae".
+    def matches_page?(names, path)
+      needle = query.downcase
+
+      names.any? { |name| name.to_s.downcase.include?(needle) } ||
+        path.split('/').last.to_s.downcase.include?(needle)
+    end
+
+    # The roster is small enough to filter in memory, and it has to be: it is a YAML file, not
+    # a table. The id is matched as well as the name, so "natalia" finds Наталя on a Ukrainian
+    # page — the names are translated, the ids are not.
+    def people
+      Team.people.select { |person| matches_person?(person) }.map do |person|
+        Result.new(kind: 'person', title: self.class.plain(person.name), hint: self.class.plain(person.role),
+                   url: routes.person_path(person, locale: locale))
+      end
+    end
+
+    def matches_person?(person)
+      needle = query.downcase
+      [self.class.plain(person.name), self.class.plain(person.role), person.id]
+        .compact.any? { |field| field.downcase.include?(needle) }
     end
 
     def cases

@@ -14,8 +14,13 @@ class Case < ApplicationRecord
   include StructuredJson
 
   # Fields that are one string per language.
+  #
+  # year, sector and status are here rather than plain columns because they read as prose:
+  # "2022—present", "publishing · education" and "built from zero · 19 contributors" printed
+  # English into the middle of a Ukrainian case page.
   LOCALISED_SCALARS = %i[
     title tagline role plain_heading engineering_heading engineering_sub scope_note
+    year sector status
   ].freeze
 
   # Structured content, declared once so the model, the admin form and the importer agree on
@@ -23,9 +28,11 @@ class Case < ApplicationRecord
   #
   # Every localised field here is :rich, because app/views/work/show.html.slim prints all of
   # them through ProseHelper#rich — see StructuredJson for what the kinds mean.
+  # A figure is localised too: Ukrainian groups thousands with a space and takes a comma for
+  # the decimal, so "89,030" beside a label reading "86 395 унікальних" said 89.03.
   STRUCTURES = {
-    metrics: { count: 4, fields: { value: :plain, label: :rich } },
-    quality: { count: 4, fields: { value: :plain, label: :rich } },
+    metrics: { count: 4, fields: { value: :localised, label: :rich } },
+    quality: { count: 4, fields: { value: :localised, label: :rich } },
     engineering_items: { count: 6, fields: { title: :rich, body: :rich } },
     plain_body: { count: 3, fields: nil, row: :rich },
     mine: { count: 4, fields: nil, row: :rich }
@@ -42,6 +49,12 @@ class Case < ApplicationRecord
   class << self
     def slugs
       ordered.pluck(:slug)
+    end
+
+    # The year the oldest project here started — what the home page means by "shipping since".
+    # Taken from the content rather than typed into the copy, so it cannot drift from the work.
+    def first_year
+      pluck(:year).filter_map { |year| year.to_s[/\d{4}/] }.min
     end
   end
 
@@ -89,10 +102,15 @@ class Case < ApplicationRecord
 
   private
 
-  # The handoff's editorial rule: never one language alone.
+  # The handoff's editorial rule: never one language alone. A bare string satisfies it — some of
+  # these fields are the same characters in both languages ("2023—2026"), and LocalisedJson
+  # hands a plain string to whichever locale asks.
   def scalars_carry_both_languages
     LOCALISED_SCALARS.each do |field|
-      values = self[field].to_h
+      value = self[field]
+      next if value.is_a?(String) && value.present?
+
+      values = value.to_h
       missing = I18n.available_locales.reject { |locale| values[locale.to_s].present? }
       errors.add(field, :blank) if missing.any?
     end

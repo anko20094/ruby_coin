@@ -1,22 +1,21 @@
 # frozen_string_literal: true
 
-# Sticky site nav: logo · sections · locale. Four sections, per the A+B decision
-# (see redesign_plan.md §2) — cv is gone, it lives inside /work now.
-#
-# A section that is not built yet stays visible — the shape of the site is a decision, not a
-# consequence of build order — but it does not navigate. It used to redirect to /work, which
-# meant two items led to one page and the wrong one lit up.
+# Sticky site nav: logo · sections · CV · ⌘K · locale. Four sections, and the roster is not
+# one of them — /team is reached from /studio, from the foot of every case page and from ⌘K.
 class NavComponent < ViewComponent::Base
-  Section = Struct.new(:key, :path, :built, keyword_init: true) do
+  Section = Struct.new(:key, :path, keyword_init: true) do
     def label = I18n.t("work.nav.#{key}")
-    def built? = built != false
   end
 
   # Which controller lights which section up. The home page is not one of the four sections —
   # the wordmark is the way back to it — so nothing is current there.
-  SECTION_FOR_CONTROLLER = { 'journal' => :journal, 'work' => :work, 'contact' => :contact }.freeze
-
-  # /search is the journal's search, so the journal item stays lit while a reader is on it.
+  #
+  # /search is the journal searching itself and /team is the studio's roster, so each keeps its
+  # parent section lit rather than leaving the reader nowhere on the map.
+  SECTION_FOR_CONTROLLER = {
+    'journal' => :journal, 'work' => :work, 'contact' => :contact,
+    'studio' => :studio, 'team' => :studio
+  }.freeze
 
   # Passed in where the caller knows; derived from the controller otherwise, so
   # the layout stays dumb.
@@ -33,14 +32,28 @@ class NavComponent < ViewComponent::Base
     [
       Section.new(key: :journal, path: helpers.journal_path),
       Section.new(key: :work, path: helpers.work_path),
-      # /studio waits on real team data — the handoff forbids placeholder people.
-      Section.new(key: :studio, path: helpers.studio_path, built: false),
+      Section.new(key: :studio, path: helpers.studio_path),
       Section.new(key: :contact, path: helpers.contact_path)
     ]
   end
 
   def current?(section)
     current_section == section.key
+  end
+
+  # The section is lit for wayfinding: /search is the journal searching itself and /team is the
+  # studio's roster, so each keeps its parent lit. But aria-current="page" is a statement about
+  # the address, and on those two pages it would be a false one — a screen reader would announce
+  # the reader as being on a page they are not on. The highlight stays; the announcement is made
+  # only where it is true.
+  def current_page?(section)
+    helpers.current_page?(section.path)
+  end
+
+  # The CV sits apart from the sections as a chip: it is one person's page on a site that is a
+  # studio's, and it is the thing a recruiter is looking for.
+  def cv_current?
+    helpers.controller_name == 'cv'
   end
 
   def locales

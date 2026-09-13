@@ -183,10 +183,16 @@ $journal-max: 1100px;
   font-family: var(--font-body);
   font-size: 18px;
   padding: 8px 2px;
+  // The one field on the site, and a thumb aims at it.
+  min-height: 38px;
   color: var(--ink);
   background: none;
   border: 0;
   border-bottom: 1px solid var(--ink-mute);
+
+  @media (pointer: coarse) {
+    min-height: 44px;
+  }
 
   &::placeholder { color: var(--ink-quiet); }
 
@@ -211,15 +217,33 @@ $journal-max: 1100px;
   border: 0;
 }
 
+// The radio and its word are one target: a 13px dot beside a 14px label is not something a
+// thumb can choose between. The row grows rather than the text.
 .jn-search__field {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
+  min-height: 32px;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--ink-soft);
 
   input { accent-color: var(--ruby); }
+
+  // The word is the target a thumb goes for, so it is the word that gets the height — the dot
+  // beside it keeps the size the browser draws.
+  label {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    cursor: pointer;
+  }
+
+  @media (pointer: coarse) {
+    min-height: 44px;
+
+    label { min-height: 44px; }
+  }
 }
 
 .jn-search__count { margin-bottom: 12px; }

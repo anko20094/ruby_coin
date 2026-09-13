@@ -28,20 +28,21 @@ describe HomeController, type: :request do
                                        contact_path(locale: 'en'))
     end
 
-    # Nothing in the hero is invented: the eyebrow and the lede are the CV's own words.
-    it 'builds the hero from the CV' do
+    # The hero is the studio speaking, and every number in it is counted rather than typed.
+    it 'counts the projects, the people and the year the oldest project started' do
       get root_path(locale: 'en')
 
-      expect(response.body).to include(CVProfile.current[:name]['en'])
-      expect(response.body).to include(ERB::Util.html_escape(I18n.with_locale(:en) { CVProfile.current.summary }))
+      expect(response.body).to include("#{Case.count} products · #{Team.people.size} of us · shipping since 2022")
     end
 
-    it 'counts the published entries' do
-      create(:post, :inactive)
-
+    it 'carries the headline and both halves of the lede' do
       get root_path(locale: 'en')
 
-      expect(response.body).to include(I18n.t('home.index.entries', count: Post.active.count, locale: :en))
+      expect(response.body).to include(I18n.t('home.index.headline_lead', locale: :en))
+      expect(response.body).to include(I18n.t('home.index.headline_mark', locale: :en))
+      # The sentence a competitor's site will not print, and the reason the good numbers above
+      # it are believable.
+      expect(response.body).to include('outage that lasted eleven hours')
     end
 
     it 'shows the featured post when one is flagged, and the newest otherwise' do
@@ -62,19 +63,33 @@ describe HomeController, type: :request do
       expect(response.body).to include(work_case_path(slug: 'intelligence', locale: 'en'))
     end
 
-    # There is no team data, and the handoff forbids placeholder people, so the crew column the
-    # design drew beside the cards is absent — which is what §4 says to do without it.
-    it 'carries no crew panel and no unconfirmed personal claims' do
+    # The third surface showing the roster, and it reads the same file as /studio and /team.
+    it 'shows the crew, each row linking at that person' do
       get root_path(locale: 'en')
 
-      expect(response.body).not_to include('hm-crew')
-      expect(response.body).not_to include('hm-notwork')
+      expect(response.body.scan('class="hm-crew__row hover-row"').size).to eq(Team.people.size)
+      expect(response.body).to include(person_path('claude', locale: 'en'))
+    end
+
+    it 'counts the humans on the roster separately, because one of them is not' do
+      get root_path(locale: 'en')
+
+      expect(response.body).to include('6 of us · 5 of them human')
+    end
+
+    # It used to be one five-column strip here, attributed to the studio as a whole. A studio
+    # does not play volleyball on Tuesdays — one specific person does.
+    it 'carries no not-work strip: that lives on a person page now' do
+      get root_path(locale: 'en')
+
+      expect(response.body).not_to include('tm-notwork')
     end
 
     it 'renders the Ukrainian copy under the uk locale' do
       get root_path(locale: 'uk')
 
-      expect(response.body).to include(I18n.t('home.index.headline', locale: :uk).first)
+      expect(response.body).to include(I18n.t('home.index.headline_lead', locale: :uk))
+      expect(response.body).to include('нас 6')
     end
   end
 

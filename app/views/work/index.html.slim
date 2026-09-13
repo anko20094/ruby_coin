@@ -1,82 +1,57 @@
 - content_for :title, full_title(t('work.index.title'))
-- page_meta description: @profile.summary, image: "/og/site-#{I18n.locale}.png", type: 'profile'
+- page_meta description: t('work.index.lede'), image: "/og/site-#{I18n.locale}.png"
 
 .wk-index
-  header.wk-index__header
-    .rc-eyebrow= "/#{t('work.index.eyebrow')}"
-    h1.wk-index__title
-      = t('work.index.title')
-      = ' '
-      span.wk-index__mark ·
-    .wk-index__identity= [@profile.name, @profile.role, @profile.years].compact_blank.join(' · ')
+  header.rc-header
+    .rc-header__intro
+      .rc-eyebrow= "/#{t('work.index.eyebrow')} · #{t('counts.projects', count: @cases.size)}"
+      h1.rc-header__title
+        = t('work.index.title')
+        = ' '
+        span.rc-header__mark ·
+      p.rc-header__lede= t('work.index.lede')
+    .rc-header__anchor
+      = render GemComponent.new(uid: 'work-anchor', variant: :anchor, size: 90)
 
-  .wk-index__grid
-    .wk-index__main
-      p.wk-index__summary= @profile.summary
+  / Every card is identical: no featured size, no hero treatment, and no case mark — the order
+  / is a judgement kept by hand in the content, and numbering a hand-ordered list turns it into
+  / a leaderboard that ages badly the first time it is reordered.
+  .wk-projects
+    - @cases.each do |kase|
+      - team = @team_by_slug[kase.slug]
+      = link_to work_case_path(slug: kase.slug), class: 'wk-project hover-row' do
+        .wk-project__meta
+          span.wk-project__sector= "#{kase.sector} · #{kase.year}"
+          .wk-project__flags
+            - if kase.is_this_site?
+              span.wk-project__here
+                span aria-hidden="true" ←
+                = " #{t('work.index.you_are_here')}"
+            - if kase.own?
+              span.wk-project__own= t('work.index.own')
 
-      section.wk-index__section.wk-index__section--projects
-        = render TrackTagComponent.new(label: t('work.index.tracks.projects'), tone: :ruby, heading: :h2)
-        p.wk-index__lede= t('work.index.lede')
-        = render 'work/project_rows', cases: @cases
+        .wk-project__head
+          h2.wk-project__title= rich(kase.title)
+          p.wk-project__tagline= rich(kase.tagline)
 
-      section.wk-index__section.wk-index__section--career
-        = render TrackTagComponent.new(label: t('work.index.tracks.career'), tone: :soft, heading: :h2)
-        .wk-career
-          - @profile.experience.each do |entry|
-            / The cases this entry names, in the order it names them, skipping any that has
-            / since been deleted. Picked out of the list the page already loaded.
-            - entry_cases = entry[:case_slugs].filter_map { |slug| @cases_by_slug[slug] }
-            .wk-career__entry
-              .wk-career__head
-                / A heading, not a div: these are the sections of a CV, and heading navigation
-                / is how a screen-reader user skims one.
-                h3.wk-career__org
-                  = entry[:org]
-                  span.wk-career__title= " · #{entry[:title]}"
-                .wk-career__when
-                  = entry[:period]
-                  br
-                  = entry[:place]
-              - if entry[:note].present?
-                .wk-career__note= entry[:note]
-              - if entry[:body].present?
-                .wk-career__body= rich(entry[:body])
-              - if entry_cases.any?
-                .wk-career__cases
-                  - entry_cases.each do |kase|
-                    = link_to work_case_path(slug: kase.slug), class: 'rc-chip rc-chip--link hover-link' do
-                      = "#{kase.mark} #{plain(kase.title)} "
-                      span aria-hidden="true" →
+        .wk-project__stack
+          .rc-chips
+            - kase.stack.first(TeamHelper::STACK_CHIPS).each do |item|
+              span.rc-chip.rc-chip--sm= item
+            - if kase.stack.size > TeamHelper::STACK_CHIPS
+              span.wk-project__more= "+#{kase.stack.size - TeamHelper::STACK_CHIPS}"
 
-      section.wk-index__section.wk-index__section--stack
-        = render TrackTagComponent.new(label: t('work.index.tracks.stack'), tone: :soft, heading: :h2)
-        .wk-stack
-          - @profile.stack_groups.each do |group|
-            .wk-stack__group
-              .wk-stack__label= group[:label]
-              .rc-chips
-                - group[:items].each do |item|
-                  span.rc-chip= item
-        .wk-strengths
-          - @profile.strengths.each do |strength|
-            .wk-strengths__item= strength
-
-    aside.wk-index__aside
-      - if @profile.portrait
-        .wk-portrait= image_tag @profile.portrait, alt: @profile.name
-      #contact.wk-contact
-        .wk-contact__label.is-ruby= t('work.index.contact')
-        - @profile.contact_rows.each do |key, label, href|
-          .wk-contact__row
-            span.wk-contact__key= key
-            = link_to label, href, class: 'wk-contact__value', target: '_blank', rel: 'noreferrer'
-        .wk-contact__label= t('work.index.location')
-        div= @profile.location
-        .wk-contact__label= t('work.index.languages')
-        div= @profile.languages
-        .wk-contact__label= t('work.index.education')
-        div= @profile.education
-      .wk-index__footnote
-        = "#{t('work.index.figures')} · #{@profile.figures_as_of}"
-        br
-        = t('work.index.both_halves')
+        .wk-project__foot
+          .wk-project__metric
+            - headline = kase.metrics.first
+            - if headline.present?
+              .wk-project__metric-value.num= rich(headline[:value])
+              .wk-project__metric-label= rich(headline[:label])
+          / A case can be added in the admin before anyone is credited for it in team.yml, and
+          / the card then said "0 contributors". Saying nothing is the honest version.
+          - if team.any?
+            .wk-project__who
+              .wk-project__faces
+                - team.first(TeamHelper::FACES).each do |contribution|
+                  = render MonogramComponent.of(contribution.person, size: 26, ring: :paper)
+              span.wk-project__count= team_size_label(team)

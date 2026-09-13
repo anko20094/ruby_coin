@@ -18,9 +18,11 @@ module JournalHelper
     Rouge::Formatters::HTML.new.format(lexer.new.lex(source)).html_safe # rubocop:disable Rails/OutputSafety -- Rouge escapes its input
   end
 
-  def journal_byline(post)
+  # `tags: false` where the page draws them as chips of their own — the home page's latest
+  # entry did both, and printed the same three tags twice ten pixels apart.
+  def journal_byline(post, tags: true)
     parts = [post.user&.nickname, t('journal.minutes', count: post.reading_minutes)]
-    parts << post.tags.map { |tag| "##{tag.title}" }.join(' ') if post.tags.any?
+    parts << post.tags.map { |tag| "##{tag.title}" }.join(' ') if tags && post.tags.any?
     parts.compact_blank.join(' · ')
   end
 
@@ -28,6 +30,13 @@ module JournalHelper
   # correct and the cheapest thing that can work.
   def journal_chip_class(active:)
     ['rc-chip', 'rc-chip--filter', ('is-active' if active)].compact.join(' ')
+  end
+
+  # The chosen chip was filled in ink and said nothing else, so which filter is on was a fact
+  # only a sighted reader had. `true` rather than `page`: these are items in a set, and the
+  # address they point at is the page the reader is already on.
+  def journal_chip_attributes(active:)
+    { class: journal_chip_class(active: active), aria: { current: ('true' if active) } }
   end
 
   private

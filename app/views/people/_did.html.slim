@@ -1,0 +1,6 @@
+/ Two lines per contribution, marked with an 8×1px ruby bar rather than a bullet glyph.
+- dense = local_assigns.fetch(:dense, false)
+
+ul class=('pf-did' + (dense ? ' pf-did--dense' : ''))
+  - lines.each do |line|
+    li.pf-did__item= rich(line)

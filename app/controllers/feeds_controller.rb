@@ -16,8 +16,10 @@ class FeedsController < ApplicationController
     @pages = sitemap_pages
     @posts = Post.active.limit(200).to_a
     @cases = Case.ordered.to_a
+    @people = Team.people
 
-    return unless stale?(etag: [@posts.map(&:updated_at).max, @cases.map(&:updated_at).max], public: true)
+    return unless stale?(etag: [@posts.map(&:updated_at).max, @cases.map(&:updated_at).max, Team.version],
+                         public: true)
 
     expires_in 1.hour, public: true
     render formats: :xml
@@ -40,11 +42,11 @@ class FeedsController < ApplicationController
 
   private
 
-  # The static pages, by route name. /studio is deliberately absent: it is a 302 to /work until
-  # there is a crew to put on it, and a sitemap that names redirects is a sitemap that teaches
-  # a crawler to distrust it.
+  # The static pages, by route name. /search stays out of robots.txt but in here: it is the
+  # address the palette points at, and a crawler told not to crawl it still benefits from
+  # knowing it exists.
   def sitemap_pages
-    %i[root journal work contact search].map { |name| public_send(:"#{name}_path", locale: nil) }
+    %i[root journal work team cv studio contact faq search].map { |name| public_send(:"#{name}_path", locale: nil) }
   end
 
   def robots_body

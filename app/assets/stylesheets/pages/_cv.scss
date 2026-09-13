@@ -1,0 +1,161 @@
+@use '../theme/controls';
+
+// /cv — the hiring page. The same document as /team/danyil (theme/_profile.scss holds what
+// they share); what is here is the frame around it and the compact project list.
+.cv-page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 56px var(--page-pad) 20px;
+}
+
+.cv-page__identity {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.cv-page__print {
+  // The only control on the page besides the navigation, and it was a 15px text box.
+  @include controls.hit-row(32px);
+
+  font: inherit;
+  color: var(--ruby);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ruby);
+  padding: 0 2px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { color: var(--ruby-bright); }
+}
+
+.cv-page__lede {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  max-width: 640px;
+  margin: 12px 0 18px;
+}
+
+// ── the compact project list ───────────────────────────────
+// Beside a career the mark reads as an index, which is why it is printed here and nowhere on
+// the /work cards.
+.cv-rows { border-top: var(--rule-strong); }
+
+.cv-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 152px;
+  gap: 18px;
+  align-items: start;
+  padding: 20px 8px;
+  border-bottom: var(--rule-row);
+}
+
+.cv-row__mark {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ruby);
+  font-style: italic;
+  padding-top: 8px;
+}
+
+.cv-row__body { min-width: 0; }
+
+.cv-row__titles {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.cv-row__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.24;
+  margin: 0;
+}
+
+.cv-row__own {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ruby);
+  letter-spacing: 1px;
+  border: 1px solid color-mix(in oklab, var(--ruby) 27%, transparent);
+  border-radius: var(--radius-chip-sm);
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
+.cv-row__here {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.cv-row__tagline {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  color: var(--ink-soft);
+  margin-top: 5px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.cv-row__meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+  margin-top: 7px;
+}
+
+.cv-row__metric {
+  min-width: 0;
+  text-align: right;
+}
+
+.cv-row__metric-value {
+  font-size: 21px;
+  line-height: 1.1;
+}
+
+.cv-row__metric-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-quiet);
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .cv-page { padding: 36px var(--page-pad) 20px; }
+
+  .cv-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .cv-row__metric {
+    grid-column: 2;
+    text-align: left;
+    margin-top: 7px;
+  }
+
+  .cv-row__title { font-size: 24px; }
+
+  .pf-career__head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .pf-career__when { text-align: left; }
+}

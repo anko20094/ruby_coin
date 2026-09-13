@@ -28,6 +28,12 @@ export default class extends Controller {
     this.toggleTarget.setAttribute("aria-expanded", "true")
     document.body.classList.add("is-nav-open")
     this.drawerTarget.querySelector("a")?.focus()
+
+    // The panel covers the page, so Tab must not walk out of it into controls nobody can see.
+    // A focusin guard rather than a Tab handler: it catches every way focus can move, including
+    // Shift+Tab and a screen reader's own navigation.
+    this.onFocusIn = (event) => this.keepFocusInside(event)
+    document.addEventListener("focusin", this.onFocusIn)
   }
 
   close() {
@@ -35,6 +41,17 @@ export default class extends Controller {
     this.element.classList.remove("is-open")
     this.toggleTarget?.setAttribute("aria-expanded", "false")
     document.body.classList.remove("is-nav-open")
+
+    if (this.onFocusIn) document.removeEventListener("focusin", this.onFocusIn)
+    this.onFocusIn = null
+  }
+
+  // The toggle counts as inside: while the drawer is open it is the close button.
+  keepFocusInside(event) {
+    if (!this.open) return
+    if (this.drawerTarget.contains(event.target) || this.toggleTarget.contains(event.target)) return
+
+    this.drawerTarget.querySelector("a, button")?.focus()
   }
 
   escape(event) {
@@ -43,8 +60,14 @@ export default class extends Controller {
     this.toggleTarget.focus()
   }
 
+  // A tap outside dismisses the menu and does nothing else. Without preventDefault the same
+  // tap also followed whatever link sat under it, so closing the menu navigated you away.
   outside(event) {
     if (!this.open || this.element.contains(event.target)) return
+
+    event.preventDefault()
+    event.stopPropagation()
     this.close()
+    this.toggleTarget?.focus()
   }
 }

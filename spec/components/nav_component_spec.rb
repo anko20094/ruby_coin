@@ -12,10 +12,34 @@ describe NavComponent, type: :component do
     end
   end
 
-  it "carries the redesign's four sections and no cv" do
+  it "carries the redesign's four sections" do
     render_in(:en)
 
     expect(page.all('.rc-nav__link').map { |link| link.text.split.first }).to eq(%w[journal work studio contact])
+  end
+
+  # Every section is a link now: /studio waited on real team data, and the roster arrived.
+  it 'lets every section navigate' do
+    render_in(:en)
+
+    expect(page.all('.rc-nav__link').map(&:tag_name)).to all(eq('a'))
+    expect(page).to have_css("a[href='/en/studio']")
+  end
+
+  # The roster is deliberately not a fifth item — it is reached from /studio, the footer, every
+  # case page and ⌘K — so being on it keeps the studio lit rather than lighting nothing.
+  it 'keeps the studio marked while the reader is in the roster' do
+    render_in(:en, current: :studio)
+
+    expect(page.find('.rc-nav__link.is-current').text).to eq('studio')
+  end
+
+  # One person's page on a site that is a studio's, and the thing a recruiter arrives for.
+  it 'offers the CV as a chip beside the sections' do
+    render_in(:en)
+
+    expect(page).to have_css("a.rc-nav__cv[href='/en/cv']", text: 'CV')
+    expect(page.all('.rc-nav__link').map(&:text)).not_to include('CV')
   end
 
   it 'translates the sections' do
@@ -25,17 +49,23 @@ describe NavComponent, type: :component do
       .to eq(%w[журнал роботи студія контакти])
   end
 
-  # /studio has nowhere to go until there is team data. It used to redirect to /work, which
-  # meant two items in this nav led to the same page and the wrong one lit up.
-  it 'keeps an unbuilt section in its place without letting it navigate' do
-    render_in(:en)
+  # The highlight is wayfinding; aria-current="page" is a claim about the address. On /team the
+  # studio is lit, and telling a screen reader the reader is on the studio page would be a lie.
+  it 'announces the current page only where the link is the page' do
+    I18n.with_locale(:en) do
+      with_request_url '/en/team' do
+        render_inline(described_class.new(current: :studio))
+      end
+    end
 
-    studio = page.all('.rc-nav__link')[2]
+    expect(page.find('.rc-nav__link.is-current').text).to eq('studio')
+    expect(page).to have_no_css('.rc-nav__link[aria-current]')
+  end
 
-    expect(studio.tag_name).to eq('span')
-    expect(studio[:class]).to include('is-soon')
-    expect(studio).to have_css('.rc-nav__soon')
-    expect(page).to have_no_css("a[href='/en/studio']")
+  it 'announces it on the page itself' do
+    render_in(:en, current: :work)
+
+    expect(page.find("a[aria-current='page']").text).to eq('work')
   end
 
   it 'marks the current section' do

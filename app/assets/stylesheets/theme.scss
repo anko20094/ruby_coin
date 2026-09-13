@@ -5,13 +5,15 @@
 // pages. Both entries live side by side until the last page moves over; see
 // redesign_plan.md §4.1 for why Bootstrap cannot leave before the admin does.
 //
-// theme/  — the design system: tokens, faces, reset, shared components, chrome.
-// pages/  — one file per screen, prefixed wk- (work), jn- (journal), and so on.
+// theme/  — the design system: tokens, faces, reset, shared components, chrome, and the
+//            profile blocks /cv and /team/:person both render.
+// pages/  — one file per screen, prefixed wk- (work), jn- (journal), tm- (team), and so on.
 
 @use 'theme/tokens';
 @use 'theme/fonts';
 @use 'theme/base';
 @use 'theme/components';
+@use 'theme/profile';
 @use 'theme/chrome';
 
 @use 'pages/home';
@@ -27,6 +29,10 @@
 @use 'pages/work_index';
 @use 'pages/work_case';
 @use 'pages/work_responsive';
+
+@use 'pages/cv';
+@use 'pages/team';
+@use 'pages/studio';
 
 // Last on purpose: the print rules override page layout, and at equal specificity the last
 // declaration wins. Loaded any earlier, pages/_work_index.scss put the sticky sidebar back.

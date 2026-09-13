@@ -1,0 +1,32 @@
+- content_for :title, full_title(t('team.index.title'))
+- page_meta description: t('team.index.lede')
+
+.tm-index
+  header.rc-header
+    .rc-header__intro
+      .rc-eyebrow= "/#{t('team.index.eyebrow')} · #{@people.size}"
+      h1.rc-header__title
+        = t('team.index.title')
+        = ' '
+        span.rc-header__mark ·
+      p.rc-header__lede= t('team.index.lede')
+    .rc-header__anchor
+      = render GemComponent.new(uid: 'team-anchor', variant: :anchor, size: 90)
+
+  .tm-cards
+    - @people.each do |person|
+      = link_to person_path(person), class: 'tm-card hover-row' do
+        = render MonogramComponent.of(person, size: 76, ring: :mute)
+        .tm-card__body
+          / The name keeps its own line: it wraps at this width, and a chip on the same
+          / baseline collides with the second line.
+          h2.tm-card__name= person.name
+          .tm-card__meta
+            span.tm-card__role= person.role
+            / Dashed means unfinished, and it is the same signal the pending CV panel uses.
+            - if person.placeholder?
+              span.tm-card__chip.is-placeholder= t('profile.placeholder_chip')
+            - elsif person.draft?
+              span.tm-card__chip= t('profile.draft')
+          p.tm-card__blurb= rich(person.blurb)
+          .tm-card__count= t('counts.projects', count: person.contributions(order: @order).size)

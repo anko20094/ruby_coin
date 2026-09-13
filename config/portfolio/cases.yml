@@ -8,9 +8,15 @@ cases:
   - slug: "intelligence"
     mark: "01"
     own: false
-    year: "2023—2026"
-    sector: "proptech · usa"
-    status: "commercial · team of 15"
+    year:
+      en: "2023—2026"
+      uk: "2023—2026"
+    sector:
+      en: "proptech · usa"
+      uk: "proptech · сша"
+    status:
+      en: "commercial · team of 15"
+      uk: "комерційний · команда з 15"
     title:
       en: "myHomeIQ · Intelligence"
       uk: "myHomeIQ · Intelligence"
@@ -29,19 +35,27 @@ cases:
       - "Sidekiq · Redis"
       - "RSpec · VCR · rswag"
     metrics:
-      - value: "295"
+      - value:
+          en: "295"
+          uk: "295"
         label:
           en: "commits merged to mainline — 20% of the repository"
           uk: "комітів у мейнлайні — 20% репозиторію"
-      - value: "#2 / 15"
+      - value:
+          en: "#2 / 15"
+          uk: "#2 / 15"
         label:
           en: "contributors · 33 active months out of 34"
           uk: "контриб’юторів · 33 активні місяці з 34"
-      - value: "64"
+      - value:
+          en: "64"
+          uk: "64"
         label:
           en: "schema migrations — 22.5% of all in the repo"
           uk: "міграції схеми — 22.5% усіх у репо"
-      - value: "20.5%"
+      - value:
+          en: "20.5%"
+          uk: "20,5%"
         label:
           en: "of the live application code is still mine"
           uk: "живого коду застосунку досі мій"
@@ -110,19 +124,27 @@ cases:
             en: "External move-probability scoring behind my own <code>Pipelines / Providers / Sources</code> abstraction, backfilled in the background, then exposed as dashboard filters and sorting. Outside production the provider is swapped for a random one, so the paid quota is never burned by a test run."
             uk: "Зовнішній скоринг імовірності переїзду за власною абстракцією <code>Pipelines / Providers / Sources</code>, фонове довантаження, далі — фільтри й сортування в дашборді. Поза продакшном провайдер підмінений на випадковий, тож платна квота не згорає на тестових прогонах."
     quality:
-      - value: "272"
+      - value:
+          en: "272"
+          uk: "272"
         label:
           en: "pull requests merged"
           uk: "змерджених PR"
-      - value: "184"
+      - value:
+          en: "184"
+          uk: "184"
         label:
           en: "tickets closed end to end"
           uk: "тікетів закрито наскрізно"
-      - value: "91.9%"
+      - value:
+          en: "91.9%"
+          uk: "91,9%"
         label:
           en: "of my PRs touch specs"
           uk: "моїх PR чіпають тести"
-      - value: "62"
+      - value:
+          en: "62"
+          uk: "62"
         label:
           en: "documented API operations"
           uk: "документованих API-операцій"
@@ -132,9 +154,15 @@ cases:
   - slug: "dna"
     mark: "02"
     own: true
-    year: "2023—2026"
-    sector: "content automation"
-    status: "built from zero · team up to 6"
+    year:
+      en: "2023—2026"
+      uk: "2023—2026"
+    sector:
+      en: "content automation"
+      uk: "автоматизація контенту"
+    status:
+      en: "built from zero · team up to 6"
+      uk: "з нуля · команда до 6"
     title:
       en: "DNA"
       uk: "DNA"
@@ -153,19 +181,27 @@ cases:
       - "pgbouncer"
       - "systemd · Capistrano"
     metrics:
-      - value: "33.8M"
+      - value:
+          en: "33.8M"
+          uk: "33,8 млн"
         label:
           en: "combined reach of managed channels"
           uk: "сукупний охват керованих каналів"
-      - value: "10,418"
+      - value:
+          en: "10,418"
+          uk: "10 418"
         label:
           en: "paying platform customers"
           uk: "платних клієнтів платформи"
-      - value: "~23k"
+      - value:
+          en: "~23k"
+          uk: "~23 тис."
         label:
           en: "posts through the pipeline daily"
           uk: "постів через пайплайн щодня"
-      - value: "×20"
+      - value:
+          en: "×20"
+          uk: "×20"
         label:
           en: "customer growth in 14 months"
           uk: "зростання клієнтів за 14 місяців"
@@ -234,19 +270,27 @@ cases:
             en: "8,289 RSpec examples, tests-to-code 1.75:1, three custom RuboCop cops, strict loading on by default, and an automated AI review of every PR against a 13-point checklist."
             uk: "8 289 прикладів RSpec, тестів до коду 1.75:1, три власні RuboCop-копи, strict loading увімкнений за замовчуванням і автоматичне AI-рев’ю кожного PR за чеклистом із 13 пунктів."
     quality:
-      - value: "429"
+      - value:
+          en: "429"
+          uk: "429"
         label:
           en: "deploys"
           uk: "деплоїв"
-      - value: "1,245"
+      - value:
+          en: "1,245"
+          uk: "1 245"
         label:
           en: "tickets · 6,840 h logged"
           uk: "тікетів · 6 840 год залоговано"
-      - value: "90%"
+      - value:
+          en: "90%"
+          uk: "90%"
         label:
           en: "of merge commits"
           uk: "merge-комітів"
-      - value: "46"
+      - value:
+          en: "46"
+          uk: "46"
         label:
           en: "custom monitoring checks"
           uk: "власних перевірок моніторингу"
@@ -256,9 +300,15 @@ cases:
   - slug: "wardybot"
     mark: "03"
     own: true
-    year: "2023—present"
-    sector: "community platform"
-    status: "built from zero · team up to 14"
+    year:
+      en: "2023—present"
+      uk: "2023—дотепер"
+    sector:
+      en: "community platform"
+      uk: "платформа спільнот"
+    status:
+      en: "built from zero · team up to 14"
+      uk: "з нуля · команда до 14"
     title:
       en: "WardyBot"
       uk: "WardyBot"
@@ -276,19 +326,27 @@ cases:
       - "Vue 3 · TypeScript · Inertia"
       - "OpenRouter · OpenAI"
     metrics:
-      - value: "2.14M"
+      - value:
+          en: "2.14M"
+          uk: "2,14 млн"
         label:
           en: "users across 2,488 chats"
           uk: "користувачів у 2 488 чатах"
-      - value: "22.9M"
+      - value:
+          en: "22.9M"
+          uk: "22,9 млн"
         label:
           en: "messages processed, peak 52k/day"
           uk: "оброблених повідомлень, пік 52 тис./день"
-      - value: "×5.7"
+      - value:
+          en: "×5.7"
+          uk: "×5,7"
         label:
           en: "growth in 11 months, same hardware"
           uk: "зростання за 11 місяців, те саме залізо"
-      - value: "982"
+      - value:
+          en: "982"
+          uk: "982"
         label:
           en: "days in production, uninterrupted"
           uk: "днів у продакшні, без перерв"
@@ -357,19 +415,27 @@ cases:
             en: "Quote rendering lives in another service, in another language, on another server: request-reply over <b>federated RabbitMQ queues</b> with zlib+base64 transport. Upstream inference cost is read out of the provider response and converted into internal tokens, so pricing tracks the market instead of a hardcoded guess. Telegram file ids cached in Redis under versioned keys removed the most expensive part of outbound traffic."
             uk: "Рендер цитат живе в іншому сервісі, іншою мовою, на іншому сервері: request-reply через <b>федеровані черги RabbitMQ</b> з транспортом zlib+base64. Собівартість інференсу читається з відповіді провайдера й конвертується у внутрішні токени — ціна їде за ринком, а не за хардкодом. Кешування Telegram file id у Redis під версійованими ключами прибрало найдорожчу частину вихідного трафіку."
     quality:
-      - value: "196"
+      - value:
+          en: "196"
+          uk: "196"
         label:
           en: "zero-downtime deploys"
           uk: "деплоїв без простою"
-      - value: "2.2:1"
+      - value:
+          en: "2.2:1"
+          uk: "2,2:1"
         label:
           en: "tests to code · 5,130 examples"
           uk: "тестів до коду · 5 130 прикладів"
-      - value: "2.9 GB"
+      - value:
+          en: "2.9 GB"
+          uk: "2,9 ГБ"
         label:
           en: "database at 2.14M users"
           uk: "база при 2,14 млн юзерів"
-      - value: "2 / 3.8"
+      - value:
+          en: "2 / 3.8"
+          uk: "2 / 3,8"
         label:
           en: "vCPU / GB — the whole box"
           uk: "vCPU / ГБ — увесь сервер"
@@ -379,9 +445,15 @@ cases:
   - slug: "leads"
     mark: "04"
     own: false
-    year: "2022—2025"
-    sector: "proptech · usa"
-    status: "commercial · 38 contributors"
+    year:
+      en: "2022—2025"
+      uk: "2022—2025"
+    sector:
+      en: "proptech · usa"
+      uk: "proptech · сша"
+    status:
+      en: "commercial · 38 contributors"
+      uk: "комерційний · 38 контриб’юторів"
     title:
       en: "myHomeIQ · Leads"
       uk: "myHomeIQ · Leads"
@@ -400,19 +472,27 @@ cases:
       - "rswag / OpenAPI"
       - "RSpec · VCR"
     metrics:
-      - value: "486"
+      - value:
+          en: "486"
+          uk: "486"
         label:
           en: "public API operations across 426 paths"
           uk: "публічних API-операцій на 426 шляхах"
-      - value: "193"
+      - value:
+          en: "193"
+          uk: "193"
         label:
           en: "commits merged · 140 pull requests"
           uk: "комітів змерджено · 140 PR"
-      - value: "110"
+      - value:
+          en: "110"
+          uk: "110"
         label:
           en: "Jira tickets closed end to end"
           uk: "Jira-тікетів закрито наскрізно"
-      - value: "9×9"
+      - value:
+          en: "9×9"
+          uk: "9×9"
         label:
           en: "roles × plans in the permission matrix"
           uk: "ролей × планів у матриці прав"
@@ -481,19 +561,27 @@ cases:
             en: "Affordability calculator and seller-commission APIs taken <code>controller → interactor → service → serializer → validator → Swagger → five spec files</code>. Combined partnerships with a custom query object; HELOC/HELOAN loan types; round-robin lead distribution for agent + lender pairs. rswag generates the spec from request specs, so no endpoint of mine shipped undocumented."
             uk: "API калькулятора доступності й комісії продавця, зроблені як <code>контролер → інтерактор → сервіс → серіалізатор → валідатор → Swagger → п’ять файлів тестів</code>. Комбіновані партнерства з власним query-об’єктом; типи позик HELOC/HELOAN; round-robin розподіл лідів для пар агент + лендер. rswag генерує специфікацію з request-тестів, тож жоден мій ендпоінт не пішов без документації."
     quality:
-      - value: "2,324"
+      - value:
+          en: "2,324"
+          uk: "2 324"
         label:
           en: "spec files in the repo"
           uk: "файлів тестів у репо"
-      - value: "8"
+      - value:
+          en: "8"
+          uk: "8"
         label:
           en: "Swagger specifications"
           uk: "Swagger-специфікацій"
-      - value: "6,256"
+      - value:
+          en: "6,256"
+          uk: "6 256"
         label:
           en: "lines · my largest commit"
           uk: "рядків · мій найбільший коміт"
-      - value: "100%"
+      - value:
+          en: "100%"
+          uk: "100%"
         label:
           en: "of my endpoints documented"
           uk: "моїх ендпоінтів з документацією"
@@ -503,9 +591,15 @@ cases:
   - slug: "imagemaker"
     mark: "05"
     own: true
-    year: "2022—present"
-    sector: "render service"
-    status: "built from zero · team of 6 · 4 years live"
+    year:
+      en: "2022—present"
+      uk: "2022—дотепер"
+    sector:
+      en: "render service"
+      uk: "сервіс рендеру"
+    status:
+      en: "built from zero · team of 6 · 4 years live"
+      uk: "з нуля · команда з 6 · 4 роки в проді"
     title:
       en: "ImageMaker"
       uk: "ImageMaker"
@@ -523,19 +617,27 @@ cases:
       - "OpenRouter"
       - "jemalloc · systemd"
     metrics:
-      - value: "430k"
+      - value:
+          en: "430k"
+          uk: "430 тис."
         label:
           en: "users in 10,471 chats"
           uk: "користувачів у 10 471 чаті"
-      - value: "225,667"
+      - value:
+          en: "225,667"
+          uk: "225 667"
         label:
           en: "images rendered, peak 1,368/day"
           uk: "зображень відрендерено, пік 1 368/день"
-      - value: "2"
+      - value:
+          en: "2"
+          uk: "2"
         label:
           en: "products served by one codebase"
           uk: "продукти на одній кодовій базі"
-      - value: "$12"
+      - value:
+          en: "$12"
+          uk: "$12"
         label:
           en: "per month of hosting, all in"
           uk: "на місяць хостингу, разом з усім"
@@ -604,19 +706,27 @@ cases:
             en: "Telegram entities become Pango markup: filtered by intersection with the quoted fragment, applied <b>in reverse order</b> so tag insertion doesn’t shift later indices, then escaped in three passes. Forwards, hidden senders, channel and supergroup posts, anonymous admins and service bots each resolve differently — with a fallback chain down to one of 17 placeholder avatars and a circular crop drawn as a mask."
             uk: "Ентіті Telegram перетворюються в Pango-розмітку: фільтруються перетином із цитованим фрагментом, застосовуються <b>у зворотному порядку</b>, щоб вставка тегів не зсувала наступні індекси, далі — екранування в три проходи. Форварди, приховані відправники, пости каналів і супергруп, анонімні адміни й сервісні боти визначаються по-різному — з ланцюжком фолбеків аж до одного з 17 плейсхолдер-аватарів і круглим кропом через маску."
     quality:
-      - value: "+118,257"
+      - value:
+          en: "+118,257"
+          uk: "+118 257"
         label:
           en: "users in the last year"
           uk: "користувачів за рік"
-      - value: "0"
+      - value:
+          en: "0"
+          uk: "0"
         label:
           en: "OOM kills after tuning"
           uk: "OOM-кілів після тюнінгу"
-      - value: "18,501"
+      - value:
+          en: "18,501"
+          uk: "18 501"
         label:
           en: "largest chat"
           uk: "найбільший чат"
-      - value: "179"
+      - value:
+          en: "179"
+          uk: "179"
         label:
           en: "examples · VCR-backed CI"
           uk: "прикладів · CI на VCR"
@@ -626,9 +736,15 @@ cases:
   - slug: "chatgpt"
     mark: "06"
     own: true
-    year: "2023—present"
-    sector: "ai assistant"
-    status: "built from zero · technical lead & co-founder"
+    year:
+      en: "2023—present"
+      uk: "2023—дотепер"
+    sector:
+      en: "ai assistant"
+      uk: "ai-асистент"
+    status:
+      en: "built from zero · technical lead & co-founder"
+      uk: "з нуля · технічний лід і співзасновник"
     title:
       en: "ChatGPT Bot"
       uk: "ChatGPT Bot"
@@ -646,19 +762,27 @@ cases:
       - "Fondy recurring"
       - "Capistrano"
     metrics:
-      - value: "289k"
+      - value:
+          en: "289k"
+          uk: "289 тис."
         label:
           en: "users"
           uk: "користувачів"
-      - value: "873k"
+      - value:
+          en: "873k"
+          uk: "873 тис."
         label:
           en: "AI responses across 219k sessions"
           uk: "AI-відповідей у 219 тис. сесій"
-      - value: "15k"
+      - value:
+          en: "15k"
+          uk: "15 тис."
         label:
           en: "paid orders, recurring"
           uk: "платних замовлень, з автопродовженням"
-      - value: "222k"
+      - value:
+          en: "222k"
+          uk: "222 тис."
         label:
           en: "referral events paid out"
           uk: "реферальних подій виплачено"
@@ -727,19 +851,27 @@ cases:
             en: "Sidekiq tuned to <b>300 workers</b> to hold peak traffic, since most of the work is waiting on an upstream API rather than burning CPU. Plus an admin panel for statistics, broadcasts, bans and the admin roster — so running the product does not require a console."
             uk: "Sidekiq налаштований на <b>300 воркерів</b>, щоб тримати піки — бо більшість роботи це очікування зовнішнього API, а не CPU. Плюс адмінка для статистики, розсилок, банів і складу адмінів — щоб вести продукт без консолі."
     quality:
-      - value: "873k"
+      - value:
+          en: "873k"
+          uk: "873 тис."
         label:
           en: "AI responses served"
           uk: "AI-відповідей віддано"
-      - value: "300"
+      - value:
+          en: "300"
+          uk: "300"
         label:
           en: "Sidekiq concurrency"
           uk: "конкурентність Sidekiq"
-      - value: "7s"
+      - value:
+          en: "7s"
+          uk: "7 с"
         label:
           en: "typing ping interval"
           uk: "інтервал пінгу набору"
-      - value: "3+"
+      - value:
+          en: "3+"
+          uk: "3+"
         label:
           en: "years in production"
           uk: "роки в продакшні"
@@ -749,9 +881,15 @@ cases:
   - slug: "rubycoin"
     mark: "07"
     own: true
-    year: "2022—present"
-    sector: "publishing · education"
-    status: "built from zero · 19 contributors"
+    year:
+      en: "2022—present"
+      uk: "2022—дотепер"
+    sector:
+      en: "publishing · education"
+      uk: "видання · освіта"
+    status:
+      en: "built from zero · 19 contributors"
+      uk: "з нуля · 19 контриб’юторів"
     title:
       en: "RubyCoin"
       uk: "RubyCoin"
@@ -769,19 +907,27 @@ cases:
       - "pg_search · Globalize"
       - "Ahoy · OpenAI"
     metrics:
-      - value: "89,030"
+      - value:
+          en: "89,030"
+          uk: "89 030"
         label:
           en: "visits · 86,395 unique visitors"
           uk: "візитів · 86 395 унікальних"
-      - value: "31k"
+      - value:
+          en: "31k"
+          uk: "31 тис."
         label:
           en: "visits in 7.5 months of 2026, vs 24.8k in all of 2025"
           uk: "візитів за 7,5 міс. 2026 проти 24,8 тис. за весь 2025"
-      - value: "19"
+      - value:
+          en: "19"
+          uk: "19"
         label:
           en: "contributors led through review"
           uk: "контриб’юторів проведено через рев’ю"
-      - value: "76ms"
+      - value:
+          en: "76ms"
+          uk: "76 мс"
         label:
           en: "home page render, 53 MB resident"
           uk: "рендер головної, 53 МБ resident"
@@ -850,19 +996,27 @@ cases:
             en: "Carried live through <b>Rails 7.0 → 8.1, Ruby 3.2 → 3.4, Sprockets/Webpacker → Propshaft + esbuild</b>, and the removal of the admin framework in favour of a custom panel. <b>Turbo Drive is deliberately off</b> — frames and streams applied where they earn it, not by default."
             uk: "Проведений живим через <b>Rails 7.0 → 8.1, Ruby 3.2 → 3.4, Sprockets/Webpacker → Propshaft + esbuild</b> і зняття адмін-фреймворку на користь власної панелі. <b>Turbo Drive свідомо вимкнений</b> — фрейми й стріми застосовані там, де вони себе виправдовують, а не за замовчуванням."
     quality:
-      - value: "608"
+      - value:
+          en: "608"
+          uk: "608"
         label:
           en: "commits"
           uk: "комітів"
-      - value: "19"
+      - value:
+          en: "19"
+          uk: "19"
         label:
           en: "contributors reviewed"
           uk: "контриб’юторів на рев’ю"
-      - value: "53 MB"
+      - value:
+          en: "53 MB"
+          uk: "53 МБ"
         label:
           en: "resident memory"
           uk: "resident-пам’ять"
-      - value: "4"
+      - value:
+          en: "4"
+          uk: "4"
         label:
           en: "slow responses in 7 days"
           uk: "повільні відповіді за 7 днів"

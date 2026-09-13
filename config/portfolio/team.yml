@@ -1,0 +1,245 @@
+# RubyCoin · who worked on what
+#
+# A contribution belongs to the PROJECT, not to the person — that is why it lives here
+# and not in people.yml. The person page is composed by querying this file for their id,
+# so a contribution is written once and can never drift between two pages.
+#
+# Keys are case slugs from cases.yml. `person` is an id from people.yml.
+#
+# `solo: true` renders as a statement ("Solo — the whole stack"), never as an empty team
+# block. Only the two myHomeIQ cases are solo — everything else has a named team. `outside:` is the honest note for commercial work: the wider team existed but was
+# the client's, not this studio's. Do not drop it — on those two cases the case page itself
+# already prints "9th of 38 contributors", and the team block must agree with it.
+#
+# `did:` is two lines. Not three, not a paragraph. Role + period + two lines is the whole
+# format, and it is what keeps six people on one screen without inflation.
+
+contributions:
+  intelligence:
+    - person: "danyil"
+      solo: true
+      role: { en: "Senior Backend Engineer", uk: "Senior Backend Engineer" }
+      period: "2023—2026"
+      did:
+        - en: "The service’s public API, Lost Deals, and three years of entity resolution."
+          uk: "Публічне API сервісу, Lost Deals і три роки entity resolution."
+        - en: "Partitioning and read/write splitting as history reached eight years."
+          uk: "Партиціювання й розведення читання/запису, коли історії стало вісім років."
+      outside:
+        en: "The other 14 contributors were the client’s own team — not people from this studio."
+        uk: "Решта 14 контриб’юторів — власна команда клієнта, не люди з цієї студії."
+
+  dna:
+    - person: "danyil"
+      role: { en: "tech lead · architect · PM", uk: "тех-лід · архітектор · PM" }
+      period: "2023—2026"
+      did:
+        - en: "Architecture, product decisions and 90% of merge commits."
+          uk: "Архітектура, продуктові рішення і 90% merge-комітів."
+        - en: "Ran the Python→Ruby, Rails 7.2→8.1 and PostgreSQL 16→18 migrations personally."
+          uk: "Провів міграції Python→Ruby, Rails 7.2→8.1 і PostgreSQL 16→18 особисто."
+    - person: "mykhailo"
+      role: { en: "cofounder · product", uk: "кофаундер · продукт" }
+      period: "2023—2026"
+      did:
+        - en: "Found the customers first: dozens of channel owners interviewed before a line was written, then the spec."
+          uk: "Спершу знайшов клієнтів: десятки власників каналів опитано до першого рядка коду, далі — ТЗ."
+        - en: "Pricing and the ad campaigns behind ×20 customer growth in 14 months."
+          uk: "Ціноутворення й рекламні кампанії за зростанням клієнтів ×20 за 14 місяців."
+    - person: "natalia"
+      role: { en: "backend · data", uk: "бекенд · дані" }
+      period: "2024—2026"
+      did:
+        - en: "Semantic dedup queries over the 1536-dim embedding column and its HNSW index."
+          uk: "Запити семантичної дедуплікації по колонці 1536-вимірних embeddings та її HNSW-індексу."
+        - en: "The per-channel JSONB prompt composition that made tuning a no-deploy change."
+          uk: "Збірка промптів на канал із JSONB — тюнінг без деплою."
+    - person: "oleksii"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024—2025"
+      did:
+        - en: "Panels inside the Telegram state machine — the product has five HTTP routes and no views."
+          uk: "Панелі всередині Telegram-стейт-машини — у продукту п’ять HTTP-роутів і жодної в’юшки."
+        - en: "Billing screens and the customer-facing bot factory flows."
+          uk: "Екрани біллінгу й флоу фабрики ботів під клієнта."
+    - person: "oleksandr"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024—2026"
+      did:
+        - en: "Both delivery pipelines — live mirroring and cursor-based drip backfill through source history."
+          uk: "Обидва пайплайни доставки — живе дзеркалення й крапельний backfill історії джерела за курсором."
+        - en: "Ad-stripping and rewrite rules — the part of the pipeline the customer actually tunes."
+          uk: "Правила вичищення реклами й переписування — та частина пайплайна, яку клієнт справді налаштовує."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2025—2026"
+      did:
+        - en: "Automated review of every PR against a 13-point checklist, inline in the diff."
+          uk: "Автоматичне рев’ю кожного PR за чеклистом із 13 пунктів, інлайн у дифі."
+        - en: "Advisory only. Two humans still have to approve before anything merges."
+          uk: "Тільки дорадчо. Перед мерджем усе одно потрібні два людських апрува."
+
+  wardybot:
+    - person: "danyil"
+      role: { en: "tech lead · architect · product owner", uk: "тех-лід · архітектор · product owner" }
+      period: "2023—2026"
+      did:
+        - en: "Product and architecture from a blank page; the immutable ledger and all 196 deploys."
+          uk: "Продукт і архітектура з чистого аркуша; незмінний леджер і всі 196 деплоїв."
+        - en: "Set the process 14 developers work inside: ticket branches, review, CI, mandatory tests."
+          uk: "Поставив процес, у якому працюють 14 розробників: тікет-бранчі, рев’ю, CI, обов’язкові тести."
+    - person: "oleksandr"
+      role: { en: "frontend · Vue 3", uk: "фронтенд · Vue 3" }
+      period: "2024—2026"
+      did:
+        - en: "The admin panel on Vue 3 + TypeScript over Inertia — the only screen-based surface here."
+          uk: "Адмінка на Vue 3 + TypeScript через Inertia — єдина екранна поверхня тут."
+        - en: "Marketplace and collectibles UI, including the duel flow."
+          uk: "UI маркетплейсу й колекційних предметів, включно з флоу дуелей."
+    - person: "oleksii"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024—2026"
+      did:
+        - en: "Command modules against the reflective router — a chunk of the 63 commands and 298 callbacks."
+          uk: "Модулі команд на рефлективному роутері — частина з 63 команд і 298 колбеків."
+        - en: "Giveaway and achievement mechanics."
+          uk: "Механіки розіграшів і ачівок."
+    - person: "natalia"
+      role: { en: "backend · data", uk: "бекенд · дані" }
+      period: "2025—2026"
+      did:
+        - en: "Counter-row aggregation that keeps 22.9M messages inside 1.48M rows."
+          uk: "Агрегація в рядки-лічильники, що тримає 22,9 млн повідомлень у 1,48 млн рядків."
+        - en: "Statistics queries that stay fast on a 2 vCPU box."
+          uk: "Запити статистики, які лишаються швидкими на 2 vCPU."
+    - person: "mykhailo"
+      role: { en: "cofounder · product", uk: "кофаундер · продукт" }
+      period: "2023—2026"
+      did:
+        - en: "Turns chat owners’ complaints into tickets — most of the moderation rules started as a customer call."
+          uk: "Перетворює скарги власників чатів на тікети — більшість правил модерації почалися з дзвінка клієнта."
+        - en: "Sold and onboarded the 17 white-label bots running on the same core."
+          uk: "Продав і завів 17 white-label ботів на тому ж ядрі."
+    - person: "claude"
+      role: { en: "pull request review · secret scanning", uk: "рев’ю PR · сканування секретів" }
+      period: "2025—2026"
+      did:
+        - en: "Review on every push, plus secret scanning before anything reaches a branch."
+          uk: "Рев’ю на кожен пуш плюс сканування секретів до того, як щось потрапить у бранч."
+        - en: "Most useful on the ledger: flags any migration that could mutate a transaction."
+          uk: "Найкорисніший на леджері: позначає будь-яку міграцію, що може змінити транзакцію."
+
+  leads:
+    - person: "danyil"
+      solo: true
+      role: { en: "Senior Backend Engineer", uk: "Senior Backend Engineer" }
+      period: "2022—2025"
+      did:
+        - en: "Stripe billing, the 9×9 permission matrix, and both sides of the cross-service integration."
+          uk: "Біллінг Stripe, матриця прав 9×9 і обидві сторони міжсервісної інтеграції."
+        - en: "Whole product verticals from controller to documented endpoint."
+          uk: "Цілі продуктові вертикалі від контролера до документованого ендпоінта."
+      outside:
+        en: "A codebase with 38 contributors; the other 37 were the client’s own team. I am the 9th by volume."
+        uk: "Кодова база з 38 контриб’юторами; решта 37 — власна команда клієнта. Я 9-й за обсягом."
+
+  imagemaker:
+    - person: "danyil"
+      role: { en: "tech lead · architect · devops", uk: "тех-лід · архітектор · devops" }
+      period: "2022—2026"
+      did:
+        - en: "The dual-mode runtime, and the decision to make it the shared render engine for a second product."
+          uk: "Двохрежимний рантайм і рішення зробити з нього спільний рендер-рушій для другого продукту."
+        - en: "Drove peak render to 586 MB on a 1.9 GB box and OOM kills to zero."
+          uk: "Звів піковий рендер до 586 МБ на 1,9 ГБ і OOM-кіли до нуля."
+    - person: "natalia"
+      role: { en: "backend · typography", uk: "бекенд · типографіка" }
+      period: "2024—2026"
+      did:
+        - en: "Three binary searches over real Pango measurements — no magic font-size constants."
+          uk: "Три бінарні пошуки по реальних вимірах Pango — жодних магічних констант кегля."
+        - en: "The Telegram-entity → Pango markup pass, applied in reverse index order."
+          uk: "Перетворення ентіті Telegram у Pango-розмітку у зворотному порядку індексів."
+    - person: "mykhailo"
+      role: { en: "cofounder · product", uk: "кофаундер · продукт" }
+      period: "2022—2026"
+      did:
+        - en: "The conversation that turned a standalone toy into the shared render engine for a second product."
+          uk: "Розмова, що перетворила окрему іграшку на спільний рендер-рушій для другого продукту."
+        - en: "Positioning and the requirements for what a quote card has to contain."
+          uk: "Позиціювання й вимоги до того, що має бути на картці цитати."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2025—2026"
+      did:
+        - en: "Reviews the render path, where a leak shows up as an OOM two days later."
+          uk: "Рев’ює шлях рендеру, де тічка вилазить як OOM через два дні."
+        - en: "Checks every image object is destroyed in an ensure block."
+          uk: "Перевіряє, що кожен об’єкт зображення знищено в блоці ensure."
+
+  chatgpt:
+    - person: "danyil"
+      role: { en: "technical lead & co-founder", uk: "технічний лід і співзасновник" }
+      period: "2023—2026"
+      did:
+        - en: "Whole application: recurring payments, freemium mechanics, referral accounting, the admin panel."
+          uk: "Увесь застосунок: регулярні платежі, freemium-механіки, реферальний облік, адмінка."
+        - en: "The threaded typing-indicator pattern — perceived latency solved in the product layer."
+          uk: "Патерн індикатора набору на потоках — відчуття затримки вирішене на продуктовому шарі."
+    - person: "mykhailo"
+      role: { en: "cofounder · product & growth", uk: "кофаундер · продукт і зростання" }
+      period: "2023—2026"
+      did:
+        - en: "Spotted the 2023 gap — Ukrainians could not sign up for Western AI services — and wrote the spec that week."
+          uk: "Побачив вікно 2023-го — українці не могли зареєструватися в західних AI-сервісах — і написав ТЗ того ж тижня."
+        - en: "Four price tiers, the 15% referral scheme, and the campaigns behind 289k users."
+          uk: "Чотири тарифи, реферальна схема на 15% і кампанії за 289 тис. користувачів."
+  rubycoin:
+    - person: "danyil"
+      role: { en: "tech lead · architect · reviewer", uk: "тех-лід · архітектор · рев’ювер" }
+      period: "2022—2026"
+      did:
+        - en: "Set the tasks and reviewed the pull requests of 19 contributors, mostly interns."
+          uk: "Ставив задачі й рев’ював pull request’и 19 контриб’юторів, переважно інтернів."
+        - en: "Carried the upgrades live: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
+          uk: "Провів апгрейди живими: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
+    - person: "oleksii"
+      role: { en: "fullstack · Hotwire", uk: "фулстек · Hotwire" }
+      period: "2024—2026"
+      did:
+        - en: "Frames and streams where they earn their place — Turbo Drive is deliberately off."
+          uk: "Фрейми й стріми там, де вони виправдані — Turbo Drive свідомо вимкнений."
+        - en: "The reading surface: lesson navigation, search UI, code blocks."
+          uk: "Поверхня читання: навігація уроків, UI пошуку, блоки коду."
+    - person: "oleksandr"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024—2026"
+      did:
+        - en: "The custom management panel that replaced the admin framework."
+          uk: "Власна панель управління, що замінила адмін-фреймворк."
+        - en: "Five image versions per upload, so a card never downloads a hero."
+          uk: "П’ять версій зображення на завантаження, щоб картка не тягнула героя."
+    - person: "natalia"
+      role: { en: "backend · data", uk: "бекенд · дані" }
+      period: "2025—2026"
+      did:
+        - en: "Statistics as five independently tested query objects."
+          uk: "Статистика як п’ять незалежно протестованих query-об’єктів."
+        - en: "Full-text search across translations, so a Ukrainian query finds a Ukrainian article."
+          uk: "Повнотекстовий пошук по перекладах, щоб український запит знаходив українську статтю."
+    - person: "mykhailo"
+      role: { en: "cofounder · product", uk: "кофаундер · продукт" }
+      period: "2022—2026"
+      did:
+        - en: "Recruited the 19 contributors and ran the intake — the school side of the project is his."
+          uk: "Набрав 19 контриб’юторів і вів відбір — шкільна частина проєкту на ньому."
+        - en: "Editorial plan and distribution, back when articles were still being published."
+          uk: "Редакційний план і дистрибуція — ще коли статті публікувалися."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2025—2026"
+      did:
+        - en: "Inline PR comments — the first reviewer an intern meets, before a human spends time."
+          uk: "Інлайн-коментарі в PR — перший рев’ювер, якого зустрічає інтерн, до того як людина витратить час."
+        - en: "On this page too: the section you are reading was reviewed the same way."
+          uk: "І на цій сторінці теж: розділ, який ви читаєте, проходив те саме рев’ю."

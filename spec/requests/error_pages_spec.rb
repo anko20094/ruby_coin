@@ -57,4 +57,20 @@ describe 'error pages', type: :request do
     expect(response).to have_http_status(:not_found)
     expect(response.body).to include('er-page')
   end
+
+  # These pages are dispatched outside the /:locale scope, so the switcher in the nav can only
+  # offer a query parameter — and it used to offer one the controller ignored.
+  it 'answers in the language the locale switch asks for' do
+    get '/404?locale=en'
+    expect(response.body).to include('<html lang="en"')
+
+    get '/404?locale=uk'
+    expect(response.body).to include('<html lang="uk"')
+  end
+
+  it 'ignores a locale it does not have' do
+    get '/404?locale=fr'
+
+    expect(response.body).to include(%(<html lang="#{I18n.default_locale}"))
+  end
 end

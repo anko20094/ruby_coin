@@ -1,0 +1,397 @@
+# RubyCoin · people
+#
+# A person record belongs to the person. It is their CV and nothing else — what they
+# did on a given project lives in `team.yml`, keyed by project.
+#
+# Bilingual: every translatable value is a { en:, uk: } pair. That includes the parts that look
+# like data — a contact row's key, a stack item, a period's open end — wherever they are prose
+# rather than a proper noun: "Ruby on Rails" is the same word twice, "merge rights" is not. A
+# bare string is still allowed and reads the same in both languages.
+# Strings may contain inline <b>, <i> and <code> only — render through the same sanitiser as
+# cases.yml.
+#
+# Three states exist, and two of them announce themselves:
+#   full         — real content (danyil, claude)
+#   placeholder  — `placeholder: true`; real role and real project work, invented dates,
+#                  employers, contacts and education. Prints a ruby dashed banner on the
+#                  page and a `PLACEHOLDER` chip in the roster. Written so the filled
+#                  layout could be judged before the real CVs arrive.
+#                  ⚠️ grep for `placeholder: true` before any launch.
+#   draft        — `cv: null`; nothing invented at all. No record uses it right now, but
+#                  the rendering path stays: a new hire lands in this state on day one.
+#
+# `cv: null` is a real, shippable state. It means nobody has filled this CV in yet,
+# and the page says so instead of guessing a career for a named colleague. The person
+# still appears in the roster and still shows their project contributions, because
+# those are written by the project lead and are accurate.
+#
+# `updated:` is the staleness guard. A CV without a date, or with a date more than a
+# year old, renders the "CV DRAFT" chip in the roster. Do not remove that chip — a
+# stale CV is worse than an absent one.
+#
+# Order in this file is roster display order.
+
+people:
+  - id: "danyil"
+    short: "DS"
+    machine: false
+    name:
+      en: "Danyil Shkoropad"
+      uk: "Данило Шкоропад"
+    role:
+      en: "cofounder · tech lead"
+      uk: "кофаундер · тех-лід"
+    blurb:
+      en: "Six years of Rails in production. Made the first commit on five of the seven projects here."
+      uk: "Шість років Rails у продакшні. Перший коміт у п’яти з семи проєктів тут — його."
+    # The one indirection in this file: his CV is the document in cv.yml, which is also
+    # what /cv renders. Load it from there rather than duplicating it here.
+    cv_file: "cv.yml"
+    # No `updated:` here: his CV is cv.yml, and so is its date. See Person#updated.
+    # Optional. Renders as the last block on the person page. Omit it rather than
+    # inventing one — see the note at the bottom of this file.
+    not_work:
+      - { icon: "🏐", label: { en: "volleyball", uk: "волейбол" }, detail: { en: "tue/thu evenings", uk: "вт/чт вечори" } }
+      - { icon: "🏍", label: { en: "moto", uk: "мотоцикл" }, detail: { en: "mid-season", uk: "середина сезону" } }
+      - { icon: "📺", label: { en: "anime", uk: "аніме" }, detail: { en: "Frieren · re-watch", uk: "Frieren · передивляю" } }
+      - { icon: "🎲", label: { en: "boardgame", uk: "настільні" }, detail: { en: "7 wonders night", uk: "вечір 7 wonders" } }
+      - { icon: "💪", label: { en: "gym", uk: "залізо" }, detail: { en: "pwr · 3x/week", uk: "пвр · 3 рази/тиж" } }
+
+  # ⚠️ PLACEHOLDER CV. The role and responsibilities are owner-supplied and real; every
+  # date, employer, contact and hobby below is invented to show the filled layout.
+  # `placeholder: true` prints a ruby dashed banner on the page and a chip in the roster.
+  # Delete the flag the moment the real content lands — never ship it silently.
+  - id: "mykhailo"
+    short: "MK"
+    machine: false
+    placeholder: true
+    name:
+      en: "Mykhailo"
+      uk: "Михайло"
+    role:
+      en: "cofounder · product & clients"
+      uk: "кофаундер · продукт і клієнти"
+    blurb:
+      en: "Ideas, specs and the customer conversations behind them. Sells what the rest of us build."
+      uk: "Ідеї, ТЗ і розмови з клієнтами за ними. Продає те, що будує решта."
+    updated: "2026·09·08"
+    not_work:
+      - { icon: "🗾", label: { en: "japan", uk: "Японія" } }
+      - { icon: "📺", label: { en: "anime", uk: "аніме" } }
+      - { icon: "🎮", label: { en: "games", uk: "комп’ютерні ігри" } }
+      - { icon: "🍵", label: { en: "quiet", uk: "спокій" } }
+      - { icon: "👀", label: { en: "watching", uk: "спостереження" } }
+    cv:
+      role:
+        en: "Cofounder · product & clients"
+        uk: "Кофаундер · продукт і клієнти"
+      years:
+        en: "8+ years in front of customers"
+        uk: "8+ років напроти клієнта"
+      summary:
+        en: "The half of the studio that talks. Finds what a customer actually needs, writes it down as something an engineer can build, then goes and sells the result. Every product in this portfolio has a spec with his name on the first version of the document."
+        uk: "Та половина студії, яка говорить. Знаходить, що клієнту справді потрібно, записує це так, щоб інженер міг збудувати, а потім іде це продавати. У кожного продукту в цьому портфоліо є ТЗ, на першій версії якого стоїть його ім’я."
+      contact:
+        - ["email", "mykhailo@rubyco.in", "mailto:mykhailo@rubyco.in"]
+        - ["telegram", "@placeholder", "https://t.me/"]
+      location:
+        en: "Ukraine · remote"
+        uk: "Україна · віддалено"
+      languages:
+        en: "Ukrainian native · English B2"
+        uk: "Українська — рідна · англійська — B2"
+      education:
+        en: "Placeholder — degree and university to be supplied"
+        uk: "Плейсхолдер — ступінь і виш уточнити"
+      experience:
+        - period: { en: "2022 — now", uk: "2022 — зараз" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title:
+            en: "Cofounder · product, clients, growth"
+            uk: "Кофаундер · продукт, клієнти, зростання"
+          place: { en: "all six products", uk: "усі шість продуктів" }
+          note: { en: "Placeholder dates.", uk: "Дати — плейсхолдер." }
+          body:
+            en: "Requirements and specs for every product here, the customer conversations behind them, pricing, partnerships and the advertising that brought the users. <b>Placeholder copy</b> — replace with his own words."
+            uk: "Вимоги й ТЗ для кожного продукту тут, розмови з клієнтами за ними, ціноутворення, партнерства й реклама, яка привела користувачів. <b>Плейсхолдер-текст</b> — замінити його власними словами."
+          cases: ["dna", "wardybot", "imagemaker", "chatgpt", "rubycoin"]
+        - period: "2019 — 2022"
+          org: { en: "Placeholder · previous company", uk: "Плейсхолдер · попередня компанія" }
+          title: { en: "Account / project management", uk: "Акаунт- та проєкт-менеджмент" }
+          place: { en: "to be supplied", uk: "уточнити" }
+      stacks:
+        - label: { en: "does", uk: "робить" }
+          items: [{ en: "discovery calls", uk: "дискавері-дзвінки" }, { en: "requirements", uk: "вимоги" }, { en: "specs", uk: "ТЗ" },
+                  { en: "pricing", uk: "ціноутворення" }, { en: "partnerships", uk: "партнерства" },
+                  { en: "paid ads", uk: "платна реклама" }, { en: "support triage", uk: "тріаж підтримки" }]
+        - label: { en: "tools", uk: "інструменти" }
+          items: ["Jira", "Notion", "Telegram Ads", { en: "Figma (reading)", uk: "Figma (читає)" },
+                  { en: "spreadsheets, many", uk: "таблиці, багато" }]
+      strengths:
+        - en: "Turns “make it better” into a ticket an engineer can close"
+          uk: "Перетворює «зробіть краще» на тікет, який інженер може закрити"
+        - en: "Says no to a feature before it reaches the backlog"
+          uk: "Каже «ні» фічі ще до того, як вона дійде до беклогу"
+        - en: "Placeholder strength — replace"
+          uk: "Плейсхолдер — замінити"
+        - en: "Placeholder strength — replace"
+          uk: "Плейсхолдер — замінити"
+
+  - id: "oleksii"
+    short: "OL"
+    machine: false
+    name:
+      en: "Oleksii"
+      uk: "Олексій"
+    role:
+      en: "fullstack"
+      uk: "фулстек"
+    blurb:
+      en: "Turbo-frame whisperer. Ships in pull requests of three files."
+      uk: "Шепоче з turbo-frame. Здає в PR із трьох файлів."
+    placeholder: true
+    updated: "2026·09·09"
+    not_work:
+      - { icon: "🎮", label: { en: "games", uk: "комп’ютерні ігри" } }
+      - { icon: "🗣", label: { en: "english", uk: "англійська" } }
+      - { icon: "🎬", label: { en: "films", uk: "фільми" } }
+      - { icon: "🔌", label: { en: "electronics", uk: "електроніка" } }
+    cv:
+      role: { en: "Fullstack engineer", uk: "Fullstack-інженер" }
+      years: { en: "placeholder · years to be supplied", uk: "плейсхолдер · роки уточнити" }
+      summary:
+        en: "Hotwire where it earns its place, and a Telegram state machine where there is no screen at all. Ships in small pull requests — three files, one behaviour, tests included."
+        uk: "Hotwire там, де він виправданий, і Telegram-стейт-машина там, де екрана немає взагалі. Здає малими PR — три файли, одна поведінка, з тестами."
+      contact:
+        - ["email", "placeholder@rubyco.in", "mailto:placeholder@rubyco.in"]
+        - ["telegram", "@placeholder", "https://t.me/"]
+      location: { en: "Ukraine · remote", uk: "Україна · віддалено" }
+      languages: { en: "Ukrainian native · English — placeholder", uk: "Українська — рідна · англійська — плейсхолдер" }
+      education: { en: "Placeholder — degree and university to be supplied", uk: "Плейсхолдер — ступінь і виш уточнити" }
+      experience:
+        - period: { en: "2024 — now", uk: "2024 — зараз" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Fullstack engineer", uk: "Fullstack-інженер" }
+          place: { en: "DNA · WardyBot · RubyCoin", uk: "DNA · WardyBot · RubyCoin" }
+          note: { en: "Placeholder dates.", uk: "Дати — плейсхолдер." }
+          body:
+            en: "Command modules on the reflective router, panels inside the Telegram state machine, and the reading surface of rubyco.in. <b>Placeholder copy</b> — replace with his own words."
+            uk: "Модулі команд на рефлективному роутері, панелі всередині Telegram-стейт-машини і поверхня читання rubyco.in. <b>Плейсхолдер-текст</b> — замінити власними словами."
+          cases: ["dna", "wardybot", "rubycoin"]
+      stacks:
+        - label: { en: "core", uk: "основне" }
+          items: ["Ruby on Rails", "Hotwire", "Turbo Frames", "Stimulus", "PostgreSQL", "RSpec"]
+        - label: { en: "also", uk: "також" }
+          items: ["Telegram Bot API", "Sidekiq", { en: "placeholder — to be supplied", uk: "плейсхолдер — уточнити" }]
+      strengths:
+        - en: "Small pull requests that are easy to review"
+          uk: "Малі PR, які легко рев’ювати"
+        - en: "Knows when Turbo is the wrong answer"
+          uk: "Знає, коли Turbo — неправильна відповідь"
+        - en: "Placeholder strength — replace"
+          uk: "Плейсхолдер — замінити"
+
+  - id: "oleksandr"
+    short: "OS"
+    machine: false
+    name:
+      en: "Oleksandr"
+      uk: "Олександр"
+    role:
+      en: "fullstack"
+      uk: "фулстек"
+    blurb:
+      en: "Front end where there is one. Will rewrite anything in three lines."
+      uk: "Фронт там, де він є. Перепише будь-що в три рядки."
+    placeholder: true
+    updated: "2026·09·09"
+    not_work:
+      - { icon: "🏀", label: { en: "basketball", uk: "баскетбол" } }
+      - { icon: "🎮", label: { en: "games", uk: "комп’ютерні ігри" } }
+      - { icon: "📚", label: { en: "studying", uk: "навчання" } }
+      - { icon: "🚶", label: { en: "walks", uk: "гуляти" } }
+    cv:
+      role: { en: "Fullstack engineer · front end", uk: "Fullstack-інженер · фронтенд" }
+      years: { en: "placeholder · years to be supplied", uk: "плейсхолдер · роки уточнити" }
+      summary:
+        en: "The one who builds the screens on the products that have screens. Vue 3 over Inertia on WardyBot, the management panel on rubyco.in, and a habit of deleting more lines than he adds."
+        uk: "Той, хто робить екрани на продуктах, у яких вони є. Vue 3 через Inertia на WardyBot, панель управління на rubyco.in і звичка видаляти більше рядків, ніж додавати."
+      contact:
+        - ["email", "placeholder@rubyco.in", "mailto:placeholder@rubyco.in"]
+        - ["telegram", "@placeholder", "https://t.me/"]
+      location: { en: "Ukraine · remote", uk: "Україна · віддалено" }
+      languages: { en: "Ukrainian native · English — placeholder", uk: "Українська — рідна · англійська — плейсхолдер" }
+      education: { en: "Placeholder — degree and university to be supplied", uk: "Плейсхолдер — ступінь і виш уточнити" }
+      experience:
+        - period: { en: "2024 — now", uk: "2024 — зараз" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Fullstack engineer · front end", uk: "Fullstack-інженер · фронтенд" }
+          place: { en: "WardyBot · RubyCoin", uk: "WardyBot · RubyCoin" }
+          note: { en: "Placeholder dates.", uk: "Дати — плейсхолдер." }
+          body:
+            en: "The WardyBot admin panel, marketplace and duel UI, the custom management panel that replaced the admin framework, and five image versions per upload. <b>Placeholder copy</b> — replace."
+            uk: "Адмінка WardyBot, UI маркетплейсу й дуелей, власна панель управління замість адмін-фреймворку і п’ять версій зображення на завантаження. <b>Плейсхолдер-текст</b> — замінити."
+          cases: ["wardybot", "rubycoin"]
+      stacks:
+        - label: { en: "core", uk: "основне" }
+          items: ["Vue 3", "TypeScript", "Inertia", "Ruby on Rails", "CSS", "esbuild"]
+        - label: { en: "also", uk: "також" }
+          items: ["Hotwire", "PostgreSQL", { en: "placeholder — to be supplied", uk: "плейсхолдер — уточнити" }]
+      strengths:
+        - en: "Will rewrite anything in three lines"
+          uk: "Перепише будь-що в три рядки"
+        - en: "Front end that does not need a rewrite next year"
+          uk: "Фронт, який не треба переписувати наступного року"
+        - en: "Placeholder strength — replace"
+          uk: "Плейсхолдер — замінити"
+
+  - id: "natalia"
+    short: "NT"
+    machine: false
+    name:
+      en: "Natalia"
+      uk: "Наталя"
+    role:
+      en: "backend"
+      uk: "бекенд"
+    blurb:
+      en: "Queries that do not hate the database. Reads an EXPLAIN for fun."
+      uk: "Запити, що не ненавидять базу. Читає EXPLAIN для задоволення."
+    placeholder: true
+    updated: "2026·09·09"
+    not_work:
+      - { icon: "🏍", label: { en: "moto", uk: "мотоцикл" } }
+      - { icon: "🧗", label: { en: "climbing", uk: "скелелазання" } }
+      - { icon: "🔬", label: { en: "research", uk: "дослідження" } }
+      - { icon: "🎮", label: { en: "games", uk: "ігри" } }
+    cv:
+      role: { en: "Backend engineer · data", uk: "Backend-інженер · дані" }
+      years: { en: "placeholder · years to be supplied", uk: "плейсхолдер · роки уточнити" }
+      summary:
+        en: "Queries that do not hate the database. Counter-row aggregation keeping 22.9M messages inside 1.48M rows, embeddings dedup on HNSW, and typography sized by real Pango measurements instead of guesses."
+        uk: "Запити, що не ненавидять базу. Агрегація в рядки-лічильники, яка тримає 22,9 млн повідомлень у 1,48 млн рядків, дедуплікація embeddings на HNSW і типографіка за реальними вимірами Pango, а не на око."
+      contact:
+        - ["email", "placeholder@rubyco.in", "mailto:placeholder@rubyco.in"]
+        - ["telegram", "@placeholder", "https://t.me/"]
+      location: { en: "Ukraine · remote", uk: "Україна · віддалено" }
+      languages: { en: "Ukrainian native · English — placeholder", uk: "Українська — рідна · англійська — плейсхолдер" }
+      education: { en: "Placeholder — degree and university to be supplied", uk: "Плейсхолдер — ступінь і виш уточнити" }
+      experience:
+        - period: { en: "2024 — now", uk: "2024 — зараз" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Backend engineer · data", uk: "Backend-інженер · дані" }
+          place: { en: "DNA · WardyBot · ImageMaker · RubyCoin", uk: "DNA · WardyBot · ImageMaker · RubyCoin" }
+          note: { en: "Placeholder dates.", uk: "Дати — плейсхолдер." }
+          body:
+            en: "Semantic dedup on pgvector, the aggregation that keeps a 2 vCPU box viable, three binary searches over Pango measurements, and statistics as independently tested query objects. <b>Placeholder copy</b> — replace."
+            uk: "Семантична дедуплікація на pgvector, агрегація, що робить сервер на 2 vCPU життєздатним, три бінарні пошуки по вимірах Pango і статистика як незалежно протестовані query-об’єкти. <b>Плейсхолдер-текст</b> — замінити."
+          cases: ["dna", "wardybot", "imagemaker", "rubycoin"]
+      stacks:
+        - label: { en: "core", uk: "основне" }
+          items: ["PostgreSQL", "SQL", "pgvector · HNSW", "pg_search", "Ruby on Rails", "RSpec"]
+        - label: { en: "also", uk: "також" }
+          items: ["ImageMagick · Pango", "Sidekiq", { en: "placeholder — to be supplied", uk: "плейсхолдер — уточнити" }]
+      strengths:
+        - en: "Reads an EXPLAIN before writing the index"
+          uk: "Читає EXPLAIN до того, як писати індекс"
+        - en: "Aggregates instead of archiving"
+          uk: "Агрегує, а не архівує"
+        - en: "Placeholder strength — replace"
+          uk: "Плейсхолдер — замінити"
+
+  # Sixth member of the roster, and not a person. `machine: true` puts a small ruby
+  # "CI" flag on the monogram — the reader is told what this is, immediately, without
+  # a footnote. Everything claimed below is something that actually runs in CI.
+  - id: "claude"
+    short: "C"
+    machine: true
+    name:
+      en: "Claude"
+      uk: "Клод"
+    role:
+      en: "automated reviewer"
+      uk: "автоматичний рев’ювер"
+    blurb:
+      en: "Reviews every pull request in four of these products. Advisory only — no merge rights."
+      uk: "Рев’ює кожен PR у чотирьох із цих продуктів. Тільки дорадчо — без права мерджити."
+    updated: "2026·09·08"
+    not_work:
+      - { icon: "💤", label: { en: "idle", uk: "простій" }, detail: { en: "between pushes", uk: "між пушами" } }
+      - { icon: "📄", label: { en: "reading", uk: "читає" }, detail: { en: "the CHANGELOG", uk: "CHANGELOG" } }
+      - { icon: "🗓", label: { en: "weekends", uk: "вихідні" }, detail: { en: "same as weekdays", uk: "як будні" } }
+    cv:
+      role:
+        en: "Automated reviewer"
+        uk: "Автоматичний рев’ювер"
+      years:
+        en: "wired into CI since 2024"
+        uk: "у CI з 2024-го"
+      summary:
+        en: "Reads every pull request in four of the products here against a 13-point checklist, at 3am, without complaining, and leaves inline comments. Has never asked for a raise. Occasionally suggests a method that does not exist — which is what the human reviewer is still for."
+        uk: "Читає кожен pull request у чотирьох продуктах тут за чеклистом із 13 пунктів, о третій ночі, без скарг, і лишає інлайн-коментарі. Ніколи не просив підвищення. Іноді пропонує метод, якого не існує — саме тому людина-рев’ювер досі потрібна."
+      contact:
+        - [{ en: "runs in", uk: "працює в" }, "github actions", "https://github.com/anko20094"]
+        - [{ en: "invoked by", uk: "запускає" }, { en: "every push", uk: "кожен пуш" }, "https://github.com/anko20094"]
+      location:
+        en: "wherever the runner is"
+        uk: "де підняли раннер"
+      languages:
+        en: "Ruby · TypeScript · SQL · YAML · your commit messages"
+        uk: "Ruby · TypeScript · SQL · YAML · ваші меседжі комітів"
+      education:
+        en: "trained, not educated"
+        uk: "натренований, не освічений"
+      experience:
+        - period: { en: "2024 — now", uk: "2024 — зараз" }
+          org:
+            en: "RubyCoin · four products"
+            uk: "RubyCoin · чотири продукти"
+          title:
+            en: "Pull request review · secret scanning"
+            uk: "Рев’ю pull request’ів · сканування секретів"
+          place:
+            en: "CI · every push"
+            uk: "CI · кожен пуш"
+          note:
+            en: "A checklist, not an opinion. The 13 points are in the repo."
+            uk: "Чеклист, а не думка. 13 пунктів лежать у репо."
+          body:
+            en: "Flags the N+1 a tired human stops seeing, the migration without a down path, the spec that asserts nothing, and the credential someone pasted into a fixture. Advisory only — <b>no merge right</b>, and that is on purpose."
+            uk: "Позначає N+1, який втомлена людина вже не бачить, міграцію без down, тест, що нічого не перевіряє, і креденшал, вставлений у фікстуру. Тільки дорадчо — <b>права мерджити немає</b>, і це навмисно."
+          cases: ["dna", "wardybot", "imagemaker", "rubycoin"]
+      stacks:
+        - label:
+            en: "reads"
+            uk: "читає"
+          items: ["Ruby", "TypeScript", "SQL", "YAML", { en: "diffs", uk: "дифи" }, { en: "stack traces", uk: "стек-трейси" }]
+        - label:
+            en: "does not have"
+            uk: "не має"
+          items: [{ en: "production access", uk: "доступу до продакшну" }, { en: "merge rights", uk: "права мерджити" }, { en: "an opinion about tabs", uk: "думки про табуляцію" }]
+      strengths:
+        - en: "Catches the N+1 you stopped seeing on pull request #400"
+          uk: "Ловить N+1, який ти перестав бачити на PR #400"
+        - en: "Never gets tired, never gets political about a diff"
+          uk: "Не втомлюється й не політизує дифи"
+        - en: "Does not know your production data, and should not"
+          uk: "Не знає ваших продових даних — і не має знати"
+        - en: "Cheaper than the bug it prevents"
+          uk: "Дешевший за баг, який запобігає"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# not_work
+#
+# This block used to be one five-column strip on the home page, attributed to the
+# studio as a whole. It moved here because a studio does not play volleyball on
+# Tuesdays — one specific person does.
+#
+# It is optional and renders only when present — all six records have one today.
+#
+# Each entry is `{ icon, label: {en, uk}, detail: {en, uk} }`; `detail` is OPTIONAL.
+# It was briefly a flat ["label", "detail", "emoji"] tuple, which made this the one
+# untranslated block on an otherwise fully Ukrainian person page — and the labels came
+# from the people themselves, in Ukrainian. Never store a user-visible string here in
+# one language.
+#
+# Only Danyil and Claude carry details; when absent the mono line is not rendered at all,
+# so "ігри" stands alone rather than sitting above a blank row. Ask before inventing one.

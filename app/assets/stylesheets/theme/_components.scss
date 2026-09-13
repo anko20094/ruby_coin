@@ -52,6 +52,7 @@
   &--link {
     font-size: 10.5px;
     padding: 3px 8px;
+    gap: 4px;
   }
 
   // Stack chips inside the facts panel.
@@ -113,6 +114,120 @@
   line-height: 1.5;
 }
 
+// A person, before there is a photograph of them. One frame and one treatment everywhere a
+// person appears — home, /studio, /team, a case page, a CV sidebar — so six real photographs
+// replace six fills and nothing in any of those layouts moves.
+//
+// The box is a container, so the initials are sized from the box rather than from the number
+// passed in: the same component is 26px overlapping on a card and 280px in a sidebar, and in
+// one column it shrinks below the width it was asked for.
+.rc-monogram {
+  --monogram-size: 88px;
+
+  container-type: inline-size;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  // aspect-ratio computes a height, and a stretch-aligned flex parent overrides it: in a
+  // roster card the stone was drawn as a tall rectangle.
+  align-self: start;
+  width: var(--monogram-size);
+  max-width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-card);
+  background: linear-gradient(var(--monogram-angle, 140deg), var(--paper-warm), oklch(89% 0.02 18));
+
+  &--mute { border-color: var(--ink-mute); }
+
+  // Overlapping faces on a card: the ring is the page behind them, so they read as separate
+  // stones rather than one dark mass.
+  &--paper { border-color: var(--paper); }
+}
+
+.rc-monogram__initials {
+  font-family: var(--font-display);
+  font-size: 42cqw;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  opacity: 0.82;
+}
+
+// The sixth member of the roster is a machine, and the card says so without a footnote. Where
+// the stone is too small for the label to be a word (the overlapping faces on a /work card), the
+// ring says it instead — MonogramComponent::COMPACT_BELOW decides which.
+.rc-monogram--compact {
+  .rc-monogram__flag { display: none; }
+
+  &.rc-monogram--machine { border-color: var(--ruby); }
+}
+
+.rc-monogram__flag {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 1px 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: max(7px, 8.5cqw);
+  line-height: 1.4;
+  letter-spacing: 1px;
+  color: var(--paper);
+  background: var(--ruby);
+}
+
+// The header every section page opens with: eyebrow, title, lede, and the anchor gem at the
+// right. Four pages drew this separately before there were four of them.
+.rc-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.rc-header__intro { min-width: 0; }
+
+.rc-header__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  // Fluid rather than a step per breakpoint: a fixed 78px shatters a two-word title into two
+  // lines the moment the column narrows, and the page has no other way to know.
+  font-size: clamp(40px, 7vw, 78px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 6px 0 0;
+}
+
+.rc-header__mark {
+  color: var(--ruby);
+  font-style: italic;
+}
+
+.rc-header__lede {
+  font-family: var(--font-body);
+  font-size: 16.5px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  max-width: 660px;
+  margin-top: 14px;
+  text-wrap: pretty;
+}
+
+.rc-header__anchor { flex: none; }
+
+// Stacked, and the gem stays after the words. It is decoration; it never leads.
+@media (max-width: 900px) {
+  .rc-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .rc-header__anchor .rc-gem { width: 64px; }
+}
+
 .rc-gem {
   display: block;
   overflow: visible;
@@ -127,7 +242,11 @@
 // The site's only button. It moved here from pages/_home.scss when the error pages
 // started using it too — a component with three callers does not belong in one page's file.
 .rc-button {
-  display: inline-block;
+  // 40px is the size the design draws; on a touch screen it grows to the 44px every other
+  // control on the site already meets. These are the largest targets on the page and were the
+  // only ones still short of it.
+  @include controls.hit-row(40px);
+
   font-size: 14px;
   padding: 10px 18px;
   border: 1px solid var(--ink);

@@ -1,0 +1,6 @@
+/ Portfolio text is authored in YAML and in the case editor, and it carries inline <b>, <i>
+/ and <code>. Every profile field goes through the one sanitiser, so a bolded word reads as
+/ bold here and on a case page rather than arriving as a literal tag on one of them.
+section.pf-block.pf-block--summary
+  = render TrackTagComponent.new(label: t('profile.summary'), tone: :ruby, heading: :h2)
+  p.pf-summary= rich(cv.summary)

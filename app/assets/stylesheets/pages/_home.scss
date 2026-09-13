@@ -8,9 +8,11 @@ $home-max: 1320px;
   margin: 0 auto;
 }
 
+// Both tracks carry minmax(0, …): the gem is drawn at an explicit pixel width, so a rigid
+// right-hand track gives itself a min-content floor and the headline column collapses under it.
 .hm-hero {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   align-items: center;
   gap: 48px;
   padding: 64px var(--page-pad) 80px;
@@ -36,11 +38,21 @@ $home-max: 1320px;
 .hm-hero__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 108px;
-  line-height: 1.02;
+  // Fluid, and no hard <br>: a literal 96px shatters this headline into one-word lines the
+  // moment the column narrows.
+  font-size: clamp(40px, 6.4vw, 96px);
+  line-height: 1.04;
   letter-spacing: -0.03em;
   text-wrap: balance;
   margin: 14px 0 0;
+}
+
+// The authored break. Above 1000px it ends the line without adding a row; below it becomes an
+// ordinary space and the headline is free to re-wrap. It holds a space so the two halves never
+// run together when it goes inline.
+.hero-br {
+  display: block;
+  height: 0;
 }
 
 .hm-hero__mark {
@@ -52,8 +64,9 @@ $home-max: 1320px;
   font-size: 20px;
   line-height: 1.5;
   color: var(--ink-soft);
-  max-width: 540px;
+  max-width: 560px;
   margin: 22px 0 0;
+  text-wrap: pretty;
 }
 
 .hm-hero__actions {
@@ -72,6 +85,15 @@ $home-max: 1320px;
 .hm-hero__gem {
   justify-self: center;
   text-align: center;
+  min-width: 0;
+}
+
+// Sized here rather than passed to the component: the gem yields the column instead of
+// starving the text track, and in one column it shrinks rather than grows.
+.hm-hero__gem .rc-gem {
+  width: clamp(240px, 28vw, 400px);
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .hm-hero__caption {
@@ -83,10 +105,7 @@ $home-max: 1320px;
 }
 
 // Latest entry.
-.hm-latest,
-.hm-work {
-  padding: 0 var(--page-pad);
-}
+.hm-latest { padding: 0 var(--page-pad); }
 
 .hm-latest__entry {
   display: grid;
@@ -146,14 +165,75 @@ $home-max: 1320px;
   &:hover { color: var(--ruby); }
 }
 
-// Recent work. Full width: there is no crew column, per §4's Option A note.
-.hm-work { margin-top: 56px; }
+// Recent work, and the crew beside it.
+.hm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+  margin-top: 56px;
+  padding: 0 var(--page-pad);
+}
+
+.hm-work { min-width: 0; }
 
 .hm-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: 18px;
   margin-top: 12px;
+}
+
+// The third surface showing the roster, and it reads the same file as /studio and /team.
+.hm-crew { min-width: 0; }
+
+.hm-crew__list {
+  margin-top: 12px;
+  border: var(--rule-strong);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.hm-crew__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+
+  + .hm-crew__row {
+    border-top: 1px solid color-mix(in oklab, var(--ink-mute) 20%, transparent);
+  }
+}
+
+.hm-crew__who {
+  flex: 1;
+  min-width: 0;
+}
+
+.hm-crew__name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.hm-crew__role {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.hm-crew__arrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-quiet);
+}
+
+.hm-crew__note {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-quiet);
+  margin-top: 8px;
 }
 
 .hm-card {
@@ -254,23 +334,29 @@ $home-max: 1320px;
   color: var(--ink-soft);
 }
 
-@media (max-width: 1100px) {
+// One column. Two things matter here and both were got wrong once: the headline comes first,
+// and the gem gets smaller rather than larger — together they had pushed the h1 off a short
+// viewport, so the page opened on a gem and nothing else.
+@media (max-width: 1000px) {
   .hm-hero {
-    grid-template-columns: 1fr;
-    gap: 32px;
-    padding: 48px var(--page-pad) 56px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 44px var(--page-pad) 56px;
   }
 
-  .hm-hero__title { font-size: 76px; }
+  .hero-br { display: inline; }
 
   .hm-hero__gem { justify-self: start; }
 
-  .hm-cards { grid-template-columns: repeat(2, 1fr); }
+  .hm-hero__gem .rc-gem { width: clamp(150px, 30vw, 220px); }
+
+  .hm-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
 }
 
 @media (max-width: 700px) {
-  .hm-hero__title { font-size: 48px; }
-
   .hm-hero__lede { font-size: 17px; }
 
   .hm-latest__entry { grid-template-columns: 1fr; }
@@ -278,8 +364,6 @@ $home-max: 1320px;
   .hm-latest__cover { height: 220px; }
 
   .hm-latest__title { font-size: 34px; }
-
-  .hm-cards { grid-template-columns: 1fr; }
 
   .hm-top { right: 14px; bottom: 14px; }
 }

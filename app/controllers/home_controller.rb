@@ -15,11 +15,12 @@ class HomeController < ApplicationController
   before_action :redirect_legacy_stream_params, only: :index
 
   def index
-    @profile = CVProfile.current
     @latest = Post.main.includes(:tags, :user, :translations).first ||
               Post.active.includes(:tags, :user, :translations).first
     @cases = Case.ordered.limit(RECENT_CASES)
-    @entries_count = Post.active.count
+    @people = Team.people
+    @projects_count = Case.count
+    @first_year = Case.first_year
   end
 
   private

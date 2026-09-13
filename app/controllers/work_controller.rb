@@ -4,13 +4,12 @@ class WorkController < ApplicationController
   layout 'theme'
 
   def index
-    @profile = CVProfile.current
     @cases = Case.ordered.to_a
-    # The career entries name their cases by slug. The list is already loaded, so the lookup
-    # is a hash rather than a query per entry.
-    @cases_by_slug = @cases.index_by(&:slug)
+    # Each card shows who built the project. Read once for the whole page rather than once per
+    # card, so the roster is parsed a single time.
+    @team_by_slug = @cases.to_h { |kase| [kase.slug, Team.for_case(kase.slug)] }
 
-    cache_publicly([@profile, @cases])
+    cache_publicly([@cases, Team.version])
   end
 
   def show
@@ -20,14 +19,14 @@ class WorkController < ApplicationController
     cases = Case.ordered.to_a
     @case = cases.find { |kase| kase.slug == slug } or raise ActiveRecord::RecordNotFound
     @previous_case, @next_case = @case.neighbours(cases)
-    @position = @case.number(cases)
     @total = cases.size
+    @team = Team.for_case(@case.slug)
 
     # Which cases actually get opened is the one number that should decide the order of
     # /work, and nothing was counting it (handoff §9a). Recorded before the freshness check,
     # so a reader coming back to a page their browser has cached still counts as a reader.
     ViewTracking.record(self, @case)
 
-    cache_publicly(@case, last_modified: @case.updated_at)
+    cache_publicly([@case, Team.version], last_modified: @case.updated_at)
   end
 end

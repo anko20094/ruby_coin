@@ -322,8 +322,128 @@
   }
 }
 
-// The band is a scroll target now, so it needs room above it for the sticky nav.
-.wk-case__band { scroll-margin-top: 56px; }
+// The band is a scroll target, so it needs room above it for the sticky nav — which is 73px
+// tall, and 56 left the band's first 17px behind it whether you clicked the skip link or
+// arrived on /work/dna#engineers from someone else's chat.
+.wk-case__band {
+  scroll-margin-top: 88px;
+
+  // It takes focus when the reader jumps to it, so the keyboard carries on from here rather
+  // than from the link that sent them. It is a scroll destination, not a control: the ring the
+  // theme draws around a focused link would be a box around half the page.
+  &:focus { outline: none; }
+}
+
+// ── who worked on it ───────────────────────────────────────
+// Between the engineering track and the pager: a reader who has just been shown the work asks
+// who did it, and a client asks it first.
+.wk-case__team {
+  max-width: var(--case-max);
+  margin: 0 auto;
+  padding: 30px var(--page-pad) 0;
+}
+
+.wk-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.wk-teammate {
+  display: block;
+  border: var(--rule-row);
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+
+  .pf-did { margin-top: 13px; }
+}
+
+.wk-teammate__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wk-teammate__who { min-width: 0; }
+
+.wk-teammate__name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.wk-teammate__role {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  margin-top: 3px;
+}
+
+// One person did the whole thing. A grid holding a single card reads as an unfinished page;
+// this reads as the claim it is.
+.wk-solo {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: var(--rule-row);
+  border-top: 2px solid var(--ruby);
+  border-radius: var(--radius-card);
+}
+
+.wk-solo__body {
+  flex: 1;
+  min-width: 0;
+
+  .pf-did { margin-top: 12px; }
+}
+
+.wk-solo__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.wk-solo__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 5px;
+}
+
+// Whose team the other contributors were. The case page above already says how far down the
+// contributor list this one name sits, and these two have to agree.
+.wk-solo__outside {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+  line-height: 1.6;
+  margin-top: 11px;
+  max-width: 80ch;
+}
+
+.wk-solo__open {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ruby);
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .wk-solo {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .wk-solo__open { width: 100%; }
+}
 
 // One line and two links between the last figure and the pager: the page argues for two
 // thousand words and then has to say what to do about it.

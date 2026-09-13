@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# The CV: who this is, the summary, the contact column, and the three ordered lists /work
-# prints — career, stack groups, strengths.
+# The CV: who this is, the summary, the contact column, and the three ordered lists that /cv
+# and /team/danyil print — career, stack groups, strengths.
 #
 # All of it is one row. The lists used to be a `cv_blocks` table with its own model,
 # controller, policy and CRUD screens, which made a CV of ten lines behave like a collection
@@ -21,10 +21,13 @@ class CVProfile < ApplicationRecord
   STRUCTURES = {
     experience: {
       count: 4,
-      # `body` is the only one /work prints through ProseHelper#rich; the rest are escaped,
+      # `body` is the only one the CV pages print through ProseHelper#rich; the rest are escaped,
       # so an editor on them would put a literal <b> on the page.
+      # `period` is localised rather than plain because its open end is a word: "2022 — now"
+      # printed the one English word on an otherwise Ukrainian CV. A bare string still works —
+      # a date range reads the same in both languages.
       fields: {
-        org: :localised, title: :localised, place: :localised, period: :plain,
+        org: :localised, title: :localised, place: :localised, period: :localised,
         note: :localised, body: :rich, case_slugs: :list
       }
     },
@@ -68,13 +71,6 @@ class CVProfile < ApplicationRecord
       values = CONTACT_KEYS.map { |key| row[key].to_s.strip }
       values.any?(&:present?) ? values : nil
     end
-  end
-
-  # The portrait only renders once a real photograph is in place; the prototype's generated
-  # placeholder is deliberately not shipped. It is a repo asset rather than an upload because
-  # there is exactly one of it and it changes about as often as the CV does.
-  def portrait
-    Rails.root.glob('app/assets/images/work-portrait.*').min&.then { |path| File.basename(path) }
   end
 
   private

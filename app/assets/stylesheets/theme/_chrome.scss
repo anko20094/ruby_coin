@@ -53,27 +53,33 @@
     color: var(--ruby);
     border-bottom-color: var(--ruby);
   }
-
-  // A section that exists in the IA but has nothing to show yet: still in its place, so the
-  // shape of the site is honest, but plainly not a link.
-  &.is-soon {
-    color: var(--ink-quiet);
-    cursor: default;
-
-    &:hover { color: var(--ink-quiet); }
-  }
 }
 
-.rc-nav__soon {
+// The CV sits apart from the four sections, as a chip: it is one person's page on a site that
+// is a studio's, and it is the thing a recruiter arrives looking for.
+.rc-nav__tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rc-nav__cv {
+  @include controls.hit-row(32px);
+
+  padding: 0 9px;
   font-family: var(--font-mono);
-  // 9.5px is the floor §11 sets and this sat below it. It is the smallest thing on the page
-  // and it is the label that explains why an item is not a link, so it has to be readable.
-  font-size: 9.5px;
+  font-size: 11px;
   letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--ink-quiet);
-  vertical-align: super;
-  margin-left: 3px;
+  color: var(--ink-soft);
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-chip);
+  transition: color 0.18s, border-color 0.18s;
+
+  &:hover,
+  &.is-current {
+    color: var(--ruby);
+    border-color: var(--ruby);
+  }
 }
 
 .rc-nav__locales {
@@ -167,6 +173,8 @@
 // carried a message arrived silent, and the first Tab on every page landed inside the nav
 // with no way past it.
 .rc-skip {
+  @include controls.hit-row(38px);
+
   position: absolute;
   left: 12px;
   top: -60px;
@@ -302,6 +310,14 @@ $nav-drawer-at: 760px;
   .rc-nav {
     padding: 6px 20px;
     gap: 12px;
+
+    // No blur here, and the background is opaque instead. A backdrop-filter makes its element
+    // the containing block for every fixed-position descendant, so the drawer's `inset: 0 0 0
+    // auto` was resolving against the 57px nav bar rather than the viewport: the menu opened as
+    // a 293×116 box with 476px of content inside it, and not one of its seven links could be
+    // tapped. The blur is a desktop nicety; below this width the drawer covers the screen.
+    backdrop-filter: none;
+    background: var(--paper);
   }
 
   // A logo is a link like any other: 26px of ruby was the smallest tap target on the page.
@@ -309,7 +325,13 @@ $nav-drawer-at: 760px;
 
   .rc-nav__wordmark { font-size: 19px; }
 
-  .rc-nav__toggle { display: inline-flex; }
+  .rc-nav__toggle {
+    display: inline-flex;
+    // Above the open drawer: the burger turns into an X, and the X has to be the thing you
+    // press to close. The drawer was painting over it, so the only way out was a tap outside.
+    position: relative;
+    z-index: 1;
+  }
 
   .rc-nav__drawer {
     position: fixed;
@@ -357,6 +379,17 @@ $nav-drawer-at: 760px;
     min-height: 44px;
   }
 
+  .rc-nav__tools {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .rc-nav__cv {
+    min-height: 44px;
+    font-size: 13px;
+    padding: 0 14px;
+  }
+
   .rc-nav__locales { gap: 8px; }
 
   .rc-nav__locale {
@@ -392,6 +425,7 @@ $nav-drawer-at: 760px;
 
 @media (prefers-reduced-motion: reduce) {
   .rc-nav__drawer,
+  .rc-nav__cv,
   .rc-nav__burger span { transition: none; }
 }
 
@@ -566,7 +600,12 @@ $nav-drawer-at: 760px;
 
   .rc-palette__dialog { margin-top: 6vh; }
 
-  .rc-palette__row { grid-template-columns: 54px minmax(0, 1fr); }
+  // Eight rows a thumb has to pick between: they get the same target every other control has.
+  .rc-palette__row {
+    grid-template-columns: 54px minmax(0, 1fr);
+    min-height: 44px;
+    align-items: center;
+  }
 
   .rc-palette__hint { display: none; }
 }

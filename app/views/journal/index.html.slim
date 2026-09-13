@@ -22,16 +22,16 @@
   nav.jn-filter aria-label=t('journal.index.filter')
     span.jn-filter__label= "#{t('journal.index.filter')} ·"
     .rc-chips
-      = link_to t('journal.index.all'), journal_path(order: @order), class: journal_chip_class(active: @active_tag.nil?)
+      = link_to t('journal.index.all'), journal_path(order: @order), **journal_chip_attributes(active: @active_tag.nil?)
       - @tags.each do |tag|
         = link_to "##{tag.title}", journal_path(tag_id: tag.id, order: @order),
-          class: journal_chip_class(active: @active_tag == tag)
+          **journal_chip_attributes(active: @active_tag == tag)
 
     span.jn-filter__label.jn-filter__label--order= "#{t('journal.index.order.label')} ·"
     .rc-chips
       - Post::ORDER_TYPES.each do |order|
         = link_to t("journal.index.order.#{order}"), journal_path(order:, tag_id: @active_tag&.id),
-          class: journal_chip_class(active: @order == order)
+          **journal_chip_attributes(active: @order == order)
 
   - if @posts.any?
     .jn-entries

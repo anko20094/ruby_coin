@@ -61,15 +61,19 @@ describe 'locale negotiation', type: :request do
     expect(response).to have_http_status(:success)
   end
 
-  it 'takes an English reader from /cv to the English portfolio' do
-    english = { 'Accept-Language' => 'en' }
+  # /cv is the address a printed CV carries, and it used to answer in Ukrainian whoever asked.
+  # It is a page of its own now rather than a redirect to /work, but the negotiation is the
+  # same: the locale-less address picks a language and sends the reader there.
+  it 'takes an English reader from /cv to the English CV' do
+    get '/cv', headers: { 'Accept-Language' => 'en' }
 
-    get '/cv', headers: english
-    expect(response).to have_http_status(:moved_permanently)
-    expect(response).to redirect_to('/work')
+    expect(response).to have_http_status(:found)
+    expect(response).to redirect_to('/en/cv')
+  end
 
-    # Followed by hand rather than with follow_redirect!, which does not carry the header on.
-    get response.location, headers: english
-    expect(response).to redirect_to('/en/work')
+  it 'takes a Ukrainian reader from /cv to the Ukrainian one' do
+    get '/cv', headers: { 'Accept-Language' => 'uk,en;q=0.8' }
+
+    expect(response).to redirect_to('/uk/cv')
   end
 end

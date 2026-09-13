@@ -35,7 +35,7 @@ describe 'HTTP caching', type: :request do
   it 'stops being fresh when the content changes' do
     before_edit = etag_for('/en/work/dna')
 
-    Case.find_by!(slug: 'dna').update!(year: '2099')
+    Case.find_by!(slug: 'dna').update!(year: { 'en' => '2099', 'uk' => '2099' })
 
     get '/en/work/dna', headers: { 'If-None-Match' => before_edit }
 

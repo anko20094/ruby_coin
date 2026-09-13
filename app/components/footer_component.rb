@@ -16,17 +16,17 @@ class FooterComponent < ViewComponent::Base
     CONTACT_KEYS.filter_map { |key| rows[key] }
   end
 
-  # The studio row is left out entirely rather than shown greyed: the footer is a list of places
-  # to go, and there is nowhere to go yet.
-  #
-  # The first row used to be labelled "rss" and point at the home page — the design's wording
-  # kept, the feed never built. There is a feed now, so the label is true; the journal keeps
-  # its own row beside it.
+  # The footer is a list of places to go, and the roster is one of them: /team is deliberately
+  # not in the main nav, so this and /studio are how a reader finds it.
   def links
     [
       [I18n.t('work.footer.journal'), helpers.journal_path],
       [I18n.t('work.footer.feed'), helpers.feed_path(format: :atom)],
       [I18n.t('work.footer.work'), helpers.work_path],
+      [I18n.t('work.footer.team'), helpers.team_path],
+      [I18n.t('work.footer.cv'), helpers.cv_path],
+      # The FAQ answers the journal's readers, and nothing on the site pointed at it.
+      [I18n.t('titles.faq').downcase, helpers.faq_path],
       [I18n.t('work.footer.contact'), helpers.contact_path]
     ]
   end

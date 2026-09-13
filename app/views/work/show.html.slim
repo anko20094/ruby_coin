@@ -34,9 +34,11 @@ article.wk-case data-controller="track-jump"
       / retype these into notes and messages by hand; this is the cheapest thing on the page
       / and the one most likely to be used.
       - @case.metrics.each do |metric|
+        / The accessible name says what pressing it does; the figure itself is the visible label.
         button.wk-metric[type="button" data-controller="copy" data-action="copy#copy"
                          data-copy-text-value="#{plain(metric[:value])} — #{plain(metric[:label])}"
-                         data-copy-done-value=t('work.case.copied')]
+                         data-copy-done-value=t('work.case.copied')
+                         aria-label="#{t('work.case.copy')}: #{plain(metric[:value])} — #{plain(metric[:label])}"]
           .wk-metric__value.num= rich(metric[:value])
           .wk-metric__label= rich(metric[:label])
           span.wk-metric__flash[aria-live="polite" data-copy-target="flash"]
@@ -62,7 +64,7 @@ article.wk-case data-controller="track-jump"
             - @case.stack.each do |item|
               span.rc-chip.rc-chip--sm= item
 
-  section#engineers.wk-case__band
+  section#engineers.wk-case__band tabindex="-1"
     .wk-case__band-inner
       = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
       h2.wk-case__heading.is-small= rich(@case.engineering_heading)
@@ -78,6 +80,9 @@ article.wk-case data-controller="track-jump"
             .wk-quality__value.num= rich(metric[:value])
             .wk-quality__label= rich(metric[:label])
       .wk-case__scope= rich(@case.scope_note)
+
+  - if @team.any?
+    = render 'work/team', team: @team, slug: @case.slug
 
   / The page whose job is to convince someone ended at "here is the next case". A reader who
   / has just read 2,000 words of evidence should not have to go looking for the way to say so.

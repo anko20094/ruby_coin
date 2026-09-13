@@ -33,6 +33,38 @@ RSpec.describe 'Routes' do
     end
   end
 
+  describe 'GET /team' do
+    it 'routes to team#index' do
+      expect(get: '/team').to route_to('team#index')
+    end
+  end
+
+  describe 'GET /team/:id' do
+    it 'routes to team#show' do
+      expect(get: '/team/danyil').to route_to('team#show', id: 'danyil')
+    end
+  end
+
+  # One person, one page. Seven projects times six people would be 42 URLs of the same CV, so
+  # the project a reader arrived through travels as ?from= instead.
+  describe 'GET /work/:slug/team/:person' do
+    it 'is deliberately absent' do
+      expect(get: '/work/dna/team/danyil').not_to be_routable
+    end
+  end
+
+  describe 'GET /cv' do
+    it 'routes to cv#show, and is a page rather than a redirect to /work' do
+      expect(get: '/cv').to route_to('cv#show')
+    end
+  end
+
+  describe 'GET /studio' do
+    it 'routes to studio#show' do
+      expect(get: '/studio').to route_to('studio#show')
+    end
+  end
+
   describe 'GET /journal' do
     it 'routes to journal#index' do
       expect(get: '/journal').to route_to('journal#index')

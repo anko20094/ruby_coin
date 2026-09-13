@@ -28,6 +28,10 @@ export default class extends Controller {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     band.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" })
 
+    // Scrolling moves the page, not the keyboard. Without this the next Tab carried on from the
+    // link that was just used and landed back above the band — the jump undone by one keypress.
+    band.focus({ preventScroll: true })
+
     if (replace) history.replaceState(null, "", `#${this.anchorValue}`)
   }
 }

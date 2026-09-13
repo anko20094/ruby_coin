@@ -59,7 +59,7 @@ module Management
     end
 
     def plain_keys
-      %i[slug mark position own is_this_site year sector status stack_list]
+      %i[slug mark position own is_this_site stack_list]
     end
 
     def localised_keys

@@ -117,6 +117,9 @@ Metrics/MethodLength:
   Exclude:
     - 'db/**/*'
 
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
 Metrics/PerceivedComplexity:
   Max: 15
 

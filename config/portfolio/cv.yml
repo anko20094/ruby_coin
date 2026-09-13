@@ -1,4 +1,4 @@
-# RubyCoin · /work CV frame
+# RubyCoin · the CV — rendered by /cv and by /team/danyil
 # Source of truth: uploads/CV_full_new.pdf (read 2026-08-18).
 # `experience[].cases` holds slugs from cases.yml — render them as links to the case pages.
 cv:
@@ -12,8 +12,8 @@ cv:
     uk: "6+ років у продакшні"
   updated: "2026·08·18"
   summary:
-    en: "Six years of Rails in production. Three and a half of them on a US proptech platform — entity resolution, ETL and PostgreSQL at 100M-row scale. In parallel, five products of my own: 3M+ users, paying customers, run single-handed."
-    uk: "Шість років Rails у продакшні. Три з половиною з них — на американській proptech-платформі: entity resolution, ETL і PostgreSQL на масштабі 100 млн рядків. Паралельно — п’ять власних продуктів: 3+ млн користувачів, платні клієнти, веду сам."
+    en: "Six years of Rails in production. Three and a half of them on a US proptech platform — entity resolution, ETL and PostgreSQL at 100M-row scale. In parallel, five products of my own: 3M+ users, paying customers, architected and led end to end."
+    uk: "Шість років Rails у продакшні. Три з половиною з них — на американській proptech-платформі: entity resolution, ETL і PostgreSQL на масштабі 100 млн рядків. Паралельно — п’ять власних продуктів: 3+ млн користувачів, платні клієнти, спроєктував і вів від початку до кінця."
   contact:
     - - "email"
       - "anko20094@gmail.com"
@@ -54,7 +54,7 @@ cv:
       cases:
         - "intelligence"
         - "leads"
-    - period: "2022 — now"
+    - period: { en: "2022 — now", uk: "2022 — зараз" }
       org:
         en: "Own products"
         uk: "Власні продукти"

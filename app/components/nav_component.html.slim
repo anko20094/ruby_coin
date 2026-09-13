@@ -17,15 +17,14 @@ nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@w
   #rc-nav-drawer.rc-nav__drawer data-nav-target="drawer"
     .rc-nav__sections
       - sections.each do |section|
-        - if section.built?
-          = link_to section.label, section.path, class: "rc-nav__link #{'is-current' if current?(section)}",
-            aria: { current: ('page' if current?(section)) }
-        - else
-          span.rc-nav__link.is-soon title=t('work.nav.soon_title')
-            = "#{section.label} "
-            span.rc-nav__soon= t('work.nav.soon')
+        = link_to section.label, section.path, class: "rc-nav__link #{'is-current' if current?(section)}",
+          aria: { current: ('page' if current_page?(section)) }
 
-    = render 'shared/palette'
+    .rc-nav__tools
+      = link_to t('work.nav.cv'), helpers.cv_path, title: t('work.nav.cv_title'),
+        class: "rc-nav__cv #{'is-current' if cv_current?}",
+        aria: { current: ('page' if cv_current?) }
+      = render 'shared/palette'
 
     .rc-nav__locales
       - locales.each do |locale|

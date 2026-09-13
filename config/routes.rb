@@ -34,19 +34,23 @@ Rails.application.routes.draw do
     # One feed per language, at the address the footer advertises.
     get '/feed', to: 'feeds#feed', as: :feed, defaults: { format: :atom }
 
-    # /work — portfolio section. The index doubles as the CV, so /cv is gone for good: 301.
+    # /work — the portfolio, in three levels: the projects, one project, one person.
     get '/work', to: 'work#index', as: 'work'
     get '/work/:slug', to: 'work#show', as: 'work_case'
-    work = ->(params) { params[:locale].present? ? "/#{params[:locale]}/work" : '/work' }
-    get '/cv', to: redirect(status: 301) { |params, _request| work.call(params) }
+
+    # One person, one page. /work/:slug/team/:person would be seven projects times six people
+    # of duplicated CV, so the project a reader arrived through travels as ?from=:slug — a
+    # query parameter, because it has to survive being pasted into a chat.
+    get '/team', to: 'team#index', as: 'team'
+    get '/team/:id', to: 'team#show', as: 'person'
+
+    # /cv is a page, not a redirect to /work. It was one while /work carried the CV; /work
+    # stopped being one person's frame the moment six people appeared on it.
+    get '/cv', to: 'cv#show', as: 'cv'
 
     get '/contact', to: 'contact#show', as: 'contact'
     get '/faq', to: 'faq#index'
-
-    # /studio waits on real team data — the handoff forbids placeholder people. 302, not the
-    # 301 that `redirect` defaults to: this page is coming, and a permanent redirect would
-    # still be cached in browsers and search engines on the day it lands.
-    get '/studio', to: redirect(status: 302) { |params, _request| work.call(params) }, as: 'studio'
+    get '/studio', to: 'studio#show', as: 'studio'
 
     namespace :management do
       root 'posts#index', as: 'root'

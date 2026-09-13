@@ -27,10 +27,52 @@ describe 'the command palette', type: :request do
     expect(palette('dna').pluck('kind')).to include('case')
   end
 
+  it 'finds people, whom neither the journal search nor the cases can' do
+    result = palette('natalia').find { |r| r['kind'] == 'person' }
+
+    expect(result['url']).to eq(person_path('natalia', locale: 'en'))
+  end
+
+  # The names are translated and the ids are not, so the id is matched too.
+  it 'finds a person by id on a Ukrainian page' do
+    expect(palette('natalia', locale: 'uk').pluck('kind')).to include('person')
+  end
+
+  # The CV page is called "Curriculum vitae" and nobody types that. The address is the other
+  # name every page has, and it is the one on the nav chip.
+  it 'finds a page by its address when the title shares no word with it' do
+    result = palette('cv').find { |r| r['kind'] == 'page' }
+
+    expect(result['url']).to eq(cv_path(locale: 'en'))
+  end
+
+  it 'finds the roster by its address on a Ukrainian page' do
+    expect(palette('team', locale: 'uk').pluck('url')).to include(team_path(locale: 'uk'))
+  end
+
+  # A page is often called two things: the roster's heading is "Who is here" and every other
+  # surface — the footer, the eyebrow — calls it команда.
+  it 'finds a page by the other name the site prints for it' do
+    expect(palette('команда', locale: 'uk').pluck('url')).to include(team_path(locale: 'uk'))
+    expect(palette('crew').pluck('url')).to include(team_path(locale: 'en'))
+  end
+
   it 'finds the pages themselves' do
     result = palette('contact').find { |r| r['kind'] == 'page' }
 
     expect(result['url']).to eq(contact_path(locale: 'en'))
+  end
+
+  # The browser prints a row with textContent, so an entity arrives as its own characters.
+  it 'answers with text rather than with entities' do
+    expect(palette('mykhailo').first['hint']).to eq('cofounder · product & clients')
+  end
+
+  # The badge beside each row is read, so it is translated; `kind` stays the machine word.
+  it 'labels each row in the reader\'s language' do
+    expect(palette('dna').first['kind']).to eq('case')
+    expect(palette('dna').first['label']).to eq('case')
+    expect(palette('dna', locale: 'uk').first['label']).to eq('кейс')
   end
 
   it 'never offers a hidden entry' do

@@ -58,12 +58,21 @@ RSpec.describe Case do
   describe 'structured readers' do
     let(:kase) { described_class.find_by!(slug: 'intelligence') }
 
-    it 'localises labels inside metrics and quality' do
+    it 'localises both halves of a metric' do
       I18n.with_locale(:en) do
         expect(kase.metrics.size).to eq(4)
-        expect(kase.metrics.first[:value]).to eq(kase[:metrics].first['value'])
+        expect(kase.metrics.first[:value]).to eq(kase[:metrics].first['value']['en'])
         expect(kase.metrics.first[:label]).to eq(kase[:metrics].first['label']['en'])
       end
+    end
+
+    # Ukrainian groups thousands with a space and takes the comma for the decimal, so the figure
+    # is translated as surely as the words beside it.
+    it 'prints a figure the way the language writes it' do
+      rubycoin = described_class.find_by!(slug: 'rubycoin')
+
+      expect(I18n.with_locale(:en) { rubycoin.metrics.first[:value] }).to eq('89,030')
+      expect(I18n.with_locale(:uk) { rubycoin.metrics.first[:value] }).to eq('89 030')
     end
 
     it 'localises both halves of an engineering card' do
@@ -143,7 +152,10 @@ RSpec.describe Case do
     end
 
     it 'keeps only the keys the shape declares' do
-      row = { 'value' => '2.14M', 'label' => { 'en' => 'users', 'uk' => 'юзерів' }, 'salary' => 'none' }
+      row = {
+        'value' => { 'en' => '2.14M', 'uk' => '2,14 млн' },
+        'label' => { 'en' => 'users', 'uk' => 'юзерів' }, 'salary' => 'none'
+      }
       kase.metrics_rows = { '0' => row }
 
       expect(kase.metrics_rows.first.keys).to match_array(%w[value label])

@@ -15,6 +15,7 @@ import NavController from "./theme/nav_controller";
 import PaletteController from "./theme/palette_controller";
 import QuoteCardController from "./theme/quote_card_controller";
 import PasswordVisibilityController from "./theme/password_visibility_controller";
+import PrintController from "./theme/print_controller";
 
 const application = Application.start();
 application.register("ruby", RubyController);
@@ -28,3 +29,4 @@ application.register("nav", NavController);
 application.register("palette", PaletteController);
 application.register("quote-card", QuoteCardController);
 application.register("password-visibility", PasswordVisibilityController);
+application.register("print", PrintController);

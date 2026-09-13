@@ -73,18 +73,31 @@ export default class extends Controller {
     this.resultsTarget.replaceChildren(...results.map((result, position) => this.row(result, position)))
     this.emptyTarget.hidden = results.length > 0
     this.resultsTarget.hidden = results.length === 0
+    this.announce()
+  }
+
+  // aria-selected alone moves a highlight nothing announces: the caret stays in the input, so
+  // the input is what has to name the option the arrows are on.
+  announce() {
+    const active = this.resultsTarget.children[this.index]
+    if (active) {
+      this.inputTarget.setAttribute("aria-activedescendant", active.id)
+    } else {
+      this.inputTarget.removeAttribute("aria-activedescendant")
+    }
   }
 
   row(result, position) {
     const link = document.createElement("a")
     link.className = "rc-palette__row"
+    link.id = `rc-palette-row-${position}`
     link.href = result.url
     link.setAttribute("role", "option")
     link.setAttribute("aria-selected", position === 0 ? "true" : "false")
 
     const kind = document.createElement("span")
     kind.className = "rc-palette__kind"
-    kind.textContent = result.kind
+    kind.textContent = result.label || result.kind
 
     const title = document.createElement("span")
     title.className = "rc-palette__title"
@@ -109,6 +122,7 @@ export default class extends Controller {
       this.index = (this.index + step + rows.length) % rows.length
       rows.forEach((row, position) => row.setAttribute("aria-selected", position === this.index ? "true" : "false"))
       rows[this.index].scrollIntoView({ block: "nearest" })
+      this.announce()
     } else if (event.key === "Enter") {
       event.preventDefault()
       rows[this.index]?.click()

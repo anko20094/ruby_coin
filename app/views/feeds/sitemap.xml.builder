@@ -9,7 +9,8 @@ xml.urlset(xmlns: 'http://www.sitemaps.org/schemas/sitemap/0.9',
            'xmlns:xhtml' => 'http://www.w3.org/1999/xhtml') do
   entries = @pages.map { |path| [path, nil] } +
             @posts.map { |post| [post_path(post, locale: nil), post.updated_at] } +
-            @cases.map { |kase| [work_case_path(slug: kase.slug, locale: nil), kase.updated_at] }
+            @cases.map { |kase| [work_case_path(slug: kase.slug, locale: nil), kase.updated_at] } +
+            @people.map { |person| [person_path(person, locale: nil), nil] }
 
   # root_path is "/", which would spell the home page "/uk/" while its own canonical says
   # "/uk". A sitemap that disagrees with the canonical is worse than no sitemap.

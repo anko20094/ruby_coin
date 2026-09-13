@@ -43,5 +43,12 @@ describe ProseHelper do
       expect(helper.plain(nil)).to eq('')
       expect(helper.plain('  <i>DNA</i>  ')).to eq('DNA')
     end
+
+    # Every caller escapes again on the way out — a <title>, an attribute, an OG card — so a
+    # string that came back escaped reached the reader as "product &amp; clients".
+    it 'gives back the characters rather than their entities' do
+      expect(helper.plain('cofounder · product & clients')).to eq('cofounder · product & clients')
+      expect(helper.plain('<i>a</i> & "b"')).to eq('a & "b"')
+    end
   end
 end

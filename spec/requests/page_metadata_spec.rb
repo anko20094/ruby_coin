@@ -64,12 +64,55 @@ describe 'page metadata', type: :request do
   end
 
   describe '/work' do
-    it 'presents itself as a person, because that is what it is' do
+    it 'presents itself as the portfolio it is, not as a person' do
       get '/en/work'
+
+      expect(content_of('og:type')).to eq('website')
+      expect(response.body).not_to include('"@type":"ProfilePage"')
+      expect(content_of('og:image')).to eq('http://www.example.com/og/site-en.png')
+    end
+  end
+
+  describe '/cv' do
+    it 'is the page that presents itself as a person' do
+      get '/en/cv'
 
       expect(content_of('og:type')).to eq('profile')
       expect(response.body).to include('"@type":"ProfilePage"')
-      expect(content_of('og:image')).to eq('http://www.example.com/og/site-en.png')
+    end
+  end
+
+  # The schema read the CV directly, so every profile page described the owner.
+  describe 'a person page' do
+    it 'describes the person whose page it is' do
+      get '/en/team/natalia'
+
+      expect(response.body).to include('"name":"Natalia"')
+      expect(response.body).not_to include('"name":"Danyil Shkoropad"')
+    end
+
+    it 'publishes no invented profile links for a placeholder record' do
+      get '/en/team/mykhailo'
+
+      expect(response.body).not_to include('sameAs')
+    end
+
+    # Everything here escapes on the way out, so a helper that hands back entities doubles them:
+    # a role reading "product & clients" reached a share preview as "product &amp;amp; clients".
+    it 'writes an ampersand once, in the tab and in a share preview' do
+      get '/en/team/mykhailo'
+
+      expect(response.body).to include('<title>Mykhailo · cofounder · product &amp; clients | rubyco.in</title>')
+      expect(content_of('og:title')).to eq('Mykhailo · cofounder · product &amp; clients | rubyco.in')
+      expect(response.body).not_to include('&amp;amp;')
+    end
+
+    # A schema.org Person record for a machine is the one place the joke would stop being
+    # accurate.
+    it 'does not call the automated reviewer a person' do
+      get '/en/team/claude'
+
+      expect(response.body).not_to include('"@type":"ProfilePage"')
     end
   end
 

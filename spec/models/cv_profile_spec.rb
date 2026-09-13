@@ -50,12 +50,6 @@ RSpec.describe CVProfile do
     end
   end
 
-  describe '#portrait' do
-    it 'finds the photograph that is in place' do
-      expect(described_class.current.portrait).to eq('work-portrait.jpg')
-    end
-  end
-
   # The career, the stack groups and the strengths. They were a cv_blocks table with a model,
   # a controller and CRUD screens, which made a ten-line document behave like a collection you
   # browse; they are StructuredJson fields on this row now. See redesign_plan.md §11.16.

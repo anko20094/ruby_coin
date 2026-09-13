@@ -32,14 +32,17 @@ describe Management::CasesController, type: :request do
       get edit_management_case_path(kase, locale: 'en')
 
       expect(response.body).to include('case[title_en]', 'case[title_uk]')
-      expect(response.body).to include('case[metrics_rows][0][value]', 'case[metrics_rows][0][label][en]')
+      expect(response.body).to include('case[metrics_rows][0][value][en]', 'case[metrics_rows][0][label][en]')
 
       # What the case holds — not Case::STRUCTURES[:count] and not that plus a spare. The form
       # used to draw a fixed number of rows and there was no way to have any other number; the
       # count is a hint beside the heading now, and the rows are added and removed on screen.
       # The <template> row is not counted here: its index is StructuredRowsHelper::ROW_INDEX, not a
       # number, which is exactly what tells the two apart.
-      expect(response.body.scan(/case\[metrics_rows\]\[\d+\]\[value\]/).size).to eq(kase.metrics_rows.size)
+      # Two inputs per row now: a figure is written differently in the two languages, so it
+      # carries a language pair like the label beside it.
+      expect(response.body.scan(/case\[metrics_rows\]\[\d+\]\[value\]\[\w+\]/).size)
+        .to eq(kase.metrics_rows.size * I18n.available_locales.size)
       expect(response.body).to include('data-controller="structure-rows"')
     end
 
@@ -47,8 +50,8 @@ describe Management::CasesController, type: :request do
       get new_management_case_path(locale: 'en')
 
       # Plus one: the <template> the add button clones carries a row of its own.
-      expected = Case::STRUCTURES.fetch(:metrics).fetch(:count)
-      expect(response.body.scan(/case\[metrics_rows\]\[\d+\]\[value\]/).size).to eq(expected)
+      expected = Case::STRUCTURES.fetch(:metrics).fetch(:count) * I18n.available_locales.size
+      expect(response.body.scan(/case\[metrics_rows\]\[\d+\]\[value\]\[\w+\]/).size).to eq(expected)
       expect(response.body).to include(StructuredRowsHelper::ROW_INDEX)
     end
 
@@ -66,7 +69,9 @@ describe Management::CasesController, type: :request do
       # Lazily, or a case form boots sixty editors to type in one.
       expect(title['data-tinymce-lazy-value']).to eq('true')
 
-      expect(form.at_css('[name="case[metrics_rows][0][value]"]').name).to eq('input')
+      figure = form.at_css('[name="case[metrics_rows][0][value][en]"]')
+      expect(figure.name).to eq('input')
+      expect(figure['data-controller']).to be_nil
 
       # Every cloned row needs an id of its own or TinyMCE will not start on the second one.
       template_ids = form.css('template [id]').pluck('id')
@@ -92,13 +97,14 @@ describe Management::CasesController, type: :request do
 
     it 'updates the structured fields from the form, dropping the empty row' do
       rows = {
-        '0' => { 'value' => '1', 'label' => { 'en' => 'one', 'uk' => 'один' } },
-        '1' => { 'value' => '', 'label' => { 'en' => '', 'uk' => '' } }
+        '0' => { 'value' => { 'en' => '1', 'uk' => '1' }, 'label' => { 'en' => 'one', 'uk' => 'один' } },
+        '1' => { 'value' => { 'en' => '', 'uk' => '' }, 'label' => { 'en' => '', 'uk' => '' } }
       }
 
       patch management_case_path(kase, locale: 'en'), params: { case: { metrics_rows: rows } }
 
-      expect(kase.reload[:metrics]).to eq([{ 'value' => '1', 'label' => { 'en' => 'one', 'uk' => 'один' } }])
+      expect(kase.reload[:metrics])
+        .to eq([{ 'value' => { 'en' => '1', 'uk' => '1' }, 'label' => { 'en' => 'one', 'uk' => 'один' } }])
     end
 
     it 'edits the stack as one item per line' do

@@ -15,20 +15,26 @@ module MetaHelper
   SITE_NAME = 'rubyco.in'
   DESCRIPTION_LIMIT = 200
 
-  def page_meta(description: nil, image: nil, type: 'website', published_at: nil, updated_at: nil)
+  # `person` names who a profile page is about. Without it every profile page would describe
+  # the owner: the schema read CVProfile directly, so /team/natalia would have told a search
+  # engine it was Danyil's page.
+  def page_meta(description: nil, image: nil, type: 'website', published_at: nil, updated_at: nil, person: nil)
     @page_meta = {
       description: description, image: image, type: type,
-      published_at: published_at, updated_at: updated_at
+      published_at: published_at, updated_at: updated_at, person: person
     }.compact
   end
 
+  # Through ProseHelper#plain rather than strip_tags: what comes back here goes straight into an
+  # attribute, which escapes it again. strip_tags alone left the entities in, so a role reading
+  # "product & clients" was served to Telegram and Slack as "product &amp;amp; clients".
   def meta_description
     text = @page_meta&.dig(:description).presence || CVProfile.current.summary
-    strip_tags(text.to_s).squish.truncate(DESCRIPTION_LIMIT, separator: ' ')
+    plain(text).squish.truncate(DESCRIPTION_LIMIT, separator: ' ')
   end
 
   def meta_title
-    content_for?(:title) ? strip_tags(content_for(:title)).strip : SITE_NAME
+    content_for?(:title) ? plain(content_for(:title)) : SITE_NAME
   end
 
   def meta_type = @page_meta&.dig(:type) || 'website'
@@ -81,17 +87,26 @@ module MetaHelper
   end
 
   def profile_schema
-    profile = CVProfile.current
+    subject = @page_meta&.dig(:person) || owner_subject
 
     {
       '@context' => 'https://schema.org', '@type' => 'ProfilePage',
       url: canonical_url, inLanguage: I18n.locale.to_s,
       mainEntity: {
-        '@type' => 'Person', name: profile.name, jobTitle: profile.role,
-        description: strip_tags(profile.summary.to_s).squish,
-        url: canonical_url,
-        sameAs: profile.contact_rows.filter_map { |_, _, href| href unless href.to_s.start_with?('mailto:') }
+        '@type' => 'Person', name: subject[:name], jobTitle: subject[:role],
+        description: plain(subject[:description]).squish,
+        url: canonical_url, sameAs: Array(subject[:links]).presence
       }.compact
+    }
+  end
+
+  # /cv is the owner's page, so it describes the CV itself.
+  def owner_subject
+    profile = CVProfile.current
+
+    {
+      name: profile.name, role: profile.role, description: profile.summary,
+      links: profile.contact_rows.filter_map { |_, _, href| href unless href.to_s.start_with?('mailto:') }
     }
   end
 end
