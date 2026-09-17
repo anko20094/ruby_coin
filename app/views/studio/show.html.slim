@@ -33,3 +33,19 @@
           .st-card__link
             = "#{t('studio.show.cv_link')} "
             span aria-hidden="true" →
+
+  / Alumni: named, and off the crew. Most are names and nothing else — nobody here can keep a
+  / CV of theirs honest — so they print as a pill with nowhere to go. One who is still credited
+  / on a project has something behind the name, and #page? is what tells the two apart.
+  - if @alumni.any?
+    section.st-alumni
+      h2.st-alumni__title
+        = t('studio.show.alumni')
+        span.st-alumni__count= @alumni.size
+      p.st-alumni__note= t('studio.show.alumni_note')
+      ul.st-alumni__list
+        - @alumni.each do |person|
+          - if person.page?
+            li= link_to person.name, person_path(person), class: 'st-alumni__pill is-open'
+          - else
+            li.st-alumni__pill= person.name

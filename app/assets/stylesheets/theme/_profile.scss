@@ -24,6 +24,22 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  // A pinned column taller than the window is a column whose bottom nobody can reach: it holds
+  // still while the page scrolls under it, so its last rows only appear once the whole grid has
+  // gone past — which on /cv meant the education line showed up at the very end of the page or
+  // not at all. Measured 761px against a 96px offset: it wants 857px of window, and a laptop
+  // with browser chrome does not have it.
+  //
+  // The cap only bites when it has to. Where the column fits there is no scroll container and
+  // no scrollbar; where it does not, the overflow is reachable instead of hidden below the fold.
+  max-height: calc(100dvh - 96px - 24px);
+  overflow-y: auto;
+
+  // Given a colour, because an overlay scrollbar that only appears once you already scrolled
+  // cannot tell anyone there is something to scroll to.
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--ink-mute) 70%, transparent) transparent;
 }
 
 @media (max-width: 900px) {
@@ -32,10 +48,14 @@
     gap: 32px;
   }
 
-  // Sticky is meaningless in one column.
+  // Sticky is meaningless in one column, and so is the cap that goes with it: in one column the
+  // page scroll already reaches everything, and a height limit here would put a second scrollbar
+  // inside a phone screen.
   .split-aside {
     position: static;
     top: auto;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .split-aside .rc-monogram { width: min(200px, 45%); }

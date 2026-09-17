@@ -1,4 +1,9 @@
 span class=css_class style=style aria-hidden="true"
-  span.rc-monogram__initials= initials
+  / The photograph is decorative: the person's name is printed beside every stone on the site,
+  / so an alt text here would be the same words read twice.
+  - if photo?
+    = image_tag photo, class: 'rc-monogram__photo', alt: '', width: photo_width, height: photo_width, loading: 'lazy'
+  - else
+    span.rc-monogram__initials= initials
   - if machine?
     span.rc-monogram__flag CI

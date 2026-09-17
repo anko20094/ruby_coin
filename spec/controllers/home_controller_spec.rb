@@ -32,7 +32,7 @@ describe HomeController, type: :request do
     it 'counts the projects, the people and the year the oldest project started' do
       get root_path(locale: 'en')
 
-      expect(response.body).to include("#{Case.count} products · #{Team.people.size} of us · shipping since 2022")
+      expect(response.body).to include("#{Case.count} products · #{Team.crew.size} of us · shipping since 2022")
     end
 
     it 'carries the headline and both halves of the lede' do
@@ -67,14 +67,16 @@ describe HomeController, type: :request do
     it 'shows the crew, each row linking at that person' do
       get root_path(locale: 'en')
 
-      expect(response.body.scan('class="hm-crew__row hover-row"').size).to eq(Team.people.size)
+      expect(response.body.scan('class="hm-crew__row hover-row"').size).to eq(Team.crew.size)
       expect(response.body).to include(person_path('claude', locale: 'en'))
     end
 
     it 'counts the humans on the roster separately, because one of them is not' do
       get root_path(locale: 'en')
 
-      expect(response.body).to include('6 of us · 5 of them human')
+      humans = Team.crew.count { |person| !person.machine? }
+
+      expect(response.body).to include("#{Team.crew.size} of us · #{humans} of them human")
     end
 
     # It used to be one five-column strip here, attributed to the studio as a whole. A studio
@@ -89,7 +91,7 @@ describe HomeController, type: :request do
       get root_path(locale: 'uk')
 
       expect(response.body).to include(I18n.t('home.index.headline_lead', locale: :uk))
-      expect(response.body).to include('нас 6')
+      expect(response.body).to include("нас #{Team.crew.size}")
     end
   end
 

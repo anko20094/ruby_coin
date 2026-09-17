@@ -80,7 +80,7 @@ module Search
     # a table. The id is matched as well as the name, so "natalia" finds Наталя on a Ukrainian
     # page — the names are translated, the ids are not.
     def people
-      Team.people.select { |person| matches_person?(person) }.map do |person|
+      Team.people.select { |person| person.page? && matches_person?(person) }.map do |person|
         Result.new(kind: 'person', title: self.class.plain(person.name), hint: self.class.plain(person.role),
                    url: routes.person_path(person, locale: locale))
       end

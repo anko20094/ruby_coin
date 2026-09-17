@@ -19,14 +19,4 @@ module ApplicationHelper
   def full_title(page_title = '')
     page_title.present? ? "#{page_title} | #{MetaHelper::SITE_NAME}" : MetaHelper::SITE_NAME
   end
-
-  # Still read by the old Bootstrap navbar on the Devise screens, the last pages that have
-  # not moved to the theme layout. It goes when they do.
-  def active_class(link_path)
-    current_page?(link_path) ? 'active' : ''
-  end
-
-  def switch_locale_to
-    I18n.locale == :en ? :uk : :en
-  end
 end

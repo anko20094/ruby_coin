@@ -18,7 +18,7 @@ class HomeController < ApplicationController
     @latest = Post.main.includes(:tags, :user, :translations).first ||
               Post.active.includes(:tags, :user, :translations).first
     @cases = Case.ordered.limit(RECENT_CASES)
-    @people = Team.people
+    @people = Team.crew
     @projects_count = Case.count
     @first_year = Case.first_year
   end

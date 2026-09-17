@@ -87,7 +87,7 @@ describe 'page metadata', type: :request do
     it 'describes the person whose page it is' do
       get '/en/team/natalia'
 
-      expect(response.body).to include('"name":"Natalia"')
+      expect(response.body).to include('"name":"Nataliia Makarenko"')
       expect(response.body).not_to include('"name":"Danyil Shkoropad"')
     end
 
@@ -102,8 +102,8 @@ describe 'page metadata', type: :request do
     it 'writes an ampersand once, in the tab and in a share preview' do
       get '/en/team/mykhailo'
 
-      expect(response.body).to include('<title>Mykhailo · cofounder · product &amp; clients | rubyco.in</title>')
-      expect(content_of('og:title')).to eq('Mykhailo · cofounder · product &amp; clients | rubyco.in')
+      expect(response.body).to include('<title>Mykhail Yun · cofounder · product &amp; clients | rubyco.in</title>')
+      expect(content_of('og:title')).to eq('Mykhail Yun · cofounder · product &amp; clients | rubyco.in')
       expect(response.body).not_to include('&amp;amp;')
     end
 

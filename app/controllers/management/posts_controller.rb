@@ -42,16 +42,8 @@ module Management
 
     def update
       if persist
-        respond_to do |format|
-          format.html do
-            flash[:success] = t('.success')
-            redirect_to management_posts_path
-          end
-
-          format.turbo_stream do
-            flash.now[:success] = t('.success')
-          end
-        end
+        flash[:success] = t('.success')
+        redirect_to management_posts_path
       else
         render :edit, status: :unprocessable_content
       end
@@ -114,14 +106,8 @@ module Management
     def destroy
       @post.destroy
 
-      respond_to do |format|
-        format.html do
-          flash[:success] = t('.success')
-          redirect_to management_posts_path, status: :see_other
-        end
-
-        format.turbo_stream { flash.now[:success] = t('.success') }
-      end
+      flash[:success] = t('.success')
+      redirect_to management_posts_path, status: :see_other
     end
 
     def translate

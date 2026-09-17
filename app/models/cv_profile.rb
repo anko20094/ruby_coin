@@ -49,28 +49,16 @@ class CVProfile < ApplicationRecord
   LOCALISED_SCALARS.each do |field|
     define_method(field) { localised(self[field]) }
 
+    # Readers only: the writers belonged to the admin form this document no longer has. The
+    # importer assigns the whole pair at once, and lib/tasks/cv.rake reads name_en to report.
     I18n.available_locales.each do |locale|
       define_method(:"#{field}_#{locale}") { self[field].to_h[locale.to_s] }
-      define_method(:"#{field}_#{locale}=") do |value|
-        self[field] = self[field].to_h.merge(locale.to_s => value)
-      end
     end
   end
-
-  CONTACT_KEYS = %w[key label href].freeze
 
   # [key, label, href] per row, printed in order.
   def contact_rows
     self[:contact].to_a.map { |row| Array(row) }
-  end
-
-  def contact_rows=(submitted)
-    rows = submitted.to_h.sort_by { |index, _| index.to_i }.map { |_, row| row.to_h }
-
-    self[:contact] = rows.filter_map do |row|
-      values = CONTACT_KEYS.map { |key| row[key].to_s.strip }
-      values.any?(&:present?) ? values : nil
-    end
   end
 
   private

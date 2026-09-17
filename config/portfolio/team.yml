@@ -9,7 +9,7 @@
 # `solo: true` renders as a statement ("Solo — the whole stack"), never as an empty team
 # block. Only the two myHomeIQ cases are solo — everything else has a named team. `outside:` is the honest note for commercial work: the wider team existed but was
 # the client's, not this studio's. Do not drop it — on those two cases the case page itself
-# already prints "9th of 38 contributors", and the team block must agree with it.
+# already prints its own — "9th of 34 contributors" on leads, "#2 / 14" on intelligence — and the team block must agree with it.
 #
 # `did:` is two lines. Not three, not a paragraph. Role + period + two lines is the whole
 # format, and it is what keeps six people on one screen without inflation.
@@ -26,8 +26,8 @@ contributions:
         - en: "Partitioning and read/write splitting as history reached eight years."
           uk: "Партиціювання й розведення читання/запису, коли історії стало вісім років."
       outside:
-        en: "The other 14 contributors were the client’s own team — not people from this studio."
-        uk: "Решта 14 контриб’юторів — власна команда клієнта, не люди з цієї студії."
+        en: "The other 13 contributors were the client’s own team — not people from this studio."
+        uk: "Решта 13 контриб’юторів — власна команда клієнта, не люди з цієї студії."
 
   dna:
     - person: "danyil"
@@ -48,15 +48,15 @@ contributions:
           uk: "Ціноутворення й рекламні кампанії за зростанням клієнтів ×20 за 14 місяців."
     - person: "natalia"
       role: { en: "backend · data", uk: "бекенд · дані" }
-      period: "2024—2026"
+      period: "2025—2026"
       did:
-        - en: "Semantic dedup queries over the 1536-dim embedding column and its HNSW index."
-          uk: "Запити семантичної дедуплікації по колонці 1536-вимірних embeddings та її HNSW-індексу."
-        - en: "The per-channel JSONB prompt composition that made tuning a no-deploy change."
-          uk: "Збірка промптів на канал із JSONB — тюнінг без деплою."
+        - en: "The Gemini embedding pass and the HNSW index on the 1536-dimension column it writes to."
+          uk: "Проходка embeddings на Gemini і HNSW-індекс на 1536-вимірній колонці, у яку вона пише."
+        - en: "Background jobs and the backup routine that runs behind all of it."
+          uk: "Фонові джоби й рутина бекапів, що працює за всім цим."
     - person: "oleksii"
       role: { en: "fullstack", uk: "фулстек" }
-      period: "2024—2025"
+      period: "2025—2026"
       did:
         - en: "Panels inside the Telegram state machine — the product has five HTTP routes and no views."
           uk: "Панелі всередині Telegram-стейт-машини — у продукту п’ять HTTP-роутів і жодної в’юшки."
@@ -64,18 +64,18 @@ contributions:
           uk: "Екрани біллінгу й флоу фабрики ботів під клієнта."
     - person: "oleksandr"
       role: { en: "fullstack", uk: "фулстек" }
-      period: "2024—2026"
-      did:
-        - en: "Both delivery pipelines — live mirroring and cursor-based drip backfill through source history."
-          uk: "Обидва пайплайни доставки — живе дзеркалення й крапельний backfill історії джерела за курсором."
-        - en: "Ad-stripping and rewrite rules — the part of the pipeline the customer actually tunes."
-          uk: "Правила вичищення реклами й переписування — та частина пайплайна, яку клієнт справді налаштовує."
-    - person: "claude"
-      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
       period: "2025—2026"
       did:
-        - en: "Automated review of every PR against a 13-point checklist, inline in the diff."
-          uk: "Автоматичне рев’ю кожного PR за чеклистом із 13 пунктів, інлайн у дифі."
+        - en: "Post creation and the per-channel posting settings — the screens a customer spends their day in."
+          uk: "Створення постів і налаштування публікації на канал — екрани, у яких клієнт проводить день."
+        - en: "Worked on the ad-stripping and rewrite rules, and on the ad-reservation service."
+          uk: "Працював над правилами вичищення реклами й переписування та над сервісом бронювання рекламних слотів."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2026"
+      did:
+        - en: "Automated review of every pull request against an eight-point checklist, inline in the diff."
+          uk: "Автоматичне рев’ю кожного pull request за чеклистом із восьми пунктів, інлайн у дифі."
         - en: "Advisory only. Two humans still have to approve before anything merges."
           uk: "Тільки дорадчо. Перед мерджем усе одно потрібні два людських апрува."
 
@@ -86,8 +86,8 @@ contributions:
       did:
         - en: "Product and architecture from a blank page; the immutable ledger and all 196 deploys."
           uk: "Продукт і архітектура з чистого аркуша; незмінний леджер і всі 196 деплоїв."
-        - en: "Set the process 14 developers work inside: ticket branches, review, CI, mandatory tests."
-          uk: "Поставив процес, у якому працюють 14 розробників: тікет-бранчі, рев’ю, CI, обов’язкові тести."
+        - en: "Set the process ten developers work inside: ticket branches, review, CI, mandatory tests."
+          uk: "Поставив процес, у якому працюють десять розробників: тікет-бранчі, рев’ю, CI, обов’язкові тести."
     - person: "oleksandr"
       role: { en: "frontend · Vue 3", uk: "фронтенд · Vue 3" }
       period: "2024—2026"
@@ -98,34 +98,42 @@ contributions:
           uk: "UI маркетплейсу й колекційних предметів, включно з флоу дуелей."
     - person: "oleksii"
       role: { en: "fullstack", uk: "фулстек" }
-      period: "2024—2026"
+      period: "2024—2025"
       did:
-        - en: "Command modules against the reflective router — a chunk of the 63 commands and 298 callbacks."
-          uk: "Модулі команд на рефлективному роутері — частина з 63 команд і 298 колбеків."
-        - en: "Giveaway and achievement mechanics."
-          uk: "Механіки розіграшів і ачівок."
+        - en: "The Mini App view layer and the donation flow behind it."
+          uk: "В’юшковий шар Mini App і флоу донатів за ним."
+        - en: "Worked on the giveaway and achievement mechanics."
+          uk: "Працював над механіками розіграшів і ачівок."
+    - person: "vladyslav"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024—2025"
+      did:
+        - en: "The quotes surface — menu, categories, backgrounds — and the API endpoint that hands a quote to the render service."
+          uk: "Поверхня цитат — меню, категорії, фони — і API-ендпоінт, який віддає цитату в рендер-сервіс."
+        - en: "Hardened the error paths: Telegram client failures, AI-filter job errors, Rollbar under rate limiting."
+          uk: "Зміцнив шляхи помилок: збої Telegram-клієнта, падіння джоби AI-фільтрів, Rollbar під рейт-лімітом."
     - person: "natalia"
       role: { en: "backend · data", uk: "бекенд · дані" }
-      period: "2025—2026"
+      period: "2024—2026"
       did:
-        - en: "Counter-row aggregation that keeps 22.9M messages inside 1.48M rows."
-          uk: "Агрегація в рядки-лічильники, що тримає 22,9 млн повідомлень у 1,48 млн рядків."
-        - en: "Statistics queries that stay fast on a 2 vCPU box."
-          uk: "Запити статистики, які лишаються швидкими на 2 vCPU."
+        - en: "The OpenRouter features, the background jobs behind them, and the backup routine."
+          uk: "Фічі на OpenRouter, фонові джоби за ними і рутина бекапів."
+        - en: "Kept both languages of the interface in step as the command surface grew."
+          uk: "Тримала обидві мови інтерфейсу в синхроні, поки росла поверхня команд."
     - person: "mykhailo"
       role: { en: "cofounder · product", uk: "кофаундер · продукт" }
       period: "2023—2026"
       did:
         - en: "Turns chat owners’ complaints into tickets — most of the moderation rules started as a customer call."
           uk: "Перетворює скарги власників чатів на тікети — більшість правил модерації почалися з дзвінка клієнта."
-        - en: "Sold and onboarded the 17 white-label bots running on the same core."
-          uk: "Продав і завів 17 white-label ботів на тому ж ядрі."
+        - en: "Sold and onboarded the 17 white-label bots that ran on the shared core."
+          uk: "Продав і завів 17 white-label ботів, які працювали на спільному ядрі."
     - person: "claude"
-      role: { en: "pull request review · secret scanning", uk: "рев’ю PR · сканування секретів" }
-      period: "2025—2026"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2026"
       did:
-        - en: "Review on every push, plus secret scanning before anything reaches a branch."
-          uk: "Рев’ю на кожен пуш плюс сканування секретів до того, як щось потрапить у бранч."
+        - en: "Review the moment a pull request opens for review — never on a draft, never twice on the same push."
+          uk: "Рев’ю в момент, коли pull request відкривається на рев’ю — ніколи на драфті й ніколи двічі на той самий пуш."
         - en: "Most useful on the ledger: flags any migration that could mutate a transaction."
           uk: "Найкорисніший на леджері: позначає будь-яку міграцію, що може змінити транзакцію."
 
@@ -140,8 +148,8 @@ contributions:
         - en: "Whole product verticals from controller to documented endpoint."
           uk: "Цілі продуктові вертикалі від контролера до документованого ендпоінта."
       outside:
-        en: "A codebase with 38 contributors; the other 37 were the client’s own team. I am the 9th by volume."
-        uk: "Кодова база з 38 контриб’юторами; решта 37 — власна команда клієнта. Я 9-й за обсягом."
+        en: "A codebase with 34 contributors; the other 33 were the client’s own team. I am the 9th by volume."
+        uk: "Кодова база з 34 контриб’юторами; решта 33 — власна команда клієнта. Я 9-й за обсягом."
 
   imagemaker:
     - person: "danyil"
@@ -150,16 +158,24 @@ contributions:
       did:
         - en: "The dual-mode runtime, and the decision to make it the shared render engine for a second product."
           uk: "Двохрежимний рантайм і рішення зробити з нього спільний рендер-рушій для другого продукту."
-        - en: "Drove peak render to 586 MB on a 1.9 GB box and OOM kills to zero."
-          uk: "Звів піковий рендер до 586 МБ на 1,9 ГБ і OOM-кіли до нуля."
-    - person: "natalia"
-      role: { en: "backend · typography", uk: "бекенд · типографіка" }
-      period: "2024—2026"
+        - en: "Drove peak render to 586 MB on a 1.9 GB box, and the web process stopped being killed at all."
+          uk: "Звів піковий рендер до 586 МБ на 1,9 ГБ, і веб-процес перестало вбивати зовсім."
+    - person: "vladyslav"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024—2025"
       did:
-        - en: "Three binary searches over real Pango measurements — no magic font-size constants."
-          uk: "Три бінарні пошуки по реальних вимірах Pango — жодних магічних констант кегля."
-        - en: "The Telegram-entity → Pango markup pass, applied in reverse index order."
-          uk: "Перетворення ентіті Telegram у Pango-розмітку у зворотному порядку індексів."
+        - en: "Moved the quote rendering into this service and built the API endpoint the second product calls."
+          uk: "Переніс рендер цитат у цей сервіс і зробив API-ендпоінт, який викликає другий продукт."
+        - en: "Part of the type measurement and the text formatting the rendered image depends on."
+          uk: "Частина вимірів кегля й форматування тексту, на яких тримається зображення."
+    - person: "oleksandr"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2025"
+      did:
+        - en: "The <code>/qx</code> command — ready-made author quotes, which is the half of the service the second product calls."
+          uk: "Команда <code>/qx</code> — готові цитати авторів, тобто та половина сервісу, яку викликає другий продукт."
+        - en: "Per-user quote settings and the <code>/stat</code> command behind them."
+          uk: "Налаштування цитат на користувача і команда <code>/stat</code> за ними."
     - person: "mykhailo"
       role: { en: "cofounder · product", uk: "кофаундер · продукт" }
       period: "2022—2026"
@@ -170,7 +186,7 @@ contributions:
           uk: "Позиціювання й вимоги до того, що має бути на картці цитати."
     - person: "claude"
       role: { en: "pull request review", uk: "рев’ю pull request’ів" }
-      period: "2025—2026"
+      period: "2026"
       did:
         - en: "Reviews the render path, where a leak shows up as an OOM two days later."
           uk: "Рев’ює шлях рендеру, де тічка вилазить як OOM через два дні."
@@ -199,47 +215,31 @@ contributions:
       role: { en: "tech lead · architect · reviewer", uk: "тех-лід · архітектор · рев’ювер" }
       period: "2022—2026"
       did:
-        - en: "Set the tasks and reviewed the pull requests of 19 contributors, mostly interns."
-          uk: "Ставив задачі й рев’ював pull request’и 19 контриб’юторів, переважно інтернів."
+        - en: "Set the tasks and reviewed the pull requests of ten contributors, mostly interns."
+          uk: "Ставив задачі й рев’ював pull request’и десяти контриб’юторів, переважно інтернів."
         - en: "Carried the upgrades live: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
           uk: "Провів апгрейди живими: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
-    - person: "oleksii"
-      role: { en: "fullstack · Hotwire", uk: "фулстек · Hotwire" }
-      period: "2024—2026"
-      did:
-        - en: "Frames and streams where they earn their place — Turbo Drive is deliberately off."
-          uk: "Фрейми й стріми там, де вони виправдані — Turbo Drive свідомо вимкнений."
-        - en: "The reading surface: lesson navigation, search UI, code blocks."
-          uk: "Поверхня читання: навігація уроків, UI пошуку, блоки коду."
     - person: "oleksandr"
       role: { en: "fullstack", uk: "фулстек" }
-      period: "2024—2026"
+      period: "2023—2024"
       did:
-        - en: "The custom management panel that replaced the admin framework."
-          uk: "Власна панель управління, що замінила адмін-фреймворк."
-        - en: "Five image versions per upload, so a card never downloads a hero."
-          uk: "П’ять версій зображення на завантаження, щоб картка не тягнула героя."
-    - person: "natalia"
-      role: { en: "backend · data", uk: "бекенд · дані" }
-      period: "2025—2026"
-      did:
-        - en: "Statistics as five independently tested query objects."
-          uk: "Статистика як п’ять незалежно протестованих query-об’єктів."
-        - en: "Full-text search across translations, so a Ukrainian query finds a Ukrainian article."
-          uk: "Повнотекстовий пошук по перекладах, щоб український запит знаходив українську статтю."
+        - en: "The admin post and tag screens, back when the site still had an admin framework."
+          uk: "Екрани постів і тегів в адмінці — ще тоді, коли на сайті був адмін-фреймворк."
+        - en: "The after_party task that regenerated every photo format across the archive."
+          uk: "Таск after_party, що перегенерував усі формати фото по архіву."
     - person: "mykhailo"
       role: { en: "cofounder · product", uk: "кофаундер · продукт" }
       period: "2022—2026"
       did:
-        - en: "Recruited the 19 contributors and ran the intake — the school side of the project is his."
-          uk: "Набрав 19 контриб’юторів і вів відбір — шкільна частина проєкту на ньому."
+        - en: "Recruited the contributors and ran the intake — the school side of the project is his."
+          uk: "Набрав контриб’юторів і вів відбір — шкільна частина проєкту на ньому."
         - en: "Editorial plan and distribution, back when articles were still being published."
           uk: "Редакційний план і дистрибуція — ще коли статті публікувалися."
     - person: "claude"
       role: { en: "pull request review", uk: "рев’ю pull request’ів" }
-      period: "2025—2026"
+      period: "2026"
       did:
-        - en: "Inline PR comments — the first reviewer an intern meets, before a human spends time."
-          uk: "Інлайн-коментарі в PR — перший рев’ювер, якого зустрічає інтерн, до того як людина витратить час."
+        - en: "Inline comments on request — an intern types <code>review</code> on the pull request and gets one before a human spends time."
+          uk: "Інлайн-коментарі на запит — інтерн пише <code>review</code> у pull request і отримує рев’ю до того, як людина витратить час."
         - en: "On this page too: the section you are reading was reviewed the same way."
           uk: "І на цій сторінці теж: розділ, який ви читаєте, проходив те саме рев’ю."

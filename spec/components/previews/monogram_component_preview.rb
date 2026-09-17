@@ -3,7 +3,7 @@
 class MonogramComponentPreview < ViewComponent::Preview
   # Every person on the roster at the sidebar size.
   def roster
-    render_with_template(locals: { people: Team.people })
+    render_with_template(locals: { people: Team.crew })
   end
 
   # The machine on the roster carries a CI flag across the bottom.

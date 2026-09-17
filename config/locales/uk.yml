@@ -94,7 +94,6 @@ uk:
     attributes:
       user:
         email: Пошта
-        old_password: Старий пароль
         password: Пароль
         password_confirmation: Підтвердження паролю
         current_password: Поточний пароль
@@ -292,37 +291,6 @@ uk:
         success: Кейс видалено
 
 
-    cv_blocks:
-      index:
-        title: Блоки CV
-        edit_profile: Редагувати рамку CV
-        add: "Додати: %{kind}"
-        kinds:
-          experience: досвід
-          stack_group: група стеку
-          strength: сильна сторона
-      new:
-      edit:
-      form:
-        kind: Тип
-        position: Позиція
-        org: Роботодавець
-        title: Роль
-        place: Місце
-        note: Нотатка
-        body: Опис
-        label: Підпис
-        text: Текст
-        period: Період
-        items: Пункти, по одному в рядок
-        case_slugs: Слаги кейсів, через кому
-      create:
-        success: Блок CV створено
-      update:
-        success: Блок CV оновлено
-      destroy:
-        success: Блок CV видалено
-
     sidebar_component:
       home: до списку дописів
       where: /management
@@ -346,12 +314,6 @@ uk:
         label: підпис
         title: заголовок
         body: текст
-        org: роботодавець
-        place: місце
-        period: період
-        note: нотатка
-        case_slugs: слаги кейсів, по одному в рядок
-        items: пункти, по одному в рядок
     tags:
       index:
         tags: Існуючі теги
@@ -424,11 +386,7 @@ uk:
       close: закрити
     skip_to_content: Перейти до вмісту
   nav_item:
-    sign_in: Увійти
     sign_out: Вихід
-    panel: Панель
-    root: Головна
-    faq: FAQ
   application_controller:
     alert: Ви не авторизовані для виконання цього екшену.
 
@@ -527,8 +485,10 @@ uk:
     show:
       eyebrow: студія
       title: Студія
-      lede: Невелика Rails-студія. Команда нижче — ті, хто тут сьогодні. Відкрий будь-кого, щоб побачити CV цієї людини й проєкти, у яких вона брала участь.
+      lede: Невелика Rails-студія. Команда нижче — люди, за якими стоять ці проєкти. Відкрий будь-кого, щоб побачити CV і те, у чому людина брала участь. Разом із нами здавали й інші — вони названі в кінці.
       cv_link: CV і проєкти
+      alumni: випускники
+      alumni_note: Здавали разом із нами й пішли далі.
 
   contact:
     show:

@@ -71,8 +71,8 @@ RSpec.describe Case do
     it 'prints a figure the way the language writes it' do
       rubycoin = described_class.find_by!(slug: 'rubycoin')
 
-      expect(I18n.with_locale(:en) { rubycoin.metrics.first[:value] }).to eq('89,030')
-      expect(I18n.with_locale(:uk) { rubycoin.metrics.first[:value] }).to eq('89 030')
+      expect(I18n.with_locale(:en) { rubycoin.metrics.second[:value] }).to eq('31k')
+      expect(I18n.with_locale(:uk) { rubycoin.metrics.second[:value] }).to eq('31 тис.')
     end
 
     it 'localises both halves of an engineering card' do

@@ -65,12 +65,27 @@ describe MonogramComponent, type: :component do
   end
 
   describe '.of' do
-    it 'builds one from a roster record' do
+    it 'builds one from a roster record, and keeps the machine flagged' do
       render_inline(described_class.of(Team.person!('claude'), size: 52, ring: :mute))
 
-      expect(page).to have_css('.rc-monogram.rc-monogram--mute')
+      expect(page).to have_css('.rc-monogram.rc-monogram--mute.rc-monogram--machine')
       expect(page).to have_css('.rc-monogram__flag')
-      expect(page.find('.rc-monogram__initials').text).to eq('C')
+    end
+
+    it 'draws the photograph where the record has one' do
+      render_inline(described_class.of(Team.person!('danyil'), size: 52))
+
+      expect(page).to have_css('.rc-monogram--photo .rc-monogram__photo')
+      expect(page).to have_no_css('.rc-monogram__initials')
+    end
+
+    # Initials are the finished state for a record with no photograph, not a missing one — the
+    # frame, the ring and the radius are the same either way.
+    it 'falls back to initials where it does not' do
+      render_inline(described_class.of(Team.person!('oleksandr'), size: 52))
+
+      expect(page).to have_no_css('.rc-monogram__photo')
+      expect(page.find('.rc-monogram__initials').text).to eq('OS')
     end
   end
 

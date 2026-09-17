@@ -16,7 +16,7 @@ class FeedsController < ApplicationController
     @pages = sitemap_pages
     @posts = Post.active.limit(200).to_a
     @cases = Case.ordered.to_a
-    @people = Team.people
+    @people = Team.crew
 
     return unless stale?(etag: [@posts.map(&:updated_at).max, @cases.map(&:updated_at).max, Team.version],
                          public: true)

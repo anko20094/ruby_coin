@@ -17,7 +17,7 @@ describe TeamController do
     it 'renders one card per person, in file order' do
       get(action, params:)
 
-      expect(response.body.scan('class="tm-card hover-row"').size).to eq(Team.people.size)
+      expect(response.body.scan('class="tm-card hover-row"').size).to eq(Team.crew.size)
       expect(response.body.index('Danyil')).to be < response.body.index('Claude')
     end
 
@@ -33,13 +33,13 @@ describe TeamController do
     it 'chips every placeholder record' do
       get(action, params:)
 
-      expect(response.body.scan('PLACEHOLDER').size).to eq(Team.people.count(&:placeholder?))
+      expect(response.body.scan('PLACEHOLDER').size).to eq(Team.crew.count(&:placeholder?))
     end
 
     it 'renders the Ukrainian copy under the uk locale' do
       get(action, params: { locale: 'uk' })
 
-      expect(response.body).to include('Хто тут є', 'Наталя')
+      expect(response.body).to include('Хто тут є', 'Наталія')
     end
   end
 
@@ -52,7 +52,7 @@ describe TeamController do
     it 'renders the CV written in people.yml' do
       get(action, params:)
 
-      expect(response.body).to include('pf-career', 'pgvector')
+      expect(response.body).to include('pf-career', 'Capybara')
     end
 
     it "renders the owner's CV from the database, so it is the one /cv shows" do
@@ -64,12 +64,12 @@ describe TeamController do
     it 'lists every project the person worked on, each anchored for a deep link' do
       get(action, params:)
 
-      expect(response.body.scan('class="worked-row hover-row').size).to eq(4)
+      expect(response.body.scan('class="worked-row hover-row').size).to eq(Team.contributions_of('natalia').size)
       expect(response.body).to include('id="c-dna"')
     end
 
     it 'prints the placeholder banner on a record whose dates are invented' do
-      get(action, params:)
+      get(action, params: { locale: 'en', id: 'oleksandr' })
 
       expect(response.body).to include('pf-placeholder')
     end

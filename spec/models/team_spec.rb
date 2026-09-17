@@ -10,13 +10,56 @@ RSpec.describe Team do
 
   describe '.people' do
     it 'reads the roster in file order, which is display order' do
-      expect(described_class.people.map(&:id)).to eq(%w[danyil mykhailo oleksii oleksandr natalia claude])
+      expect(described_class.crew.map(&:id)).to eq(%w[danyil mykhailo oleksii natalia vladyslav claude])
+    end
+
+    it 'separates the crew from the people who have left, and loses nobody between them' do
+      expect(described_class.people).to match_array(described_class.crew + described_class.alumni)
+      expect(described_class.crew & described_class.alumni).to be_empty
+      expect(described_class.alumni.map(&:id)).to include('oleksandr')
+    end
+  end
+
+  # Hiding someone is the one operation with no example in the shipped content — the file has no
+  # hidden record and should not need one to keep the mechanism working. So the roster is stubbed
+  # here rather than edited, and the point being proved is that a hidden person leaves every list
+  # while their rows in team.yml stay exactly where they were.
+  describe 'a hidden record' do
+    let(:absent) { Person.new('id' => 'absent', 'status' => 'hidden', 'name' => { 'en' => 'Absent' }) }
+
+    before do
+      described_class.reload!
+      allow(described_class).to receive(:everyone).and_return(described_class.crew + [absent])
+      allow(described_class).to receive(:person).and_wrap_original do |original, id|
+        id.to_s == 'absent' ? absent : original.call(id)
+      end
+    end
+
+    after { described_class.reload! }
+
+    it 'is in the file and on none of the lists' do
+      expect(described_class.everyone).to include(absent)
+      expect(described_class.people).not_to include(absent)
+      expect(described_class.crew).not_to include(absent)
+      expect(described_class.alumni).not_to include(absent)
+    end
+
+    it 'has no page, so the link nobody should follow cannot be built' do
+      expect(absent).not_to be_page
+      expect { described_class.person!('absent') }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it 'takes their credits off the case pages without taking them out of team.yml' do
+      allow(described_class).to receive(:person).with('natalia').and_return(absent)
+
+      expect(described_class.for_case('dna').map(&:person_id)).not_to include('natalia')
+      expect(described_class.contributions_of('natalia')).to be_present
     end
   end
 
   describe '.person!' do
     it 'finds a person by id' do
-      expect(described_class.person!('natalia').short).to eq('NT')
+      expect(described_class.person!('natalia').short).to eq('NM')
     end
 
     it 'raises for an id nobody has, so a bad link is a 404 rather than a blank page' do
@@ -44,20 +87,20 @@ RSpec.describe Team do
 
   describe '.contributions_of' do
     it 'returns every project one person touched' do
-      expect(described_class.contributions_of('natalia').map(&:slug))
-        .to match_array(%w[dna wardybot imagemaker rubycoin])
+      expect(described_class.contributions_of('mykhailo').map(&:slug))
+        .to match_array(%w[dna wardybot imagemaker chatgpt rubycoin])
     end
 
     it "orders them by the projects' own display order, not by this file's" do
       order = Case.slugs
 
-      expect(described_class.contributions_of('natalia', order: order).map(&:slug))
-        .to eq(%w[dna wardybot imagemaker rubycoin])
+      expect(described_class.contributions_of('mykhailo', order: order).map(&:slug))
+        .to eq(%w[dna wardybot imagemaker chatgpt rubycoin])
     end
 
     # Otherwise a project taken off /work leaves a row pointing at a 404 behind it.
     it 'drops a contribution whose project is no longer in the portfolio' do
-      expect(described_class.contributions_of('natalia', order: %w[dna rubycoin]).map(&:slug))
+      expect(described_class.contributions_of('mykhailo', order: %w[dna rubycoin]).map(&:slug))
         .to eq(%w[dna rubycoin])
     end
   end
@@ -65,8 +108,28 @@ RSpec.describe Team do
   describe '.version' do
     # A page cached on the roster has to expire when the roster does, and the files are the
     # only thing that can say so — there is no updated_at on a YAML file worth trusting.
-    it 'is a digest of the two files' do
+    it 'is a digest' do
       expect(described_class.version).to match(/\A\h{64}\z/)
+    end
+
+    # A replaced photograph changes neither YAML. Hashing only those left every roster page's
+    # ETag identical, so a browser holding the page went on serving the old face from its own
+    # cache — the only thing that had changed was a file on disk.
+    it 'moves when a photograph is replaced, and settles when it is put back' do
+      file = Rails.root.join('app', 'assets', 'images', 'people', 'natalia.jpg')
+      original = file.binread
+      before = described_class.version
+
+      file.binwrite("#{original}\0")
+      described_class.reload!
+      expect(described_class.version).not_to eq(before)
+
+      file.binwrite(original)
+      described_class.reload!
+      expect(described_class.version).to eq(before)
+    ensure
+      file.binwrite(original)
+      described_class.reload!
     end
   end
 end

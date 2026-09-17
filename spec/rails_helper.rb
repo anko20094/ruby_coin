@@ -28,18 +28,10 @@ RSpec.configure do |config|
   config.before do
     Rails.application.routes.default_url_options[:locale] = I18n.default_locale
   end
-  config.before(:each, type: :feature) do
-    default_url_options[:locale] = I18n.default_locale
-  end
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [Rails.root.join('spec', 'fixtures')]
   config.include Devise::Test::ControllerHelpers, type: :controller
-  config.include Devise::Test::IntegrationHelpers, type: :system
   config.include Devise::Test::IntegrationHelpers, type: :request
-
-  # Ahoy no longer counts bots, and a request without a User-Agent is a bot as far as the
-  # browser gem is concerned — which is every rack-test request. A request spec stands in for
-  # a person with a browser, so it carries a browser's header.
 
   config.include ActiveSupport::Testing::TimeHelpers
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -70,5 +62,4 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
   config.include FactoryBot::Syntax::Methods
-  config.include_context 'when carrierwave cleanup', include_shared: true
 end

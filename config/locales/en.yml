@@ -11,17 +11,12 @@ en:
     remember_me: Remember me
     forgot_password: Forgot password?
     sign_in: Sign in
-    sign_up: Sign up
     update: Update
-    delete_account: Delete account
-    have_account: Do you already have an account?
-    back: Back
     send_reset_password: Send me reset password instructions
     create: Create
     yes_text: 'Yes'
     no_text: 'No'
   labels:
-    registration: Registration
     enter_account: Account login
     show_password: Show the password
     edit_account: Edit account
@@ -95,7 +90,6 @@ en:
     attributes:
       user:
         email: Email
-        old_password: Old password
         password: Password
         password_confirmation: Password confirmation
         current_password: Current password
@@ -284,7 +278,6 @@ en:
         engineering_items: Engineering cards
         plain_body: Plain-words paragraphs
         mine: What was mine
-        expected: "the design draws %{count}"
       create:
         success: Case successfully created
       update:
@@ -292,37 +285,6 @@ en:
       destroy:
         success: Case successfully deleted
 
-
-    cv_blocks:
-      index:
-        title: CV blocks
-        edit_profile: Edit the CV frame
-        add: "Add %{kind}"
-        kinds:
-          experience: career
-          stack_group: stack group
-          strength: strength
-      new:
-      edit:
-      form:
-        kind: Kind
-        position: Position
-        org: Employer
-        title: Role
-        place: Place
-        note: Note
-        body: Body
-        label: Label
-        text: Text
-        period: Period
-        items: Items, one per line
-        case_slugs: Case slugs, comma separated
-      create:
-        success: CV block created
-      update:
-        success: CV block updated
-      destroy:
-        success: CV block deleted
 
     sidebar_component:
       home: back to the post list
@@ -347,12 +309,6 @@ en:
         label: label
         title: title
         body: text
-        org: employer
-        place: place
-        period: period
-        note: note
-        case_slugs: case slugs, one per line
-        items: items, one per line
     tags:
       index:
         tags: Exist tags
@@ -416,11 +372,7 @@ en:
       close: close
     skip_to_content: Skip to the content
   nav_item:
-    sign_in: Sign in
     sign_out: Sign out
-    panel: Panel
-    root: Main page
-    faq: FAQ
   application_controller:
     alert: You are not authorized to perform this action.
   
@@ -520,8 +472,10 @@ en:
     show:
       eyebrow: studio
       title: The studio
-      lede: A small Rails studio. The crew below is who is here today — open anyone for their CV and the projects they took part in.
+      lede: A small Rails studio. The crew below are the people behind these projects — open anyone for their CV and what they took part in. More have shipped with us; they are named at the end.
       cv_link: cv & projects
+      alumni: alumni
+      alumni_note: Shipped with us and moved on.
 
   contact:
     show:

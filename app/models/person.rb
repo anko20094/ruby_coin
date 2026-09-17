@@ -3,21 +3,32 @@
 # One record from config/portfolio/people.yml: who someone is, and their CV. What they did on
 # a project is a Contribution, kept in team.yml and reached through #contributions.
 #
-# Three states, and two of them announce themselves on the page: a full CV; a placeholder
-# (`placeholder: true` — real role, invented dates, a loud banner); and no CV at all
-# (`cv: null`), which renders as "not filled in yet" rather than as an invented career.
+# `status:` is how someone joins and leaves without their work leaving with them:
+#
+#   active (default) — on the crew, on every page
+#   alumni           — off the crew, still credited on the cases they worked on
+#   hidden           — off the site entirely; the record and its contributions stay in the file
+#
+# The point of `hidden` is that taking someone down is one word rather than a deletion: their
+# rows in team.yml stay put, the diff says what happened, and putting them back is the same
+# word again. The point of `alumni` is that leaving a studio does not unwrite the code.
+#
+# The CV has three states of its own, and two announce themselves on the page: a full CV; a
+# placeholder (`placeholder: true` — real role, invented dates, a loud banner); and no CV at
+# all (`cv: null`), which renders as "not filled in yet" rather than as an invented career.
 class Person
   include LocalisedJson
 
   # A CV nobody has dated, or one dated longer ago than this, is shown as a draft.
   STALE_AFTER = 1.year
 
-  attr_reader :id, :short
+  STATUSES = %w[active alumni hidden].freeze
+
+  attr_reader :id
 
   def initialize(attributes)
     @attributes = attributes
     @id = attributes.fetch('id')
-    @short = attributes.fetch('short')
   end
 
   def to_param = id
@@ -25,6 +36,32 @@ class Person
   def name = localised(@attributes['name'])
   def role = localised(@attributes['role'])
   def blurb = localised(@attributes['blurb'])
+
+  # Only a crew card draws a monogram, and a name-only alumnus has no initials to draw one from.
+  def short = @attributes['short']
+
+  # A file under app/assets/images/people. Absent means initials, which is a finished state and
+  # not a missing one — see MonogramComponent.
+  def photo
+    name = @attributes['photo']
+
+    "people/#{name}" if name.present?
+  end
+
+  def status
+    value = @attributes['status'].presence || 'active'
+
+    STATUSES.include?(value) ? value : raise(ArgumentError, "#{id}: unknown status #{value.inspect}")
+  end
+
+  def active? = status == 'active'
+  def alumni? = status == 'alumni'
+  def hidden? = status == 'hidden'
+
+  # Whether this record is worth opening. An alumnus credited on a project has something to
+  # show and the case page links at them; one who is only a name has nothing behind the link,
+  # and a link that leads nowhere is worse than a name that does not pretend to.
+  def page? = !hidden? && (cv? || contributions.any?)
 
   def machine? = @attributes['machine'] == true
   def placeholder? = @attributes['placeholder'] == true

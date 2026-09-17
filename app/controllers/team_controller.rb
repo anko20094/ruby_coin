@@ -8,7 +8,7 @@
 # "what did this person do on that project" and must not have to scroll for the answer.
 class TeamController < ApplicationController
   def index
-    @people = Team.people
+    @people = Team.crew
     @order = Case.slugs
 
     # CVProfile is in the key because the owner's card reads it: his CV is the database row, so

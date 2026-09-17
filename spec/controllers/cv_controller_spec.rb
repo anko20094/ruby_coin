@@ -47,7 +47,7 @@ describe CVController do
   it 'renders the Ukrainian copy under the uk locale' do
     get(action, params: { locale: 'uk' })
 
-    expect(response.body).to include('Резюме', 'Данило Шкоропад')
+    expect(response.body).to include('Резюме', 'Даниїл Шкоропад')
   end
 
   it 'declares itself a person to a search engine' do

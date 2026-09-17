@@ -52,6 +52,6 @@ describe FooterComponent, type: :component do
     end
 
     expect(page).to have_text('Україна · віддалено')
-    expect(page).to have_text('Данило Шкоропад')
+    expect(page).to have_text('Даниїл Шкоропад')
   end
 end

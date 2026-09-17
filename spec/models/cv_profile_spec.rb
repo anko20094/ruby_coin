@@ -21,7 +21,7 @@ RSpec.describe CVProfile do
   describe 'localised scalars' do
     it 'returns the current locale' do
       I18n.with_locale(:en) { expect(described_class.current.name).to eq('Danyil Shkoropad') }
-      I18n.with_locale(:uk) { expect(described_class.current.name).to eq('Данило Шкоропад') }
+      I18n.with_locale(:uk) { expect(described_class.current.name).to eq('Даниїл Шкоропад') }
     end
 
     it 'refuses a scalar written in one language only' do
@@ -36,17 +36,6 @@ RSpec.describe CVProfile do
   describe 'contact rows' do
     it 'keeps key, label and href in the order they are printed' do
       expect(described_class.current.contact_rows.first).to eq(%w[email anko20094@gmail.com mailto:anko20094@gmail.com])
-    end
-
-    it 'takes the indexed rows a form sends and drops the empty one' do
-      profile = described_class.current
-      profile.contact_rows = {
-        '1' => { 'key' => 'telegram', 'label' => '@x', 'href' => 'https://t.me/x' },
-        '0' => { 'key' => 'email', 'label' => 'a@b.c', 'href' => 'mailto:a@b.c' },
-        '2' => { 'key' => '', 'label' => '', 'href' => '' }
-      }
-
-      expect(profile.contact_rows).to eq([%w[email a@b.c mailto:a@b.c], ['telegram', '@x', 'https://t.me/x']])
     end
   end
 

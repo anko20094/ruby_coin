@@ -132,7 +132,7 @@ describe WorkController do
       get(action, params: { locale: 'en', slug: 'leads' })
 
       expect(response.body).to include('wk-solo__outside')
-      expect(response.body).to include('38 contributors')
+      expect(response.body).to include('34 contributors')
     end
 
     it 'wraps the pager at the end of the list' do

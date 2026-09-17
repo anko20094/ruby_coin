@@ -22,12 +22,10 @@ export default class extends Controller {
       no_results: this.renderNoResults.bind(this)
     },
     onItemAdd: function(value, $item) {
-      document.getElementById("tags-ts-control") && (document.getElementById("tags-ts-control").value = "");
       document.getElementById("post_tag_ids-ts-control") && (document.getElementById("post_tag_ids-ts-control").value = "");
     },
     onItemRemove: function(value, $item) {
-      document.getElementById("tags-ts-control") && (document.getElementById("tags-ts-control").value = "");
-      document.getElementById("post_tag_ids-ts-control") && (document.getElementById("post_tag_ids-ts-control").value = ""); 
+      document.getElementById("post_tag_ids-ts-control") && (document.getElementById("post_tag_ids-ts-control").value = "");
     }
     
   }

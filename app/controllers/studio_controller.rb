@@ -5,7 +5,8 @@
 # three edits.
 class StudioController < ApplicationController
   def show
-    @people = Team.people
+    @people = Team.crew
+    @alumni = Team.alumni
 
     cache_publicly(Team.version)
   end

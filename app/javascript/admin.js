@@ -34,23 +34,10 @@ application.register("structure-rows", StructureRowsController)
 import SidebarController from "./controllers/sidebar_controller"
 application.register("sidebar", SidebarController)
 
-import "bootstrap/js/dist/dropdown"
-import "bootstrap/js/dist/collapse"
-import "bootstrap/js/dist/modal"
-import { BootstrapToggle } from "bootstrap5-toggle"
-
+// No Bootstrap JS either. The dropdown went with the old post index, the modal with the delete
+// confirmation that is a button_to and confirm_controller now, and the collapse with the old
+// navbar — the sidebar has its own Stimulus controller.
+//
 // No editor import here. TinyMCE is self-hosted under public/tinymce and loads itself — core,
 // theme, icons, plugins and skin — the first time a screen on the page has a textarea asking
 // for it. Bundling it would put 500 KB of editor into every admin screen, list pages included.
-
-const initBootstrapToggles = () => {
-  document
-    .querySelectorAll("input[type='checkbox'][data-toggle='toggle']")
-    .forEach((element) => {
-      // bootstrap5-toggle stores an instance on element.bsToggle
-      if (!element.bsToggle) new BootstrapToggle(element)
-    })
-}
-
-document.addEventListener("DOMContentLoaded", initBootstrapToggles)
-document.addEventListener("turbo:load", initBootstrapToggles)

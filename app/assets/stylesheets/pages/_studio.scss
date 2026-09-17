@@ -1,3 +1,5 @@
+@use '../theme/controls';
+
 // /studio — the same roster as /team at a lower density, and the way into it from the nav.
 .st-page {
   max-width: 1100px;
@@ -83,4 +85,73 @@
 
 @media (prefers-reduced-motion: reduce) {
   .st-card { transition: none; }
+}
+
+// Alumni. Dashed, per the handoff: the border says "not a card, nothing to click" before the
+// cursor does. A pill is not a control, so it carries no hit target and no hover.
+.st-alumni {
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: var(--rule-row);
+}
+
+.st-alumni__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-quiet);
+}
+
+.st-alumni__count {
+  font-size: 10px;
+  color: var(--ruby);
+}
+
+.st-alumni__note {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ink-quiet);
+  text-wrap: pretty;
+}
+
+.st-alumni__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.st-alumni__pill {
+  padding: 6px 14px;
+  border: 1px dashed color-mix(in oklab, var(--ink-mute) 55%, transparent);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+// A pill that opens something is a control and has to be one under a thumb. It also stops being
+// dashed: the dashes are what tell the reader there is nothing behind the other names.
+a.st-alumni__pill.is-open {
+  @include controls.hit-row(32px);
+
+  border-style: solid;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--ruby);
+    color: var(--ruby);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.st-alumni__pill.is-open { transition: none; }
 }

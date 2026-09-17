@@ -22,7 +22,7 @@ puts "\nseeding #{Rails.env}"
 # the same importers the deploy runs are the only way it gets in.
 Cases::Importer.call
 CV::Importer.call
-say "cases: #{Case.count} · cv blocks: #{CVBlock.count} · profile: #{CVProfile.current.name}"
+say "cases: #{Case.count} · profile: #{CVProfile.current.name}"
 
 # --- a way in -----------------------------------------------------------------------------
 admin = User.find_or_initialize_by(email: ENV.fetch('SEED_ADMIN_EMAIL', 'admin@rubyco.in'))

@@ -123,7 +123,7 @@
         .mg-field
           = f.label :tag_ids, t('.tags'), class: 'mg-field__label'
           = f.collection_select :tag_ids, (tags || post.tags), :id, :title, { selected: post.tag_ids },
-            { multiple: true, class: 'mg-input js-multiple-select', data: { controller: :tomselect, ajax_url: '/api/tags' } }
+            { multiple: true, class: 'mg-input', data: { controller: :tomselect, ajax_url: '/api/tags' } }
 
         .mg-field
           = f.label :user_id, t('.author'), class: 'mg-field__label'

@@ -96,10 +96,10 @@ RSpec.describe Person do
     end
 
     it 'carries both languages, and leaves the detail out where there is none' do
-      item = I18n.with_locale(:uk) { Team.person!('oleksii').not_work.first }
+      items = I18n.with_locale(:uk) { Team.person!('oleksii').not_work }
 
-      expect(item[:label]).to be_present
-      expect(item[:detail]).to be_nil
+      expect(items.pluck(:label)).to all(be_present)
+      expect(items.pluck(:detail)).to include(nil)
     end
   end
 end

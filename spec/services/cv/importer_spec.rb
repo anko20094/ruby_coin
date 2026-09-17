@@ -16,7 +16,7 @@ RSpec.describe CV::Importer do
   it 'joins the yaml name and nameUk into one language pair' do
     described_class.call
 
-    expect(CVProfile.current[:name]).to eq({ 'en' => 'Danyil Shkoropad', 'uk' => 'Данило Шкоропад' })
+    expect(CVProfile.current[:name]).to eq({ 'en' => 'Danyil Shkoropad', 'uk' => 'Даниїл Шкоропад' })
   end
 
   # A strength is a bare {en, uk} in the YAML, and the row is that value — it used to be

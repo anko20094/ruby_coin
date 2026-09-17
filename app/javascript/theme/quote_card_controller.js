@@ -69,7 +69,7 @@ export default class extends Controller {
   typing(element) {
     if (!element) return false
     const name = element.tagName?.toLowerCase()
-    return name === "input" || name === "textarea" || name === "trix-editor" || element.isContentEditable
+    return name === "input" || name === "textarea" || element.isContentEditable
   }
 
   open(text) {
