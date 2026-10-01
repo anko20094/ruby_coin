@@ -86,4 +86,33 @@ describe NavComponent, type: :component do
     expect(page.all('.rc-nav__locale').map(&:text)).to eq(%w[UK EN])
     expect(page.find('.rc-nav__locale.is-current').text).to eq('EN')
   end
+
+  describe 'the language switcher' do
+    def switcher_hrefs(path)
+      I18n.with_locale(:en) do
+        with_request_url(path) { render_inline(described_class.new) }
+      end
+
+      page.all('.rc-nav__locale').pluck(:href)
+    end
+
+    it 'points each language at this same page' do
+      expect(switcher_hrefs('/en/work/dna')).to eq(%w[/uk/work/dna /en/work/dna])
+    end
+
+    it 'carries the query string across' do
+      expect(switcher_hrefs('/en/journal?tag_id=3&order=best'))
+        .to eq(%w[/uk/journal?order=best&tag_id=3 /en/journal?order=best&tag_id=3])
+    end
+
+    # url_for reads host, action, controller and the like as routing instructions, and the
+    # address bar is the reader's — or whoever sent them the link.
+    %w[host=evil.example script_name=x anchor=y protocol=javascript controller=x action=x _recall=x].each do |query|
+      it "keeps ?#{query} a value in the query, on this site" do
+        hrefs = switcher_hrefs("/en/faq?#{query}")
+
+        expect(hrefs).to eq(["/uk/faq?#{query}", "/en/faq?#{query}"])
+      end
+    end
+  end
 end

@@ -7,6 +7,9 @@
 class MonogramComponent < ViewComponent::Base
   RINGS = %i[ink mute paper].freeze
 
+  PHOTO_WIDTHS = [120, 280].freeze
+  PHOTO_ORIGINAL_WIDTH = 560
+
   # Below this the CI label is a red smudge rather than a word, so it is not drawn — and the
   # ring turns ruby in its place, because a machine seated unlabelled among four faces is the
   # one thing this design must not do. The component decides it rather than a container query:
@@ -49,9 +52,17 @@ class MonogramComponent < ViewComponent::Base
     ].compact.join(' ')
   end
 
-  # Twice the drawn size, capped at what the file actually holds: the largest stone on the site
-  # is 280px, and asking for 560 on a phone strip that draws it at 32 wastes the visit.
-  def photo_width = [size * 2, 560].min
+  # Beside each 560px photograph sit <name>-120.<ext> and <name>-280.<ext>, so a 26px stone does
+  # not fetch the file a 280px one needs.
+  def photo_responsive
+    smaller = PHOTO_WIDTHS.filter_map do |width|
+      path = photo.sub(/(?=\.\w+\z)/, "-#{width}")
+      [path, "#{width}w"] if Rails.application.assets.load_path.find(path)
+    end
+    return {} if smaller.empty?
+
+    { srcset: smaller.to_h.merge(photo => "#{PHOTO_ORIGINAL_WIDTH}w"), sizes: "#{size}px" }
+  end
 
   def style = "--monogram-size: #{size}px; --monogram-angle: #{angle}deg"
 end

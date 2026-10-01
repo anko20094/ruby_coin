@@ -200,6 +200,9 @@ $home-max: 1320px;
   gap: 12px;
   padding: 12px 14px;
 
+  // The list clips to its rounded corners, which would cut a ring drawn outside the link.
+  &:focus-visible { outline-offset: -2px; }
+
   + .hm-crew__row {
     border-top: 1px solid color-mix(in oklab, var(--ink-mute) 20%, transparent);
   }

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateCvTables < ActiveRecord::Migration[8.1]
+class CreateCVTables < ActiveRecord::Migration[8.1]
   def change
     # The frame around the cases: who this is, how to reach them, when it was last checked.
     # One row, ever — CVProfile.current is the only way it is read.

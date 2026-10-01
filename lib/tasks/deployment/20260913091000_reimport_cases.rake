@@ -13,6 +13,7 @@ namespace :after_party do
     result = Cases::Importer.call
 
     puts "cases: #{result.imported.size} imported"
+    puts "in the table, not in the yaml: #{result.strays.join(', ')}" if result.strays.any?
     abort "the copy does not match the source:\n  #{result.mismatches.join("\n  ")}" unless result.clean?
 
     puts 'every field matches the yaml'

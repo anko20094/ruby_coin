@@ -143,8 +143,8 @@ contributions:
       role: { en: "Senior Backend Engineer", uk: "Senior Backend Engineer" }
       period: "2022—2025"
       did:
-        - en: "Stripe billing, the 9×9 permission matrix, and both sides of the cross-service integration."
-          uk: "Біллінг Stripe, матриця прав 9×9 і обидві сторони міжсервісної інтеграції."
+        - en: "Stripe billing, the 9×12 permission matrix, and both sides of the cross-service integration."
+          uk: "Біллінг Stripe, матриця прав 9×12 і обидві сторони міжсервісної інтеграції."
         - en: "Whole product verticals from controller to documented endpoint."
           uk: "Цілі продуктові вертикалі від контролера до документованого ендпоінта."
       outside:

@@ -109,7 +109,7 @@
 
 .rc-footer {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 32px;
   align-items: flex-end;
   margin-top: 60px;
@@ -143,8 +143,9 @@
 
 .rc-footer__sections {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 36px;
+  gap: 0 36px;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--ink-soft);
@@ -222,6 +223,8 @@
 .rc-flash__text { flex: 1; }
 
 .rc-flash__close {
+  @include controls.hit-square(32px, 44px);
+
   flex: none;
   background: none;
   border: 0;
@@ -229,7 +232,6 @@
   font-family: var(--font-mono);
   font-size: 16px;
   line-height: 1;
-  padding: 4px 8px;
   color: var(--ink-soft);
   border-radius: var(--radius-chip-sm);
 
@@ -416,11 +418,40 @@ $nav-drawer-at: 760px;
 
   .rc-footer__sections {
     justify-content: flex-start;
-    flex-wrap: wrap;
     gap: 18px;
   }
 
   .rc-footer__contacts { text-align: left; }
+}
+
+// Nothing can open the drawer when scripting is off, so there it stays in the page, under the
+// brand, instead of off-canvas behind a button that does nothing.
+@media (max-width: $nav-drawer-at) and (scripting: none) {
+  .rc-nav { flex-wrap: wrap; }
+
+  .rc-nav__toggle { display: none; }
+
+  .rc-nav__drawer {
+    position: static;
+    width: 100%;
+    padding: 0 0 8px;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    transform: none;
+    visibility: visible;
+    flex-flow: row wrap;
+    gap: 0 20px;
+    overflow: visible;
+  }
+
+  .rc-nav__sections {
+    flex-flow: row wrap;
+    gap: 0 20px;
+    font-size: 15px;
+  }
+
+  .rc-nav__tools { width: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -440,10 +471,13 @@ $nav-drawer-at: 760px;
 // the platform rather than from three hundred lines of JavaScript that gets one of them wrong.
 .rc-palette { display: contents; }
 
+@media (scripting: none) {
+  .rc-palette { display: none; }
+}
+
 .rc-palette__open {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
+  @include controls.hit-row(32px);
+
   padding: 0 4px;
   background: none;
   border: 0;
@@ -511,6 +545,12 @@ $nav-drawer-at: 760px;
   border: 0;
 
   &:focus { outline: none; }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 4px;
+    border-radius: var(--radius-chip-sm);
+  }
 
   &::placeholder { color: var(--ink-quiet); }
 }
@@ -638,6 +678,11 @@ $nav-drawer-at: 760px;
   }
 
   &[hidden] { display: none; }
+}
+
+// The hint names a key, and a selection made by touch has no keyboard to press it on.
+@media (hover: none), (pointer: coarse) {
+  .rc-quote__hint { display: none; }
 }
 
 .rc-quote__card {

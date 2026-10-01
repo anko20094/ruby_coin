@@ -71,6 +71,54 @@ RSpec.describe Person do
     end
   end
 
+  describe 'the owner, asked several things in one request' do
+    subject(:person) { Team.owner }
+
+    include_context 'when the cv is imported'
+
+    def cv_queries(&)
+      statements = []
+      collect = ->(*, payload) { statements << payload[:sql] if payload[:sql].include?('FROM "cv_profiles"') }
+
+      ActiveSupport::Notifications.subscribed(collect, 'sql.active_record', &)
+      statements.size
+    end
+
+    def ask_everything
+      person.cv
+      person.cv?
+      person.updated
+      person.updated_on
+      person.draft?
+      person.page?
+      person.public_links
+    end
+
+    it 'reads the CV from the database once' do
+      expect(cv_queries { ask_everything }).to eq(1)
+    end
+
+    it 'answers every question from the same row' do
+      expect(person.cv).to equal(person.cv)
+      expect(person.updated).to eq(person.cv.figures_as_of)
+    end
+
+    it 'remembers that there is none rather than asking again' do
+      CVProfile.delete_all
+
+      expect(cv_queries { ask_everything }).to eq(1)
+    end
+
+    it 'reads again in the next request' do
+      expect(person.updated).to eq(CVProfile.first.figures_as_of)
+      CVProfile.first.update_columns(figures_as_of: '2030·01·01')
+
+      Current.reset
+
+      expect(person.updated).to eq('2030·01·01')
+    end
+  end
+
   describe '#draft?' do
     it 'is true for a CV nobody has dated' do
       expect(described_class.new(attributes.merge('cv' => { 'summary' => 'x' }))).to be_draft

@@ -9,6 +9,6 @@ class ContactController < ApplicationController
   def show
     @profile = CVProfile.current
 
-    cache_publicly(@profile, last_modified: @profile.updated_at)
+    cache_publicly
   end
 end

@@ -7,7 +7,7 @@
 # controller, policy and CRUD screens, which made a CV of ten lines behave like a collection
 # you browse: changing two words was a page navigation, and reordering was typing a number
 # into a field. It is one document, edited whole a few times a year, so it is stored and
-# edited as one. See redesign_plan.md §11.16.
+# edited as one. See redesign_plan.md §12.
 #
 # A singleton. Everything reads it through .current, which builds an unsaved row when the
 # table is empty so the page renders on a fresh database instead of raising.
@@ -40,10 +40,10 @@ class CVProfile < ApplicationRecord
 
   validate :scalars_carry_both_languages
 
+  after_save { Current.cv_rows = nil }
+
   class << self
-    def current
-      first || new
-    end
+    def current = Current.cv_profile || new
   end
 
   LOCALISED_SCALARS.each do |field|
@@ -52,21 +52,23 @@ class CVProfile < ApplicationRecord
     # Readers only: the writers belonged to the admin form this document no longer has. The
     # importer assigns the whole pair at once, and lib/tasks/cv.rake reads name_en to report.
     I18n.available_locales.each do |locale|
-      define_method(:"#{field}_#{locale}") { self[field].to_h[locale.to_s] }
+      define_method(:"#{field}_#{locale}") { pair_of(self[field])[locale.to_s] }
     end
   end
 
-  # [key, label, href] per row, printed in order.
+  # [key, label, href] per row, printed in order. The key and the label may each be a language
+  # pair, as in Person::CV.
   def contact_rows
-    self[:contact].to_a.map { |row| Array(row) }
+    self[:contact].to_a.map do |key, label, href|
+      [localised(key), localised(label), href]
+    end
   end
 
   private
 
   def scalars_carry_both_languages
     LOCALISED_SCALARS.each do |field|
-      values = self[field].to_h
-      errors.add(field, :blank) if I18n.available_locales.any? { |locale| values[locale.to_s].blank? }
+      errors.add(field, :blank) if missing_languages(self[field]).any?
     end
   end
 end

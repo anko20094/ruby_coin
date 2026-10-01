@@ -3,7 +3,7 @@
 # The CV was a table of ten rows with a model, a controller, a policy and CRUD screens — so
 # changing two words meant navigating to another page and back, and reordering meant typing a
 # number into a field. It is one document with three ordered lists in it, which is what
-# Case::STRUCTURES already models well, so it becomes that. See redesign_plan.md §11.16.
+# Case::STRUCTURES already models well, so it becomes that. See redesign_plan.md §12.
 #
 # cv_blocks is deliberately left in place. The plan's own rule (§10.4) is that a table is not
 # dropped until the migration has been checked against a copy of production; a follow-up drops

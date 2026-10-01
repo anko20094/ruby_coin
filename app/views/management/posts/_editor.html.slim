@@ -9,7 +9,7 @@
 - editing = post.persisted?
 - locales = [I18n.locale] + (I18n.available_locales - [I18n.locale])
 
-= form_with model: [:management, post], data: { controller: 'aitranslation post-editor', aitranslation_locale: I18n.locale, post_editor_autosave_url_value: (editing ? autosave_management_post_path(post) : nil), post_editor_preview_url_value: (editing ? preview_management_post_path(post) : nil) } do |f|
+= form_with model: [:management, post], data: { controller: 'aitranslation post-editor unsaved-guard', aitranslation_locale: I18n.locale, post_editor_autosave_url_value: (editing && response.status != 409 ? autosave_management_post_path(post) : nil), post_editor_preview_url_value: (editing ? preview_management_post_path(post) : nil), unsaved_guard_dirty_value: (post.errors.any? || !request.get?), action: 'input->unsaved-guard#mark change->unsaved-guard#mark submit->unsaved-guard#release post-editor:saved->unsaved-guard#release' } do |f|
   .mg-editor
     - if editing
       = f.hidden_field :lock_version, data: { post_editor_target: 'lockVersion' }
@@ -22,10 +22,10 @@
     .mg-editor__bar
       .mg-tabs
         - locales.each do |locale|
-          button.mg-tab type="button" data-locale=locale data-action="post-editor#pickLocale" data-post-editor-target="tab"
+          button.mg-tab type="button" data-locale=locale aria-pressed=(locale == I18n.locale ? 'true' : 'false') data-action="post-editor#pickLocale" data-post-editor-target="tab"
             = locale.to_s
             span.mg-tab__dirty data-locale=locale
-        button.mg-tab type="button" data-action="post-editor#toggleSideBySide" data-post-editor-target="sideBySide"
+        button.mg-tab type="button" aria-pressed="false" data-action="post-editor#toggleSideBySide" data-post-editor-target="sideBySide"
           = t('.side_by_side')
 
       / The wording lives here rather than in the controller, so every state stays translated.
@@ -41,7 +41,8 @@
         data-phrase-saving=t('.state.saving')
         data-phrase-saved=t('.state.saved', at: '%{at}')
         data-phrase-invalid=t('.state.invalid', errors: '%{errors}')
-        data-phrase-conflict=t('.state.conflict')]
+        data-phrase-conflict=t('.state.conflict')
+        data-phrase-failed=t('.state.failed')]
         span.mg-state__dot
         - clean_phrase = editing ? t('.state.clean') : t('.state.unsaved')
         span[data-post-editor-target="stateText"]= failed ? t('.state.invalid', errors: post.errors.full_messages.to_sentence) : clean_phrase
@@ -54,7 +55,7 @@
       .mg-editor__main
         - locales.each do |locale|
           - own = locale == I18n.locale
-          .mg-locale data-locale=locale data-post-editor-target="locale" hidden=(!own)
+          .mg-locale data-locale=locale lang=locale data-post-editor-target="locale" hidden=(!own)
             .mg-locale__label= t('.language', name: t(locale))
 
             / `label_tag nil` renders a <label> with no `for`, so the three main fields of the
@@ -85,7 +86,7 @@
               = f.text_area body_field, value: editor_html(post.public_send(:"rich_text_#{body_field}")), class: 'mg-editor__body', data: tinymce_post_data
 
         .mg-field
-          = link_to t('.translate'), 'javascript:void(0)', id: 'translation-button', class: 'mg-btn', data: { action: 'click->aitranslation#fetchData' }
+          = button_tag t('.translate'), type: 'button', id: 'translation-button', class: 'mg-btn', data: { action: 'click->aitranslation#fetchData' }
 
       - if editing
         .mg-editor__preview
@@ -95,8 +96,8 @@
             / chrome was in, whichever tab was open — so writing Ukrainian showed an English
             / preview, and there was no way to tell.
             span.mg-preview__locale[data-post-editor-target="previewLocale"]= I18n.locale.to_s
-            button.mg-preview__width.is-current type="button" data-width="desktop" data-action="post-editor#setWidth" desktop
-            button.mg-preview__width type="button" data-width="mobile" data-action="post-editor#setWidth" mobile
+            button.mg-preview__width.is-current type="button" aria-pressed="true" data-width="desktop" data-action="post-editor#setWidth"= t('.width.desktop')
+            button.mg-preview__width type="button" aria-pressed="false" data-width="mobile" data-action="post-editor#setWidth"= t('.width.mobile')
 
             / The real page, in the language being edited. A new tab, because leaving the
             / editor mid-write to look at the article is not the thing anybody wants.

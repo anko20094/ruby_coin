@@ -11,15 +11,12 @@ export default class extends Controller {
   static targets = ["flash"]
 
   connect() {
-    if (!navigator.clipboard) return
     this.element.classList.add("is-copyable")
   }
 
   async copy() {
-    if (!navigator.clipboard) return
-
     try {
-      await navigator.clipboard.writeText(this.textValue)
+      await this.write(this.textValue)
     } catch {
       return
     }
@@ -36,5 +33,23 @@ export default class extends Controller {
 
   disconnect() {
     clearTimeout(this.timer)
+  }
+
+  // navigator.clipboard exists only in a secure context, and the site is served over plain
+  // HTTP, so the old selection-and-command route is what has to work there.
+  async write(text) {
+    if (navigator.clipboard) return navigator.clipboard.writeText(text)
+
+    const field = document.createElement("textarea")
+    field.value = text
+    field.setAttribute("readonly", "")
+    Object.assign(field.style, { position: "fixed", top: "0", left: "0", opacity: "0" })
+    document.body.append(field)
+    field.select()
+    const copied = document.execCommand("copy")
+    field.remove()
+    this.element.focus({ preventScroll: true })
+
+    if (!copied) throw new Error("copy was refused")
   }
 }

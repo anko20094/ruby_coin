@@ -46,6 +46,58 @@ describe 'the /management editor layout' do
     end
   end
 
+  describe 'the choices on the editor' do
+    let(:entry) { create(:post) }
+
+    def pressed(selector)
+      response.parsed_body.css(selector).to_h { |button| [button.text.strip, button['aria-pressed']] }
+    end
+
+    it 'says which language tab is showing, and that side by side is off' do
+      get "/en/management/posts/#{entry.slug}/edit"
+
+      side_by_side = I18n.t('management.posts.editor.side_by_side', locale: :en)
+
+      expect(pressed('.mg-tab')).to eq('en' => 'true', 'uk' => 'false', side_by_side => 'false')
+    end
+
+    it 'says which preview width is showing' do
+      get "/en/management/posts/#{entry.slug}/edit"
+
+      expect(pressed('.mg-preview__width')).to eq('desktop' => 'true', 'mobile' => 'false')
+    end
+  end
+
+  describe 'the guard against leaving with unsaved edits' do
+    let(:entry) { create(:post) }
+    let(:form) { response.parsed_body.at_css('form[data-controller~="post-editor"]') }
+
+    def controllers = form['data-controller'].split
+
+    it 'protects a new post, which has no autosave to do it' do
+      get '/en/management/posts/new'
+
+      expect(controllers).to include('unsaved-guard')
+      expect(form['data-post-editor-autosave-url-value']).to be_nil
+      expect(form['data-action']).to include('input->unsaved-guard#mark', 'submit->unsaved-guard#release')
+      expect(form['data-unsaved-guard-dirty-value']).to eq('false')
+    end
+
+    it 'lifts the guard when an autosave lands, on the post being edited' do
+      get "/en/management/posts/#{entry.slug}/edit"
+
+      expect(controllers).to include('unsaved-guard', 'post-editor')
+      expect(form['data-action']).to include('post-editor:saved->unsaved-guard#release')
+    end
+
+    it 'starts armed when a failed Save puts the typed text back on the page' do
+      post '/en/management/posts', params: { post: { title: '' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(form['data-unsaved-guard-dirty-value']).to eq('true')
+    end
+  end
+
   # The preview is of one language and it has to be the one the tab is on. It used to render in
   # whatever language the admin's own chrome was in, whichever tab was open — so an editor
   # writing Ukrainian watched an English preview, with nothing on the pane saying which.
@@ -60,6 +112,14 @@ describe 'the /management editor layout' do
       expect(response.body).to include('тіло українською')
       expect(response.body).not_to include('the english body')
       expect(response.parsed_body.at_css('.mg-preview__article')['data-locale']).to eq('uk')
+    end
+
+    it 'sets the language of the article, so a reader of it is not given the admin chrome\'s' do
+      get "/en/management/posts/#{post.slug}/preview", params: { preview_locale: 'uk' }
+      expect(response.parsed_body.at_css('.mg-preview__article')['lang']).to eq('uk')
+
+      get "/uk/management/posts/#{post.slug}/preview", params: { preview_locale: 'en' }
+      expect(response.parsed_body.at_css('.mg-preview__article')['lang']).to eq('en')
     end
 
     it "falls back to the admin's own language when asked for one that does not exist" do

@@ -49,3 +49,5 @@
 
 # Self-hosted TinyMCE, copied out of node_modules by bin/copy_tinymce.mjs on every build.
 /public/tinymce
+
+/.claude/settings.local.json

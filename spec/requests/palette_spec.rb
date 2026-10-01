@@ -101,4 +101,38 @@ describe 'the command palette', type: :request do
     expect(response.body).to include('data-controller="palette"')
     expect(response.body).to include('rc-palette__legend')
   end
+
+  describe 'the dialog a screen reader meets' do
+    let(:html) { Capybara.string(response.body) }
+
+    before { get '/en/journal' }
+
+    # The listbox starts hidden, and the script flips this to true only while it holds rows.
+    it 'is a collapsed list-autocomplete combobox until there is something to expand' do
+      expect(html).to have_css('input.rc-palette__input[role="combobox"][aria-expanded="false"]' \
+                               '[aria-autocomplete="list"][aria-controls="rc-palette-results"]')
+    end
+
+    it 'has a name that is not the placeholder' do
+      expect(html).to have_css('input.rc-palette__input[aria-label="Search the site"]')
+      expect(html).to have_no_css('input.rc-palette__input[placeholder="Search the site"]')
+    end
+
+    it 'keeps its empty state in a live region' do
+      expect(html).to have_css('[role="status"] p.rc-palette__empty[data-palette-target="empty"]')
+    end
+
+    it 'hands the script the full results page and the words for no match' do
+      expect(html).to have_css('.rc-palette[data-palette-all-url-value="/en/search"]' \
+                               '[data-palette-all-label-value="Search the journal"]' \
+                               '[data-palette-none-value="Nothing found."]')
+    end
+
+    it 'says them in the page language' do
+      get '/uk/journal'
+
+      expect(html).to have_css('.rc-palette[data-palette-all-url-value="/uk/search"]' \
+                               '[data-palette-none-value="Нічого не знайдено."]')
+    end
+  end
 end

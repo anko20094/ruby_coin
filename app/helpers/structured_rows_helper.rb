@@ -26,12 +26,13 @@ module StructuredRowsHelper
   #
   # `keys` is the path into it: [:label, :en] for one language of a localised sub-field,
   # [:period] for a plain one, [:en] for a row that *is* the string. `index` is the row's
-  # position, or ROW_INDEX for the row inside the <template>.
+  # position, or ROW_INDEX for the row inside the <template>. `locale` is the language the
+  # field holds, for the editor to set on its document.
   #
   # The name is assembled from two data attributes as well as written out, because
   # structure_rows_controller.js renumbers every row after an add, a remove or a move: the
   # server reads the rows in index order, so the index has to follow what is on the screen.
-  def structure_row_field(path, keys:, kind:, value: nil, label: nil)
+  def structure_row_field(path, keys:, kind:, value: nil, label: nil, locale: nil)
     prefix = "#{path.scope}[#{path.field}_rows]"
     suffix = keys.map { |key| "[#{key}]" }.join
 
@@ -41,7 +42,7 @@ module StructuredRowsHelper
            # gsub, not parameterize: parameterize would turn ROW_INDEX into "index", every
            # cloned row would carry the same id, and TinyMCE would refuse a second editor on it.
            id: "#{path.scope}_#{path.field}_#{path.index}_#{keys.join('_')}".gsub(/[^A-Za-z0-9_]/, '_'),
-           prefix: prefix, suffix: suffix
+           prefix: prefix, suffix: suffix, lang: locale
   end
 
   # Where in a row a value lives, for the rows that already exist.

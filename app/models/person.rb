@@ -33,9 +33,9 @@ class Person
 
   def to_param = id
 
-  def name = localised(@attributes['name'])
-  def role = localised(@attributes['role'])
-  def blurb = localised(@attributes['blurb'])
+  def name(fallback: true) = localised(@attributes['name'], fallback: fallback)
+  def role(fallback: true) = localised(@attributes['role'], fallback: fallback)
+  def blurb(fallback: true) = localised(@attributes['blurb'], fallback: fallback)
 
   # Only a crew card draws a monogram, and a name-only alumnus has no initials to draw one from.
   def short = @attributes['short']
@@ -73,7 +73,7 @@ class Person
   # comes from the imported record rather than from a second copy here — two copies of the same
   # date drift the first time one of them is updated, and this one gates the staleness chip.
   def updated
-    return CVProfile.first&.figures_as_of if owner?
+    return Current.cv_profile&.figures_as_of if owner?
 
     @attributes['updated']
   end
@@ -87,7 +87,7 @@ class Person
   # CVProfile for the owner — nil until the row is imported, so an empty database shows the
   # same pending state a new hire does — and the YAML block for everyone else.
   def cv
-    owner? ? CVProfile.first : yaml_cv
+    owner? ? Current.cv_profile : yaml_cv
   end
 
   def cv? = cv.present?
@@ -95,9 +95,12 @@ class Person
   def draft? = !cv? || updated_on.nil? || updated_on < STALE_AFTER.ago.to_date
 
   # Optional, and rendered only when present; `detail` is optional inside it.
-  def not_work
+  def not_work(fallback: true)
     Array(@attributes['not_work']).map do |item|
-      { icon: item['icon'], label: localised(item['label']), detail: localised(item['detail']) }
+      {
+        icon: item['icon'], label: localised(item['label'], fallback: fallback),
+        detail: localised(item['detail'], fallback: fallback)
+      }
     end
   end
 

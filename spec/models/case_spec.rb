@@ -31,6 +31,128 @@ RSpec.describe Case do
     end
   end
 
+  describe 'position' do
+    let(:scalars) { described_class::LOCALISED_SCALARS.index_with { { 'en' => 'x', 'uk' => 'ікс' } } }
+
+    def build(position, slug: 'scratch')
+      described_class.new(slug: slug, mark: '99', position: position, **scalars)
+    end
+
+    it 'is a whole number between one and a million' do
+      expect(build(1)).to be_valid
+
+      [0, -1, '1.5', 1_000_000, 99_999_999_999, nil].each do |position|
+        expect(build(position)).not_to be_valid, "#{position.inspect} should be refused"
+      end
+    end
+
+    context 'when two cases share one' do
+      before do
+        build(50, slug: 'tie-a').save!
+        build(50, slug: 'tie-b').save!
+      end
+
+      it 'keeps them in the order they were made, however often either is saved' do
+        expect(described_class.slugs.last(2)).to eq(%w[tie-a tie-b])
+
+        described_class.find_by!(slug: 'tie-a').update!(mark: '98')
+
+        expect(described_class.slugs.last(2)).to eq(%w[tie-a tie-b])
+      end
+    end
+  end
+
+  describe 'rows in one language only' do
+    let(:kase) { described_class.find_by!(slug: 'intelligence') }
+
+    it 'refuses a row of a list written in one language' do
+      kase.mine_rows = { '0' => { 'en' => 'only english', 'uk' => '' } }
+
+      expect(kase).not_to be_valid
+      expect(kase.errors.where(:mine, :one_language_only)).to be_present
+    end
+
+    it 'refuses a half-translated sub-field of a row that has others complete' do
+      kase.metrics_rows = {
+        '0' => { 'value' => { 'en' => '1', 'uk' => '1' }, 'label' => { 'en' => 'only english', 'uk' => '' } }
+      }
+
+      expect(kase).not_to be_valid
+      expect(kase.errors.where(:metrics, :one_language_only)).to be_present
+    end
+
+    it 'accepts a sub-field left empty in both languages, and a plain string standing for both' do
+      kase.metrics_rows = { '0' => { 'value' => { 'en' => '', 'uk' => '' }, 'label' => { 'en' => 'a', 'uk' => 'б' } } }
+      kase.update_columns(mine: ['the same in both'])
+
+      expect(kase).to be_valid
+    end
+
+    it 'says so in words, in either language' do
+      kase.mine_rows = { '0' => { 'en' => 'only english', 'uk' => '' } }
+
+      messages = %i[en uk].index_with do |locale|
+        I18n.with_locale(locale) { kase.tap(&:valid?).errors.full_messages.to_sentence }
+      end
+
+      expect(messages).to eq(en: 'What was mine has a row written in one language only',
+                             uk: 'Що було моїм має рядок, написаний лише однією мовою')
+    end
+  end
+
+  describe 'a plain string where a language pair is expected' do
+    subject(:kase) { described_class.new(year: '2023—2026') }
+
+    it 'reads the same in both languages through the accessors' do
+      expect([kase.year_en, kase.year_uk]).to eq(['2023—2026', '2023—2026'])
+    end
+
+    it 'becomes a pair when one language is written, keeping the other' do
+      kase.year_en = '2023—2027'
+
+      expect(kase[:year]).to eq({ 'en' => '2023—2027', 'uk' => '2023—2026' })
+    end
+
+    it 'has no accessors that raise on a column that is still empty' do
+      expect(described_class.new.year_en).to be_nil
+    end
+  end
+
+  describe 'a case the roster names' do
+    let(:scratch) do
+      described_class.find_by!(slug: 'dna').dup.tap { |copy| copy.slug = 'scratch' }.tap(&:save!)
+    end
+
+    it 'keeps its slug, because team.yml credits and CV entries find it by that' do
+      credited = described_class.find_by!(slug: 'dna')
+      credited.slug = 'renamed'
+
+      expect(credited).not_to be_valid
+      expect(credited.errors.where(:slug, :named_elsewhere)).to be_present
+    end
+
+    it 'cannot be deleted' do
+      credited = described_class.find_by!(slug: 'dna')
+
+      expect(credited.destroy).to be(false)
+      expect(credited.errors.where(:slug, :named_elsewhere)).to be_present
+      expect(described_class.exists?(credited.id)).to be(true)
+    end
+
+    it 'is also named by the career in the CV' do
+      CV::Importer.call
+      CVProfile.current.update_columns(experience: [{ 'case_slugs' => ['scratch'] }])
+
+      expect(scratch.destroy).to be(false)
+    end
+
+    it 'leaves a case nobody names free to be renamed and deleted' do
+      scratch.update!(slug: 'renamed')
+
+      expect(scratch.destroy).to be_truthy
+    end
+  end
+
   describe 'localised readers' do
     let(:dna) { described_class.find_by!(slug: 'dna') }
 

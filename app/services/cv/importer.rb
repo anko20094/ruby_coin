@@ -5,7 +5,8 @@
 # retyped a second time.
 #
 # The three lists used to import into a cv_blocks table, one row each. They are structured
-# fields on the profile now, so the whole CV is one write and one comparison.
+# fields on the profile now, so the whole CV is one write and one comparison. The write is
+# rolled back when the comparison fails, so the row is never left holding what was not checked.
 class CV::Importer < BaseService
   SOURCE = Rails.root.join('config', 'portfolio', 'cv.yml')
 
@@ -19,12 +20,19 @@ class CV::Importer < BaseService
 
   def initialize(path = SOURCE)
     @path = path
+    @mismatches = []
   end
 
   def call
     source = YAML.load_file(@path)['cv']
+    profile = nil
 
-    Result.new(profile: import_profile(source), mismatches: @mismatches.to_a)
+    CVProfile.transaction(requires_new: true) do
+      profile = import_profile(source)
+      raise ActiveRecord::Rollback if @mismatches.any?
+    end
+
+    Result.new(profile: profile, mismatches: @mismatches)
   end
 
   private
@@ -69,8 +77,6 @@ class CV::Importer < BaseService
   end
 
   def record_mismatches(record, label, attributes)
-    @mismatches ||= []
-
     attributes.each do |column, expected|
       stored = record[column]
       next if stored == expected

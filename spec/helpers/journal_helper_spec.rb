@@ -42,6 +42,20 @@ RSpec.describe JournalHelper do
       expect(helper.journal_body(post, :en)).not_to include('jn-code')
     end
 
+    it 'highlights the listing the editor calls ERB / HTML, which Prism names markup' do
+      post = create(:post, description_en: '<pre class="language-markup"><code>&lt;b&gt;y&lt;/b&gt;</code></pre>')
+
+      expect(helper.journal_body(post, :en)).to include('jn-code__lang">html', '<span class="nt">')
+    end
+
+    it 'finds a lexer for every language the editor offers' do
+      controller = Rails.root.join('app', 'javascript', 'controllers', 'tinymce_controller.js').read
+      offered = controller[/codesample_languages:\s*\[(.*?)\]/m, 1].scan(/value:\s*"([^"]+)"/).flatten
+
+      expect(offered).to include('ruby', 'markup')
+      expect(offered.reject { |language| helper.__send__(:lexer_named, language) }).to be_empty
+    end
+
     it 'leaves a language Rouge does not know plain' do
       post = create(:post, description_en: '<pre><code class="language-nonesuch">x</code></pre>')
 
@@ -69,6 +83,12 @@ RSpec.describe JournalHelper do
 
       expect(body).to include('jn-code__lang">ruby')
       expect(body).to include('<span class="k">def</span>')
+    end
+
+    it 'highlights a block whose language was typed with capitals and a stray space' do
+      block = JournalBlock.create!(kind: 'code', payload: { 'language' => 'Ruby ', 'source' => 'def call; end' })
+
+      expect(attach(create(:post), block)).to include('<span class="k">def</span>')
     end
 
     it 'renders a callout in the tone it was given' do

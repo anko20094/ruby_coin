@@ -6,7 +6,7 @@
         .tags__inner
           .tags__right
             .inner-title
-              h1.admin__title = t('.tags')
+              h2.admin__title = t('.tags')
             = turbo_frame_tag 'tags', class: 'tags' do
               - if @tags.present?
                 = render @tags
@@ -15,10 +15,9 @@
               = t("labels.create_tag")
             = turbo_frame_tag @tag, class: 'create_tag' do
               = form_with model: [:management, Tag.new] do |f|
-                = f.text_field :title, class: 'standart-input', placeholder: t('.placeholders.name')
+                = f.text_field :title, class: 'standart-input', placeholder: t('.placeholders.name'),
+                  aria: { label: t('.placeholders.name') }
                 = f.submit t('global.button.create'), class: 'main-btn'
-            .search-form
-              input.search-input type="search" placeholder=t("titles.search")
           - if @pagy.present? && @pagy.pages > 1
             .pagination__inner
               == pagy_bootstrap_nav(@pagy)

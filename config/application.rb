@@ -15,11 +15,15 @@ module RubyCoin
 
     config.exceptions_app = routes
 
-    # Nothing on the wire was compressed: no Deflater in the stack, and the deployed nginx
-    # vhost does not gzip either. The theme's stylesheet alone is 42 KB uncompressed and 9 KB
-    # gzipped, and on a 3G connection that difference is most of a second. Inserted before
-    # ActionDispatch::Static so files served out of public/ are compressed too.
-    config.middleware.insert_before ActionDispatch::Static, Rack::Deflater
+    # Text only: fonts, JPEG and PNG are compressed already. Behind the deployed nginx the files
+    # in public/ never reach this, and config/nginx.conf does their compressing.
+    config.middleware.insert_before ActionDispatch::Static, Rack::Deflater, include: %w[
+      text/html text/css text/plain text/javascript application/javascript application/json
+      application/atom+xml application/xml image/svg+xml
+    ]
+
+    # Nothing opens a cable connection, and the railtie would still mount /cable.
+    config.action_cable.mount_path = nil
 
     config.i18n.available_locales = [:en, :uk]
     config.i18n.default_locale = :uk
@@ -51,9 +55,9 @@ module RubyCoin
 end
 
 # "cv" is an abbreviation everywhere it appears on this site: CVProfile, CV::Importer,
-# Management::CVProfilesController. One acronym covers all of them, because both inflectors that
-# matter here go through camelize — Rails' autoloader inflector and the one routing uses to
-# turn "management/cv_blocks" into a controller class.
+# CVController. One acronym covers all of them, because both inflectors that matter here go
+# through camelize — Rails' autoloader inflector and the one routing uses to turn "cv" into a
+# controller class.
 #
 # It has to be declared here rather than in config/initializers/inflections.rb: initializers
 # run after the autoloader has already worked out the constant names for app/models.

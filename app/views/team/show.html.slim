@@ -63,7 +63,7 @@
             = link_to work_case_path(slug: kase.slug), id: "c-#{kase.slug}",
               class: "worked-row hover-row #{'is-here' if here}" do
               .tm-worked__body
-                h3.tm-worked__title= rich(kase.title)
+                h3.tm-worked__title= rich(kase.title, links: false)
                 .tm-worked__did= rich(contribution.did.first)
               .tm-worked__meta
                 = contribution.role

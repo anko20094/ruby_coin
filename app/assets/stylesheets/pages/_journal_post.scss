@@ -57,6 +57,7 @@ $post-max: 760px;
   line-height: 1.65;
   color: var(--ink);
   margin-top: 28px;
+  overflow-wrap: break-word;
 
   p { margin: 0 0 18px; }
 
@@ -99,6 +100,10 @@ $post-max: 760px;
     margin: 0 0 18px;
     padding-left: 22px;
   }
+
+  ul { list-style: disc; }
+
+  ol { list-style: decimal; }
 
   li { margin-bottom: 6px; }
 
@@ -448,6 +453,9 @@ $post-max: 760px;
   display: block;
   background: var(--paper);
   padding: 18px 20px;
+
+  // The strip clips to its rounded corners, which would cut a ring drawn outside the link.
+  &:focus-visible { outline-offset: -2px; }
 
   &--next { text-align: right; }
 }

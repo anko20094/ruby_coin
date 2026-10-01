@@ -61,4 +61,41 @@ RSpec.describe CV::Importer do
     expect(CVProfile.current.experience.first[:case_slugs]).to eq(%w[intelligence leads])
     expect(CVProfile.current.experience.third[:case_slugs]).to eq([])
   end
+
+  describe 'when the copy cannot be trusted' do
+    let(:file) { Tempfile.new(['cv', '.yml']) }
+
+    after { file.close! }
+
+    def source_with
+      data = YAML.load_file(described_class::SOURCE)
+      yield data['cv']
+      file.write(data.to_yaml)
+      file.flush
+      file.path
+    end
+
+    it 'reports an unquoted yaml number read back from a string column, and writes no row' do
+      path = source_with { |cv| cv['updated'] = 2026 }
+
+      result = described_class.new(path).call
+
+      expect(result).not_to be_clean
+      expect(result.mismatches).to include(a_string_matching(/profile\.figures_as_of: expected 2026, stored "2026"/))
+      expect(CVProfile.count).to eq(0)
+    end
+
+    it 'leaves the row it already has as it was' do
+      described_class.call
+      path = source_with do |cv|
+        cv['updated'] = 2026
+        cv['strengths'] = []
+      end
+
+      described_class.new(path).call
+
+      expect(CVProfile.current.strengths.size).to eq(4)
+      expect(CVProfile.current.figures_as_of).not_to eq('2026')
+    end
+  end
 end

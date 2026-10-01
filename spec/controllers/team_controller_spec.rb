@@ -28,12 +28,22 @@ describe TeamController do
       expect(response.body).to include('4 projects')
     end
 
-    # Four records carry invented dates and employers. They say so on the card and again on the
-    # page; `grep -r "placeholder: true" config/portfolio` is the check before launch.
-    it 'chips every placeholder record' do
-      get(action, params:)
+    describe 'a placeholder on the crew' do
+      let(:stand_in) do
+        Person.new('id' => 'stand-in', 'short' => 'SI', 'placeholder' => true, 'name' => { 'en' => 'Stand In' },
+                   'role' => { 'en' => 'engineer' }, 'blurb' => { 'en' => 'Invented.' })
+      end
 
-      expect(response.body.scan('PLACEHOLDER').size).to eq(Team.crew.count(&:placeholder?))
+      before { allow(Team).to receive(:everyone).and_return(Team.everyone + [stand_in]) }
+
+      it 'chips its card' do
+        expect(Team.crew.count(&:placeholder?)).to eq(1)
+
+        get(action, params:)
+
+        expect(Capybara.string(response.body))
+          .to have_css('.tm-card__chip.is-placeholder', text: 'PLACEHOLDER', count: 1)
+      end
     end
 
     it 'renders the Ukrainian copy under the uk locale' do
@@ -82,6 +92,20 @@ describe TeamController do
 
     it 'raises for a person nobody is' do
       expect { get(action, params: { locale: 'en', id: 'nobody' }) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    # The page behind a bare name would have to be invented, which is why /studio draws no link.
+    it 'raises for an alumnus who is only a name' do
+      expect(Team.person('andrii-mazurok')).not_to be_page
+      expect { get(action, params: { locale: 'en', id: 'andrii-mazurok' }) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it 'opens an alumnus who is still credited on a project' do
+      expect(Team.person('oleksandr')).to be_alumni.and be_page
+
+      get(action, params: { locale: 'en', id: 'oleksandr' })
+
+      expect(response).to have_http_status(:success)
     end
 
     # The whole point of the design: the visitor arrived asking what this person did on that

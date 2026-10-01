@@ -3,9 +3,12 @@
 .mg-topbar
   .mg-crumbs
     span= t('management.sidebar_component.where').delete_prefix('/')
-    - crumbs.each do |crumb|
+    - *trail, here = crumbs
+    - trail.each do |crumb|
       span.mg-crumbs__sep /
-      span.mg-crumbs__here= crumb
+      span= crumb
+    span.mg-crumbs__sep /
+    h1.mg-crumbs__here= here
   .mg-topbar__right
     - if defined?(note) && note.present?
       span.mg-topbar__note= note

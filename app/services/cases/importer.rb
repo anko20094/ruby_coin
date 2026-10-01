@@ -5,12 +5,16 @@
 #
 # The YAML stays in the repo as the source of truth for the initial load: every figure in it
 # was read from production, git or a tracker, and the handoff forbids retyping any of them. So
-# this is a copy that refuses to claim success — it returns the mismatches it found and lets
-# the caller decide how loudly to fail.
+# this is a copy that refuses to claim success. It writes in one transaction and rolls back when
+# the read-back differs, so nothing is committed that was not checked, and it returns the
+# mismatches it found and lets the caller decide how loudly to fail.
+#
+# Rows are matched on slug, which the admin can edit: a renamed case is created again beside
+# the old one, and `strays` names the rows the file does not.
 class Cases::Importer < BaseService
   SOURCE = Rails.root.join('config', 'portfolio', 'cases.yml')
 
-  Result = Struct.new(:imported, :mismatches, keyword_init: true) do
+  Result = Struct.new(:imported, :mismatches, :strays, keyword_init: true) do
     def clean? = mismatches.empty?
   end
 
@@ -22,25 +26,30 @@ class Cases::Importer < BaseService
     imported = []
     mismatches = []
 
-    entries.each_with_index do |entry, index|
-      attributes = attributes_for(entry, index)
-      record = Case.find_or_initialize_by(slug: entry['slug'])
-      record.assign_attributes(attributes)
-      record.save!
-      record.reload
+    Case.transaction(requires_new: true) do
+      entries.each_with_index do |entry, index|
+        attributes = attributes_for(entry, index)
+        record = Case.find_or_initialize_by(slug: entry['slug'])
+        record.assign_attributes(attributes)
+        record.save!
+        record.reload
 
-      imported << record.slug
-      mismatches.concat(differences(record, attributes))
+        imported << record.slug
+        mismatches.concat(differences(record, attributes))
+      end
+
+      raise ActiveRecord::Rollback if mismatches.any?
     end
 
-    Result.new(imported: imported, mismatches: mismatches)
+    imported.clear if mismatches.any?
+    Result.new(imported: imported, mismatches: mismatches, strays: Case.where.not(slug: slugs).pluck(:slug))
   end
 
   private
 
-  def entries
-    YAML.load_file(@path)['cases']
-  end
+  def entries = @entries ||= YAML.load_file(@path)['cases']
+
+  def slugs = entries.pluck('slug')
 
   # The YAML nests plain/* and engineering/*; the table keeps them flat, because nothing reads
   # them as a group and a flat column is one less level to reach through in a form.

@@ -22,7 +22,7 @@ const target = path.resolve("public/tinymce")
 // here fails at runtime with a 404 and a silently reduced toolbar, so the list is asserted
 // against the controller by spec/javascript/tinymce_assets_spec.rb.
 const PLUGINS = [
-  "advlist", "anchor", "autolink", "autoresize", "autosave", "charmap", "code",
+  "anchor", "autolink", "autoresize", "charmap", "code",
   "codesample",
   "directionality", "emoticons", "fullscreen", "help", "image", "importcss",
   "insertdatetime", "link", "lists", "nonbreaking", "preview", "searchreplace", "table",

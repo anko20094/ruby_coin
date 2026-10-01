@@ -4,7 +4,7 @@
 - sort_path = ->(**overrides) { management_posts_path(**keep.except(:sort, :direction), status: params[:status].presence, **overrides) }
 
 - content_for :topbar do
-  = render 'management/shared/top_bar', crumbs: ['Post'],
+  = render 'management/shared/top_bar', crumbs: [t('management.crumbs.posts')],
     note: t('.counted', shown: @posts.size, total: @pagy.count),
     action: link_to(t('.new'), new_management_post_path, class: 'mg-btn mg-btn--primary', data: { turbo: false })
 
@@ -12,14 +12,16 @@
   .mg-filters
     - filters.each do |value, label|
       - current = params[:status].presence == value
-      = link_to management_posts_path(**keep, status: value), class: "mg-filter #{'is-current' if current}" do
+      = link_to management_posts_path(**keep, status: value), class: "mg-filter #{'is-current' if current}",
+        aria: { current: ('true' if current) } do
         = label
         span.mg-filter__count= value.nil? ? @counts.values.sum : @counts[value].to_i
 
   = form_with url: management_posts_path, method: :get, class: 'mg-search', data: { turbo: false } do |f|
     span.mg-search__glyph ⌕
     = f.hidden_field :status, value: params[:status].presence, id: nil
-    = f.search_field :query, value: params[:query], placeholder: t('.search'), class: 'mg-search__input', id: nil
+    = f.search_field :query, value: params[:query], placeholder: t('.search'), class: 'mg-search__input', id: nil,
+      aria: { label: t('.search') }
 
 - if @posts.any?
   / The table is a working list with eight columns; on a phone it used to push the whole page
@@ -28,16 +30,17 @@
     table.mg-table
       thead
         tr
-          th= mg_sort_link('#', 'number', path: sort_path)
-          th= mg_sort_link(t('.columns.status'), 'status', path: sort_path)
+          th[aria-sort=mg_aria_sort('number')]= mg_sort_link('#', 'number', path: sort_path)
+          th[aria-sort=mg_aria_sort('status')]= mg_sort_link(t('.columns.status'), 'status', path: sort_path)
           th= t('.columns.title')
           th= t('.columns.langs')
           th= t('.columns.tags')
           th= t('.columns.author')
-          th= mg_sort_link(t('.columns.updated'), 'updated', path: sort_path)
+          th[aria-sort=mg_aria_sort('updated')]= mg_sort_link(t('.columns.updated'), 'updated', path: sort_path)
           th
       tbody
         - @posts.each do |post|
+          - title = post.title.presence || post.post_translations.map(&:title).compact_blank.first || post.slug
           tr
             td.mg-cell--mono= post.entry_label
             td= mg_status_pill(post.status)
@@ -46,7 +49,7 @@
             / the far edge of the row. The separate `edit` button has gone with it.
             td
               = link_to edit_management_post_path(post), class: 'mg-title-link', data: { turbo: false } do
-                .mg-title= post.title.presence || post.post_translations.map(&:title).compact_blank.first
+                .mg-title= title
                 .mg-title__path= "/post/#{post.slug}"
             td= mg_language_pair(post.translated_locales)
             td
@@ -60,14 +63,14 @@
             td.mg-cell--right
               .mg-actions
                 = button_to t('.delete'), management_post_path(post), method: :delete,
-                  class: 'mg-action mg-action--danger',
+                  class: 'mg-action mg-action--danger', aria: { label: t('global.button.delete_item', item: title) },
                   form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
-                                  confirm_message_value: t('global.dialog.you_sure') } }
+                                  confirm_message_value: t('confirmations.delete', item: title) } }
 
   - if @pagy.pages > 1
     nav.mg-pager
-      - if @pagy.prev
-        = link_to '←', management_posts_path(**keep, status: params[:status].presence, page: @pagy.prev), class: 'mg-pager__step'
+      - if @pagy.previous
+        = link_to '←', management_posts_path(**keep, status: params[:status].presence, page: @pagy.previous), class: 'mg-pager__step'
       span= "#{@pagy.page} / #{@pagy.pages}"
       - if @pagy.next
         = link_to '→', management_posts_path(**keep, status: params[:status].presence, page: @pagy.next), class: 'mg-pager__step'

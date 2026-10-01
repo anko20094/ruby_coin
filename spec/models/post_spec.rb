@@ -76,6 +76,53 @@ RSpec.describe Post do
         expect(described_class.similar_posts(post).count).to eq(Post::LIMIT_COUNT)
       end
     end
+
+    context 'when the candidates share different numbers of tags' do
+      let(:tags) { create_list(:tag, 4) }
+      let(:post) { create(:post, :active, tags: tags) }
+      let!(:one_shared) { create(:post, :active, tags: tags.first(1), created_at: 1.day.ago) }
+      let!(:three_shared) { create(:post, :active, tags: tags.first(3), created_at: 3.days.ago) }
+      let!(:two_shared_older) { create(:post, :active, tags: tags.last(2), created_at: 5.days.ago) }
+      let!(:two_shared_newer) { create(:post, :active, tags: tags.first(2), created_at: 2.days.ago) }
+
+      it 'puts the most tags in common first, and the newest first among equals' do
+        expect(described_class.similar_posts(post)).to eq([three_shared, two_shared_newer, two_shared_older])
+      end
+    end
+
+    context 'when the only thing in common is the last of many tags' do
+      let(:tags) { create_list(:tag, 5) }
+      let(:post) { create(:post, :active, tags: tags) }
+      let!(:last_shared) { create(:post, :active, tags: tags.last(1)) }
+
+      it 'still finds the post' do
+        expect(described_class.similar_posts(post)).to eq([last_shared])
+      end
+    end
+
+    context 'when the cards are drawn' do
+      let(:tags) { create_list(:tag, 3) }
+      let!(:post) { create(:post, :active, tags: tags.first(1)) }
+
+      before { create(:post, :active, tags: tags) }
+
+      it 'carries every tag of a related post, not only the one it was matched on' do
+        related = described_class.similar_posts(post).includes(:tags, :user, :translations).to_a
+
+        expect(related.first.tags.map(&:id)).to match_array(tags.map(&:id))
+      end
+
+      it 'reads the posts in one query' do
+        statements = []
+        collect = ->(*, payload) { statements << payload[:sql] unless payload[:name] == 'SCHEMA' }
+
+        ActiveSupport::Notifications.subscribed(collect, 'sql.active_record') do
+          described_class.similar_posts(post).includes(:tags, :user, :translations).to_a
+        end
+
+        expect(statements.grep(/FROM "posts"/).size).to eq(1)
+      end
+    end
   end
 
   describe '.ordered' do
@@ -85,6 +132,120 @@ RSpec.describe Post do
       post3 = create(:post, created_at: 2.hours.ago)
 
       expect(described_class.ordered).to eq([post1, post2, post3])
+    end
+  end
+
+  # Featuring is a display choice and hiding is a publication one, and the second wins: the
+  # home page must never show an entry the author has switched off.
+  describe '.main' do
+    it 'returns a post that is featured and published' do
+      featured = create(:post, :main_post)
+
+      expect(described_class.main).to contain_exactly(featured)
+    end
+
+    it 'leaves out a featured post that is hidden' do
+      create(:post, :main_post, :inactive)
+
+      expect(described_class.main).to be_empty
+    end
+
+    it 'puts the newest featured post first' do
+      older = create(:post, created_at: 2.days.ago)
+      newer = create(:post, created_at: 1.day.ago)
+      described_class.where(id: [older.id, newer.id]).update_all(main_post: true)
+
+      expect(described_class.main.first).to eq(newer)
+    end
+  end
+
+  describe 'featuring a post' do
+    it 'takes the flag off the post that had it' do
+      first = create(:post, :main_post)
+      second = create(:post, :main_post)
+
+      expect(first.reload.main_post).to be(false)
+      expect(second.reload.main_post).to be(true)
+    end
+
+    it 'does so when the previous one is unfinished in the current locale' do
+      previous = I18n.with_locale(:en) { create(:post, :main_post) }
+      current = I18n.with_locale(:uk) { create(:post, :main_post) }
+
+      expect(described_class.where(main_post: true)).to contain_exactly(current)
+      expect(I18n.with_locale(:uk) { previous.reload.valid? }).to be(false)
+    end
+
+    it 'repairs a pair that is already featured' do
+      pair = create_list(:post, 2)
+      described_class.where(id: pair.map(&:id)).update_all(main_post: true)
+      current = create(:post, :main_post)
+
+      expect(described_class.where(main_post: true)).to contain_exactly(current)
+    end
+
+    it 'moves the version of the post it demotes, so an editor who has it open is told' do
+      previous = create(:post, :main_post)
+
+      expect { create(:post, :main_post) }.to change { previous.reload.lock_version }.by(1)
+    end
+
+    it 'leaves every other post alone when it is not featured' do
+      featured = create(:post, :main_post)
+
+      expect { create(:post) }.not_to(change { featured.reload.lock_version })
+      expect(featured.reload.main_post).to be(true)
+    end
+  end
+
+  # The slug is the canonical address, and FriendlyId answers an old one with a redirect.
+  describe 'slugs' do
+    let!(:holder) { create(:post, slug: 'first-address') }
+
+    it 'refuses a slug another post holds' do
+      other = build(:post, slug: 'first-address')
+
+      expect(other).not_to be_valid
+      expect(other.errors.added?(:slug, :taken)).to be(true)
+    end
+
+    it 'refuses a slug another post used to hold, because that address redirects to it' do
+      holder.update!(slug: 'second-address')
+
+      expect(build(:post, slug: 'first-address')).not_to be_valid
+    end
+
+    it 'lets a post go back to a slug it used before' do
+      holder.update!(slug: 'second-address')
+
+      expect(holder.update(slug: 'first-address')).to be(true)
+    end
+
+    it 'does not take a post to be in conflict with itself' do
+      expect(holder.reload).to be_valid
+    end
+
+    it 'has no opinion on a post that has no slug yet' do
+      expect(build(:post, slug: nil)).to be_valid
+    end
+
+    describe '.unused_slug' do
+      it 'is the base itself while nobody holds it' do
+        expect(described_class.unused_slug('a-new-title')).to eq('a-new-title')
+      end
+
+      it 'counts up past every holder, current or former' do
+        create(:post, slug: 'a-title')
+        create(:post, slug: 'a-title-2')
+        former = create(:post, slug: 'a-title-3')
+        former.update!(slug: 'renamed')
+
+        expect(described_class.unused_slug('a-title')).to eq('a-title-4')
+      end
+
+      it 'is nil for a blank base' do
+        expect(described_class.unused_slug('')).to be_nil
+      end
     end
   end
 
@@ -111,6 +272,38 @@ RSpec.describe Post do
 
       expect(post.reload.plain_body(:en).strip).to eq('Rewritten entirely')
       expect(described_class.search_by_description('Rewritten')).to include(post)
+    end
+
+    context 'when the body holds journal blocks' do
+      let(:code) { JournalBlock.create!(kind: 'code', payload: { 'source' => 'def uniquecodetoken; end' }) }
+      let(:callout) { JournalBlock.create!(kind: 'callout', payload: { 'body' => 'uniquecallouttoken bites' }) }
+      let(:embed) do
+        JournalBlock.create!(kind: 'embed', payload: { 'url' => 'https://x.com/a', 'caption' => 'uniquecaptiontoken' })
+      end
+      let(:body) do
+        blocks = [code, callout, embed].map do |block|
+          %(<action-text-attachment sgid="#{block.attachable_sgid}"></action-text-attachment>)
+        end
+
+        "<p>intro words here</p>#{blocks.join}"
+      end
+
+      before { post.update!(description_en: body) }
+
+      it 'can be searched for what is inside a block' do
+        %w[uniquecodetoken uniquecallouttoken uniquecaptiontoken].each do |token|
+          expect(described_class.search_everywhere(token)).to include(post)
+        end
+      end
+
+      it 'counts what is inside a block towards the reading time' do
+        expect(post.plain_body(:en).split.size).to be > 3
+      end
+
+      it 'keeps the words around a block apart from it' do
+        expect(post.plain_body(:en)).to include('intro words here')
+        expect(post.plain_body(:en)).not_to include('here def')
+      end
     end
   end
 
@@ -163,6 +356,15 @@ RSpec.describe Post do
 
       expect(post.reload.post_translations.pluck(:locale).sort).to eq(%w[en uk])
       expect(post.translations.count).to eq(post.post_translations.count)
+    end
+
+    it 'does not read the legacy body column on a preload, though it stays in the table' do
+      post.post_translations.update_all(description: '<p>the body from before Action Text</p>')
+
+      loaded = described_class.includes(:translations).find(post.id).translations.first
+
+      expect(loaded.has_attribute?(:description)).to be(false)
+      expect(PostTranslation.find_by(post_id: post.id).description).to include('before Action Text')
     end
 
     it 'reads each locale back on its own' do
@@ -256,6 +458,24 @@ RSpec.describe Post do
 
     it 'can be counted for the pager' do
       expect(described_class.best.except(:select, :order).distinct.count(:id)).to eq(2)
+    end
+  end
+
+  describe '.translated_in' do
+    let(:full) do
+      I18n.with_locale(:en) { create(:post, title: 'Both ways') }.tap do |post|
+        I18n.with_locale(:uk) { post.update!(title: 'Обидва', subtitle: 'Підзаголовок') }
+      end
+    end
+    let(:no_body_in_uk) { I18n.with_locale(:en) { create(:post, title: 'English body only') } }
+
+    it 'needs a title, a subtitle and a stored body in the language' do
+      I18n.with_locale(:uk) { no_body_in_uk.update!(title: 'Є лише заголовок', subtitle: 'Є підзаголовок') }
+      no_body_in_uk.update_columns(search_body_uk: nil)
+
+      expect(described_class.translated_in(:uk)).to include(full)
+      expect(described_class.translated_in(:uk)).not_to include(no_body_in_uk)
+      expect(described_class.translated_in(:en)).to include(full, no_body_in_uk)
     end
   end
 end

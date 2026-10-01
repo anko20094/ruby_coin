@@ -22,18 +22,29 @@ class ErrorsController < ApplicationController
   skip_forgery_protection
 
   def not_found
-    render :show, status: :not_found
+    render_page :not_found
   end
 
   def unacceptable
-    render :show, status: :unprocessable_content
+    render_page :unprocessable_content
   end
 
   def internal_error
-    render :show, status: :internal_server_error
+    render_page :internal_server_error
   end
 
   private
+
+  # HTML whatever the request asked for: there is no template in any other format, and looking
+  # for one ends in a failsafe 500. When the page itself cannot render — the database is usually
+  # what failed — the static one stands in.
+  def render_page(status)
+    render :show, status: status, formats: :html
+  rescue StandardError => e
+    Rails.error.report(e, handled: true)
+    send_file Rails.public_path.join('500.html'), status: :internal_server_error, type: 'text/html',
+                                                  disposition: 'inline'
+  end
 
   # Errors are dispatched outside the /:locale scope, so switch_locale sees no locale param
   # and would answer every mistyped English URL in Ukrainian.

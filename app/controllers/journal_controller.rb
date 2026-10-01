@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 # The article stream on the new theme. A re-skin of Post — no new data, except the stored
-# entry number. home#index keeps the old stream until W7 takes the front page.
+# entry number.
 class JournalController < ApplicationController
   layout 'theme'
 
-  # The index is a row list at 1100px, not the card grid home uses, so it carries far more
-  # than Post::PAGY_LIMIT rows before paging.
   PER_PAGE = 20
 
   # Which half of a post to look in. 'all' first, because it is the default.
@@ -21,26 +19,28 @@ class JournalController < ApplicationController
   }.freeze
 
   before_action :set_post!, only: :show
+  before_action :redirect_to_current_address, only: :show
 
   def index
-    @tags = Tag.joins(:posts).where(posts: { status: :active }).distinct.order(:title)
+    readable = Post.active.unscope(:order).translated_in(I18n.locale)
+    @tags = Tag.joins(:posts).where(posts: { id: readable.select(:id) }).distinct.order(:title)
     # Looked up in Tag, not in @tags: a tag whose posts are all hidden has no chip but a
     # bookmarked link to it should say "no entries", not silently list everything.
     @active_tag = Tag.find_by(id: params[:tag_id])
     @order = Post::ORDER_TYPES.include?(params[:order]) ? params[:order] : 'new'
-    @entries_count = Post.active.count
+    @entries_count = readable.count
 
     posts = filtered_posts
-    @pagy, @posts = pagy(posts, limit: PER_PAGE, count: filtered_posts_count)
+    @pagy, @posts = pagy(posts, limit: PER_PAGE, count: filtered_posts_count, raise_range_error: true)
   end
 
   def show
     process_event
-    @related = Post.similar_posts(@post).includes(:tags, :user, :translations)
+    @related = Post.similar_posts(@post).translated_in(I18n.locale).includes(:tags, :user, :translations).to_a
     # Reading order, not publication order: an entry numbered #003 comes after #002 whenever
     # it was written.
-    @previous_entry = Post.before(@post).includes(:translations).first
-    @next_entry = Post.after(@post).includes(:translations).first
+    @previous_entry = Post.before(@post).translated_in(I18n.locale).includes(:translations).first
+    @next_entry = Post.after(@post).translated_in(I18n.locale).includes(:translations).first
   end
 
   # Search moved here from home#search when the front page stopped being the article stream.
@@ -48,13 +48,13 @@ class JournalController < ApplicationController
   # the old Bootstrap layout, and nothing in the redesigned nav pointed at it, so the site
   # had a search screen no reader could find.
   def search
-    @query = params[:query].to_s.strip
+    @query = params[:query].to_s.delete("\0").strip
     @field = SEARCH_FIELDS.include?(params[:search_in]) ? params[:search_in] : SEARCH_FIELDS.first
 
     respond_to do |format|
       format.html do
         results = Posts::Search.call(query: @query, search_in: @field) || Post.none
-        @pagy, @results = pagy(results.includes(:tags, :user, :translations), limit: PER_PAGE)
+        @pagy, @results = pagy(results.includes(:tags, :user, :translations), limit: PER_PAGE, raise_range_error: true)
       end
 
       # The command palette. Same action, same query, wider net — it also has to find the
@@ -66,18 +66,17 @@ class JournalController < ApplicationController
   private
 
   def filtered_posts
-    posts = ORDERS.fetch(@order, ORDERS['new']).call
-    posts = posts.joins(:tags).where(tags: { id: @active_tag.id }) if @active_tag
+    posts = ORDERS.fetch(@order) { ORDERS['new'] }.call.translated_in(I18n.locale)
+    posts = posts.where(id: @active_tag.posts.select(:id)) if @active_tag
     # :translations, not :post_translations — Mobility's Table backend reads the association
     # it defines, so preloading only the app's own name left one Post::Translation query per
     # row on this page. Both are named where both are read (the admin list).
     posts.includes(:tags, :user, :translations)
   end
 
-  # Post.best groups by post id, so the relation's own count returns a hash per group rather
-  # than a number. Pagy needs the row count, which is the number of distinct posts.
+  # Post.best selects a computed column, which COUNT cannot take, so Pagy is handed the count.
   def filtered_posts_count
-    filtered_posts.except(:group, :select, :order, :includes).distinct.count(:id)
+    filtered_posts.except(:select, :order, :includes).count(:id)
   end
 
   # FriendlyId's history module already resolves a slug the post used to have, so there is
@@ -93,9 +92,19 @@ class JournalController < ApplicationController
   # Staff keep the unscoped lookup, because previewing a hidden post before publishing it is
   # the reason the two states exist.
   def set_post!
-    @post = visible_posts.friendly.find(params.expect(:id))
+    slug = params.expect(:id)
+    raise ActiveRecord::RecordNotFound if slug.include?("\0")
+
+    @post = visible_posts.friendly.find(slug)
+    raise ActiveRecord::RecordNotFound unless current_user&.staff_member? || @post.translated_in?(I18n.locale)
   rescue ActiveRecord::RecordNotFound
     raise ActionController::RoutingError, 'post not found'
+  end
+
+  def redirect_to_current_address
+    return if params[:id] == @post.slug
+
+    redirect_to post_path(@post), status: :moved_permanently
   end
 
   def visible_posts

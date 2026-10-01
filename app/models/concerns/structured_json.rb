@@ -7,7 +7,7 @@
 # document with three ordered lists inside it — career, stack groups, strengths — and it used
 # to be a table of ten rows with its own model, controller, policy and CRUD screens, so
 # changing two words meant a page navigation and reordering meant typing a number into a
-# field. See redesign_plan.md §11.16.
+# field. See redesign_plan.md §12.1.
 #
 # A field kind is one of:
 #
@@ -58,7 +58,7 @@ module StructuredJson
   def structured_value(kind, raw)
     case kind
     when *LOCALISED_KINDS then localised(raw)
-    when :list then Array(raw)
+    when :list then Array(raw).map { |item| localised(item) }
     else raw
     end
   end
@@ -89,6 +89,22 @@ module StructuredJson
     when :list then value.is_a?(Array) ? value.map { |item| item.to_s.strip } : value.to_s.split("\n").map(&:strip)
     else value
     end.then { |result| result.is_a?(Array) ? result.compact_blank : result }
+  end
+
+  # One language filled in and the other left empty: the row a form can post half-translated.
+  def half_translated?(spec, row)
+    pairs = spec[:fields].nil? ? [row] : localised_values(spec, row)
+
+    pairs.any? do |pair|
+      missing = missing_languages(pair)
+      missing.any? && missing.size < I18n.available_locales.size
+    end
+  end
+
+  def localised_values(spec, row)
+    return [] unless row.is_a?(Hash)
+
+    spec[:fields].filter_map { |key, kind| row[key.to_s] if LOCALISED_KINDS.include?(kind) }
   end
 
   def filled?(value)

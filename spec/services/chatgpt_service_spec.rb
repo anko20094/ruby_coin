@@ -69,8 +69,97 @@ RSpec.describe ChatgptService, type: :service do
     context 'when the API returns an error' do
       let(:cassette_name) { 'api_error' }
 
-      it 'raises a RuntimeError with the API error message' do
-        expect { call_service }.to raise_error(RuntimeError, 'OpenAI API internal server error')
+      it 'raises an Error with the API error message' do
+        expect { call_service }.to raise_error(described_class::Error, 'OpenAI API internal server error')
+      end
+    end
+
+    # What comes back from the model is stored as the article, so only a finished, non-empty
+    # completion counts as one.
+    context 'when the answer is not a usable translation' do
+      subject(:call_service) { described_class.call(params) }
+
+      def answer(code: 200, body: nil)
+        allow(HTTParty).to receive(:post).and_return(instance_double(HTTParty::Response, code:, parsed_response: body))
+      end
+
+      def completion(finish_reason:, content:)
+        { 'choices' => [{ 'finish_reason' => finish_reason, 'message' => { 'content' => content } }] }
+      end
+
+      it 'refuses an answer the model cut off' do
+        answer(body: completion(finish_reason: 'length', content: '<p>Half a transl'))
+
+        expect { call_service }.to raise_error(described_class::Error, /stopped early/)
+      end
+
+      it 'refuses an answer the model withheld' do
+        answer(body: completion(finish_reason: 'content_filter', content: nil))
+
+        expect { call_service }.to raise_error(described_class::Error, /stopped early/)
+      end
+
+      it 'refuses an empty answer' do
+        answer(body: completion(finish_reason: 'stop', content: ''))
+
+        expect { call_service }.to raise_error(described_class::Error, /empty/)
+      end
+
+      it 'refuses a reply that is not JSON, without a NoMethodError' do
+        answer(code: 502, body: '<html>Bad gateway</html>')
+
+        expect { call_service }.to raise_error(described_class::Error, 'OpenAI answered 502')
+      end
+
+      it 'refuses an empty body' do
+        expect { described_class.call(input_data: '', locale: 'uk') }.to raise_error(described_class::Error)
+      end
+
+      it 'turns a timeout into the same Error' do
+        allow(HTTParty).to receive(:post).and_raise(Net::ReadTimeout)
+
+        expect { call_service }.to raise_error(described_class::Error, /Net::ReadTimeout/)
+      end
+
+      it 'waits no longer than TIMEOUT for the API' do
+        answer(body: completion(finish_reason: 'stop', content: '<p>Hello</p>'))
+
+        call_service
+
+        expect(HTTParty).to have_received(:post).with(anything, hash_including(timeout: described_class::TIMEOUT))
+      end
+    end
+
+    context 'when the message is long enough to be sent in sections' do
+      let(:message) { (1..40).map { |n| "<h2>Heading #{n}</h2><p>#{'text ' * 3000}</p>" }.join }
+
+      it 'never has more than MAX_PARALLEL sections in the air' do
+        running = Concurrent::AtomicFixnum.new
+        peak = Concurrent::AtomicFixnum.new
+        allow_any_instance_of(described_class).to receive(:translate) do
+          peak.update { |seen| [seen, running.increment].max }
+          sleep 0.01
+          running.decrement
+          '<p>done</p>'
+        end
+
+        described_class.call(input_data: message, locale: 'uk')
+
+        expect(peak.value).to be_between(2, described_class::MAX_PARALLEL)
+      end
+
+      it 'keeps the sections in order' do
+        sections = 0
+        lock = Mutex.new
+        allow_any_instance_of(described_class).to receive(:translate) do |_service, section|
+          lock.synchronize { sections += 1 }
+          section[/Heading \d+/]
+        end
+
+        result = described_class.call(input_data: message, locale: 'uk')
+
+        expect(result.scan(/Heading \d+/)).to eq(result.scan(/Heading \d+/).sort_by { |label| label[/\d+/].to_i })
+        expect(sections).to be > described_class::MAX_PARALLEL
       end
     end
   end

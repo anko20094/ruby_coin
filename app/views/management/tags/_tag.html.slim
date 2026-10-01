@@ -7,11 +7,11 @@
   .tag__actions
     .edit
       = link_to edit_management_tag_path(tag), data: { turbo_frame: dom_id(tag) },
-        aria: { label: t('global.button.edit') } do
+        aria: { label: t('global.button.edit_item', item: tag.title) } do
         = image_tag 'edit-icon.svg', alt: ''
     .delete
       = button_to management_tag_path(tag), method: :delete,
-        aria: { label: t('global.button.delete') },
+        aria: { label: t('global.button.delete_item', item: tag.title) },
         form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
                         confirm_message_value: t('confirmations.delete', item: tag.title) } } do
         = image_tag 'delete-icon.svg', alt: ''

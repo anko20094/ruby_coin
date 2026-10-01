@@ -7,8 +7,8 @@ class FaqController < ApplicationController
   def index
     @entries = faq_entries
 
-    # The copy is in the locale files, so the only thing that can change it is a deploy.
-    cache_publicly(I18n.t('faq').to_s)
+    # The copy is in the locale files, which are part of the release.
+    cache_publicly
   end
 
   private

@@ -19,12 +19,22 @@ en:
         subject: Confirmation instructions
       reset_password_instructions:
         subject: Reset password instructions
+        greeting: Hello %{recipient}!
+        instruction: Someone has requested a link to change your password. You can do this through the link below.
+        action: Change my password
+        instruction_2: If you didn't request this, please ignore this email.
+        instruction_3: Your password won't change until you access the link above and create a new one.
       unlock_instructions:
         subject: Unlock instructions
       email_changed:
         subject: Email Changed
+        greeting: Hello %{recipient}!
+        message: We're contacting you to notify you that your email has been changed to %{email}.
+        message_unconfirmed: We're contacting you to notify you that your email is being changed to %{email}.
       password_change:
         subject: Password Changed
+        greeting: Hello %{recipient}!
+        message: We're contacting you to notify you that your password has been changed.
     omniauth_callbacks:
       failure: 'Could not authenticate you from %{kind} because \%{reason}\.'
       success: 'Successfully authenticated from %{kind} account.'
@@ -34,7 +44,6 @@ en:
       send_paranoid_instructions: If your email address exists in our database, you will receive a password recovery link at your email address in a few minutes.
       updated: Your password has been changed successfully. You are now signed in.
       updated_not_active: Your password has been changed successfully.
-    passwords:
       edit:
         title: Change your password
         new_password: New password

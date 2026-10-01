@@ -12,22 +12,53 @@ module HttpCaching
 
   # Long enough that a reader clicking through /work and back does not re-ask, short enough
   # that publishing something is visible without anyone clearing anything.
-  PUBLIC_TTL = 5.minutes
+  PAGE_TTL = 5.minutes
+
+  # Rails only digests the action's own template, and for Slim not even its partials.
+  RELEASE_SOURCES = '{app,config/locales,public/og}/**/*'
+
+  included do
+    etag { HttpCaching.release }
+  end
+
+  class << self
+    # Everything a page is rendered from besides its records, so a deploy that touches any of
+    # it expires what browsers hold. Development re-reads it, because there the files are what
+    # is being edited.
+    def release
+      return digest_sources if Rails.application.config.enable_reloading
+
+      @release ||= digest_sources
+    end
+
+    private
+
+    def digest_sources
+      files = Rails.root.glob(RELEASE_SOURCES).select(&:file?).sort << Rails.root.join('Gemfile.lock')
+
+      Digest::SHA256.hexdigest(files.sum('') { |path| Digest::SHA256.file(path).hexdigest })
+    end
+  end
 
   private
 
-  # `record` is whatever the page is made of — a record, an array of them, anything with a
-  # cache key. The locale is part of the key because the same records render as two pages.
-  def cache_publicly(record, last_modified: nil)
+  # `page` is whatever the page is made of — records, arrays of them, anything with a cache
+  # key — and nothing for a page made of what every page shares. That part is added here, so a
+  # new page cannot forget it: the footer's CV, the language, and the day (the copyright year
+  # and the draft chip read the clock).
+  #
+  # Browser cache only: every response sets the visitor's Ahoy cookie, which a shared cache
+  # must never replay to the next reader.
+  def cache_publicly(*page)
     return false if uncacheable?
 
-    expires_in PUBLIC_TTL, public: true
-    fresh_when(etag: [record, I18n.locale, request.path], last_modified: last_modified, public: true)
+    expires_in PAGE_TTL
+    fresh_when(etag: [page, CVProfile.current, I18n.locale, request.path, Date.current])
   end
 
   # A message meant for this reader must not be answered with a copy of the page from before
-  # it, and must never be handed to a shared cache.
+  # it.
   def uncacheable?
-    flash.any? || request.format.json?
+    flash.any?
   end
 end

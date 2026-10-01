@@ -37,7 +37,7 @@ jobs:
           prompt: |
             You are a senior Rails engineer reviewing a PR for a web platform with admin panel.
 
-            Stack: Rails 8.1, PostgreSQL, Pundit (authorization), Devise (auth), Carrierwave (file uploads), Action Text + Trix (article bodies), Hotwire (Turbo Frames + Stimulus; Turbo Drive is deliberately off), ViewComponent, Slim, Propshaft, Mobility (translations), pg_search, Pagy, friendly_id, Rouge, Ahoy, Capistrano.
+            Stack: Rails 8.1, PostgreSQL, Pundit (authorization), Devise (auth), Carrierwave (file uploads), Action Text with self-hosted TinyMCE (article bodies), Hotwire (Turbo Frames + Stimulus; Turbo Drive is deliberately off), ViewComponent, Slim, Propshaft, Mobility (translations), pg_search, Pagy, friendly_id, Rouge, Ahoy, Capistrano.
 
             Do NOT use any skills or slash commands.
 
@@ -58,9 +58,9 @@ jobs:
 
             Focus on:
             1. **Bugs & logic errors** — incorrect conditions, edge cases, nil handling
-            2. **Security** — missing Pundit checks, mass assignment vulnerabilities, ActiveAdmin access control
+            2. **Security** — missing Pundit checks, mass assignment vulnerabilities, `/management` access control
             3. **N+1 queries** — missing `.includes`, `.preload`, or DB indexes
-            4. **Sidekiq jobs** — idempotency, error handling, retry safety
+            4. **Data tasks and importers** (`after_party`, `Cases::Importer`, `CV::Importer`) — idempotency, error handling, retry safety
             5. **File uploads (Carrierwave)** — missing validations, MIME type checks, size limits
             6. **Rails conventions** — fat models/controllers, misuse of callbacks
 

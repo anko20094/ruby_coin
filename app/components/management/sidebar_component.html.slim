@@ -20,12 +20,12 @@ aside.mg-sidebar data-controller="sidebar"
       data-label-expand=t('.expand')]
       span aria-hidden="true" ⟨
 
-  / The rail hides the names with CSS rather than dropping them, so the accessible name of
-    / each link is the same whether the sidebar is open or shut.
-  #mg-sidebar-nav.mg-sidebar__models
+  / The rail clips the names rather than hiding them, so the accessible name of each link is
+    / the same whether the sidebar is open or shut.
+  nav#mg-sidebar-nav.mg-sidebar__models aria-label=t('.navigation')
     .mg-sidebar__label= t('.models')
     - models.each do |model|
-      = link_to model.path, class: "mg-model #{'is-current' if model.current?(current)}", title: model.label do
+      = link_to model.path, **link_attributes(model) do
         span.mg-model__dot
         .mg-model__body
           .mg-model__name= model.label
@@ -34,7 +34,7 @@ aside.mg-sidebar data-controller="sidebar"
 
     .mg-sidebar__label= t('.system')
     - system_entries.each do |entry|
-      = link_to entry.path, class: "mg-model #{'is-current' if entry.current?(current)}", title: entry.label do
+      = link_to entry.path, **link_attributes(entry) do
         span.mg-model__dot
         .mg-model__body
           .mg-model__name= entry.label

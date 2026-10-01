@@ -26,7 +26,7 @@ describe 'the Action Text contract' do # rubocop:disable RSpec/DescribeClass
     clean.to_s.gsub(/\s*\n\s*/, '')
   end
 
-  # rubocop:disable Layout/LineLength,Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration
+  # rubocop:disable-next Layout/LineLength,Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration
   SURVIVES = {
     'bold, italic and inline code' => '<p><strong>b</strong> <em>i</em> <code>c</code></p>',
     'underline and strikethrough' => '<p><u>u</u> <s>s</s></p>',
@@ -44,7 +44,6 @@ describe 'the Action Text contract' do # rubocop:disable RSpec/DescribeClass
     'a right-to-left paragraph' => '<p dir="rtl">r</p>',
     'a figure with a caption' => '<figure><img src="/a.jpg" alt=""><figcaption>c</figcaption></figure>'
   }.freeze
-  # rubocop:enable Layout/LineLength,Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration
 
   SURVIVES.each do |what, html|
     it "keeps #{what}" do
@@ -57,12 +56,51 @@ describe 'the Action Text contract' do # rubocop:disable RSpec/DescribeClass
   # the button can come back.
   {
     'an inline style, which is how TinyMCE writes an indent' => ['<p style="padding-left: 40px;">i</p>', 'style'],
+    'a list style, which is how advlist writes a lettered list' =>
+      ['<ol style="list-style-type: lower-alpha;"><li>a</li></ol>', 'style'],
+    'a font size or a colour' => ['<p><span style="font-size: 18pt; color: #e03e2d;">x</span></p>', 'style'],
+    'an underline written as a style, which is what TinyMCE does unless told to write <u>' =>
+      ['<p><span style="text-decoration: underline;">u</span></p>', 'style'],
     'a <details> accordion' => ['<details><summary>s</summary><p>b</p></details>', 'details'],
     'an embedded <video>' => ['<p><video controls src="/v.mp4"></video></p>', 'video'],
     'a bare <iframe>' => ['<iframe src="https://x"></iframe>', 'iframe']
   }.each do |what, (html, needle)|
     it "strips #{what}, so nothing offers it" do
       expect(sanitized(html)).not_to include(needle)
+    end
+  end
+
+  # The configuration is JavaScript, so it is read as text, as tinymce_assets_spec does.
+  describe 'what the post editor offers' do
+    let(:source) { Rails.root.join('app', 'javascript', 'controllers', 'tinymce_controller.js').read }
+    let(:post_profile) { source[/postSettings\(\) \{.*?\n  \}\n/m] }
+
+    def quoted(text) = text.scan(/"([^"]+)"/).flatten
+
+    it 'loads none of the plugins whose output is stripped' do
+      plugins = quoted(post_profile[/plugins:\s*\[(.*?)\]/m, 1])
+
+      expect(plugins).to include('lists', 'table', 'codesample')
+      expect(plugins & %w[accordion advlist media pagebreak]).to be_empty
+    end
+
+    it 'puts nothing that writes an inline style in a menu or on the toolbar' do
+      menu = post_profile[/items:\s*"([^"]+)"/, 1].split
+      toolbar = quoted(post_profile[/toolbar:\s*\[(.*?)\]\.join/m, 1]).flat_map(&:split)
+
+      expect(menu & toolbar).to include('bold')
+      styled = %w[fontfamily fontsize forecolor backcolor lineheight styles indent outdent]
+
+      expect((menu + toolbar) & styled).to be_empty
+    end
+
+    it 'writes underline as <u>' do
+      expect(post_profile).to include('...INLINE_FORMATS')
+      expect(source).to include('INLINE_FORMATS = { underline: { inline: "u"')
+    end
+
+    it 'takes the case editor\'s elements from the server, where the sanitiser list is' do
+      expect(source).to include('valid_elements: this.validElementsValue')
     end
   end
 

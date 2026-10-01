@@ -2,21 +2,23 @@
 / inside the <template> the add button clones — that copy carries ROW_INDEX in place of a
 / number and no values.
 - path = StructuredRowsHelper::RowPath.new(scope, field, index)
-.mg-row[data-structure-rows-target="row"]
+- name_id = "#{path.scope}_#{path.field}_#{path.index}_group".gsub(/\W/, '_')
+.mg-row[data-structure-rows-target="row" role="group" aria-labelledby=name_id]
+  span.mg-row__name[id=name_id data-label=t('.row')]= t('.row')
   .mg-row__inputs
     - if spec[:fields].nil?
       / The row is one string per language and nothing else. `row:` says whether the page
       / prints it as markup; without it, a strength would get an editor it has no use for.
       - I18n.available_locales.each do |locale|
-        = structure_row_field(path, keys: [locale], kind: spec.fetch(:row, :localised),
-                              label: t(locale).downcase, value: structure_row_value(row, locale))
+        = structure_row_field(path, keys: [locale], kind: spec.fetch(:row, :localised), locale: locale,
+                              label: "#{list} · #{t(locale).downcase}", value: structure_row_value(row, locale))
     - else
       - spec[:fields].each do |key, kind|
         / Both kinds that hold a language pair split into one box per language. Checking only
         / for :localised here collapsed every :rich field into a single un-localised value.
         - if StructuredJson::LOCALISED_KINDS.include?(kind)
           - I18n.available_locales.each do |locale|
-            = structure_row_field(path, keys: [key, locale], kind: kind,
+            = structure_row_field(path, keys: [key, locale], kind: kind, locale: locale,
                                   label: "#{t(".#{key}")} · #{t(locale).downcase}",
                                   value: structure_row_value(row, key, locale))
         - else

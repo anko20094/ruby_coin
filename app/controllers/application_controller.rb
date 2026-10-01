@@ -12,8 +12,10 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :exception
   before_action :set_pagy_locale
+  before_action :forbid_indexing, if: :devise_controller?
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from Pagy::RangeError, with: :redirect_to_last_page
 
   def set_pagy_locale
     # Pagy 43 internal i18n is thread-local; keep it in sync with Rails I18n
@@ -28,5 +30,18 @@ class ApplicationController < ActionController::Base
     Rails.logger.info { "Pundit denied: #{error.message}" } if error
     flash[:alert] = t('application_controller.alert')
     redirect_to(root_path)
+  end
+
+  private
+
+  # A page past the last one has no entries, so it goes to the last page that has. Reached only
+  # by a list that passes `raise_range_error: true`.
+  def redirect_to_last_page(error)
+    redirect_to "#{request.path}?#{request.query_parameters.merge(page: error.pagy.last).to_query}"
+  end
+
+  # robots.txt Disallow stops a fetch, not a listing of a linked URL; this is what keeps it out.
+  def forbid_indexing
+    response.set_header('X-Robots-Tag', 'noindex, nofollow')
   end
 end

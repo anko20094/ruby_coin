@@ -132,4 +132,41 @@ describe 'page metadata', type: :request do
       end
     end
   end
+
+  # Cards are baked by a rake task, and a case is added in the admin without a deploy.
+  it 'falls back to the site card for a case whose own card has not been baked' do
+    Case.find_by!(slug: 'dna').dup.update!(slug: 'brand-new', position: 99)
+
+    get '/en/work/brand-new'
+
+    expect(content_of('og:image')).to eq('http://www.example.com/og/site-en.png')
+    expect(content_of('twitter:image')).to eq('http://www.example.com/og/site-en.png')
+  end
+
+  # A paginated or filtered list is a different list, not a copy of the first one; the person
+  # page's ?from= is only the way the reader arrived.
+  describe 'the canonical address' do
+    it 'keeps the parameters that choose which list this is' do
+      tag = create(:tag)
+
+      get "/en/journal?tag_id=#{tag.id}&order=best"
+
+      expect(response.body)
+        .to include(%(<link href="http://www.example.com/en/journal?tag_id=#{tag.id}" rel="canonical" />))
+      expect(response.body)
+        .to include(%(<link href="http://www.example.com/uk/journal?tag_id=#{tag.id}" hreflang="uk" rel="alternate" />))
+    end
+
+    it 'does not make an address of a page that is not there, a first page or a tag that does not exist' do
+      get '/en/journal?tag_id=999999&page=1'
+
+      expect(response.body).to include('<link href="http://www.example.com/en/journal" rel="canonical" />')
+    end
+
+    it 'drops the ones that only say how the reader arrived' do
+      get '/en/team/danyil?from=dna'
+
+      expect(response.body).to include('<link href="http://www.example.com/en/team/danyil" rel="canonical" />')
+    end
+  end
 end

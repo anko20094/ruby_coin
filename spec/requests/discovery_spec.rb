@@ -96,5 +96,85 @@ describe 'discovery', type: :request do
     it 'keeps them out of the search screen, which is an unbounded crawl space' do
       expect(response.body).to include('Disallow: /*/search')
     end
+
+    # Every live address carries its locale, so the bare prefixes only match the redirect.
+    it 'keeps them out of the admin, the sign-in screens and the API under both locales' do
+      expect(response.body).to include('Disallow: /*/management/', 'Disallow: /*/users/', 'Disallow: /*/api/')
+    end
+  end
+
+  # What a crawler is told it can skip must not outlive the list it was told about.
+  describe 'validators' do
+    let(:older) { I18n.with_locale(:en) { create(:post, status: 'active', title: 'The older one') } }
+
+    before do
+      older.update_columns(updated_at: 3.days.ago)
+      post_record.update_columns(updated_at: 1.day.ago)
+    end
+
+    it 'expire the sitemap when a post that is not the newest is hidden' do
+      get '/sitemap.xml'
+      before_hiding = response.headers['ETag']
+
+      I18n.with_locale(:en) { older.update!(status: 'inactive') }
+      get '/sitemap.xml', headers: { 'If-None-Match' => before_hiding }
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).not_to include(older.slug)
+    end
+
+    it 'expire the sitemap when a post is deleted' do
+      get '/sitemap.xml'
+      before_deleting = response.headers['ETag']
+
+      older.destroy!
+      get '/sitemap.xml', headers: { 'If-None-Match' => before_deleting }
+
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'expire the feed when a post that is not the newest is hidden' do
+      get '/en/feed'
+      before_hiding = response.headers['ETag']
+
+      I18n.with_locale(:en) { older.update!(status: 'inactive') }
+      get '/en/feed', headers: { 'If-None-Match' => before_hiding }
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).not_to include(older.slug)
+    end
+
+    it 'expire the feed when a tag it carries is renamed' do
+      tag = create(:tag, title: 'before')
+      post_record.tags << tag
+      get '/en/feed'
+      before_renaming = response.headers['ETag']
+
+      tag.update!(title: 'after', updated_at: 1.minute.from_now)
+      get '/en/feed', headers: { 'If-None-Match' => before_renaming }
+
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('term="after"')
+    end
+
+    it 'answer an unchanged document with 304' do
+      get '/sitemap.xml'
+
+      get '/sitemap.xml', headers: { 'If-None-Match' => response.headers['ETag'] }
+
+      expect(response).to have_http_status(:not_modified)
+    end
+  end
+
+  # These are held by shared caches, which would hand the next reader the previous one's cookie.
+  describe 'cookies' do
+    ['/sitemap.xml', '/robots.txt', '/en/feed'].each do |path|
+      it "sets none on #{path}, which is public" do
+        get path
+
+        expect(response.headers['Cache-Control']).to include('public')
+        expect(response.headers['Set-Cookie']).to be_nil
+      end
+    end
   end
 end

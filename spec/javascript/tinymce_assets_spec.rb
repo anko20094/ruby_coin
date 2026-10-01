@@ -40,6 +40,14 @@ describe 'the self-hosted TinyMCE build' do # rubocop:disable RSpec/DescribeClas
     expect(unknown).to be_empty, "not in the tinymce package: #{unknown.join(', ')}"
   end
 
+  it 'offers the image button only the types the upload endpoint stores' do
+    offered = controller_source[/images_file_types:\s*"([^"]*)"/, 1].split(',')
+    stored = Management::EditorImagesController::FORMATS.values
+
+    # jpeg and jpg are one format under two extensions.
+    expect(offered - stored - %w[jpeg]).to be_empty
+  end
+
   it 'has actually been built into public/tinymce' do
     root = Rails.public_path.join('tinymce')
     skip 'run `yarn build:tinymce` first' unless root.directory?

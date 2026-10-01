@@ -4,9 +4,10 @@
     .admin-panel__inner
       .admin-panel__right
         .inner-title
-          h1.admin__title= t('.title')
+          h2.admin__title= t('.title')
         .cases-admin
           - @cases.each do |kase|
+            - name = plain(kase.title)
             .case-row
               span.case-row__mark= kase.mark
               .case-row__body
@@ -20,13 +21,13 @@
               .post__actions
                 .delete
                   = button_to management_case_path(kase), method: :delete,
-                    aria: { label: t('global.button.delete') },
+                    aria: { label: t('global.button.delete_item', item: name) },
                     form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
-                                    confirm_message_value: t('global.dialog.you_sure') } } do
+                                    confirm_message_value: t('confirmations.delete', item: name) } } do
                     = image_tag('delete-icon.svg', alt: '')
                 .edit
                   = link_to edit_management_case_path(kase), data: { turbo: :false },
-                    aria: { label: t('global.button.edit') } do
+                    aria: { label: t('global.button.edit_item', item: name) } do
                     = image_tag 'edit-icon.svg', alt: ''
         .footer-panel
           = link_to t('buttons.create'), new_management_case_path, class: 'main-btn', data: { turbo: :false }

@@ -65,11 +65,16 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  # There was no delivery configuration at all, and Devise's :recoverable module is enabled —
-  # so a password reset in production raised "Missing host to link to!" before it ever got as
-  # far as trying to send. Reads the environment so no credentials live in the repo; with
-  # SMTP_ADDRESS unset it falls back to logging the mail instead of pretending to send it.
-  config.action_mailer.default_url_options = { host: ENV.fetch('APP_HOST', 'rubyco.in'), protocol: 'https' }
+  # The address every absolute URL a page prints is built from — canonical, share cards, the
+  # sitemap, the feed — in place of the Host header a client chose to send.
+  config.x.canonical_url_options = { host: ENV['APP_HOST'].presence || 'rubyco.in', protocol: 'https' }
+
+  # Devise's :recoverable builds a reset link, which needs a host. Credentials come from the
+  # environment so none live in the repo; with SMTP_ADDRESS unset the mail is written to
+  # tmp/mails rather than sent. Links are https whatever FORCE_SSL says: the vhost in
+  # config/nginx.conf redirects plain HTTP to it. MAILER_FROM sets the sender of every mail
+  # (default no-reply@rubyco.in).
+  config.action_mailer.default_url_options = { host: ENV['APP_HOST'].presence || 'rubyco.in', protocol: 'https' }
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
 
@@ -77,19 +82,16 @@ Rails.application.configure do
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       address: ENV.fetch('SMTP_ADDRESS'),
-      port: ENV.fetch('SMTP_PORT', 587).to_i,
-      user_name: ENV.fetch('SMTP_USERNAME', nil),
-      password: ENV.fetch('SMTP_PASSWORD', nil),
+      port: (ENV['SMTP_PORT'].presence || 587).to_i,
+      user_name: ENV['SMTP_USERNAME'].presence,
+      password: ENV['SMTP_PASSWORD'].presence,
       authentication: :plain,
       enable_starttls_auto: true
     }
   else
-    config.action_mailer.delivery_method = :test
+    config.action_mailer.delivery_method = :file
+    config.action_mailer.file_settings = { location: Rails.root.join('tmp', 'mails').to_s }
   end
-
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

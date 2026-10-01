@@ -43,20 +43,26 @@ class Management::SidebarComponent < ViewComponent::Base
     numbers = counts
 
     [
-      Model.new(key: :posts, label: 'Post', path: helpers.management_posts_path,
+      Model.new(key: :posts, label: t('.post'), path: helpers.management_posts_path,
                 total: numbers[:posts], hint: t('.posts_hint', **numbers[:posts_by_status])),
-      Model.new(key: :cases, label: 'Case', path: helpers.management_cases_path,
+      Model.new(key: :cases, label: t('.case'), path: helpers.management_cases_path,
                 total: numbers[:cases], hint: t('.cases_hint', own: numbers[:own_cases])),
-      Model.new(key: :tags, label: 'Tag', path: helpers.management_tags_path,
+      Model.new(key: :tags, label: t('.tag'), path: helpers.management_tags_path,
                 total: numbers[:tags], hint: t('.tags_hint', used: numbers[:used_tags]))
     ]
   end
 
   def system_entries
     [
-      Model.new(key: :statistics, label: 'Statistics', path: helpers.management_statistics_path,
+      Model.new(key: :statistics, label: t('.statistics'), path: helpers.management_statistics_path,
                 total: nil, hint: t('.statistics_hint'))
     ]
+  end
+
+  def link_attributes(entry)
+    here = entry.current?(current)
+
+    { class: class_names('mg-model', 'is-current': here), title: entry.label, aria: { current: ('page' if here) } }
   end
 
   def initial

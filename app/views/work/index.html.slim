@@ -31,8 +31,8 @@
               span.wk-project__own= t('work.index.own')
 
         .wk-project__head
-          h2.wk-project__title= rich(kase.title)
-          p.wk-project__tagline= rich(kase.tagline)
+          h2.wk-project__title= rich(kase.title, links: false)
+          p.wk-project__tagline= rich(kase.tagline, links: false)
 
         .wk-project__stack
           .rc-chips
@@ -45,8 +45,8 @@
           .wk-project__metric
             - headline = kase.metrics.first
             - if headline.present?
-              .wk-project__metric-value.num= rich(headline[:value])
-              .wk-project__metric-label= rich(headline[:label])
+              .wk-project__metric-value.num= rich(headline[:value], links: false)
+              .wk-project__metric-label= rich(headline[:label], links: false)
           / A case can be added in the admin before anyone is credited for it in team.yml, and
           / the card then said "0 contributors". Saying nothing is the honest version.
           - if team.any?

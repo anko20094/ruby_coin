@@ -8,7 +8,8 @@
 # redesign_plan.md §12.5.
 #
 # Run it as often as you like. The importer rewrites the single row and then reads it back and
-# compares, so a run that says nothing is wrong means the database and the file agree.
+# compares, so a run that says nothing is wrong means the database and the file agree. The
+# deploy runs it on every release (deploy:data), so a commit to cv.yml is the whole edit.
 namespace :cv do
   desc 'Import config/portfolio/cv.yml into the CV row, and check the copy matches'
   task import: :environment do

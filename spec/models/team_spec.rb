@@ -112,24 +112,32 @@ RSpec.describe Team do
       expect(described_class.version).to match(/\A\h{64}\z/)
     end
 
-    # A replaced photograph changes neither YAML. Hashing only those left every roster page's
-    # ETag identical, so a browser holding the page went on serving the old face from its own
-    # cache — the only thing that had changed was a file on disk.
-    it 'moves when a photograph is replaced, and settles when it is put back' do
-      file = Rails.root.join('app', 'assets', 'images', 'people', 'natalia.jpg')
-      original = file.binread
-      before = described_class.version
+    context 'when a photograph is replaced under the same filename' do
+      let(:photos) { Pathname(Dir.mktmpdir) }
+      let(:photo) { photos.join('natalia.jpg') }
 
-      file.binwrite("#{original}\0")
-      described_class.reload!
-      expect(described_class.version).not_to eq(before)
+      before do
+        photo.binwrite('the first face')
+        stub_const('Team::PHOTOS', photos)
+        described_class.reload!
+      end
 
-      file.binwrite(original)
-      described_class.reload!
-      expect(described_class.version).to eq(before)
-    ensure
-      file.binwrite(original)
-      described_class.reload!
+      after do
+        FileUtils.remove_entry(photos)
+        described_class.reload!
+      end
+
+      it 'moves, and settles when the old one is put back' do
+        first = described_class.version
+
+        photo.binwrite('the second face')
+        described_class.reload!
+        expect(described_class.version).not_to eq(first)
+
+        photo.binwrite('the first face')
+        described_class.reload!
+        expect(described_class.version).to eq(first)
+      end
     end
   end
 end

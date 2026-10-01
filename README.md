@@ -8,7 +8,7 @@ Preinstallation
 
 1. Install postgresql if you don't have it
 2. Create a `dev` user: `sudo -u postgres createuser -d -W dev` and enter password `dev`
-3. Install nodeJS v18.15.0 or higher
+3. Install Node.js 20.19 or higher
 
 Installation
 --------------
@@ -27,9 +27,12 @@ Start server
 ### Stack of technologies
 * Ruby       3.4.9
 * Rails      8.1
-* PostgreSQL 15.2
-* Node.js    18.15.0 or higher
-* Yarn       4.15.0
+* PostgreSQL 14 or higher (CI runs 14.10)
+* Node.js    20.19 or higher
+* Yarn       4 (the exact version is pinned in `package.json`)
+
+`tech_audit.md` describes how the stack fits together; `redesign_plan.md` records why, and its
+later sections win over its earlier ones.
 
 Testing & Quality Control
 --------------

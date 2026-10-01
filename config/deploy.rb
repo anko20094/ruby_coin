@@ -50,8 +50,9 @@ set :puma_systemctl_user, :system
 # ------------------------------
 append :linked_files, *%w[config/master.key config/database.yml config/credentials.yml.enc .env]
 
-set :linked_dirs, %w[log tmp/pids tmp/cache tmp/sockets vendor/bundle public/uploads public/system node_modules
-                     storage]
+set :linked_dirs, %w[
+  log tmp/pids tmp/cache tmp/sockets vendor/bundle public/uploads public/system node_modules storage
+]
 
 # ------------------------------
 # Yarn install before asset precompile
@@ -70,12 +71,11 @@ end
 before 'deploy:assets:precompile', 'deploy:yarn_install'
 
 # ------------------------------
-# Data tasks, after the new release is live
+# Data tasks, before the new release is live
 # ------------------------------
-# after_party was a task you had to remember to invoke by hand, so a deploy could ship code
-# that depended on a data migration and never run it. The importers and the cover rebuild are
-# all idempotent, which is what makes running them every deploy safe.
-after 'deploy:published', 'after_party'
+# What they write is ignored by the release still serving, and a failure stops the deploy
+# before the symlink moves.
+before 'deploy:publishing', 'deploy:data'
 
 # ------------------------------
 # Upload credentials automatically

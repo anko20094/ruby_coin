@@ -4,10 +4,9 @@
 # and enough journal entries that the index, the pager and the tag filter have something to
 # do.
 #
-# The previous version could not run at all — it ended in
-# `Rake::Task['after_party:fill_translations'].invoke`, a task deleted with Globalize, so
-# `rails db:seed` (and `cap deploy:seed`) raised on any empty database. It also wrote each
-# post in one language only, which the site renders as blanks in the other.
+# Outside development and test it creates the admin and nothing else, because the deploy owns
+# the portfolio. ALLOW_SEED opens it to such an environment; SEED_ADMIN_EMAIL and
+# SEED_ADMIN_PASSWORD are then required.
 #
 # Idempotent: run it twice and nothing doubles.
 
@@ -17,22 +16,33 @@ def say(message) = puts("  #{message}")
 
 puts "\nseeding #{Rails.env}"
 
-# --- the portfolio ------------------------------------------------------------------------
-# Cases and the CV are real content, and the handoff forbids retyping any of it by hand, so
-# the same importers the deploy runs are the only way it gets in.
-Cases::Importer.call
-CV::Importer.call
-say "cases: #{Case.count} · profile: #{CVProfile.current.name}"
-
 # --- a way in -----------------------------------------------------------------------------
-admin = User.find_or_initialize_by(email: ENV.fetch('SEED_ADMIN_EMAIL', 'admin@rubyco.in'))
+email = ENV['SEED_ADMIN_EMAIL'].presence
+password = ENV['SEED_ADMIN_PASSWORD'].presence
+if !Rails.env.local? && (email.nil? || password.nil?)
+  abort '  SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are required outside development and test.'
+end
+
+admin = User.find_or_initialize_by(email: email || 'admin@rubyco.in')
 if admin.new_record?
-  admin.password = ENV.fetch('SEED_ADMIN_PASSWORD', 'password123')
+  admin.password = password || SecureRandom.base64(12)
   admin.nickname = 'danyil'
   admin.role = :admin
   admin.save!
+  say "password: #{admin.password}" if password.nil?
 end
 say "admin: #{admin.email}"
+
+return unless Rails.env.local?
+
+# --- the portfolio ------------------------------------------------------------------------
+# Cases and the CV are real content, and the handoff forbids retyping any of it by hand, so
+# the same importers the deploy runs are the only way it gets in.
+imports = [Cases::Importer.call, CV::Importer.call]
+unless imports.all?(&:clean?)
+  abort "  the portfolio does not match its yaml:\n    #{imports.flat_map(&:mismatches).join("\n    ")}"
+end
+say "cases: #{Case.count} · profile: #{CVProfile.current.name}"
 
 # --- the journal --------------------------------------------------------------------------
 TAGS = %w[rails hotwire postgres activerecord viewcomponent turbo].freeze
@@ -73,6 +83,12 @@ ENTRIES = [
   ]
 ].freeze
 
+# One more page than the journal shows at once, and two entries on it, so the pager has a second
+# page to go to and a last page that is not a single row.
+numbers = (ENTRIES.size + 1)..(JournalController::PER_PAGE + 2)
+filler = numbers.map { |number| [format('Seeded entry %02d', number), format('Засіяний запис %02d', number)] }
+SEEDED = (ENTRIES + filler).freeze
+
 BODY = {
   en: '<p>A short entry, seeded so the journal has shape: an index with more than one page, ' \
       'a tag filter with something to filter, and a post long enough to read.</p>' \
@@ -110,7 +126,7 @@ rescue MiniMagick::Invalid, MiniMagick::Error, Errno::ENOENT => e
 end
 
 created = 0
-ENTRIES.each_with_index do |(en_title, uk_title), index|
+SEEDED.each_with_index do |(en_title, uk_title), index|
   slug = en_title.parameterize
   next if Post.exists?(slug: slug)
 
@@ -137,7 +153,7 @@ end
 # and the file the column names is there, so nothing notices until a cover renders as a
 # broken image. Re-attaching the source rebuilds the versions under the names in force now.
 repaired = 0
-Post.where(slug: ENTRIES.map { |en, _uk| en.parameterize }).find_each do |post|
+Post.where(slug: SEEDED.map { |en, _uk| en.parameterize }).find_each do |post|
   next if post.photo.blank?
   next if File.exist?(post.photo.medium.path.to_s)
 

@@ -50,7 +50,7 @@ module Team
 
     # Every row the file holds for a project, hidden people included. The check task is the
     # caller: to report that a row is parked you first have to be able to see it.
-    def rows_for(slug) = contributions.fetch(slug.to_s, [])
+    def rows_for(slug) = contributions[slug.to_s] || []
 
     # Who worked on a project, in file order. A hidden person's row stays in team.yml and stops
     # being rendered — which is what makes hiding someone reversible.
@@ -121,7 +121,7 @@ module Team
 
     def sources
       FILES.map { |name| PATH.join("#{name}.yml").read } +
-        photo_files.map { |file| Digest::SHA256.file(file).hexdigest }
+        photo_files.map { |file| Digest::SHA256.file(file).then(&:hexdigest) }
     end
 
     # Dir.glob sorts, which matters: the digest has to be the same on every machine.

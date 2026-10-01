@@ -95,6 +95,27 @@ RSpec.describe 'Routes' do
     end
   end
 
+  describe 'the admin writes' do
+    it 'routes the editor calls on a post, each to its own verb' do
+      expect(post: '/management/posts/translate').to route_to('management/posts#translate')
+      expect(patch: '/management/posts/1/autosave').to route_to('management/posts#autosave', id: '1')
+      expect(get: '/management/posts/1/preview').to route_to('management/posts#preview', id: '1')
+    end
+
+    it 'routes create, update and destroy on every admin list' do
+      %w[posts tags cases].each do |list|
+        expect(post: "/management/#{list}").to route_to("management/#{list}#create")
+        expect(patch: "/management/#{list}/1").to route_to("management/#{list}#update", id: '1')
+        expect(delete: "/management/#{list}/1").to route_to("management/#{list}#destroy", id: '1')
+      end
+    end
+
+    it 'routes what the editor mints and uploads' do
+      expect(post: '/management/journal_blocks').to route_to('management/journal_blocks#create')
+      expect(post: '/management/editor_images').to route_to('management/editor_images#create')
+    end
+  end
+
   describe 'GET /api/tags' do
     it 'routes to api/tags#index' do
       expect(get: '/api/tags').to route_to('api/tags#index')
@@ -117,21 +138,35 @@ RSpec.describe 'Routes' do
     end
 
     describe 'GET /users/sign_in' do
-      it 'routes to users/sessions#new' do
+      it 'routes to devise/sessions#new' do
         expect(get: '/users/sign_in').to route_to('devise/sessions#new')
       end
     end
 
     describe 'POST /users/sign_in' do
-      it 'routes to users/sessions#create' do
+      it 'routes to devise/sessions#create' do
         expect(post: '/users/sign_in').to route_to('devise/sessions#create')
       end
     end
 
     describe 'DELETE /users/sign_out' do
-      it 'routes to users/sessions#destroy' do
+      it 'routes to devise/sessions#destroy' do
         expect(delete: '/users/sign_out').to route_to('devise/sessions#destroy')
       end
+    end
+  end
+
+  describe 'the locale segment' do
+    it 'is uk or en, and is optional' do
+      expect(get: '/uk/work').to route_to('work#index', locale: 'uk')
+      expect(get: '/en/work').to route_to('work#index', locale: 'en')
+      expect(get: '/work').to route_to('work#index')
+    end
+
+    it 'is matched as a whole segment, so a longer word is not a locale' do
+      expect(get: '/enterprise').not_to be_routable
+      expect(get: '/ukraine/work').not_to be_routable
+      expect(get: '/de/work').not_to be_routable
     end
   end
 
@@ -152,9 +187,38 @@ RSpec.describe 'Routes' do
       expect(get: '/set_locale').not_to be_routable
     end
 
-    # Nothing in the app opens a cable connection — no turbo_stream_from anywhere.
+    # Nothing in the app opens a cable connection — no turbo_stream_from anywhere. A mounted
+    # Rack app is never recognised as a controller route, so only the route table can tell.
     it 'does not mount ActionCable' do
+      mounted = Rails.application.routes.routes.map { |route| route.path.spec.to_s }
+
+      expect(mounted.grep(%r{\A/cable})).to be_empty
+      expect(Rails.application.config.action_cable.mount_path).to be_nil
       expect(get: '/cable').not_to be_routable
+    end
+  end
+
+  # A page has one address. Every route used to take an optional extension, so /.env, /en.foo
+  # and /en/work.foo answered 200 with a copy of a page that named itself canonical.
+  describe 'pages and their extensions' do
+    %w[
+      /.env /en.foo /en/work.foo /en/work/dna.foo /en/team/danyil.foo /en/journal.foo /en/post/a-post.foo
+      /en/cv.foo /en/contact.foo /en/faq.foo /en/studio.foo /en/team.foo
+    ].each do |path|
+      it "has no #{path}" do
+        expect(get: path).not_to be_routable
+      end
+    end
+
+    it 'keeps the extension where something is served in another format' do
+      expect(get: '/en/search.json').to route_to('journal#search', locale: 'en', format: 'json')
+      expect(get: '/en/feed.atom').to route_to('feeds#feed', locale: 'en', format: 'atom')
+      expect(get: '/en/feed').to route_to('feeds#feed', locale: 'en', format: 'atom')
+    end
+
+    it 'serves those two in no other format' do
+      expect(get: '/en/search.foo').not_to be_routable
+      expect(get: '/en/feed.foo').not_to be_routable
     end
   end
 

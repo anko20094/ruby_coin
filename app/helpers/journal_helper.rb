@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 module JournalHelper
+  # The editor's code-sample list is Prism's, and Prism calls HTML "markup".
+  LEXER_ALIASES = { 'markup' => 'html' }.freeze
+
   # The rendered body, with code blocks highlighted server-side.
   def journal_body(post, locale = I18n.locale)
     fragment = Nokogiri::HTML5.fragment(post.rich_body(locale).to_s)
@@ -12,7 +15,7 @@ module JournalHelper
   # Used by the code block partial, and by the plain <pre> pass below, so a listing looks the
   # same however it got into the body.
   def journal_highlight(source, language)
-    lexer = language.present? && Rouge::Lexer.find(language)
+    lexer = lexer_named(language)
     return ERB::Util.html_escape(source) unless lexer
 
     Rouge::Formatters::HTML.new.format(lexer.new.lex(source)).html_safe # rubocop:disable Rails/OutputSafety -- Rouge escapes its input
@@ -82,8 +85,14 @@ module JournalHelper
   # `lang-` as well as `language-`, because that is the other spelling in the wild and costs a
   # single alternation to accept.
   def lexer_for(node)
-    language = node['class'].to_s[/(?:language|lang)-([\w+-]+)/, 1]
+    lexer_named(node['class'].to_s[/(?:language|lang)-([\w+-]+)/, 1])
+  end
 
-    language && Rouge::Lexer.find(language)
+  # What an author types in the block's free-text language field is "Ruby " as often as "ruby".
+  def lexer_named(name)
+    token = name.to_s.strip.downcase
+    return if token.empty?
+
+    Rouge::Lexer.find(LEXER_ALIASES.fetch(token) { token })
   end
 end

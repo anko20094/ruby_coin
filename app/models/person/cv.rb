@@ -12,7 +12,7 @@ class Person::CV
   end
 
   SCALARS.each do |field|
-    define_method(field) { localised(@block[field]) }
+    define_method(field) { |fallback: true| localised(@block[field], fallback: fallback) }
   end
 
   # [key, label, href] per row, printed in order. The key and the label may each be a language

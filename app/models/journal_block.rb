@@ -32,6 +32,11 @@ class JournalBlock < ApplicationRecord
   def embed_caption = payload['caption'].presence
   def url = payload['url'].to_s
 
+  # What Post mirrors into search_body_* and counts for reading time in place of the block.
+  def attachable_plain_text_representation(_caption = nil)
+    " #{[source, body, embed_caption].compact_blank.join(' ')} "
+  end
+
   def tone
     TONES.include?(payload['tone']) ? payload['tone'] : 'note'
   end

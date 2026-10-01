@@ -57,10 +57,16 @@ class NavComponent < ViewComponent::Base
   end
 
   def locales
-    I18nExtended::AVAILABLE_LOCALES
+    helpers.page_locales
   end
 
   def current_locale?(locale)
     I18n.locale.to_s == locale
+  end
+
+  # The same page in the other language. The query string rides along as a value under `params:`
+  # rather than as route options, so `?host=` or `?action=` in the address cannot steer url_for.
+  def locale_path(locale)
+    helpers.url_for(locale: locale, only_path: true, params: request.query_parameters.except(:locale))
   end
 end

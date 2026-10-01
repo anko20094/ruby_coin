@@ -8,12 +8,18 @@ import { Controller } from "@hotwired/stimulus"
 // with it rather than having them reimplemented here and got subtly wrong.
 const DEBOUNCE_MS = 140
 
+// Match the character, falling back to the physical key only when the layout types a
+// non-Latin letter (Ukrainian): event.code alone would also fire for a Dvorak typist's T.
+const isK = (event) =>
+  event.key?.toLowerCase() === "k" || (!/^[a-z]$/i.test(event.key ?? "") && event.code === "KeyK")
+
 export default class extends Controller {
   static targets = ["dialog", "input", "results", "empty"]
-  static values = { url: String }
+  static values = { url: String, allUrl: String, allLabel: String, none: String }
 
   connect() {
     this.index = 0
+    this.prompt = this.emptyTarget.textContent
     this.onKey = (event) => this.shortcut(event)
     window.addEventListener("keydown", this.onKey)
   }
@@ -21,10 +27,11 @@ export default class extends Controller {
   disconnect() {
     window.removeEventListener("keydown", this.onKey)
     clearTimeout(this.timer)
+    this.pending?.abort()
   }
 
   shortcut(event) {
-    if (event.key?.toLowerCase() !== "k" || !(event.metaKey || event.ctrlKey)) return
+    if (!(event.metaKey || event.ctrlKey) || !isK(event)) return
     event.preventDefault()
     this.dialogTarget.open ? this.close() : this.open()
   }
@@ -50,8 +57,11 @@ export default class extends Controller {
     if (outside) this.close()
   }
 
+  // An answer to an earlier keystroke must not land after a later one, or on a box that has
+  // since been cleared, so the request in flight is cancelled the moment the text changes.
   search() {
     clearTimeout(this.timer)
+    this.pending?.abort()
     this.timer = setTimeout(() => this.fetchResults(), DEBOUNCE_MS)
   }
 
@@ -59,20 +69,32 @@ export default class extends Controller {
     const query = this.inputTarget.value.trim()
     if (!query) return this.render([])
 
-    const response = await fetch(`${this.urlValue}?query=${encodeURIComponent(query)}`, {
-      headers: { Accept: "application/json" },
-    }).catch(() => null)
-    if (!response?.ok) return this.render([])
+    this.pending = new AbortController()
+    try {
+      const response = await fetch(`${this.urlValue}?query=${encodeURIComponent(query)}`, {
+        headers: { Accept: "application/json" },
+        signal: this.pending.signal,
+      })
+      if (!response.ok) return this.render([])
 
-    const { results } = await response.json()
-    this.render(results)
+      const { results } = await response.json()
+      this.render(results)
+    } catch (error) {
+      if (error.name !== "AbortError") this.render([])
+    }
   }
 
   render(results) {
+    const query = this.inputTarget.value.trim()
+    const rows = results.map((result, position) => this.row(result, position))
+    if (rows.length > 0) rows.push(this.allRow(query, rows.length))
+
     this.index = 0
-    this.resultsTarget.replaceChildren(...results.map((result, position) => this.row(result, position)))
-    this.emptyTarget.hidden = results.length > 0
-    this.resultsTarget.hidden = results.length === 0
+    this.resultsTarget.replaceChildren(...rows)
+    this.emptyTarget.textContent = query ? this.noneValue : this.prompt
+    this.emptyTarget.hidden = rows.length > 0
+    this.resultsTarget.hidden = rows.length === 0
+    this.inputTarget.setAttribute("aria-expanded", String(rows.length > 0))
     this.announce()
   }
 
@@ -88,24 +110,34 @@ export default class extends Controller {
   }
 
   row(result, position) {
+    return this.option(position, result.url, result.label || result.kind, result.title, result.hint)
+  }
+
+  // The list is cut at what fits a palette; this is the way to the rest.
+  allRow(query, position) {
+    const url = `${this.allUrlValue}?query=${encodeURIComponent(query)}`
+    return this.option(position, url, "→", this.allLabelValue, query)
+  }
+
+  option(position, href, kindText, titleText, hintText) {
     const link = document.createElement("a")
     link.className = "rc-palette__row"
     link.id = `rc-palette-row-${position}`
-    link.href = result.url
+    link.href = href
     link.setAttribute("role", "option")
     link.setAttribute("aria-selected", position === 0 ? "true" : "false")
 
     const kind = document.createElement("span")
     kind.className = "rc-palette__kind"
-    kind.textContent = result.label || result.kind
+    kind.textContent = kindText
 
     const title = document.createElement("span")
     title.className = "rc-palette__title"
-    title.textContent = result.title
+    title.textContent = titleText
 
     const hint = document.createElement("span")
     hint.className = "rc-palette__hint"
-    hint.textContent = result.hint || ""
+    hint.textContent = hintText || ""
 
     link.append(kind, title, hint)
     return link

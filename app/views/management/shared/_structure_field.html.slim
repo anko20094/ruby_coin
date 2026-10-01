@@ -10,7 +10,7 @@
   - if kind == :rich
     / An editor only where the page renders markup. Everywhere else it would produce a <b>
     / that arrives on the site as four visible characters.
-    = text_area_tag name, value, id: id, rows: 2, class: 'standart-input mg-cell__rich', data: tinymce_data(profile: 'case', lazy: true, name_prefix: prefix, name_suffix: suffix)
+    = text_area_tag name, value, id: id, rows: 2, class: 'standart-input mg-cell__rich', data: tinymce_data(profile: 'case', lazy: true, lang: lang, name_prefix: prefix, name_suffix: suffix)
   - elsif kind == :list
     / A list is edited one item per line. These are stack names and case slugs.
     = text_area_tag name, value, id: id, rows: 5, class: 'standart-input', data: { name_prefix: prefix, name_suffix: suffix }

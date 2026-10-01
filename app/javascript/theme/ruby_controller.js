@@ -7,7 +7,8 @@ import { Controller } from "@hotwired/stimulus";
 // (shade, brightness, inset). Change one, change both.
 //
 // :hero   — light follows the cursor, scroll rotates the crown, the stone tilts.
-// :anchor — scroll rotates it, the light stays put.
+// :anchor — scroll rotates it, the light stays put. Nothing changes between scrolls, so it
+//           repaints on scroll and runs no frame loop of its own.
 const LIGHT_RADIUS = 55; // just past the girdle, so the highlight sits on the rim
 const SMOOTHING = 0.1;
 const IDLE_AFTER_MS = 1500;
@@ -37,6 +38,7 @@ export default class extends Controller {
 
     this.onScroll = () => {
       this.scrollRotation = (window.scrollY || 0) * SCROLL_FACTOR[this.variantValue];
+      if (!this.looping) this.paintSoon();
     };
     window.addEventListener("scroll", this.onScroll, { passive: true });
 
@@ -48,12 +50,30 @@ export default class extends Controller {
     // A gem scrolled past has no business holding a frame loop open.
     this.observer = new IntersectionObserver(([entry]) => {
       this.visible = entry.isIntersecting;
-      if (this.visible && !this.frame) this.tick();
+      if (this.visible && !this.frame) this.resume();
     });
     this.observer.observe(this.element);
 
     this.onScroll();
-    this.tick();
+    this.resume();
+  }
+
+  get looping() {
+    return this.variantValue === "hero";
+  }
+
+  resume() {
+    if (this.looping) this.tick();
+    else this.paintSoon();
+  }
+
+  paintSoon() {
+    if (this.frame || !this.visible) return;
+
+    this.frame = requestAnimationFrame(() => {
+      this.frame = null;
+      this.paint(this.scrollRotation);
+    });
   }
 
   disconnect() {

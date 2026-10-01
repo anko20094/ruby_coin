@@ -29,12 +29,7 @@ module EditorHelper
   private
 
   def attachment_preview(attachment)
-    attachable = attachment.attachable
-
-    return render(attachable) if attachable.is_a?(JournalBlock)
-
-    # An image or a file: Action Text's own partial already knows how to draw it.
-    attachment.to_html
+    render(attachment.attachable)
   rescue ActionView::MissingTemplate, ActiveSupport::MessageVerifier::InvalidSignature
     ''
   end

@@ -76,4 +76,30 @@ describe 'locale negotiation', type: :request do
 
     expect(response).to redirect_to('/uk/cv')
   end
+
+  # The language is in the path. A ?locale= on an address without one used to be believed, which
+  # made /work?locale=en a second 200 for a page that has exactly one.
+  it 'does not let a query string stand in for the locale in the path' do
+    get '/work?locale=en', headers: { 'Accept-Language' => 'uk' }
+
+    expect(response).to redirect_to('/uk/work?locale=en')
+  end
+
+  it 'answers in the language of the path, whatever the query string asks for' do
+    get '/uk/work?locale=en'
+
+    expect(response.body).to include('<html lang="uk"')
+  end
+
+  it 'sends a feed reader that came without a language to the feed in one' do
+    get '/feed', headers: { 'Accept-Language' => 'en' }
+
+    expect(response).to redirect_to('/en/feed')
+  end
+
+  it 'leaves the sitemap, which has no language, alone' do
+    get '/sitemap.xml'
+
+    expect(response).to have_http_status(:success)
+  end
 end

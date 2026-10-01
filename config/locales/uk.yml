@@ -1,7 +1,6 @@
 uk:
   titles:
     faq: FAQ
-    search: Пошук
     edit: Редагування
     new: Новий
     tags: Теги
@@ -10,17 +9,12 @@ uk:
     remember_me: Запам'ятати мене
     forgot_password: Забули пароль?
     sign_in: Увійти
-    sign_up: Зареєструватись
     update: Оновити
-    delete_account: Видалити акаунт
-    have_account: У вас вже є обліковий запис?
-    back: Назад
     send_reset_password: Відправити інструкцію зі скидання паролю
     create: Створити
     yes_text: Так
     no_text: Ні
   labels:
-    registration: Реєстрація
     enter_account: Вхід в акаунт
     show_password: Показати пароль
     edit_account: Змінити акаунт
@@ -107,8 +101,28 @@ uk:
         description: Опис
         photo: Фото
         status: Статус
+        slug: Слаг
       tag:
         title: Заголовок
+      case:
+        slug: Слаг
+        metrics: Метрики
+        quality: Показники якості
+        engineering_items: Інженерні картки
+        plain_body: Абзаци «простими словами»
+        mine: Що було моїм
+        mark: Позначка
+        position: Позиція
+        title: Заголовок
+        tagline: Підзаголовок
+        role: Роль
+        plain_heading: Заголовок «простими словами»
+        engineering_heading: Заголовок інженерного блоку
+        engineering_sub: Підзаголовок інженерного блоку
+        scope_note: Примітка про обсяг
+        year: Рік
+        sector: Галузь
+        status: Статус
     models:
       post: Допис
     errors:
@@ -142,8 +156,18 @@ uk:
             photo:
               blank: не може бути порожнім
               translation_missing: відсутній переклад
+        case:
+          one_language_only: має рядок, написаний лише однією мовою
+          attributes:
+            slug:
+              named_elsewhere: названий у team.yml або в резюме, тому його не можна ні змінити, ні видалити
 
   management:
+    crumbs:
+      posts: Пости
+      cases: Кейси
+      tags: Теги
+      statistics: Статистика
     statistics:
       index:
         title: Статистика
@@ -202,6 +226,9 @@ uk:
         og: як виглядає посилання на це
         created: створено
         preview: прев'ю
+        width:
+          desktop: комп’ютер
+          mobile: телефон
         open: відкрити ↗
         translate: перекласти іншою мовою
         conflict: Хтось зберіг цей пост після того, як ти його відкрив. Тут нічого не записано.
@@ -214,6 +241,7 @@ uk:
           saved: "збережено %{at}"
           invalid: "не збережено: %{errors}"
           conflict: конфлікт — не збережено
+          failed: не збережено — перевір з'єднання або увійди знову
         placeholders:
           title: Про що це?
           subtitle: Одне речення про те, про що текст.
@@ -243,6 +271,11 @@ uk:
         load_error: "Редактор не завантажився. Поле нижче все ще тримає текст і зберігається."
         block_error: Не вдалося вставити блок.
         upload_error: Не вдалося завантажити зображення.
+        paragraph: Абзац
+        heading2: Заголовок 2
+        heading3: Заголовок 3
+        heading4: Заголовок 4
+        preformatted: Моноширинний текст
         kinds:
           code: Лістинг коду…
           callout: Виноска…
@@ -251,6 +284,7 @@ uk:
       create:
         missing: файл відсутній
         type: цей файл не є зображенням
+        processing: не вдалося прочитати це зображення
         size: "зображення має бути не більшим за %{limit} МБ"
 
     cases:
@@ -282,11 +316,11 @@ uk:
         engineering_items: Інженерні картки
         plain_body: Абзаци «простими словами»
         mine: Що було моїм
-        expected: "дизайн малює %{count}"
       create:
         success: Кейс створено
       update:
         success: Кейс оновлено
+        conflict: Хтось інший зберіг цей кейс після того, як ви його відкрили. Нічого не записано. Ваші зміни лишаються тут, а «Зберегти» замінить чужі.
       destroy:
         success: Кейс видалено
 
@@ -298,6 +332,11 @@ uk:
       expand: розгорнути бічну панель
       models: МОДЕЛІ
       system: СИСТЕМА
+      navigation: розділи адмінки
+      post: Пост
+      case: Кейс
+      tag: Тег
+      statistics: Статистика
       posts_hint: "%{active} видимих · %{inactive} схованих"
       cases_hint: "%{own} власних"
       tags_hint: "%{used} у вжитку"
@@ -310,6 +349,7 @@ uk:
         move_up: вище
         move_down: нижче
         remove: прибрати рядок
+        row: рядок
         value: число
         label: підпис
         title: заголовок
@@ -365,6 +405,8 @@ uk:
       create: Створити
       save: Зберегти
       edit: Редагувати
+      delete_item: Видалити %{item}
+      edit_item: Редагувати %{item}
     dialog:
       you_sure: Ви впевнені?
     dismiss: Сховати це повідомлення
@@ -376,6 +418,8 @@ uk:
       open: Пошук по сайту
       placeholder: сторінки, кейси, записи…
       empty: Почни писати, щоб шукати.
+      none: Нічого не знайдено.
+      all: Шукати в журналі
       kinds:
         page: сторінка
         case: кейс
@@ -393,8 +437,12 @@ uk:
   errors:
     messages:
       processing_error: Неможливо змінити розмір зображення
-      integrity_error: Не зображення
-      download_error: Не вдалося завантажити зображення
+      carrierwave_processing_error: Неможливо змінити розмір зображення
+      carrierwave_integrity_error: Не зображення
+      carrierwave_download_error: Не вдалося завантажити зображення
+      content_type_allowlist_error: "Не зображення: файли %{content_type} завантажувати не можна"
+      max_size_error: "Файл завеликий: він має бути не більшим за %{max_size}"
+      min_size_error: "Файл замалий: він має бути не меншим за %{min_size}"
       extension_allowlist_error: "Вам заборонено завантажувати файли %{extension}, дозволені типи: %{allowed_types}"
       extension_denylist_error: "Вам заборонено завантажувати файли %{extension}, заборонені типи: %{prohibited_types}"
   work:
@@ -465,7 +513,7 @@ uk:
     show:
       eyebrow: cv
       title: Резюме
-      lede: Два комерційні сервіси, п’ять власних продуктів. Кожна цифра знята з продакшну, git і трекерів — не з пам’яті.
+      lede: Комерційні сервіси та власні продукти. Кожна цифра знята з продакшну, git і трекерів — не з пам’яті.
       projects: проєкти
       print: зберегти PDF
       pending_body: Проєкти нижче — це портфоліо, і вони точні. Досвід, стек і контакти лежать у config/portfolio/cv.yml, який ця база ще не імпортувала.

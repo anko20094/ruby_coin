@@ -8,6 +8,9 @@ module Ahoy
   # /work (§9a). Same throttle, same shape, one more subject.
   class EventProcess < BaseService
     EVENTS = { 'Post' => 'Viewed Post', 'Case' => 'Viewed Case' }.freeze
+    SESSION_KEY_PREFIX = 'last_visit_'
+    SESSION_WINDOW = 24.hours
+    MAX_TRACKED = 30
 
     def initialize(ahoy, subject, request)
       @ahoy = ahoy
@@ -18,12 +21,12 @@ module Ahoy
     def call
       @ahoy.visit
       @ahoy.track(event_name, title: @subject.title, slug: @subject.slug, **identifier)
-      @request.session[session_key] = Time.zone.now.to_i
+      remember_view
     end
 
     # The key a controller checks before deciding whether this is a repeat view.
     def self.session_key_for(subject)
-      "last_visit_#{subject.class.name.downcase}_#{subject.id}"
+      "#{SESSION_KEY_PREFIX}#{subject.class.name.downcase}_#{subject.id}"
     end
 
     private
@@ -40,6 +43,21 @@ module Ahoy
 
     def session_key
       self.class.session_key_for(@subject)
+    end
+
+    def remember_view
+      prune_session
+      @request.session[session_key] = Time.zone.now.to_i
+    end
+
+    # The session is a 4 KB cookie: keep the views still inside the throttle window, newest first.
+    def prune_session
+      session = @request.session
+      views = session.keys.select { |key| key.to_s.start_with?(SESSION_KEY_PREFIX) }
+      current = views.select { |key| session[key].to_i > SESSION_WINDOW.ago.to_i }
+      kept = current.max_by(MAX_TRACKED - 1) { |key| session[key].to_i }
+
+      (views - kept).each { |key| session.delete(key) }
     end
   end
 end

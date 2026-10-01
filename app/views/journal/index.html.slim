@@ -40,8 +40,8 @@
 
     - if @pagy.pages > 1
       nav.jn-pager aria-label=t('journal.index.title')
-        - if @pagy.prev
-          = link_to journal_path(page: @pagy.prev, order: @order, tag_id: @active_tag&.id),
+        - if @pagy.previous
+          = link_to journal_path(page: @pagy.previous, order: @order, tag_id: @active_tag&.id),
             class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') } do
             span aria-hidden="true" ←
         span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"

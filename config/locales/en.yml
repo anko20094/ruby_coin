@@ -2,7 +2,6 @@ en:
 
   titles:
     faq: FAQ
-    search: Search
     edit: Edit
     new: New
     tags: Tags
@@ -103,8 +102,28 @@ en:
         description: Description
         photo: Photo
         status: Status
+        slug: Slug
       tag:
         title: Title
+      case:
+        slug: Slug
+        metrics: Metrics
+        quality: Quality figures
+        engineering_items: Engineering cards
+        plain_body: Plain-words paragraphs
+        mine: What was mine
+        mark: Mark
+        position: Position
+        title: Title
+        tagline: Tagline
+        role: Role
+        plain_heading: Plain-words heading
+        engineering_heading: Engineering heading
+        engineering_sub: Engineering subheading
+        scope_note: Scope note
+        year: Year
+        sector: Sector
+        status: Status
     models:
       post: Post
     errors:
@@ -138,8 +157,18 @@ en:
             photo:
               blank: can't be blank
               translation_missing: translation missing
+        case:
+          one_language_only: has a row written in one language only
+          attributes:
+            slug:
+              named_elsewhere: is named in team.yml or the CV, so it can be neither changed nor deleted
   
   management:
+    crumbs:
+      posts: Posts
+      cases: Cases
+      tags: Tags
+      statistics: Statistics
     statistics:
       index:
         title: Statistics
@@ -198,6 +227,9 @@ en:
         og: how a link to this looks
         created: created
         preview: preview
+        width:
+          desktop: desktop
+          mobile: mobile
         open: open ↗
         translate: translate the other language
         conflict: Someone else saved this post after you opened it. Nothing here has been written.
@@ -210,6 +242,7 @@ en:
           saved: "saved %{at}"
           invalid: "not saved: %{errors}"
           conflict: conflict — not saved
+          failed: not saved — check your connection or sign in again
         placeholders:
           title: What is this about?
           subtitle: One sentence saying what the piece is about.
@@ -239,6 +272,11 @@ en:
         load_error: "The editor could not load. The field below still holds the body and still saves."
         block_error: The block could not be inserted.
         upload_error: The image could not be uploaded.
+        paragraph: Paragraph
+        heading2: Heading 2
+        heading3: Heading 3
+        heading4: Heading 4
+        preformatted: Preformatted
         kinds:
           code: Code listing…
           callout: Callout…
@@ -247,6 +285,7 @@ en:
       create:
         missing: no file
         type: that file is not an image
+        processing: that image could not be read
         size: "an image may be at most %{limit} MB"
 
     cases:
@@ -282,6 +321,7 @@ en:
         success: Case successfully created
       update:
         success: Case successfully updated
+        conflict: Someone else saved this case after you opened it. Nothing has been written. Your changes are still here, and Save will replace theirs.
       destroy:
         success: Case successfully deleted
 
@@ -293,6 +333,11 @@ en:
       expand: expand the sidebar
       models: MODELS
       system: SYSTEM
+      navigation: admin sections
+      post: Post
+      case: Case
+      tag: Tag
+      statistics: Statistics
       posts_hint: "%{active} published · %{inactive} hidden"
       cases_hint: "%{own} own"
       tags_hint: "%{used} in use"
@@ -305,6 +350,7 @@ en:
         move_up: move up
         move_down: move down
         remove: remove this row
+        row: row
         value: figure
         label: label
         title: title
@@ -351,6 +397,8 @@ en:
       create: Create
       save: Save
       edit: Edit
+      delete_item: Delete %{item}
+      edit_item: Edit %{item}
     dialog:
       you_sure: Are you sure?
     dismiss: Dismiss this message
@@ -362,6 +410,8 @@ en:
       open: Search the site
       placeholder: pages, cases, entries…
       empty: Type to search the site.
+      none: Nothing found.
+      all: Search the journal
       kinds:
         page: page
         case: case
@@ -379,8 +429,12 @@ en:
   errors:
     messages:
       processing_error: "Cannot resize image."
-      integrity_error: "Not an image."
-      download_error: "Couldn't download image."
+      carrierwave_processing_error: "Cannot resize image."
+      carrierwave_integrity_error: "Not an image."
+      carrierwave_download_error: "Couldn't download image."
+      content_type_allowlist_error: "Not an image: %{content_type} files cannot be uploaded."
+      max_size_error: "The file is too large: it must be no more than %{max_size}."
+      min_size_error: "The file is too small: it must be at least %{min_size}."
       extension_allowlist_error: "You are not allowed to upload %{extension} files, allowed types: %{allowed_types}"
       extension_denylist_error: "You are not allowed to upload %{extension} files, prohibited types: %{prohibited_types}"
 
@@ -452,7 +506,7 @@ en:
     show:
       eyebrow: cv
       title: Curriculum vitae
-      lede: Two commercial services, five products of my own. Every figure read from production, git and trackers — not from memory.
+      lede: Commercial services and products of my own. Every figure read from production, git and trackers — not from memory.
       projects: the projects
       print: save as pdf
       pending_body: The projects below are the portfolio and are accurate. The career, the stack and the contact details come from config/portfolio/cv.yml, which this database has not imported yet.

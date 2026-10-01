@@ -38,6 +38,24 @@ describe Statistics::PostViewsQuery, type: :query do
 
       expect(result.sum(&:last)).to eq(3)
     end
+
+    it 'loads every title the screen prints in one query, not one per post' do
+      statements = []
+      collect = ->(*, payload) { statements << payload[:sql] }
+
+      ActiveSupport::Notifications.subscribed(collect, 'sql.active_record') do
+        described_class.new.count.each { |(post)| post.title }
+      end
+
+      expect(statements.grep(/FROM "post_translations"/).size).to eq(1)
+    end
+
+    it 'leaves the article bodies in the database, and still has what the screen links with' do
+      post = result.first.first
+
+      expect(post.has_attribute?(:search_body_en)).to be(false)
+      expect(Rails.application.routes.url_helpers.post_path(post, locale: 'en')).to eq("/en/post/#{post_first.slug}")
+    end
   end
 
   context 'when there is no data' do

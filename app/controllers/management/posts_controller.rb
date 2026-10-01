@@ -21,7 +21,7 @@ module Management
 
     def index
       @counts = Post.group(:status).count
-      @pagy, @posts = pagy(listed_posts, limit: PER_PAGE)
+      @pagy, @posts = pagy(listed_posts, limit: PER_PAGE, raise_range_error: true)
     end
 
     def new
@@ -29,10 +29,10 @@ module Management
     end
 
     def create
-      @post = current_user.posts.build(post_params)
-
+      @post = current_user.posts.build
       authorize @post
-      if @post.save && Posts::Translator.call(@post, localization_params)
+
+      if persist
         flash[:success] = t('.success')
         redirect_to management_posts_path
       else
@@ -48,12 +48,9 @@ module Management
         render :edit, status: :unprocessable_content
       end
     rescue ActiveRecord::StaleObjectError
-      # #autosave has always handled this; #update never did, so a Save that raced its own
-      # autosave — the autosave lands, lock_version goes up, the submit arrives holding the
-      # number from before it — came out as a 500 with the whole article in the backtrace.
-      # Nothing has been written, so the editor gets its work back with the version that is
-      # actually current, and can press Save again.
-      @post.reload
+      # Nothing was written. The author's text stays in the form over the current version, so
+      # the next Save takes it.
+      @post.lock_version = Post.where(id: @post.id).pick(:lock_version)
       flash.now[:alert] = t('.conflict')
       render :edit, status: :conflict
     end
@@ -78,19 +75,11 @@ module Management
           at: Time.current.strftime('%H:%M:%S')
         }
       else
-        # The version goes out with the failure too: the editor has to stay in step with the
-        # record even when nothing was written, or its next save reports a conflict that is
-        # not one.
-        render json: {
-                 status: 'invalid', errors: @post.errors.full_messages,
-                 lock_version: @post.reload.lock_version
-               },
+        render json: { status: 'invalid', errors: @post.errors.full_messages },
                status: :unprocessable_content
       end
     rescue ActiveRecord::StaleObjectError
-      # Someone else saved this post since this editor loaded it. Nothing is written.
-      render json: { status: 'conflict', lock_version: @post.reload.lock_version },
-             status: :conflict
+      render json: { status: 'conflict' }, status: :conflict
     end
 
     # The preview follows the language tab, not the language of the admin's own chrome. It
@@ -112,23 +101,33 @@ module Management
 
     def translate
       render json: { data: ChatgptService.call(ai_translation_params) }
+    rescue ChatgptService::Error => e
+      Rails.logger.warn { "Translation failed: #{e.message}" }
+      render json: { error: 'translation_failed' }, status: :bad_gateway
     end
 
     private
 
-    # One transaction, because these are two writes to the same post and the second can fail:
-    # the update lands first and the translator only then rejects a blank other-language
-    # title. Without the rollback, autosave answered "invalid" on a post it had already
-    # rewritten — and left the editor holding a stale lock_version, so the save after that
-    # reported a conflict against itself.
+    # One transaction: the post and its other-language rows are a single save, so a refusal from
+    # either leaves nothing behind. A refused save also leaves the form's version as it came.
     def persist
+      attributes = post_params
+      loaded_version = nil
       saved = false
 
       ActiveRecord::Base.transaction do
-        saved = @post.update(post_params) && Posts::Translator.call(@post, localization_params)
+        # Inside the transaction: the tag writer commits its own rows the moment it is assigned.
+        @post.assign_attributes(attributes)
+        loaded_version = @post.lock_version
+        saved = @post.save
+        # An edit of only the other language changes no column on posts, so nothing else would
+        # check the version it carries or move updated_at.
+        @post.touch if saved && !@post.saved_changes?
+        saved &&= Posts::Translator.call(@post, localization_params)
         raise ActiveRecord::Rollback unless saved
       end
 
+      @post.lock_version = loaded_version unless saved
       saved
     end
 
@@ -150,7 +149,7 @@ module Management
     end
 
     def sort_column
-      SORTS.fetch(params[:sort], SORTS.fetch('updated'))
+      SORTS.fetch(params[:sort]) { SORTS.fetch('updated') }
     end
 
     def sort_direction
@@ -183,9 +182,6 @@ module Management
       slug_param
     end
 
-    # Only a post that does not have a URL yet gets one derived. This used to run on every
-    # save including autosave, so typing a title into a published post moved its canonical
-    # URL once per debounce tick and left a FriendlyId history row behind each time.
     def new_record?
       action_name == 'create'
     end
@@ -212,19 +208,15 @@ module Management
 
     # The slug is derived from the English title, because that is what reads in a URL — but only
     # for a post being created, and only when the editor has not written one. Renaming an
-    # existing post is the editor's decision, made in the slug field; FriendlyId keeps the
-    # history, so a deliberate rename is safe.
+    # existing post is the editor's decision, made in the slug field and kept by a Save:
+    # autosave never writes it, so a half-typed slug is not a published URL.
     def slug_param
+      return params[:post].delete(:slug) if action_name == 'autosave'
       return if params.dig('post', 'slug').present?
-
-      # An existing post keeps the URL it already has. An empty slug box means "leave it
-      # alone", not "make me a new one from whatever is half-typed in the title" — that is
-      # what used to move a published post's canonical URL once per autosave tick and mint a
-      # FriendlyId history row for each keystroke.
       return params[:post].delete(:slug) unless new_record?
 
       english_title = I18n.locale == :en ? params.dig('post', 'title') : params.dig('post', 'title_localizations', 'en')
-      params[:post][:slug] = english_title&.parameterize # rubocop:disable Rails/StrongParametersExpect
+      params[:post][:slug] = Post.unused_slug(english_title.to_s.parameterize) # rubocop:disable Rails/StrongParametersExpect
     end
   end
 end

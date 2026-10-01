@@ -1,6 +1,8 @@
 / ⌘K (handoff §9a). The button matters as much as the shortcut — a keyboard shortcut nobody is
 / told about does not exist — so it sits in the nav next to the locale switcher.
-.rc-palette[data-controller="palette" data-palette-url-value=search_path(format: :json)]
+.rc-palette[data-controller="palette" data-palette-url-value=search_path(format: :json)
+            data-palette-all-url-value=search_path data-palette-all-label-value=t('global.palette.all')
+            data-palette-none-value=t('global.palette.none')]
   button.rc-palette__open[type="button" data-action="palette#open" aria-label=t('global.palette.open')]
     span.rc-palette__keys
       kbd ⌘
@@ -13,13 +15,14 @@
       input.rc-palette__input[type="search" data-palette-target="input"
                               data-action="input->palette#search keydown->palette#navigate"
                               placeholder=t('global.palette.placeholder')
-                              aria-label=t('global.palette.placeholder')
-                              autocomplete="off" role="combobox" aria-expanded="true"
-                              aria-controls="rc-palette-results"]
+                              aria-label=t('global.palette.open')
+                              autocomplete="off" role="combobox" aria-expanded="false"
+                              aria-autocomplete="list" aria-controls="rc-palette-results"]
 
     #rc-palette-results.rc-palette__results[role="listbox" data-palette-target="results" hidden=true]
 
-    p.rc-palette__empty[data-palette-target="empty"]= t('global.palette.empty')
+    .rc-palette__status[role="status"]
+      p.rc-palette__empty[data-palette-target="empty"]= t('global.palette.empty')
 
     .rc-palette__legend
       span

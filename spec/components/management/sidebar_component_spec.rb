@@ -35,6 +35,17 @@ RSpec.describe Management::SidebarComponent, type: :component do
     expect(page).to have_no_text('find anything')
   end
 
+  context 'when the admin reads Ukrainian' do
+    around { |example| I18n.with_locale(:uk) { example.run } }
+
+    it 'names every entry in Ukrainian, in the link and in its tooltip' do
+      render_inline(described_class.new(user: user, current: :posts))
+
+      expect(page.all('.mg-model__name').map(&:text)).to eq(%w[Пост Кейс Тег Статистика])
+      expect(page.all('.mg-model').pluck('title')).to eq(%w[Пост Кейс Тег Статистика])
+    end
+  end
+
   it 'marks the model being looked at' do
     render_inline(described_class.new(user: user, current: :cases))
 
@@ -48,6 +59,24 @@ RSpec.describe Management::SidebarComponent, type: :component do
     render_inline(described_class.new(user: user, current: :posts))
 
     expect(page).to have_css('.mg-model__hint', text: '2 published · 1 hidden')
+  end
+
+  context 'with a real cache store' do
+    before { allow(Rails).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new) }
+
+    it 'keeps the numbers it counted until COUNTS_TTL has passed, then counts again' do
+      render_inline(described_class.new(user: user, current: :posts))
+      expect(page).to have_css('.mg-model__hint', text: '2 published · 0 hidden')
+
+      create(:post, :inactive)
+      render_inline(described_class.new(user: user, current: :posts))
+      expect(page).to have_css('.mg-model__hint', text: '2 published · 0 hidden')
+
+      travel(described_class::COUNTS_TTL + 1.second) do
+        render_inline(described_class.new(user: user, current: :posts))
+        expect(page).to have_css('.mg-model__hint', text: '2 published · 1 hidden')
+      end
+    end
   end
 
   it 'shows who is signed in' do

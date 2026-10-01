@@ -31,6 +31,9 @@ application.register("tinymce", TinymceController)
 import StructureRowsController from "./controllers/structure_rows_controller"
 application.register("structure-rows", StructureRowsController)
 
+import UnsavedGuardController from "./controllers/unsaved_guard_controller"
+application.register("unsaved-guard", UnsavedGuardController)
+
 import SidebarController from "./controllers/sidebar_controller"
 application.register("sidebar", SidebarController)
 

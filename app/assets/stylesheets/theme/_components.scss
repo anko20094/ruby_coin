@@ -256,6 +256,10 @@
   // only ones still short of it.
   @include controls.hit-row(40px);
 
+  // An <input type=submit> takes its label's width, so a long translation overflows a narrow
+  // column unless it is allowed to wrap.
+  max-width: 100%;
+  white-space: normal;
   font-size: 14px;
   padding: 10px 18px;
   border: 1px solid var(--ink);

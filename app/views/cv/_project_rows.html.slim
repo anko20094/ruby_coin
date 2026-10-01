@@ -6,17 +6,17 @@
       span.cv-row__mark= kase.mark
       .cv-row__body
         .cv-row__titles
-          h3.cv-row__title= rich(kase.title)
+          h3.cv-row__title= rich(kase.title, links: false)
           - if kase.own?
             span.cv-row__own= t('work.index.own')
           - if kase.is_this_site?
             span.cv-row__here
               span aria-hidden="true" ←
               = " #{t('work.index.you_are_here')}"
-        .cv-row__tagline= rich(kase.tagline)
+        .cv-row__tagline= rich(kase.tagline, links: false)
         .cv-row__meta= "#{kase.year} · #{kase.sector}"
       .cv-row__metric
         - headline = kase.metrics.first
         - if headline.present?
-          .cv-row__metric-value.num= rich(headline[:value])
-          .cv-row__metric-label= rich(headline[:label])
+          .cv-row__metric-value.num= rich(headline[:value], links: false)
+          .cv-row__metric-label= rich(headline[:label], links: false)

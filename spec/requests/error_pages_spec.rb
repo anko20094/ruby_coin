@@ -2,9 +2,7 @@
 
 require 'rails_helper'
 
-# config.exceptions_app has pointed at the router since the app was generated, but nothing was
-# routed at /404 — so a production 404 fell through to an empty body. These specs run with the
-# exception middleware switched on, which is the only way to see what a visitor would get.
+# Run with the exception middleware switched on: it is the only way to see what a visitor gets.
 describe 'error pages', type: :request do
   around do |example|
     config = Rails.application.env_config
@@ -58,8 +56,7 @@ describe 'error pages', type: :request do
     expect(response.body).to include('er-page')
   end
 
-  # These pages are dispatched outside the /:locale scope, so the switcher in the nav can only
-  # offer a query parameter — and it used to offer one the controller ignored.
+  # Dispatched outside the /:locale scope, so the nav switcher can only offer a query parameter.
   it 'answers in the language the locale switch asks for' do
     get '/404?locale=en'
     expect(response.body).to include('<html lang="en"')
@@ -72,5 +69,100 @@ describe 'error pages', type: :request do
     get '/404?locale=fr'
 
     expect(response.body).to include(%(<html lang="#{I18n.default_locale}"))
+  end
+
+  describe 'a miss on a page that has a record behind it' do
+    include_context 'when the cases are imported'
+    include_context 'when the cv is imported'
+
+    it 'is a 404 on the designed page for a case that does not exist' do
+      get '/en/work/nope'
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include('er-page')
+    end
+
+    it 'is a 404 on the designed page for a person who does not exist' do
+      get '/en/team/nobody'
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include('er-page')
+    end
+  end
+
+  describe 'a request that is not for a page' do
+    %w[/apple-touch-icon.png /humans.txt /en/missing.json /en/missing.xml /.env /en.foo /en/work.foo].each do |path|
+      it "answers #{path} with the designed 404" do
+        get path
+
+        expect(response).to have_http_status(:not_found)
+        expect(response.media_type).to eq('text/html')
+        expect(response.body).to include('er-page')
+      end
+    end
+
+    it 'answers a missing post asked for as JSON with the designed 404' do
+      get '/en/post/a-slug-that-never-existed', headers: { 'Accept' => 'application/json' }
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).to include('er-page')
+    end
+  end
+
+  describe 'the 422 page' do
+    around do |example|
+      was = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = true
+
+      example.run
+    ensure
+      ActionController::Base.allow_forgery_protection = was
+    end
+
+    it 'answers a form posted without its token' do
+      post '/en/users/sign_in', params: { user: { email: 'someone@example.com', password: 'password' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('er-page')
+      expect(response.body).to include(I18n.t('error_pages.unacceptable.title', locale: :en))
+    end
+  end
+
+  describe 'the 500 page' do
+    include_context 'when the cases are imported'
+
+    it 'is the designed page when an action raises' do
+      allow(Case).to receive(:ordered).and_raise(StandardError, 'boom')
+
+      get '/en/work'
+
+      expect(response).to have_http_status(:internal_server_error)
+      expect(response.body).to include('er-page')
+      expect(response.body).to include(I18n.t('error_pages.internal.title', locale: :en))
+    end
+
+    # The footer reads the database, and a database that is down is the commonest reason for a
+    # 500 — the layout then fails again while explaining the first failure.
+    it 'is the static page when the layout cannot render either' do
+      allow(CVProfile).to receive(:current).and_raise(ActiveRecord::ConnectionNotEstablished)
+
+      get '/en/journal'
+
+      expect(response).to have_http_status(:internal_server_error)
+      expect(response.media_type).to eq('text/html')
+      expect(response.body.b).to eq(Rails.public_path.join('500.html').binread)
+    end
+  end
+
+  describe 'a query string that url_for would read as routing' do
+    ['/en/nope?controller=x', '/en/nope?action=x', '/en/nope?_recall=x', '/en/nope?host=evil.example'].each do |path|
+      it "keeps #{path} on the designed 404, with a switcher that stays on this site" do
+        get path
+
+        expect(response).to have_http_status(:not_found)
+        hrefs = response.body.scan(/class="rc-nav__locale[^"]*"[^>]*href="([^"]*)"/).flatten
+        expect(hrefs).to all(start_with('/404?'))
+      end
+    end
   end
 end

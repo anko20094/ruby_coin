@@ -1,4 +1,5 @@
 @use '../theme/controls';
+@use 'a11y';
 
 // admin.scss deliberately does not pull in theme/_base.scss — that file styles a reading
 // surface. These are the few resets a tool needs, and they have to beat the Bootstrap bundle
@@ -9,16 +10,19 @@
     text-decoration: none;
   }
 
-  button {
-    font-family: inherit;
-    cursor: pointer;
-  }
+  button { cursor: pointer; }
 
-  input,
-  select,
-  textarea { font-family: inherit; }
+  // :where() keeps the reset at the shell's own specificity, so one class can pick a family.
+  :where(button, input, select, textarea) { font-family: inherit; }
 
   table { margin: 0; }
+
+  // Bootstrap's input::placeholder halves the opacity and sets 16px light, which is 2:1 on paper.
+  :is(input, textarea)::placeholder {
+    font: inherit;
+    color: var(--ink-quiet);
+    opacity: 1;
+  }
 }
 
 // Flash sits in the pane rather than floating over the top bar, which is where the Bootstrap
@@ -104,7 +108,6 @@
 
   .mg-sidebar__name-block,
   .mg-sidebar__label,
-  .mg-model__body,
   .mg-sidebar__who { display: none; }
 
   .mg-sidebar__brand,
@@ -127,6 +130,11 @@
     font-size: 9px;
     margin-left: 3px;
   }
+}
+
+// Clipped rather than display:none, which would leave each link named by its count alone.
+@media (min-width: 901px) {
+  .mg-shell.is-sidebar-collapsed .mg-model__body { @include a11y.visually-hidden; }
 }
 
 .mg-sidebar__wordmark {
@@ -158,6 +166,7 @@
 }
 
 .mg-model {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -313,7 +322,11 @@
 
 .mg-crumbs__sep { color: var(--ink-quiet); }
 
-.mg-crumbs__here { color: var(--ink); }
+.mg-crumbs__here {
+  margin: 0;
+  font: inherit;
+  color: var(--ink);
+}
 
 .mg-topbar__right {
   display: flex;
@@ -365,6 +378,25 @@
   flex: 1;
   min-width: 0;
   padding: 22px;
+
+  &:focus { outline: none; }
+}
+
+.mg-skip {
+  @include controls.hit-row(38px);
+
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  transition: top 120ms;
+
+  &:focus-visible { top: 12px; }
 }
 
 // The screens that have not been re-skinned yet keep their Bootstrap markup; this just stops
@@ -432,7 +464,6 @@
 
     .mg-sidebar__name-block,
     .mg-sidebar__label,
-    .mg-model__body,
     .mg-sidebar__who { display: revert; }
 
     .mg-model__hint { display: none; }
@@ -446,6 +477,7 @@
 @media (prefers-reduced-motion: reduce) {
   .mg-model,
   .mg-btn,
+  .mg-skip,
   .mg-sidebar,
   .mg-sidebar__toggle { transition: none; }
 }

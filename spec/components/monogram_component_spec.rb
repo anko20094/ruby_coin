@@ -79,6 +79,32 @@ describe MonogramComponent, type: :component do
       expect(page).to have_no_css('.rc-monogram__initials')
     end
 
+    # A 26px stone on a /work card fetched the same 560px file as the 280px one on a person page.
+    it 'offers the photograph in three widths, for the browser to pick by the stone it draws' do
+      render_inline(described_class.of(Team.person!('danyil'), size: 52))
+      photo = page.find('.rc-monogram__photo')
+
+      expect(photo[:srcset].split(', ').map { |candidate| candidate.split.last }).to eq(%w[120w 280w 560w])
+      expect(photo[:srcset]).to match(%r{/assets/people/danyil-120-\h+\.jpg 120w})
+      expect(photo[:sizes]).to eq('52px')
+      expect(photo[:src]).to match(%r{/assets/people/danyil-\h+\.jpg})
+    end
+
+    it 'finds the smaller copies of a photograph that is a PNG' do
+      render_inline(described_class.of(Team.person!('claude'), size: 26))
+
+      expect(page.find('.rc-monogram__photo')[:srcset]).to match(%r{people/claude-120-\h+\.png 120w})
+    end
+
+    it 'ships every roster photograph in every width the component asks for' do
+      photographed = Team.everyone.filter_map(&:photo)
+      missing = photographed.product(described_class::PHOTO_WIDTHS).reject do |photo, width|
+        Rails.application.assets.load_path.find(photo.sub(/(?=\.\w+\z)/, "-#{width}"))
+      end
+
+      expect(missing).to be_empty, "no smaller copy for: #{missing.map(&:inspect).join(', ')}"
+    end
+
     # Initials are the finished state for a record with no photograph, not a missing one — the
     # frame, the ring and the radius are the same either way.
     it 'falls back to initials where it does not' do
@@ -87,6 +113,16 @@ describe MonogramComponent, type: :component do
       expect(page).to have_no_css('.rc-monogram__photo')
       expect(page.find('.rc-monogram__initials').text).to eq('OS')
     end
+  end
+
+  # A person added with only the one file must still render: the page asks for what exists.
+  it 'asks for the original alone where no smaller copy has been made' do
+    load_path = Rails.application.assets.load_path
+    allow(load_path).to(receive(:find).and_wrap_original { |find, path| find.call(path) unless path.match?(/-\d+\./) })
+    render_inline(described_class.new(initials: 'DS', size: 52, photo: 'people/danyil.jpg'))
+
+    expect(page).to have_css('.rc-monogram__photo[src]')
+    expect(page).to have_no_css('.rc-monogram__photo[srcset], .rc-monogram__photo[sizes]')
   end
 
   it 'refuses a ring the design does not have' do

@@ -14,42 +14,49 @@
 # on the deploy target. Re-run this after editing a case title, tagline or first metric — or the
 # home page's eyebrow, headline or lede, which are what the site card prints:
 #
-#     bundle exec rake og:cards
+#     bin/rails runner 'Cases::Importer.call' && bundle exec rake og:cards
+#
+# The cards are drawn from the cases table, so the import comes first: a table that has drifted
+# from config/portfolio/cases.yml gives cards the guard spec reads as stale.
 #
 # Set CHROME_BIN if the browser is somewhere unusual.
+#
+# public/og/cards.json holds a digest of each card's text, written with the PNGs;
+# spec/requests/og_cards_spec.rb fails when a case or the home lede changes without a re-render.
 module OgCards
-  OgCards::CARD_SIZE = [1200, 630].freeze
-  OgCards::OUTPUT_DIR = Rails.public_path.join('og')
-  OgCards::CHROME_CANDIDATES = %w[google-chrome google-chrome-stable chromium chromium-browser].freeze
-  # The Cyrillic slices are declared with the same unicode-range the site uses. Without it the
-  # last @font-face for a family wins for every character, so a Cyrillic slice that contains no
-  # digits took the digits with it and "295" came out of a fallback face.
-  CYRILLIC_RANGE = 'U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116'
-  FONT_DIR = Rails.root.join('app', 'assets', 'fonts')
-end
+  # Loaded again by the specs, and a constant reassigned warns.
+  unless const_defined?(:CARD_SIZE)
+    OgCards::CARD_SIZE = [1200, 630].freeze
+    OgCards::OUTPUT_DIR = Rails.public_path.join('og')
+    OgCards::MANIFEST = OgCards::OUTPUT_DIR.join('cards.json')
+    OgCards::CHROME_CANDIDATES = %w[google-chrome google-chrome-stable chromium chromium-browser].freeze
+    # The Cyrillic slices are declared with the same unicode-range the site uses. Without it the
+    # last @font-face for a family wins for every character, so a Cyrillic slice that contains no
+    # digits took the digits with it and "295" came out of a fallback face.
+    CYRILLIC_RANGE = 'U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116'
+    FONT_DIR = Rails.root.join('app', 'assets', 'fonts')
+  end
 
-namespace :og do
-  desc 'Render the Open Graph share cards into public/og'
-  task cards: :environment do
-    browser = ENV['CHROME_BIN'].presence || OgCards::CHROME_CANDIDATES.find { |name| system('which', name, out: File::NULL) }
-    abort "no Chrome found — set CHROME_BIN (tried: #{OgCards::CHROME_CANDIDATES.join(', ')})" if browser.nil?
+  module_function
 
-    FileUtils.mkdir_p(OgCards::OUTPUT_DIR)
-    written = []
+  # Yields every card with the locale it is drawn in, inside that locale.
+  def each_card
+    return enum_for(:each_card) unless block_given?
 
     I18n.available_locales.each do |locale|
       I18n.with_locale(locale) do
-        written << render_card(browser, locale, 'site', site_card(locale))
+        yield locale, 'site', site_card(locale)
 
-        Case.ordered.each do |kase|
-          written << render_card(browser, locale, kase.slug, case_card(kase))
-        end
+        Case.ordered.each { |kase| yield locale, kase.slug, case_card(kase) }
       end
     end
-
-    puts "wrote #{written.size} cards:"
-    written.each { |path| puts "  #{path.relative_path_from(Rails.root)} (#{(path.size / 1024.0).round} KB)" }
   end
+
+  def digests
+    each_card.to_h { |locale, name, card| ["#{name}-#{locale}", digest(card)] }
+  end
+
+  def digest(card) = Digest::SHA256.hexdigest(card.to_json)[0, 16]
 
   # --- what goes on a card ------------------------------------------------------------------
 
@@ -86,6 +93,21 @@ namespace :og do
   # is not the place for a bolded word. The words go on, the markup does not.
   def strip_case_markup(value)
     ActionController::Base.helpers.strip_tags(value.to_s).strip
+  end
+end
+
+namespace :og do
+  desc 'Render the Open Graph share cards into public/og'
+  task cards: :environment do
+    browser = ENV['CHROME_BIN'].presence || OgCards::CHROME_CANDIDATES.find { |name| system('which', name, out: File::NULL) }
+    abort "no Chrome found — set CHROME_BIN (tried: #{OgCards::CHROME_CANDIDATES.join(', ')})" if browser.nil?
+
+    FileUtils.mkdir_p(OgCards::OUTPUT_DIR)
+    written = OgCards.each_card.map { |locale, name, card| render_card(browser, locale, name, card) }
+    OgCards::MANIFEST.write("#{JSON.pretty_generate(OgCards.digests)}\n")
+
+    puts "wrote #{written.size} cards:"
+    written.each { |path| puts "  #{path.relative_path_from(Rails.root)} (#{(path.size / 1024.0).round} KB)" }
   end
 
   # --- rendering ----------------------------------------------------------------------------

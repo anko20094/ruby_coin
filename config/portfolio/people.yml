@@ -16,7 +16,7 @@
 #                  employers, contacts and education. Prints a ruby dashed banner on the
 #                  page and a `PLACEHOLDER` chip in the roster. Written so the filled
 #                  layout could be judged before the real CVs arrive.
-#                  ⚠️ grep for `placeholder: true` before any launch.
+#                  ⚠️ before launch: grep -n '^ *placeholder: true' — one record, an alumnus.
 #   draft        — `cv: null`; nothing invented at all. A new hire lands in this state on
 #                  day one, and so does anyone whose CV nobody here can keep honest.
 #
@@ -88,10 +88,6 @@ people:
       - { icon: "🎲", label: { en: "boardgame", uk: "настільні" }, detail: { en: "7 wonders night", uk: "вечір 7 wonders" } }
       - { icon: "💪", label: { en: "gym", uk: "залізо" }, detail: { en: "pwr · 3x/week", uk: "пвр · 3 рази/тиж" } }
 
-  # ⚠️ PLACEHOLDER CV. The role and responsibilities are owner-supplied and real; every
-  # date, employer, contact and hobby below is invented to show the filled layout.
-  # `placeholder: true` prints a ruby dashed banner on the page and a chip in the roster.
-  # Delete the flag the moment the real content lands — never ship it silently.
   - id: "mykhailo"
     short: "MY"
     photo: "mykhailo.jpg"

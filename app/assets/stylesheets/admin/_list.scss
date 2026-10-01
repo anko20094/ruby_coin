@@ -79,8 +79,6 @@
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--ink);
-
-  &::placeholder { color: var(--ink-quiet); }
 }
 
 .mg-table {

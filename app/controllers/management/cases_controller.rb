@@ -33,12 +33,19 @@ module Management
       else
         render :edit, status: :unprocessable_content
       end
+    rescue ActiveRecord::StaleObjectError
+      @case.lock_version = Case.where(id: @case.id).pick(:lock_version)
+      flash.now[:alert] = t('.conflict')
+      render :edit, status: :conflict
     end
 
     def destroy
-      @case.destroy
+      if @case.destroy
+        flash[:success] = t('.success')
+      else
+        flash[:alert] = @case.errors.full_messages.to_sentence
+      end
 
-      flash[:success] = t('.success')
       redirect_to management_cases_path, status: :see_other
     end
 
@@ -54,12 +61,21 @@ module Management
 
     # The structured fields arrive as index-keyed hashes and are permitted wholesale; Case
     # keeps only the keys it declares, so nothing else can reach a column. See Case::STRUCTURES.
+    # An emptied list posts no rows at all, so each list also posts its name (`structures`);
+    # one named without rows is one the author emptied.
     def case_params
-      params.expect(case: [*plain_keys, *localised_keys, *structure_keys])
+      permitted = params.expect(case: [*plain_keys, *localised_keys, *structure_keys, { structures: [] }])
+      named = permitted.delete(:structures).to_a
+
+      Case::STRUCTURES.each_key do |field|
+        permitted[:"#{field}_rows"] ||= {} if named.include?(field.to_s)
+      end
+
+      permitted
     end
 
     def plain_keys
-      %i[slug mark position own is_this_site stack_list]
+      %i[slug mark position own is_this_site stack_list lock_version]
     end
 
     def localised_keys

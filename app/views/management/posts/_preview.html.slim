@@ -9,7 +9,7 @@
 / and keeps the frame element's own attributes, so one up there would still name the language
 / the page was first rendered in.
 = turbo_frame_tag dom_id(post, :preview), class: 'mg-preview__frame' do
-  article.jn-post.mg-preview__article data-locale=locale
+  article.jn-post.mg-preview__article data-locale=locale lang=locale
     h1.jn-post__title= post.title.presence || t('management.posts.editor.untitled')
     .jn-post__byline= journal_byline(post)
 

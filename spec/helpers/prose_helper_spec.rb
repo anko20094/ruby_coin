@@ -19,6 +19,14 @@ describe ProseHelper do
       expect(helper.rich(value)).to eq(value)
     end
 
+    # A card is one link, and a link inside it ends it early: the rest of the card is then a
+    # sibling of the anchor, not part of it.
+    it 'drops the link and keeps its words where the text sits inside a link' do
+      value = 'read <a href="/en/work/dna">the <b>case</b></a>'
+
+      expect(helper.rich(value, links: false)).to eq('read the <b>case</b>')
+    end
+
     it 'strips script, and anything block-level' do
       expect(helper.rich('<script>alert(1)</script>')).to eq('alert(1)')
       # A case field is printed inside the design's own <p>, <li> or <h3>.

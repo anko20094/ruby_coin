@@ -18,6 +18,8 @@ class TeamController < ApplicationController
 
   def show
     @person = Team.person!(params.expect(:id))
+    raise ActiveRecord::RecordNotFound, "#{@person.id} has nothing behind the name" if @person.alumni? && !@person.page?
+
     @cases_by_slug = Case.ordered.index_by(&:slug)
     # Ordered by the projects' own display order, which is also the list of projects that
     # still exist — one that has left the portfolio does not leave a dead row behind.

@@ -16,6 +16,33 @@ describe EditorHelper do
       expect(helper.editor_html(post.rich_text_description_en)).to eq('<p>one</p><p>two</p>')
     end
 
+    context 'with an uploaded image in the body' do
+      let(:dot) { Base64.decode64(<<~PNG) }
+        iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==
+      PNG
+      let(:blob) do
+        ActiveStorage::Blob.create_and_upload!(io: StringIO.new(dot), filename: 'dot.png', content_type: 'image/png')
+      end
+      let(:html) { helper.editor_html(post.rich_text_description_en) }
+
+      before do
+        attachment = %(<action-text-attachment sgid="#{blob.attachable_sgid}" content-type="image/png">) \
+                     '</action-text-attachment>'
+        post.update!(description_en: "<p>before</p>#{attachment}")
+      end
+
+      after { blob.purge }
+
+      it 'fills the attachment with the figure the public page draws' do
+        expect(html).to include('<figure class="attachment attachment--preview attachment--png">')
+        expect(html).to match(/<action-text-attachment[^>]+contenteditable="false"/)
+      end
+
+      it 'draws it once, not as an element holding an empty copy of itself' do
+        expect(html.scan('<action-text-attachment').size).to eq(1)
+      end
+    end
+
     context 'with a journal block in the body' do
       let(:block) { JournalBlock.create!(kind: 'code', payload: { 'language' => 'ruby', 'source' => 'puts 1' }) }
 

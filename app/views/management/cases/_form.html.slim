@@ -2,13 +2,16 @@
 / stack list and five structured fields, each of those a list of rows and each row up to four
 / values across two languages.
 /
-/ Two things it did not use to do. Every text field is a real editor now — the /work page
-/ renders these strings as markup (ProseHelper#rich), so an author needs a way to make the
-/ markup. And the structured fields are no longer fixed: Case::STRUCTURES#count says what the
-/ design draws, not how many rows may exist, and rows are added, removed and reordered here.
-= form_with model: [:management, kase], scope: :case do |f|
+/ Two things it did not use to do. Every text field the /work page renders as markup
+/ (ProseHelper#rich) is a real editor now, so an author has a way to make the markup. And the
+/ structured fields are no longer fixed: Case::STRUCTURES#count says what the design draws, not
+/ how many rows may exist, and rows are added, removed and reordered here.
+= form_with model: [:management, kase], scope: :case,
+  data: { controller: 'unsaved-guard', unsaved_guard_dirty_value: (kase.errors.any? || !request.get?),
+          action: 'input->unsaved-guard#mark change->unsaved-guard#mark submit->unsaved-guard#release' } do |f|
   .admin-form__content
     = render 'shared/errors', object: kase
+    = f.hidden_field :lock_version if kase.persisted?
 
     .row
       .col.d-grid.align-items-end
@@ -19,7 +22,7 @@
         = f.text_field :mark, class: 'standart-input'
       .col.d-grid.align-items-end
         = f.label :position, t('.position'), class: 'standart-label'
-        = f.number_field :position, class: 'standart-input'
+        = f.number_field :position, min: 1, class: 'standart-input'
 
     .checkboxes
       .flex-inner
@@ -37,8 +40,11 @@
         .mg-cells
           - I18n.available_locales.each do |locale|
             .mg-cell
-              label.mg-cell__label[for="case_#{field}_#{locale}"]= t(locale).downcase
-              = f.text_area :"#{field}_#{locale}", rows: 2, class: 'standart-input mg-cell__rich', data: tinymce_data(profile: 'case', lazy: true)
+              label.mg-cell__label[for="case_#{field}_#{locale}"]= "#{t(".#{field}")} · #{t(locale).downcase}"
+              - if Case::PLAIN_SCALARS.include?(field)
+                = f.text_field :"#{field}_#{locale}", class: 'standart-input'
+              - else
+                = f.text_area :"#{field}_#{locale}", rows: 2, class: 'standart-input mg-cell__rich', data: tinymce_data(profile: 'case', lazy: true, lang: locale)
 
     .mg-structure
       = f.label :stack_list, t('.stack'), class: 'standart-label'

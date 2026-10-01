@@ -9,3 +9,9 @@
   --mg-sidebar:    232px;
   --mg-topbar:     52px;
 }
+
+// Instrument Serif has no Cyrillic. theme/_base.scss swaps the face per page and this bundle
+// skips that file; :lang rather than html[lang] lets the preview follow its own tab.
+:lang(uk) { --font-display: 'EB Garamond', Georgia, serif; }
+
+.mg-preview__article:lang(en) { --font-display: 'Instrument Serif', 'EB Garamond', Georgia, serif; }

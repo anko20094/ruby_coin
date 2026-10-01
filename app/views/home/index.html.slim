@@ -63,10 +63,10 @@
             = link_to work_case_path(slug: kase.slug), class: 'hm-card' do
               .hm-card__cover
                 span.hm-card__glyph= kase.mark
-              h3.hm-card__title= rich(kase.title.to_s.gsub(' · ', '&nbsp;· '))
+              h3.hm-card__title= rich(kase.title.to_s.gsub(' · ', '&nbsp;· '), links: false)
               .hm-card__mark= kase.mark
               .hm-card__meta= "#{kase.sector} · #{kase.year}"
-              .hm-card__tagline= rich(kase.tagline)
+              .hm-card__tagline= rich(kase.tagline, links: false)
         = link_to work_path, class: 'hm-more' do
           = "#{t('home.index.all_work')} "
           span aria-hidden="true" →

@@ -1,7 +1,7 @@
 - provide(:title, full_title(t('.title')))
 
 - content_for :topbar do
-  = render 'management/shared/top_bar', crumbs: ['Statistics'], note: t('.note')
+  = render 'management/shared/top_bar', crumbs: [t('management.crumbs.statistics')], note: t('.note')
 
 .mg-stats
   .mg-stats__totals

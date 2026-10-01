@@ -19,8 +19,8 @@ Rails.application.configure do
     policy.script_src :self
     policy.connect_src :self
 
-    # Action Text writes image attachments as blob: URLs while the editor holds them, and Trix
-    # previews a pasted image as a data: URI before it is uploaded.
+    # TinyMCE shows a pasted or dropped image from a blob: URL until its upload answers, and
+    # its skin inlines a data: image.
     policy.img_src :self, :data, :blob
 
     # Two directives rather than one: a nonce covers <style> elements, but a style="..."

@@ -10,6 +10,7 @@ module Management
   class ApplicationController < ApplicationController
     layout 'management/layouts/application'
 
+    before_action :forbid_indexing
     before_action :authenticate_user!
     after_action :verify_authorized
 

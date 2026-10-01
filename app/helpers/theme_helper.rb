@@ -21,7 +21,7 @@ module ThemeHelper
   }.freeze
 
   def theme_preloaded_faces
-    PRELOADED_FACES.fetch(I18n.locale, PRELOADED_FACES[:en])
+    PRELOADED_FACES.fetch(I18n.locale) { PRELOADED_FACES[:en] }
   end
 
   # Rails, Devise and Pundit each name the same two states differently. Two tones is all the

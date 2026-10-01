@@ -44,8 +44,8 @@ cases:
           en: "#2 / 14"
           uk: "#2 / 14"
         label:
-          en: "contributors · a commit in all 34 months"
-          uk: "контриб’юторів · коміт у кожному з 34 місяців"
+          en: "contributors · a commit in 33 of the 34 months"
+          uk: "контриб’юторів · коміт у 33 із 34 місяців"
       - value:
           en: "64"
           uk: "64"
@@ -306,8 +306,8 @@ cases:
       en: "community platform"
       uk: "платформа спільнот"
     status:
-      en: "built from zero · team up to 14"
-      uk: "з нуля · команда до 14"
+      en: "built from zero · team up to ten"
+      uk: "з нуля · команда до десяти"
     title:
       en: "WardyBot"
       uk: "WardyBot"
@@ -363,8 +363,8 @@ cases:
     mine:
       - en: "<b>Designed the product and the architecture from a blank page</b> and made the first commit."
         uk: "<b>Спроєктував продукт і архітектуру з чистого аркуша</b> й зробив перший коміт."
-      - en: "<b>Assembled and led a team of up to 14 developers</b> — and set the process they work in: ticket branches, review, CI, mandatory tests."
-        uk: "<b>Зібрав і вів команду до 14 розробників</b> — і поставив процес, у якому вони працюють: тікет-бранчі, рев’ю, CI, обов’язкові тести."
+      - en: "<b>Assembled and led a team of up to ten developers</b> — and set the process they work in: ticket branches, review, CI, mandatory tests."
+        uk: "<b>Зібрав і вів команду до десяти розробників</b> — і поставив процес, у якому вони працюють: тікет-бранчі, рев’ю, CI, обов’язкові тести."
       - en: "<b>Owned production alone:</b> all 196 deploys, the runbooks, the incident response."
         uk: "<b>Продакшн вів сам:</b> усі 196 деплоїв, ранбуки, реакція на інциденти."
       - en: "<b>Owned the business model:</b> subscriptions, two internal currencies, Telegram Stars payments with refunds — and, while the multi-tenant core ran, <b>17 white-label bots</b> on it."
@@ -399,8 +399,8 @@ cases:
             en: "Reflective command router"
             uk: "Рефлективний роутер команд"
           body:
-            en: "Instead of a route table the dispatcher discovers controllers by glob and maps a command to a method by reflection — a new command module is a new file, nothing else. Exactly what you want when fourteen people add commands in parallel. 73 registered commands."
-            uk: "Замість таблиці роутів диспетчер знаходить контролери через glob і зіставляє команду з методом рефлексією — новий модуль команди це новий файл і більше нічого. Саме те, що потрібно, коли чотирнадцять людей додають команди паралельно. 73 зареєстровані команди."
+            en: "Instead of a route table the dispatcher discovers controllers by glob and maps a command to a method by reflection — a new command module is a new file, nothing else. Exactly what you want when ten people add commands in parallel. 73 registered commands."
+            uk: "Замість таблиці роутів диспетчер знаходить контролери через glob і зіставляє команду з методом рефлексією — новий модуль команди це новий файл і більше нічого. Саме те, що потрібно, коли десять людей додають команди паралельно. 73 зареєстровані команди."
         - title:
             en: "Moderation pipeline before routing"
             uk: "Модерація перед роутингом"
@@ -509,8 +509,8 @@ cases:
     mine:
       - en: "<b>Stripe billing</b> — charge-day logic, lockout and automatic unlock on payment, duplicate invoice suppression on upgrade."
         uk: "<b>Біллінг на Stripe</b> — логіка дня списання, блокування й автоматичне розблокування після оплати, гасіння дублікатів інвойсів при апгрейді."
-      - en: "<b>Access control</b> across a 9-roles × 9-plans matrix, including a brand-new customer role threaded through every part of it."
-        uk: "<b>Контроль доступу</b> в матриці 9 ролей × 9 планів, включно з новою роллю клієнта, протягнутою через усі її частини."
+      - en: "<b>Access control</b> across a 9-roles × 12-plans matrix, including a brand-new customer role threaded through every part of it."
+        uk: "<b>Контроль доступу</b> в матриці 9 ролей × 12 планів, включно з новою роллю клієнта, протягнутою через усі її частини."
       - en: "<b>Both sides of the cross-service integration:</b> SSO, profile, partnership and licence sync, deletion webhooks."
         uk: "<b>Обидві сторони міжсервісної інтеграції:</b> SSO, синхронізація профілів, партнерств і ліцензій, вебхуки видалення."
       - en: "<b>Whole product verticals</b> taken from controller to documented endpoint — affordability, seller commission, combined partnerships, HELOC/HELOAN."
@@ -792,8 +792,8 @@ cases:
       body:
         - en: "Cards were declined, phone numbers rejected, the interface was in English. This bot removed all of that: open Telegram, ask a question in Ukrainian, get an answer. Free to start, topped up over the first week, paid if you need more."
           uk: "Картки не проходили, номери телефонів не приймалися, інтерфейс був англійською. Цей бот прибрав усе це: відкрив Telegram, спитав українською, отримав відповідь. Безкоштовно на старті, з доливками за перший тиждень, платно — якщо треба більше."
-        - en: "It is deliberately a small product with one job, and it is the clearest commercial proof I can show: <b>289,000 people used it, 15,000 of them paid, and the money keeps arriving through automatic renewals.</b> Nobody sends an invoice, nobody reconciles a spreadsheet — the product bills itself."
-          uk: "Це свідомо маленький продукт з однією задачею, і це найясніший комерційний доказ, який я можу показати: <b>289 000 людей ним скористалися, 15 000 із них заплатили, і гроші продовжують приходити через автоматичні продовження.</b> Ніхто не виставляє інвойси, ніхто не зводить таблиці — продукт білить сам себе."
+        - en: "It is deliberately a small product with one job, and it is the clearest commercial proof I can show: <b>289,000 people used it, the product has taken 15,000 paid orders, and the money keeps arriving through automatic renewals.</b> Nobody sends an invoice, nobody reconciles a spreadsheet — the product bills itself."
+          uk: "Це свідомо маленький продукт з однією задачею, і це найясніший комерційний доказ, який я можу показати: <b>289 000 людей ним скористалися, продукт прийняв 15 000 платних замовлень, і гроші продовжують приходити через автоматичні продовження.</b> Ніхто не виставляє інвойси, ніхто не зводить таблиці — продукт білить сам себе."
         - en: "<b>A detail I like.</b> AI answers are slow, and silence feels broken. So the bot keeps typing — literally: a parallel thread pings the “typing” indicator every seven seconds for the whole duration of the response, so the chat never looks dead."
           uk: "<b>Деталь, яка мені подобається.</b> AI-відповіді повільні, а тишу користувач читає як «зламалося». Тому бот увесь час «друкує» — буквально: паралельний потік пінгує індикатор набору кожні сім секунд протягом усієї відповіді, тож чат ніколи не виглядає мертвим."
     mine:
@@ -801,8 +801,8 @@ cases:
         uk: "<b>Регулярні платежі наскрізно</b> — зберігання платіжного токена, щоденний autopay-воркер, обробка колбеків із перевіркою статусу перед зарахуванням."
       - en: "<b>Freemium mechanics that survive abuse:</b> four paid durations, a free starting allowance topped up over the first week, and a 300-second duplicate-request throttle."
         uk: "<b>Freemium-механіки, що витримують зловживання:</b> чотири платні тривалості, безкоштовний стартовий ліміт із доливками за перший тиждень і 300-секундний тротлінг дублікатів."
-      - en: "<b>Referral accounting:</b> a 15% bonus credited on every purchase by a referred user, tracked across <b>222,000 referral records</b> without manual reconciliation."
-        uk: "<b>Реферальний облік:</b> 15% бонусу з кожної покупки залученого користувача, облік по <b>222 000 реферальних записів</b> без ручної роботи."
+      - en: "<b>Referral accounting:</b> a 15% bonus credited on every purchase by a referred user, with no manual reconciliation."
+        uk: "<b>Реферальний облік:</b> 15% бонусу з кожної покупки залученого користувача, без ручної роботи."
       - en: "<b>Nothing waits for a human.</b> Autopay and the day-one-to-seven notification funnel both run on the scheduler."
         uk: "<b>Ніщо не чекає людини.</b> Autopay і воронка повідомлень першого-сьомого дня — обидва на планувальнику."
     engineering:
@@ -841,8 +841,8 @@ cases:
             en: "Referral accounting"
             uk: "Реферальний облік"
           body:
-            en: "A <b>15% bonus credited on every purchase made by a referred user</b>, tracked per account across <b>222,000 referral records</b> without manual reconciliation. Referral logic is where money quietly leaks; this one balances on its own."
-            uk: "<b>15% бонусу з кожної покупки залученого користувача</b>, облік по акаунтах на <b>222 000 реферальних записів</b> без ручної звірки. Реферальна логіка — типове місце, де тихо течуть гроші; ця зводиться сама."
+            en: "A <b>15% bonus credited on every purchase made by a referred user</b>, tracked per account without manual reconciliation. Referral logic is where money quietly leaks; this one balances on its own."
+            uk: "<b>15% бонусу з кожної покупки залученого користувача</b>, облік по акаунтах без ручної звірки. Реферальна логіка — типове місце, де тихо течуть гроші; ця зводиться сама."
         - title:
             en: "Load shape · operator tooling"
             uk: "Форма навантаження · інструменти оператора"
@@ -916,8 +916,8 @@ cases:
           en: "31k"
           uk: "31 тис."
         label:
-          en: "visits in the first half of 2026, against 25k in all of 2025"
-          uk: "візитів за першу половину 2026 проти 25 тис. за весь 2025"
+          en: "visits in seven and a half months of 2026, against 25k in all of 2025"
+          uk: "візитів за сім із половиною місяців 2026 проти 25 тис. за весь 2025"
       - value:
           en: "10"
           uk: "10"
@@ -955,8 +955,8 @@ cases:
         en: "AI translation that keeps the markup, and analytics with no counter to drift"
         uk: "AI-переклад, що не ламає розмітку, і аналітика без лічильника, який розсинхронізується"
       sub:
-        en: "440+ commits, a lint gate of three linters before the suite runs, and AI review with inline comments on the pull request."
-        uk: "440+ комітів, гейт із трьох лінтерів перед прогоном тестів і AI-рев’ю з інлайн-комментарями в pull request."
+        en: "360+ commits, a lint gate of three linters before the suite runs, and AI review with inline comments on the pull request."
+        uk: "360+ комітів, гейт із трьох лінтерів перед прогоном тестів і AI-рев’ю з інлайн-комментарями в pull request."
       items:
         - title:
             en: "AI translation that keeps the markup"
@@ -996,8 +996,8 @@ cases:
             uk: "Проведений живим через <b>Rails 7.0 → 8.1, Ruby 3.1 → 3.4, Sprockets → Propshaft + esbuild</b> і зняття адмін-фреймворку на користь власної панелі. <b>Turbo Drive свідомо вимкнений</b> — фрейми й стріми застосовані там, де вони себе виправдовують, а не за замовчуванням."
     quality:
       - value:
-          en: "440+"
-          uk: "440+"
+          en: "360+"
+          uk: "360+"
         label:
           en: "commits"
           uk: "комітів"

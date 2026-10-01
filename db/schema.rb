@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_13_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_01_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -101,6 +101,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_13_090000) do
     t.jsonb "engineering_items", default: [], null: false
     t.jsonb "engineering_sub", default: {}, null: false
     t.boolean "is_this_site", default: false, null: false
+    t.integer "lock_version", default: 0, null: false
     t.string "mark", null: false
     t.jsonb "metrics", default: [], null: false
     t.jsonb "mine", default: [], null: false

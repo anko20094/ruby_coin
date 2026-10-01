@@ -17,7 +17,7 @@ module I18nExtended
   private
 
   def switch_locale(&)
-    locale = params.permit(:locale)[:locale]
+    locale = request.path_parameters[:locale]
 
     return redirect_to_negotiated_locale if locale.blank? && negotiable_request?
 
@@ -41,7 +41,7 @@ module I18nExtended
     return false unless request.get? || request.head?
     return false if request.xhr?
 
-    request.format.html? || request.format.to_s == ANY_FORMAT
+    request.format.html? || request.format.atom? || request.format.to_s == ANY_FORMAT
   end
 
   def redirect_to_negotiated_locale
@@ -65,6 +65,6 @@ module I18nExtended
   end
 
   def default_url_options
-    { locale: I18n.locale }
+    { locale: I18n.locale, **Rails.application.config.x.canonical_url_options }
   end
 end

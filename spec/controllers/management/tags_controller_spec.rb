@@ -82,17 +82,23 @@ describe Management::TagsController do
     end
 
     context 'with invalid parameters' do
+      let(:params) { { locale: 'uk', tag: invalid_attributes } }
+
+      before { sign_in(create(:user, role: :admin)) }
+
+      it_behaves_like 'unprocessable_entity status', :post
+
       it 'does not create a new tag' do
-        expect { post :create, params: { tag: invalid_attributes } }.not_to change(Tag, :count)
+        expect { post(action, params:) }.not_to change(Tag, :count)
       end
     end
 
     context 'when user is not authenticated' do
-      it_behaves_like 'redirects to new_user_session_path'
+      it_behaves_like 'redirects to new_user_session_path', :post
     end
   end
 
-  describe 'PUT #update' do
+  describe 'PATCH #update' do
     let(:tag) { create(:tag) }
     let(:new_title) { 'Updated Title' }
     let(:action) { :update }
@@ -105,20 +111,26 @@ describe Management::TagsController do
       end
 
       it 'updates the tag' do
-        get(action, params:)
+        patch(action, params:)
         tag.reload
         expect(tag.title).to eq(new_title)
       end
     end
 
     context 'with invalid parameters' do
-      it 'does not update the tag when title is nil' do
-        expect(tag.title).not_to be_nil
+      let(:params) { { locale: 'uk', id: tag.id, tag: { title: '' } } }
+
+      before { sign_in(create(:user, role: :admin)) }
+
+      it_behaves_like 'unprocessable_entity status', :patch
+
+      it 'does not update the tag when title is blank' do
+        expect { patch(action, params:) }.not_to(change { tag.reload.title })
       end
     end
 
     context 'when user is not authenticated' do
-      it_behaves_like 'redirects to new_user_session_path'
+      it_behaves_like 'redirects to new_user_session_path', :patch
     end
   end
 
@@ -140,7 +152,7 @@ describe Management::TagsController do
     end
 
     context 'when user is not authenticated' do
-      it_behaves_like 'redirects to new_user_session_path'
+      it_behaves_like 'redirects to new_user_session_path', :delete
     end
   end
 end

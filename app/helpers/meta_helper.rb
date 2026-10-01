@@ -10,11 +10,11 @@
 # falls back to the site's own card and lede where a page says nothing. The value has to
 # survive from the template to the layout, which in Rails means an instance variable on the
 # view context — the same thing content_for does, but holding a hash rather than a buffer.
-# rubocop:disable Rails/HelperInstanceVariable
 module MetaHelper
   SITE_NAME = 'rubyco.in'
   DESCRIPTION_LIMIT = 200
 
+  # rubocop:disable Rails/HelperInstanceVariable
   # `person` names who a profile page is about. Without it every profile page would describe
   # the owner: the schema read CVProfile directly, so /team/natalia would have told a search
   # engine it was Danyil's page.
@@ -42,7 +42,14 @@ module MetaHelper
   # An absolute URL, because a share card is fetched by someone else's server.
   def meta_image
     path = @page_meta&.dig(:image).presence || "/og/site-#{I18n.locale}.png"
-    path.start_with?('http') ? path : URI.join(request.base_url, path).to_s
+    path.start_with?('http') ? path : absolute_url(path)
+  end
+
+  # Cards are baked by `rake og:cards`, so a case added in the admin has none until that runs;
+  # nil lets the page fall back to the site's own card instead of pointing at a 404.
+  def share_card(slug)
+    card = "og/#{slug}-#{I18n.locale}.png"
+    "/#{card}" if Rails.public_path.join(card).exist?
   end
 
   def meta_published_at = @page_meta&.dig(:published_at)
@@ -50,15 +57,24 @@ module MetaHelper
 
   # The same page in the other language, and the canonical form of this one. The site answers
   # at /en/… and /uk/… only — the locale-less address redirects (I18nExtended) — so the
-  # canonical is simply the current path without its query string.
+  # canonical is the current path and the few parameters that choose which list this is.
   def canonical_url
-    URI.join(request.base_url, request.path).to_s
+    absolute_url(request.path, canonical_query)
   end
 
   def alternate_urls
-    I18nExtended::AVAILABLE_LOCALES.index_with do |locale|
-      URI.join(request.base_url, url_for(locale: locale, only_path: true)).to_s
+    page_locales.index_with do |locale|
+      absolute_url(url_for(locale: locale, only_path: true), canonical_query)
     end
+  end
+
+  # The languages this page exists in: an entry is only in the ones it has text for, and the
+  # language being read is always listed.
+  def page_locales
+    return I18nExtended::AVAILABLE_LOCALES unless controller_path == 'journal' && action_name == 'show'
+
+    written = @post.translated_locales.map(&:to_s) | [I18n.locale.to_s]
+    I18nExtended::AVAILABLE_LOCALES.select { |locale| written.include?(locale) }
   end
 
   # Schema.org, so a search engine can tell a person from an article from a portfolio.
@@ -75,6 +91,23 @@ module MetaHelper
   end
 
   private
+
+  # From the configured host where there is one, never from the Host the client sent.
+  def absolute_url(path, query = {})
+    url = URI.join(root_url(locale: nil), path)
+    url.query = query.to_query.presence
+    url.to_s
+  end
+
+  def canonical_query
+    return {} unless controller_path == 'journal' && %w[index search].include?(action_name)
+
+    query = {}
+    page = request.query_parameters['page'].to_s.to_i
+    query['page'] = page if page > 1
+    query['tag_id'] = @active_tag.id if @active_tag
+    query
+  end
 
   def article_schema
     {
@@ -109,5 +142,5 @@ module MetaHelper
       links: profile.contact_rows.filter_map { |_, _, href| href unless href.to_s.start_with?('mailto:') }
     }
   end
+  # rubocop:enable Rails/HelperInstanceVariable
 end
-# rubocop:enable Rails/HelperInstanceVariable

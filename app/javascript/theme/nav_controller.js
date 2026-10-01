@@ -6,14 +6,25 @@ import { Controller } from "@hotwired/stimulus"
 // Correct means: the button reports its state, Escape closes, a click outside closes, focus
 // moves into the drawer on open and back to the button on close, and the page behind does not
 // scroll while it is open.
+
+// $nav-drawer-at in theme/_chrome.scss.
+const DRAWER = "(max-width: 760px)"
+
 export default class extends Controller {
   static targets = ["toggle", "drawer"]
 
   connect() {
     this.close()
+
+    // Past the breakpoint the toggle is gone and the drawer is the nav row, so a drawer still
+    // marked open would trap focus and swallow the next click behind nothing the reader can see.
+    this.layout = window.matchMedia(DRAWER)
+    this.onLayout = (event) => { if (!event.matches) this.close() }
+    this.layout.addEventListener("change", this.onLayout)
   }
 
   disconnect() {
+    this.layout.removeEventListener("change", this.onLayout)
     document.body.classList.remove("is-nav-open")
   }
 
@@ -60,8 +71,8 @@ export default class extends Controller {
     this.toggleTarget.focus()
   }
 
-  // A tap outside dismisses the menu and does nothing else. Without preventDefault the same
-  // tap also followed whatever link sat under it, so closing the menu navigated you away.
+  // A tap outside dismisses the menu and does nothing else. It is heard in the capture phase,
+  // so the link or button under the tap never gets to act on it.
   outside(event) {
     if (!this.open || this.element.contains(event.target)) return
 

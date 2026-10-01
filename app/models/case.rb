@@ -13,15 +13,15 @@
 class Case < ApplicationRecord
   include StructuredJson
 
-  # Fields that are one string per language.
+  # Fields that are one string per language, and which of them the pages print as markup.
   #
   # year, sector and status are here rather than plain columns because they read as prose:
   # "2022—present", "publishing · education" and "built from zero · 19 contributors" printed
-  # English into the middle of a Ukrainian case page.
-  LOCALISED_SCALARS = %i[
-    title tagline role plain_heading engineering_heading engineering_sub scope_note
-    year sector status
-  ].freeze
+  # English into the middle of a Ukrainian case page. They are printed escaped, so they get a
+  # plain input and not an editor.
+  RICH_SCALARS = %i[title tagline role plain_heading engineering_heading engineering_sub scope_note].freeze
+  PLAIN_SCALARS = %i[year sector status].freeze
+  LOCALISED_SCALARS = (RICH_SCALARS + PLAIN_SCALARS).freeze
 
   # Structured content, declared once so the model, the admin form and the importer agree on
   # the shape. `count` is what the design draws; the schema does not enforce it.
@@ -41,10 +41,14 @@ class Case < ApplicationRecord
   structured_json STRUCTURES
 
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
-  validates :mark, :position, presence: true
+  validates :mark, presence: true
+  validates :position, numericality: { only_integer: true, greater_than: 0, less_than: 1_000_000 }
   validate :scalars_carry_both_languages
+  validate :rows_carry_both_languages
+  validate :slug_kept_while_named, on: :update
+  before_destroy :refuse_while_named, prepend: true
 
-  scope :ordered, -> { order(:position) }
+  scope :ordered, -> { order(:position, :id) }
 
   class << self
     def slugs
@@ -62,9 +66,9 @@ class Case < ApplicationRecord
     define_method(field) { localised(self[field]) }
 
     I18n.available_locales.each do |locale|
-      define_method(:"#{field}_#{locale}") { self[field].to_h[locale.to_s] }
+      define_method(:"#{field}_#{locale}") { pair_of(self[field])[locale.to_s] }
       define_method(:"#{field}_#{locale}=") do |value|
-        self[field] = self[field].to_h.merge(locale.to_s => value)
+        self[field] = pair_of(self[field]).merge(locale.to_s => value)
       end
     end
   end
@@ -107,12 +111,31 @@ class Case < ApplicationRecord
   # hands a plain string to whichever locale asks.
   def scalars_carry_both_languages
     LOCALISED_SCALARS.each do |field|
-      value = self[field]
-      next if value.is_a?(String) && value.present?
+      errors.add(field, :blank) if missing_languages(self[field]).any?
+    end
+  end
 
-      values = value.to_h
-      missing = I18n.available_locales.reject { |locale| values[locale.to_s].present? }
-      errors.add(field, :blank) if missing.any?
+  # team.yml credits and the owner's CV entries name a case by its slug, and nothing follows a
+  # rename or a delete: the credits and links simply stop resolving.
+  def slug_kept_while_named
+    errors.add(:slug, :named_elsewhere) if slug_changed? && named_elsewhere?(slug_was)
+  end
+
+  def refuse_while_named
+    return unless named_elsewhere?(slug)
+
+    errors.add(:slug, :named_elsewhere)
+    throw :abort
+  end
+
+  def named_elsewhere?(name)
+    Team.credited_slugs.include?(name) ||
+      CVProfile.current.experience_rows.any? { |row| Array(row['case_slugs']).include?(name) }
+  end
+
+  def rows_carry_both_languages
+    STRUCTURES.each do |field, spec|
+      errors.add(field, :one_language_only) if self[field].to_a.any? { |row| half_translated?(spec, row) }
     end
   end
 end

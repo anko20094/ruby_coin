@@ -1,4 +1,4 @@
-nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@window->nav#outside"
+nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@window->nav#outside:capture"
   = link_to helpers.root_path, class: 'rc-nav__brand' do
     = render GemComponent.new(uid: 'nav')
     span.rc-nav__wordmark rubyco.in
@@ -28,7 +28,7 @@ nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@w
 
     .rc-nav__locales
       - locales.each do |locale|
-        = link_to locale.upcase, helpers.url_for(request.query_parameters.merge(locale: locale)),
+        = link_to locale.upcase, locale_path(locale),
           class: "rc-nav__locale #{'is-current' if current_locale?(locale)}",
           lang: locale, hreflang: locale,
           aria: { current: ('true' if current_locale?(locale)) }

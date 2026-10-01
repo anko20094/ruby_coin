@@ -17,7 +17,8 @@ module Statistics
                           .limit(LIMIT)
                           .count
 
-      posts = Post.where(id: counts.keys.compact).index_by { |post| post.id.to_s }
+      posts = Post.where(id: counts.keys.compact).select(:id, :slug).includes(:translations)
+                  .index_by { |post| post.id.to_s }
 
       counts.filter_map do |id, views|
         post = posts[id]

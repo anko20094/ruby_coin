@@ -26,18 +26,28 @@ export default class extends Controller {
     // The autosave currently in the air, if there is one, and whether a real submit is on its
     // way. Between them they are what stops the two racing — see onSubmit.
     this.saving = null
+    this.queued = false
     this.submitting = false
+    this.edits = 0
     this.locale = this.localeTargets[0]?.dataset.locale
     this.markTabs()
     this.markPreviewLocale()
     this.element.addEventListener("input", this.onInput)
     this.element.addEventListener("submit", this.onSubmit)
+    window.addEventListener("pageshow", this.onPageShow)
   }
 
   disconnect() {
     clearTimeout(this.timer)
     this.element.removeEventListener("input", this.onInput)
     this.element.removeEventListener("submit", this.onSubmit)
+    window.removeEventListener("pageshow", this.onPageShow)
+  }
+
+  // Back after Save restores this page from the back/forward cache with its script state as it
+  // was: `submitting` still set, so nothing autosaves, and lock_version a save behind.
+  onPageShow = (event) => {
+    if (event.persisted) window.location.reload()
   }
 
   // Pressing Save while an autosave is in the air is how this screen used to 500.
@@ -68,14 +78,28 @@ export default class extends Controller {
     const field = event.target
     if (!field || field.type === "submit" || this.submitting) return
 
+    this.edits += 1
     this.dirty.add(this.fieldKey(field))
     this.setState("dirty")
     this.markTabs()
+
+    // Autosave never writes the slug, so typing in it has nothing to save until the form is.
+    if (field === this.slugField) return
 
     if (!this.hasAutosaveUrlValue || this.autosaveUrlValue === "") return
 
     clearTimeout(this.timer)
     this.timer = setTimeout(() => this.save(), this.debounceValue)
+  }
+
+  get slugField() {
+    return this.element.querySelector("[name='post[slug]']")
+  }
+
+  // A slug typed and not yet submitted: the server's answer to an autosave does not cover it.
+  get slugPending() {
+    const field = this.slugField
+    return Boolean(field) && field.value !== field.defaultValue
   }
 
   // Which language a field belongs to, so the tab counts mean something. Fields outside a
@@ -90,11 +114,19 @@ export default class extends Controller {
     // lock_version out from under it.
     if (this.submitting) return
 
+    // One in the air at a time: the next is built from the version this one reports.
+    if (this.saving) {
+      this.queued = true
+      return this.saving
+    }
+
     this.setState("saving")
     this.previewTarget?.classList.add("is-busy")
 
     const body = new FormData(this.element)
     body.delete("_method")
+    const uploads = this.selectedFiles()
+    const edits = this.edits
 
     this.saving = fetch(this.autosaveUrlValue, {
       method: "PATCH",
@@ -104,37 +136,59 @@ export default class extends Controller {
       },
       body,
     })
-      .then(response => response.json().then(data => ({ status: response.status, data })))
-      .then(({ status, data }) => {
+      .then(response => response.json().then(data => ({ response, data })))
+      .then(({ response, data }) => {
         this.previewTarget?.classList.remove("is-busy")
 
-        if (status === 409) return this.onConflict(data)
-
-        // The version comes back on every answer, success or not, and the form takes it
-        // whichever way the save went. Skipping it on "invalid" is what used to leave the
-        // editor a version behind and turn the next keystroke into a phantom conflict.
-        this.syncLockVersion(data)
-
+        if (response.status === 409) return this.onConflict()
         if (data.status === "invalid") return this.setState("invalid", { errors: data.errors.join(", ") })
+        if (!response.ok || data.status !== "saved") return this.setState("failed")
 
+        this.syncLockVersion(data)
+        this.forgetUploaded(uploads)
         this.dirty.clear()
+        const slugPending = this.slugPending
+        if (slugPending) this.dirty.add(this.fieldKey(this.slugField))
         this.markTabs()
-        this.setState("saved", { at: data.at })
+        if (this.hasConflictTarget) this.conflictTarget.hidden = true
+        this.setState(slugPending ? "dirty" : "saved", { at: data.at })
         this.reloadPreview()
+        // Typing since the snapshot is not in what was saved; the autosave it armed will say so.
+        if (this.edits === edits && !slugPending) this.dispatch("saved")
       })
       .catch(() => {
         this.previewTarget?.classList.remove("is-busy")
-        this.setState("invalid", { errors: "network" })
+        this.setState("failed")
       })
-      .finally(() => { this.saving = null })
+      .finally(() => {
+        this.saving = null
+        if (this.queued) {
+          this.queued = false
+          this.save()
+        }
+      })
 
     return this.saving
   }
 
+  // Only a save that wrote hands out a version, so only a "saved" answer is taken: a refused one
+  // wrote nothing, and the version the form holds is still the one its content was loaded at.
   syncLockVersion(data) {
     if (this.hasLockVersionTarget && data.lock_version != null) {
       this.lockVersionTarget.value = data.lock_version
     }
+  }
+
+  // The cover is in the form for as long as the file is selected, so without this every pause
+  // would upload it again. Cleared once saved, unless the author has picked another meanwhile.
+  selectedFiles() {
+    return Array.from(this.element.querySelectorAll("input[type=file]"))
+      .filter(input => input.files.length)
+      .map(input => [input, input.files[0]])
+  }
+
+  forgetUploaded(uploads) {
+    uploads.forEach(([input, file]) => { if (input.files[0] === file) input.value = "" })
   }
 
   onConflict() {
@@ -174,8 +228,7 @@ export default class extends Controller {
   // data attribute the server rendered.
   phrase(name, interpolations) {
     const template = this.stateTarget.dataset[`phrase${name[0].toUpperCase()}${name.slice(1)}`] || name
-    return Object.entries(interpolations)
-      .reduce((text, [key, value]) => text.replace(`%{${key}}`, value), template)
+    return template.replace(/%\{(\w+)\}/g, (_, key) => interpolations[key] ?? "")
   }
 
   markTabs() {
@@ -187,7 +240,7 @@ export default class extends Controller {
 
     this.tabTargets.forEach(tab => {
       const locale = tab.dataset.locale
-      tab.classList.toggle("is-current", locale === this.locale && !this.sideBySide)
+      this.press(tab, locale === this.locale && !this.sideBySide)
       const badge = tab.querySelector(".mg-tab__dirty")
       if (badge) badge.textContent = counts[locale] ? String(counts[locale]) : ""
     })
@@ -196,7 +249,7 @@ export default class extends Controller {
   pickLocale(event) {
     this.sideBySide = false
     this.locale = event.currentTarget.dataset.locale
-    this.sideBySideTarget?.classList.remove("is-current")
+    if (this.hasSideBySideTarget) this.press(this.sideBySideTarget, false)
     this.colsTarget?.classList.remove("is-side-by-side")
     this.localeTargets.forEach(group => { group.hidden = group.dataset.locale !== this.locale })
     this.markTabs()
@@ -207,7 +260,7 @@ export default class extends Controller {
 
   toggleSideBySide() {
     this.sideBySide = !this.sideBySide
-    this.sideBySideTarget?.classList.toggle("is-current", this.sideBySide)
+    if (this.hasSideBySideTarget) this.press(this.sideBySideTarget, this.sideBySide)
     this.colsTarget?.classList.toggle("is-side-by-side", this.sideBySide)
     this.localeTargets.forEach(group => {
       group.hidden = this.sideBySide ? false : group.dataset.locale !== this.locale
@@ -226,7 +279,13 @@ export default class extends Controller {
     const width = event.currentTarget.dataset.width
     this.previewTarget.dataset.width = width
     this.element.querySelectorAll(".mg-preview__width").forEach(button => {
-      button.classList.toggle("is-current", button.dataset.width === width)
+      this.press(button, button.dataset.width === width)
     })
+  }
+
+  // These buttons are choices, so the choice made is said in markup and not only painted.
+  press(button, pressed) {
+    button.classList.toggle("is-current", pressed)
+    button.setAttribute("aria-pressed", String(pressed))
   }
 }

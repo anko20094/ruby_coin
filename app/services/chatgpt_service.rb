@@ -3,8 +3,18 @@
 class ChatgptService
   include HTTParty
 
+  class Error < StandardError; end
+
   DEFAULT_MODEL = 'gpt-5.4'
   LANGUAGE = { uk: 'Ukrainian', en: 'English' }.freeze
+
+  # One section is up to 16 KB of HTML and comes back as a completion of about that size.
+  TIMEOUT = 120
+  MAX_PARALLEL = 4
+  NETWORK_ERRORS = [
+    Timeout::Error, SocketError, SystemCallError, EOFError, OpenSSL::SSL::SSLError, JSON::ParserError,
+    HTTParty::Error
+  ].freeze
 
   attr_reader :api_url, :options, :model, :message, :locale
 
@@ -23,28 +33,17 @@ class ChatgptService
   end
 
   def call
+    raise Error, 'nothing to translate' if message.blank?
+
     choose_translation_language(locale)
 
-    if message.length > 90_000
-      sections = separated_content(message)
-      translated_responses = Concurrent::Hash.new
+    return translate(message) unless message.length > 90_000
 
-      threads = sections.each_with_index.map do |section, index|
-        Thread.new do
-          translated_responses[index] = translate(section)
-        end
-      end
-
-      threads.each(&:join)
-
-      translated_responses = translated_responses.sort.to_h
-      joined_response = translated_responses.values.join
-
-    else
-      joined_response = translate(message)
+    translated = separated_content(message).each_slice(MAX_PARALLEL).flat_map do |sections|
+      sections.map { |section| Thread.new { translate(section) } }.map(&:value)
     end
 
-    joined_response
+    translated.join
   end
 
   def translate(section)
@@ -68,10 +67,12 @@ class ChatgptService
       ]
     }
 
-    response = HTTParty.post(api_url, body: body.to_json, headers: options[:headers], timeout: 999)
-    raise response['error']['message'] unless response.code == 200
+    response = HTTParty.post(api_url, body: body.to_json, headers: options[:headers], timeout: TIMEOUT)
+    raise Error, failure_message(response) unless response.code == 200
 
-    response['choices'][0]['message']['content']
+    completion(response.parsed_response)
+  rescue *NETWORK_ERRORS => e
+    raise Error, e.message
   end
 
   def self.call(params, model = DEFAULT_MODEL)
@@ -79,6 +80,26 @@ class ChatgptService
   end
 
   private
+
+  def failure_message(response)
+    parsed = response.parsed_response
+    detail = parsed.dig('error', 'message') if parsed.is_a?(Hash)
+
+    detail.presence || "OpenAI answered #{response.code}"
+  end
+
+  # Only a completion the model finished is a translation; a refusal or a cut-off answer would
+  # otherwise be stored as the article.
+  def completion(parsed)
+    choice = parsed.is_a?(Hash) ? parsed.dig('choices', 0) : nil
+    finish = choice&.dig('finish_reason')
+    content = choice&.dig('message', 'content')
+
+    raise Error, "translation stopped early (#{finish.inspect})" unless finish == 'stop'
+    raise Error, 'translation came back empty' if content.blank?
+
+    content
+  end
 
   def choose_translation_language(locale)
     @input_locale = LANGUAGE[locale.to_sym]

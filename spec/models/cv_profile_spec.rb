@@ -18,6 +18,47 @@ RSpec.describe CVProfile do
     end
   end
 
+  describe '.current, asked again in the same request' do
+    def cv_queries(&)
+      statements = []
+      collect = ->(*, payload) { statements << payload[:sql] if payload[:sql].include?('FROM "cv_profiles"') }
+
+      ActiveSupport::Notifications.subscribed(collect, 'sql.active_record', &)
+      statements.size
+    end
+
+    it 'reads the row once, however many callers ask' do
+      expect(cv_queries { 4.times { described_class.current } }).to eq(1)
+    end
+
+    it 'is the same row the owner on the roster reads' do
+      expect(Team.owner.cv).to equal(described_class.current)
+    end
+
+    it 'remembers that the table is empty rather than asking again' do
+      described_class.delete_all
+
+      expect(cv_queries { 3.times { described_class.current } }).to eq(1)
+    end
+
+    it 'reads again in the next request' do
+      expect(described_class.current.location).to be_present
+
+      described_class.first.update_columns(location: { 'en' => 'Elsewhere', 'uk' => 'Деінде' })
+      Current.reset
+
+      expect(I18n.with_locale(:en) { described_class.current.location }).to eq('Elsewhere')
+    end
+
+    it 'forgets the row when a row is saved, so the importer is never read back stale' do
+      described_class.current.update_columns(strengths: [])
+
+      CV::Importer.call
+
+      expect(described_class.current.strengths).to be_present
+    end
+  end
+
   describe 'localised scalars' do
     it 'returns the current locale' do
       I18n.with_locale(:en) { expect(described_class.current.name).to eq('Danyil Shkoropad') }
@@ -41,7 +82,7 @@ RSpec.describe CVProfile do
 
   # The career, the stack groups and the strengths. They were a cv_blocks table with a model,
   # a controller and CRUD screens, which made a ten-line document behave like a collection you
-  # browse; they are StructuredJson fields on this row now. See redesign_plan.md §11.16.
+  # browse; they are StructuredJson fields on this row now. See redesign_plan.md §12.
   describe 'the three lists' do
     it 'reads a row as a ready-to-print hash in the current locale' do
       entry = I18n.with_locale(:en) { described_class.current.experience.first }

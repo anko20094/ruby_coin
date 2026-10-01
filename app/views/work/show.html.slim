@@ -2,7 +2,7 @@
 / the sector is the shortest thing that makes it a sentence.
 - content_for :title, full_title([plain(@case.title), @case.sector].compact_blank.join(' · '))
 - title = plain(@case.title)
-- page_meta description: plain(@case.tagline), image: "/og/#{@case.slug}-#{I18n.locale}.png", type: 'article', updated_at: @case.updated_at
+- page_meta description: plain(@case.tagline), image: share_card(@case.slug), type: 'article', updated_at: @case.updated_at
 
 = render 'shared/reading_progress'
 
@@ -39,8 +39,8 @@ article.wk-case data-controller="track-jump"
                          data-copy-text-value="#{plain(metric[:value])} — #{plain(metric[:label])}"
                          data-copy-done-value=t('work.case.copied')
                          aria-label="#{t('work.case.copy')}: #{plain(metric[:value])} — #{plain(metric[:label])}"]
-          .wk-metric__value.num= rich(metric[:value])
-          .wk-metric__label= rich(metric[:label])
+          .wk-metric__value.num= rich(metric[:value], links: false)
+          .wk-metric__label= rich(metric[:label], links: false)
           span.wk-metric__flash[aria-live="polite" data-copy-target="flash"]
 
   section.wk-case__plain
@@ -101,9 +101,9 @@ article.wk-case data-controller="track-jump"
         .wk-pager-card__eyebrow
           span aria-hidden="true" ←
           = " #{t('work.case.previous')}"
-        .wk-pager-card__title= rich(@previous_case.title)
+        .wk-pager-card__title= rich(@previous_case.title, links: false)
       = link_to work_case_path(slug: @next_case.slug), class: 'wk-pager-card wk-pager-card--next hover-row' do
         .wk-pager-card__eyebrow
           = "#{t('work.case.next')} "
           span aria-hidden="true" →
-        .wk-pager-card__title= rich(@next_case.title)
+        .wk-pager-card__title= rich(@next_case.title, links: false)

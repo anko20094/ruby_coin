@@ -25,6 +25,6 @@ http_interactions:
       - application/json
     body:
       encoding: UTF-8
-      string: '{"choices":[{"message":{"content":"<h1>Hello World</h1><p>This is a test article for translation.</p>"}}]}'
+      string: '{"choices":[{"finish_reason":"stop","message":{"content":"<h1>Hello World</h1><p>This is a test article for translation.</p>"}}]}'
   recorded_at: Sat, 23 May 2026 16:33:30 GMT
 recorded_with: VCR 6.3.0

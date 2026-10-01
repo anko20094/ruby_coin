@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 describe Management::PostsController do
+  def form_lock_version
+    response.parsed_body.at_css('input[name="post[lock_version]"]')['value'].to_i
+  end
+
   describe 'GET #index' do
     let(:action) { :index }
     let(:params) { { locale: 'uk' } }
@@ -60,15 +64,15 @@ describe Management::PostsController do
 
   describe 'PUT #update' do
     let(:test_post) { create(:post) }
-    let(:action) { :update }
     let(:new_title) { 'Updated Title' }
     let(:params) { { locale: 'uk', id: test_post.slug, post: { title: new_title } } }
     let(:second_post) { create(:post, main_post: false) }
-    let(:params_status_true_second_post) { { locale: 'uk', id: second_post.id, post: { main_post: 'true' } } }
-    let(:params_status_false_second_post) { { locale: 'uk', id: second_post.id, post: { main_post: 'false' } } }
     let(:third_post) { create(:post, main_post: true) }
-    let(:params_status_true_third_post) { { locale: 'uk', id: third_post.id, post: { main_post: 'true' } } }
-    let(:params_status_false_third_post) { { locale: 'uk', id: third_post.id, post: { main_post: 'false' } } }
+
+    def feature(post_record, value)
+      patch :update, params: { locale: 'uk', id: post_record.id, post: { main_post: value } }
+      post_record.reload
+    end
 
     context 'when admin is signed in' do
       before do
@@ -78,55 +82,59 @@ describe Management::PostsController do
 
       context 'with valid attributes' do
         it 'updates the post' do
-          get(action, params:)
-          test_post.reload
-          expect(test_post.title).to eq(new_title)
+          patch(:update, params:)
+
+          expect(response).to redirect_to(management_posts_path)
+          expect(test_post.reload.title).to eq(new_title)
         end
 
         context 'when main-post is false' do
           it 'changes from false to true' do
-            get(action, params: params_status_true_second_post)
-            second_post.reload
-            expect(second_post.main_post).to be(true)
+            expect(feature(second_post, 'true').main_post).to be(true)
           end
 
           it 'doesnt change' do
-            get(action, params: params_status_false_second_post)
-            second_post.reload
-            expect(second_post.main_post).to be(false)
+            expect(feature(second_post, 'false').main_post).to be(false)
           end
         end
 
         context 'when main-post is true' do
           it 'changes from true to false' do
-            get(action, params: params_status_false_third_post)
-            third_post.reload
-            expect(third_post.main_post).to be(false)
+            expect(feature(third_post, 'false').main_post).to be(false)
           end
 
           it 'doesnt change' do
-            get(action, params: params_status_true_third_post)
-            third_post.reload
-            expect(third_post.main_post).to be(true)
+            expect(feature(third_post, 'true').main_post).to be(true)
           end
         end
       end
 
       context 'with invalid attributes' do
         it 'does not update the post' do
-          expect(test_post.title).not_to be_nil
+          original = test_post.title
+
+          patch :update, params: { locale: 'uk', id: test_post.slug, post: { title: '' } }
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(test_post.reload.title).to eq(original)
         end
       end
     end
 
     context 'when admin is not signed in' do
-      it_behaves_like 'redirects to new_user_session_path'
+      it 'redirects to new_user_session_path and writes nothing' do
+        original = test_post.title
+
+        patch(:update, params:)
+
+        expect(response).to redirect_to(new_user_session_path)
+        expect(test_post.reload.title).to eq(original)
+      end
     end
   end
 
   describe 'DELETE #destroy' do
     let(:test_post) { create(:post) }
-    let(:action) { :destroy }
     let(:params) { { locale: 'uk', id: test_post.id } }
 
     context 'when admin is signed in' do
@@ -142,14 +150,18 @@ describe Management::PostsController do
     end
 
     context 'when admin is not signed in' do
-      it_behaves_like 'redirects to new_user_session_path'
+      it 'redirects to new_user_session_path and deletes nothing' do
+        test_post
+
+        expect { delete(:destroy, params:) }.not_to change(Post, :count)
+        expect(response).to redirect_to(new_user_session_path)
+      end
     end
   end
 
   describe 'POST #create' do
     let(:valid_attributes) { attributes_for(:post) }
     let(:invalid_attributes) { attributes_for(:post, title: nil) }
-    let(:action) { :create }
     let(:params) { { locale: 'uk', post: valid_attributes } }
 
     context 'when admin is signed in' do
@@ -163,10 +175,10 @@ describe Management::PostsController do
           expect { post :create, params: { post: valid_attributes } }.to change(Post, :count).by(1)
         end
 
-        it 'redirects to the new post' do
+        it 'redirects to the list' do
           post :create, params: { post: valid_attributes }
-          expected_path = response.location
-          expect(response).to redirect_to(expected_path)
+
+          expect(response).to redirect_to(management_posts_path)
         end
       end
 
@@ -175,12 +187,61 @@ describe Management::PostsController do
           expect { post :create, params: { post: invalid_attributes } }.not_to change(Post, :count)
         end
 
-        it_behaves_like 'unprocessable_entity status'
+        it 'responds with unprocessable_entity status' do
+          post :create, params: { locale: 'uk', post: invalid_attributes }
+
+          expect(response).to have_http_status(:unprocessable_content)
+        end
       end
     end
 
     context 'when admin is not signed in' do
-      it_behaves_like 'redirects to new_user_session_path'
+      it 'redirects to new_user_session_path and creates nothing' do
+        expect { post :create, params: }.not_to change(Post, :count)
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
+  # The post and its other-language rows are one save: a refusal from either leaves nothing
+  # behind, and the form it comes back in is still a form for a post that does not exist.
+  describe 'a create the other language refuses' do
+    render_views
+
+    let(:attributes) do
+      attributes_for(:post).merge(title: 'English title', slug: '', title_localizations: { uk: '' })
+    end
+
+    before { sign_in(create(:user, role: :admin)) }
+
+    it 'writes nothing at all' do
+      expect { post :create, params: { locale: 'en', post: attributes } }
+        .not_to(change { [Post.count, PostTranslation.count, FriendlyId::Slug.count] })
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'comes back as a form for a post that is not saved yet' do
+      post :create, params: { locale: 'en', post: attributes }
+
+      expect(response.body).not_to include('post[lock_version]')
+      expect(response.body).to include('English title')
+    end
+
+    it 'can be sent again, corrected' do
+      post :create, params: { locale: 'en', post: attributes }
+
+      corrected = attributes.merge(title_localizations: { uk: 'Заголовок' })
+
+      expect { post :create, params: { locale: 'en', post: corrected } }.to change(Post, :count).by(1)
+
+      expect(Post.last.slug).to eq('english-title')
+    end
+
+    it 'can be refused twice without raising' do
+      refused = attributes.merge(title_localizations: { en: '' })
+
+      expect { 2.times { post :create, params: { locale: 'uk', post: refused } } }.not_to raise_error
     end
   end
 
@@ -250,6 +311,23 @@ describe Management::PostsController do
 
       expect(response.body).to include('data-tinymce-profile-value="post"')
       expect(response.body).not_to include('trix-editor')
+    end
+
+    # A javascript: URL is inline script, which the admin's script-src refuses on every click.
+    it 'offers the translation as a button, not as a javascript: link' do
+      get :new, params: { locale: 'uk' }
+
+      page = response.parsed_body
+      expect(page.at_css('button#translation-button')['type']).to eq('button')
+      expect(page.at_css('[href^="javascript:"]')).to be_nil
+    end
+
+    it 'has a phrase for every state the editor can report' do
+      get :new, params: { locale: 'uk' }
+
+      state = response.parsed_body.at_css('[data-post-editor-target="state"]')
+      phrases = %w[clean dirty saving saved invalid conflict failed].map { |name| state["data-phrase-#{name}"] }
+      expect(phrases).to all(be_present)
     end
 
     it 'points the editor at the block and upload endpoints, in the reader\'s language' do
@@ -376,6 +454,22 @@ describe Management::PostsController do
       expect(I18n.with_locale(:en) { post_record.reload.subtitle }).to eq('A better lede')
     end
 
+    it 'leaves the tags alone when the save is refused as stale or invalid' do
+      kept = create(:tag)
+      other = create(:tag)
+      I18n.with_locale(:en) { post_record.update!(tag_ids: [kept.id]) }
+      stale = post_record.lock_version
+      I18n.with_locale(:en) { post_record.update!(subtitle: 'saved by someone else') }
+
+      autosave(lock_version: stale, tag_ids: ['', other.id.to_s])
+      expect(response).to have_http_status(:conflict)
+
+      autosave(lock_version: post_record.reload.lock_version, title: '', tag_ids: ['', other.id.to_s])
+      expect(response).to have_http_status(:unprocessable_content)
+
+      expect(post_record.reload.tag_ids).to eq([kept.id])
+    end
+
     # The conflict is detected by the real lock_version, which is why the banner means
     # something: on 409 nothing has been written.
     it 'refuses a stale version and writes nothing' do
@@ -423,21 +517,72 @@ describe Management::PostsController do
       expect(I18n.with_locale(:en) { post_record.reload.title }).to eq(before_title)
     end
 
-    # ...and the version goes out with the failure, so the editor's next keystroke is not
-    # reported as a conflict with itself.
-    it 'reports the record version even when it refuses the save' do
+    # Only a write hands out a version. A refused save changed nothing, so the editor keeps the
+    # one its content was loaded at: adopting the database's would pass off another editor's
+    # newer text as the base of this form.
+    it 'hands out no version for a save that wrote nothing' do
       autosave(title: 'A renamed title', title_localizations: { uk: '' })
+
+      expect(response.parsed_body).not_to have_key('lock_version')
+    end
+
+    it 'still answers a stale form with a conflict once the refused field is corrected' do
+      stale = post_record.lock_version
+      I18n.with_locale(:en) { post_record.update!(description_en: '<p>Written in the other tab</p>') }
+
+      autosave(lock_version: stale, subtitle: '')
+      expect(response).to have_http_status(:unprocessable_content)
+      held = response.parsed_body.fetch('lock_version') { stale }
+
+      autosave(lock_version: held, subtitle: 'A lede, corrected')
+
+      expect(response).to have_http_status(:conflict)
+      expect(post_record.reload.rich_body(:en).body.to_plain_text).to eq('Written in the other tab')
+    end
+
+    it 'reports the version the database holds after a save' do
+      autosave(title: 'A renamed title', title_localizations: { uk: 'Нова назва' })
 
       expect(response.parsed_body['lock_version']).to eq(post_record.reload.lock_version)
     end
 
+    it 'does not hand a conflict a version to adopt' do
+      stale = post_record.lock_version
+      I18n.with_locale(:en) { post_record.update!(subtitle: 'saved by someone else') }
+
+      autosave(lock_version: stale, subtitle: 'mine')
+
+      expect(response.parsed_body).not_to have_key('lock_version')
+    end
+
+    # Only a Save names a URL: a slug being typed is a different slug at every pause.
     it 'does not move the slug of a published post while it is being typed' do
       original = post_record.slug
 
-      autosave(title: 'Halfway through a re', slug: '')
+      %w[half-typ half-typed half-typed-slug].each { |typed| autosave(title: 'A title', slug: typed) }
       autosave(title: 'Halfway through a rename', slug: '')
 
       expect(post_record.reload.slug).to eq(original)
+      expect(post_record.slugs.count).to eq(1)
+    end
+
+    # A localization-only edit changes no column on posts, so nothing else would check the
+    # version it carries or move updated_at.
+    it 'counts an edit of only the other language as a write' do
+      expect { autosave(title_localizations: { uk: 'Тільки українська' }) }
+        .to change { post_record.reload.lock_version }.and(change { post_record.reload.updated_at })
+
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'refuses the second of two editors who both only changed the other language' do
+      loaded = post_record.lock_version
+
+      autosave(lock_version: loaded, title_localizations: { uk: 'Перший редактор' })
+      autosave(lock_version: loaded, title_localizations: { uk: 'Другий редактор' })
+
+      expect(response).to have_http_status(:conflict)
+      expect(post_record.post_translations.find_by(locale: 'uk').title).to eq('Перший редактор')
     end
   end
 
@@ -476,6 +621,47 @@ describe Management::PostsController do
         locale: 'en', id: post_record.id,
         post: { title: 'A Brand New Title', subtitle: 'A lede', slug: '' }
       }
+
+      expect(post_record.reload.slug).to eq(original)
+    end
+
+    def put_slug(slug)
+      patch :update, params: {
+        locale: 'en', id: post_record.id, post: { title: 'A title', subtitle: 'A lede', slug: }
+      }
+    end
+
+    it 'gives a second post with the same English title a slug of its own' do
+      attributes = -> { attributes_for(:post).merge(title: 'Same Title', slug: '') }
+
+      expect { 2.times { post :create, params: { locale: 'en', post: attributes.call } } }
+        .to change(Post, :count).by(2)
+
+      expect(Post.order(:id).last(2).map(&:slug)).to eq(%w[same-title same-title-2])
+    end
+
+    it 'does not hand out a slug an earlier post has since moved away from' do
+      original = post_record.slug
+      put_slug('moved-on')
+
+      post :create, params: { locale: 'en', post: attributes_for(:post).merge(title: 'Anything', slug: original) }
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'refuses a typed slug that another post already has, without raising' do
+      taken = I18n.with_locale(:en) { create(:post, title: 'Other', subtitle: 'Other lede') }
+
+      expect { put_slug(taken.slug) }.not_to raise_error
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(post_record.reload.slug).not_to eq(taken.slug)
+    end
+
+    it 'lets a post go back to a slug it used before' do
+      original = post_record.slug
+      put_slug('moved-on')
+      put_slug(original)
 
       expect(post_record.reload.slug).to eq(original)
     end
@@ -570,6 +756,123 @@ describe Management::PostsController do
 
       expect(post_record.reload.subtitle).to eq('saved by somebody else')
       expect(response.body).to include(%(value="#{post_record.lock_version}"))
+    end
+
+    # The notice says the work is still here and Save will take it, so it has to be.
+    it 'gives the author back what they typed, over the version that is current' do
+      stale = post_record.lock_version
+      post_record.update!(subtitle: 'saved by somebody else')
+
+      patch :update, params: {
+        locale: 'en', id: post_record.id,
+        post: { title: 'TYPED TITLE', subtitle: 'TYPED LEDE', description_en: '<p>TYPED BODY</p>', lock_version: stale }
+      }
+
+      expect(response).to have_http_status(:conflict)
+      expect(response.body).to include('TYPED TITLE', 'TYPED LEDE', 'TYPED BODY')
+      expect(form_lock_version).to eq(post_record.reload.lock_version)
+    end
+
+    it 'takes the work on the next Save' do
+      stale = post_record.lock_version
+      post_record.update!(subtitle: 'saved by somebody else')
+
+      save_mine(stale)
+      save_mine(form_lock_version)
+
+      expect(response).to redirect_to(management_posts_path)
+      expect(I18n.with_locale(:en) { post_record.reload.subtitle }).to eq('mine')
+    end
+
+    def save_mine(version)
+      patch :update, params: {
+        locale: 'en', id: post_record.id, post: { title: 'A title', subtitle: 'mine', lock_version: version }
+      }
+    end
+  end
+
+  # The other language's title is refused after the post itself has been written, inside the
+  # same transaction. The form that comes back must still hold the version it was loaded at.
+  describe 'a Save the other language refuses' do
+    render_views
+
+    let(:post_record) { I18n.with_locale(:en) { create(:post, title: 'A title', subtitle: 'A lede') } }
+
+    before { sign_in(create(:user, role: :admin)) }
+
+    def save(version, uk_title)
+      patch :update, params: {
+        locale: 'en', id: post_record.id,
+        post: {
+          lock_version: version, title: 'A title', subtitle: 'A lede', description_en: '<p>Typed body</p>',
+          title_localizations: { uk: uk_title }, subtitle_localizations: { uk: 'Лід' }
+        }
+      }
+    end
+
+    it 'puts the version it was loaded at back in the form, with what was typed' do
+      loaded = post_record.lock_version
+
+      save(loaded, '')
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(form_lock_version).to eq(loaded)
+      expect(response.body).to include('Typed body')
+    end
+
+    it 'goes through once it is corrected, with the version the form showed' do
+      save(post_record.lock_version, '')
+      save(form_lock_version, 'Заголовок')
+
+      expect(response).to redirect_to(management_posts_path)
+      expect(post_record.reload.rich_body(:en).body.to_plain_text).to eq('Typed body')
+    end
+  end
+
+  # The sibling of #update that spends money: it has to be as closed as the screen it serves.
+  describe 'POST #translate' do
+    let(:params) { { locale: 'en', input_data: '<p>Hello</p>' } }
+
+    before { allow(ChatgptService).to receive(:call).and_return('<p>Привіт</p>') }
+
+    it 'refuses a visitor who is not signed in, without calling the service' do
+      post(:translate, params:)
+
+      expect(response).to redirect_to(new_user_session_path)
+      expect(ChatgptService).not_to have_received(:call)
+    end
+
+    %i[moderator user].each do |role|
+      it "refuses a #{role}, without calling the service" do
+        sign_in(create(:user, role:))
+
+        post(:translate, params:)
+
+        expect(response).to redirect_to(root_path)
+        expect(ChatgptService).not_to have_received(:call)
+      end
+    end
+
+    context 'when an admin asks' do
+      before { sign_in(create(:user, role: :admin)) }
+
+      it 'answers with the translation' do
+        post(:translate, params:)
+
+        expect(response).to have_http_status(:success)
+        expect(response.parsed_body).to eq('data' => '<p>Привіт</p>')
+        expect(ChatgptService).to have_received(:call)
+          .with(satisfy { |sent| sent[:input_data] == '<p>Hello</p>' && sent[:locale] == 'en' })
+      end
+
+      it 'answers 502 when the service gives up, not a 500' do
+        allow(ChatgptService).to receive(:call).and_raise(ChatgptService::Error, 'upstream is down')
+
+        post(:translate, params:)
+
+        expect(response).to have_http_status(:bad_gateway)
+        expect(response.parsed_body['error']).to be_present
+      end
     end
   end
 end

@@ -82,7 +82,7 @@ module Management
     private
 
     def load_tags!
-      @pagy, @tags = pagy(policy_scope([:management, Tag]).order(created_at: :desc), limit: 8)
+      @pagy, @tags = pagy(policy_scope([:management, Tag]).order(created_at: :desc), limit: 8, raise_range_error: true)
     end
 
     def tag_params

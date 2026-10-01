@@ -30,7 +30,7 @@
 
   - if @query.blank?
     p.jn-empty= t('.prompt')
-  - elsif @results.any?
+  - elsif @pagy.count.positive?
     .rc-eyebrow.jn-search__count= t('.found', count: @pagy.count)
     .jn-entries
       - @results.each_with_index do |post, index|
@@ -38,8 +38,8 @@
 
     - if @pagy.pages > 1
       nav.jn-pager aria-label=t('.title')
-        - if @pagy.prev
-          = link_to search_path(query: @query, search_in: @field, page: @pagy.prev),
+        - if @pagy.previous
+          = link_to search_path(query: @query, search_in: @field, page: @pagy.previous),
             class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') } do
             span aria-hidden="true" ←
         span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"

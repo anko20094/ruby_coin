@@ -9,7 +9,7 @@ class WorkController < ApplicationController
     # card, so the roster is parsed a single time.
     @team_by_slug = @cases.to_h { |kase| [kase.slug, Team.for_case(kase.slug)] }
 
-    cache_publicly([@cases, Team.version])
+    cache_publicly(@cases, Team.version)
   end
 
   def show
@@ -27,6 +27,6 @@ class WorkController < ApplicationController
     # so a reader coming back to a page their browser has cached still counts as a reader.
     ViewTracking.record(self, @case)
 
-    cache_publicly([@case, Team.version], last_modified: @case.updated_at)
+    cache_publicly(cases, Team.version)
   end
 end

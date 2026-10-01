@@ -8,7 +8,7 @@ class User < ApplicationRecord
 
   before_create :set_nickname
 
-  has_many :posts, dependent: :delete_all
+  has_many :posts, dependent: :destroy
 
   validates :nickname, presence: true, uniqueness: { case_sensitive: false }, on: :update
   validates :email, presence: true
@@ -29,6 +29,14 @@ class User < ApplicationRecord
 
   def staff_member?
     admin? || moderator?
+  end
+
+  protected
+
+  # Queued: sent inline, a known address answers slower than an unknown one, which :paranoid
+  # exists to hide.
+  def send_devise_notification(notification, *)
+    devise_mailer.public_send(notification, self, *).deliver_later
   end
 
   private

@@ -16,6 +16,6 @@ class CVController < ApplicationController
     # is a hash rather than a query per entry.
     @cases_by_slug = @cases.index_by(&:slug)
 
-    cache_publicly([@profile, @cases, Team.version], last_modified: @profile.updated_at)
+    cache_publicly(@cases, Team.version)
   end
 end

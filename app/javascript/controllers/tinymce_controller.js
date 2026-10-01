@@ -45,6 +45,8 @@ export default class extends Controller {
     editorCss: String,
     blocksUrl: String,
     uploadUrl: String,
+    validElements: String,
+    lang: String,
     height: { type: Number, default: 0 },
     labels: Object,
   }
@@ -54,8 +56,7 @@ export default class extends Controller {
     document.addEventListener(REVEAL_EVENT, this.revealed)
 
     if (this.lazyValue) {
-      this.element.addEventListener("focus", this.onFirstFocus)
-      this.element.classList.add("mg-tinymce-idle")
+      this.arm()
     } else {
       this.boot()
     }
@@ -66,20 +67,41 @@ export default class extends Controller {
     this.element.removeEventListener("focus", this.onFirstFocus)
     // remove(), not destroy(): destroy() on a node Stimulus has already detached leaves
     // TinyMCE holding a reference to a dead iframe and the next boot on the same id is a no-op.
-    this.editor?.remove()
+    const editor = this.editor
     this.editor = null
+    editor?.remove()
+  }
+
+  arm() {
+    this.element.addEventListener("focus", this.onFirstFocus)
+    this.element.classList.add("mg-tinymce-idle")
+  }
+
+  // structure_rows removes the editors of a row under controllers that stay connected; each goes
+  // back to a textarea that boots on focus. A microtask later: remove() restores the class last.
+  released(editor) {
+    if (this.editor !== editor) return
+
+    this.editor = null
+    if (this.lazyValue) queueMicrotask(() => this.arm())
   }
 
   // An editor built inside a hidden language tab has nothing to measure and settles at its
   // floor. The tab dispatches this when it shows a group; anything now on screen re-measures.
   revealed = () => {
-    if (this.editor?.getContainer()?.offsetParent) this.editor.execCommand("mceAutoResize")
+    if (this.editor?.getContainer()?.offsetParent) {
+      this.editor.execCommand("mceAutoResize", false, null, { skip_focus: true })
+    }
   }
 
+  // The boot takes as long as the first fetch of TinyMCE; whoever has tabbed on meanwhile is
+  // not pulled back.
   onFirstFocus = () => {
     this.element.removeEventListener("focus", this.onFirstFocus)
     this.element.classList.remove("mg-tinymce-idle")
-    this.boot().then(() => this.editor?.focus())
+    this.boot().then(() => {
+      if ([this.element, document.body].includes(document.activeElement)) this.editor?.focus()
+    })
   }
 
   boot() {
@@ -101,6 +123,19 @@ export default class extends Controller {
     return this.profileValue === "case"
   }
 
+  get language() {
+    return this.langValue || this.element.closest("[data-locale]")?.dataset.locale
+  }
+
+  // TinyMCE hides the textarea the label points at, so the iframe is named from it. A case
+  // field's label carries its language; the post editor's sits inside a language group.
+  get accessibleName() {
+    const label = this.element.labels?.[0]?.textContent.trim()
+    if (!label || this.hasLangValue) return label
+
+    return [label, languageName(this.language)].filter(Boolean).join(" · ")
+  }
+
   settings() {
     return {
       target: this.element,
@@ -112,7 +147,6 @@ export default class extends Controller {
       license_key: "gpl",
       promotion: false,
       branding: false,
-      language: undefined,
       skin: "oxide",
       // The editor body reads the real site stylesheet, so what the author sees is the
       // measure, the faces and the ruby rules the article will actually be set in.
@@ -136,6 +170,7 @@ export default class extends Controller {
       relative_urls: false,
       browser_spellcheck: true,
       contextmenu: false,
+      ...(this.accessibleName && { iframe_aria_text: this.accessibleName }),
       ...(this.isCase ? this.caseSettings() : this.postSettings()),
       setup: editor => this.setup(editor),
     }
@@ -157,25 +192,37 @@ export default class extends Controller {
       // of it behind an inner scrollbar.
       min_height: this.heightValue || 110,
       autoresize_bottom_margin: 12,
-      valid_elements: "strong/b,em/i,code,a[href|title|target|rel],br,span[class],sup,sub,u,s",
+      valid_elements: this.validElementsValue,
+      formats: INLINE_FORMATS,
+      // Enter is a <br>: a second paragraph is one the serialiser drops, which fuses the lines.
+      newline_behavior: "linebreak",
+      entity_encoding: "raw",
     }
   }
 
   postSettings() {
     return {
       menubar: "edit view insert format tools table help",
-      // Three plugins are deliberately absent, because the sanitiser drops everything they
+      // The stock Format menu also offers font, size and colours, which are all inline styles.
+      menu: {
+        format: {
+          title: "Format",
+          items: "bold italic underline strikethrough superscript subscript codeformat | blocks align | removeformat",
+        },
+      },
+      // Four plugins are deliberately absent, because the sanitiser drops everything they
       // make and a button that loses your work on save is worse than a missing one — see
       // spec/models/action_text_contract_spec.rb, which is what keeps this list honest.
       //
       //   accordion — <details>/<summary>, stripped whole
+      //   advlist   — list styles are written as list-style-type, an inline style
       //   media     — <video>/<iframe>, stripped whole; the block menu's Embed is the
       //               supported way, and it is better: click-to-load, and the two hosts it
       //               may reach are named in the CSP
       //   pagebreak — survives as a stray <img class="mce-pagebreak">, which is nothing on a
       //               web page
       plugins: [
-        "advlist", "anchor", "autolink", "autoresize", "autosave", "charmap", "code",
+        "anchor", "autolink", "autoresize", "charmap", "code",
         "codesample", "directionality", "emoticons", "fullscreen", "help", "image",
         "importcss", "insertdatetime", "link", "lists", "nonbreaking",
         "preview", "searchreplace", "table", "visualblocks", "visualchars", "wordcount",
@@ -203,8 +250,7 @@ export default class extends Controller {
       // it to measure again when it is shown. See revealed().
       min_height: this.heightValue || 420,
       autoresize_bottom_margin: 32,
-      block_formats:
-        "Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Preformatted=pre",
+      block_formats: BLOCK_FORMATS.map(([key, tag]) => `${this.label(key)}=${tag}`).join("; "),
       codesample_languages: [
         { text: "Ruby", value: "ruby" },
         { text: "ERB / HTML", value: "markup" },
@@ -217,6 +263,7 @@ export default class extends Controller {
       // Alignment as a class, not a style attribute. config/initializers/action_text.rb says
       // why: `class` survives the sanitiser and `style` is not going on its allow list.
       formats: {
+        ...INLINE_FORMATS,
         alignleft: { selector: ALIGNABLE, classes: "align-left" },
         aligncenter: { selector: ALIGNABLE, classes: "align-center" },
         alignright: { selector: ALIGNABLE, classes: "align-right" },
@@ -230,10 +277,9 @@ export default class extends Controller {
       valid_children: "+body[action-text-attachment],+action-text-attachment[#text|div|figure|pre|p|span|iframe|button|a]",
       noneditable_class: "mce-noneditable",
       images_upload_handler: (blobInfo, progress) => this.upload(blobInfo, progress),
-      images_file_types: "jpeg,jpg,png,gif,webp,avif,svg",
+      images_file_types: "jpeg,jpg,png,gif,webp,avif",
       automatic_uploads: true,
       file_picker_types: "image",
-      autosave_ask_before_unload: false,
     }
   }
 
@@ -251,12 +297,14 @@ export default class extends Controller {
       this.element.dispatchEvent(new Event("input", { bubbles: true }))
     }
 
-    editor.on("change input undo redo SetContent ExecCommand", announce)
+    editor.on("change input undo redo", announce)
+    editor.on("remove", () => this.released(editor))
 
     // Belt and braces on the way out: TinyMCE hooks the form's submit itself, but the autosave
     // path builds a FormData by hand and would otherwise read a stale textarea.
     editor.on("init", () => {
       this.element.form?.addEventListener("submit", () => editor.save())
+      if (this.language) editor.getDoc().documentElement.lang = this.language
     })
   }
 
@@ -284,6 +332,11 @@ export default class extends Controller {
   // so a wrapper would be stripped on render anyway — after being stored, and after showing up
   // in every diff. The editor keeps its paragraph; the value that leaves does not have one.
   keepItInline(editor) {
+    // Pasted blocks would otherwise lose their boundary with the tag: "alpha" and "beta" fuse.
+    editor.on("PastePreProcess", event => {
+      event.content = event.content.replace(BLOCK_BOUNDARY, "<br>")
+    })
+
     editor.on("GetContent", event => {
       // 'raw' is TinyMCE talking to itself — undo levels, the internal cache. Only the HTML
       // that is on its way to the textarea gets unwrapped.
@@ -363,12 +416,22 @@ export default class extends Controller {
       request.upload.onprogress = event => progress((event.loaded / event.total) * 100)
       request.onerror = () => reject({ message: this.label("upload_error"), remove: true })
       request.onload = () => {
-        if (request.status !== 201) return reject({ message: this.label("upload_error"), remove: true })
+        if (request.status !== 201) return reject({ message: this.uploadError(request), remove: true })
 
         resolve(JSON.parse(request.responseText).location)
       }
       request.send(body)
     })
+  }
+
+  // A refused upload says why, in the admin's language; anything that is not that answer (a proxy's
+  // 413, an HTML error page) gets the generic wording.
+  uploadError(request) {
+    try {
+      return JSON.parse(request.responseText).error || this.label("upload_error")
+    } catch {
+      return this.label("upload_error")
+    }
   }
 
   label(key) {
@@ -380,7 +443,12 @@ export default class extends Controller {
 export const REVEAL_EVENT = "tinymce:reveal"
 
 const ALIGNABLE = "p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img,pre,blockquote"
+
+// TinyMCE writes underline as a span with an inline style, which the sanitiser strips.
+const INLINE_FORMATS = { underline: { inline: "u", exact: true } }
 const BLOCK_KINDS = ["code", "callout", "embed"]
+const BLOCK_BOUNDARY = /<\/(?:p|div|li|h[1-6])>\s*(?=<(?:p|div|li|h[1-6])[\s>])/gi
+const BLOCK_FORMATS = [["paragraph", "p"], ["heading2", "h2"], ["heading3", "h3"], ["heading4", "h4"], ["preformatted", "pre"]]
 
 // The dialog fields, per kind — the same three shapes the server validates in JournalBlock.
 const BLOCK_FIELDS = {
@@ -404,6 +472,14 @@ const BLOCK_FIELDS = {
     { type: "input", name: "url", label: controller.label("url"), placeholder: "https://" },
     { type: "input", name: "caption", label: controller.label("caption") },
   ],
+}
+
+const languageName = code => {
+  try {
+    return new Intl.DisplayNames([document.documentElement.lang || "en"], { type: "language" }).of(code)
+  } catch {
+    return code
+  }
 }
 
 const csrfToken = () =>

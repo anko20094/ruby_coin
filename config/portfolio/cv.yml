@@ -122,8 +122,8 @@ cv:
         - "cascading model fallback"
         - "cost-based token billing"
   strengths:
-    - en: "Systems at 100M-row scale"
-      uk: "Системи на масштабі 100 млн рядків"
+    - en: "Keeping PostgreSQL fast as eight years of history accumulate"
+      uk: "PostgreSQL, що лишається швидким на восьми роках історії"
     - en: "Owning a product from architecture to production"
       uk: "Продукт від архітектури до продакшну"
     - en: "Leading small teams and the process around them"

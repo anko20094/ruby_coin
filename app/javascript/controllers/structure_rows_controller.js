@@ -12,7 +12,7 @@ import { Controller } from "@hotwired/stimulus"
 // rewrites each row's field names from its position on the screen. Ids are not touched: they
 // come from a counter that only goes up, so TinyMCE never sees two editors claiming one id.
 export default class extends Controller {
-  static targets = ["rows", "template", "count", "row"]
+  static targets = ["rows", "template", "count", "row", "add"]
   static values = { next: Number }
 
   connect() {
@@ -25,31 +25,48 @@ export default class extends Controller {
 
     this.rowsTarget.insertAdjacentHTML("beforeend", this.templateTarget.innerHTML.replaceAll(PLACEHOLDER, uid))
     this.reindex()
+    this.changed()
 
     const added = this.rowTargets[this.rowTargets.length - 1]
     added?.querySelector("input, textarea")?.focus()
-    added?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches
+    added?.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" })
   }
 
   remove(event) {
     const row = event.currentTarget.closest("[data-structure-rows-target='row']")
     if (!row) return
 
+    const index = this.rowTargets.indexOf(row)
+
     // The editors inside go first. Stimulus would disconnect them a microtask later anyway,
     // but by then TinyMCE is holding an iframe whose document has already been detached.
     this.destroyEditorsIn(row)
     row.remove()
     this.reindex()
+    this.changed()
+
+    const next = this.rowTargets[index] || this.rowTargets[index - 1]
+    const target = next?.querySelector("input, textarea") || (this.hasAddTarget && this.addTarget)
+    target?.focus()
   }
 
   moveUp(event) {
     const row = event.currentTarget.closest("[data-structure-rows-target='row']")
     this.swap(row, row?.previousElementSibling)
+    this.refocus(row, event.currentTarget)
   }
 
   moveDown(event) {
     const row = event.currentTarget.closest("[data-structure-rows-target='row']")
     this.swap(row?.nextElementSibling, row)
+    this.refocus(row, event.currentTarget)
+  }
+
+  // A moved node drops focus, and the pressed button is disabled when its row has reached an end.
+  refocus(row, button) {
+    const control = button.disabled ? row.querySelector("[data-action*='structure-rows#move']:not([disabled])") : button
+    control?.focus()
   }
 
   // Moving a node detaches it, and a detached TinyMCE iframe loses its document. So the text
@@ -62,6 +79,12 @@ export default class extends Controller {
     this.destroyEditorsIn(upper)
     upper.before(lower)
     this.reindex()
+    this.changed()
+  }
+
+  // Rows are form content too: whatever listens for input on the form should hear about them.
+  changed() {
+    this.element.dispatchEvent(new Event("input", { bubbles: true }))
   }
 
   destroyEditorsIn(row) {
@@ -80,6 +103,9 @@ export default class extends Controller {
       row.querySelectorAll("[data-name-prefix]").forEach(field => {
         field.name = `${field.dataset.namePrefix}[${index}]${field.dataset.nameSuffix}`
       })
+
+      const name = row.querySelector(".mg-row__name")
+      if (name) name.textContent = `${name.dataset.label} ${index + 1}`
 
       row.querySelector("[data-action*='moveUp']")?.toggleAttribute("disabled", index === 0)
       row.querySelector("[data-action*='moveDown']")
