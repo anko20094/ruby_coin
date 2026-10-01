@@ -1439,8 +1439,8 @@ __metadata:
     bootstrap: "npm:^5.3.8"
     bootstrap5-toggle: "npm:^5.4.1"
     esbuild: "npm:^0.28.2"
-    sass: "npm:^1.103.1"
-    tinymce: "npm:^8.8.2"
+    sass: "npm:^1.105.1"
+    tinymce: "npm:^8.9.2"
     tom-select: "npm:^2.6.2"
   languageName: unknown
   linkType: soft
@@ -1459,9 +1459,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.103.1":
-  version: 1.103.1
-  resolution: "sass@npm:1.103.1"
+"sass@npm:^1.105.1":
+  version: 1.105.1
+  resolution: "sass@npm:1.105.1"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^5.0.0"
@@ -1472,7 +1472,7 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10/b66acf027bbd0e6bfd9eb2a171779ae7c59115d10b2b55d52f547a7835bf63c108879ba699b47bcf5328042067a9e1b7f38141da3b8cd6af8d6805a9b5666609
+  checksum: 10/772b8943117cb9badaa1a3d3dda888acc456de859820ab7ac401d03e095f8d88de1e6a39dc969baa850efbbc6ed1a5e4eeb288d0ae4d0d7d99b6efffcf9ec050
   languageName: node
   linkType: hard
 
@@ -1631,10 +1631,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinymce@npm:^8.8.2":
-  version: 8.8.2
-  resolution: "tinymce@npm:8.8.2"
-  checksum: 10/4553fc657960093371f8a3a4691f1cdf7e2ee68231cc4725a4911e58462d34a1c597a78d11aaab7d802d0b32b0f44f32a78e442effde67ab85be61f43b6fdbd3
+"tinymce@npm:^8.9.2":
+  version: 8.9.2
+  resolution: "tinymce@npm:8.9.2"
+  checksum: 10/f764001562bd767df2f9550cd4776eeaa66b711df2fe49cd3759ea2eea298d025595bd0358fc67b5523fa7cf0626d49e1c6224808c3df9d7a396aab90ce5d42a
   languageName: node
   linkType: hard
 
