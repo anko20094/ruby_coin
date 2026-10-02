@@ -1,5 +1,5 @@
-/ The 1200×630 card a link unfurls into. Rendered by lib/tasks/og_cards.rake through headless
-/ Chrome, once per case per locale, straight to public/og/. Never served at request time.
+/ The 1200×630 card a link unfurls into. Rendered by OgCards (app/services/og_cards.rb) through
+/ headless Chrome, once per case per locale, straight to public/og/. Never served at request time.
 /
 / The faces are inlined as data URIs because the page is opened over file:// with no server
 / behind it, and the whole point of the card is that it is set in the site's own type.

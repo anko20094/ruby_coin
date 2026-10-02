@@ -80,6 +80,50 @@ describe 'what the admin says after an action' do
       expect(response.headers['Location']).to be_nil
       expect(tag.reload.title).to eq('before')
     end
+
+    def refuse_saving_tags
+      allow_any_instance_of(Tag).to receive(:valid?) do |tag|
+        tag.errors.add(:title, :taken)
+        false
+      end
+    end
+
+    def blank_title_error = "Title #{I18n.t('errors.messages.blank', locale: :en)}"
+
+    # The create form was built from Tag.new, so what had been typed and why it was refused
+    # were both gone.
+    it 'keeps what was typed in the create form and says why it was refused' do
+      refuse_saving_tags
+
+      post '/en/management/tags', params: { tag: { title: 'kept title' } }
+
+      form = response.parsed_body.at_css('form.mg-tag-create')
+      expect(form.at_css('input[name="tag[title]"]')['value']).to eq('kept title')
+      expect(response.parsed_body.at_css('#new_tag [role="alert"]').text).to include('Title')
+    end
+
+    it 'shows a failed rename on that tag, with what was typed and the error' do
+      tag = create(:tag, title: 'before')
+      refuse_saving_tags
+
+      patch "/en/management/tags/#{tag.id}", params: { tag: { title: 'after' } }
+
+      row = response.parsed_body.at_css("#tag_#{tag.id}")
+      expect(row.at_css('input[name="tag[title]"]')['value']).to eq('after')
+      expect(row.at_css('[role="alert"]')).to be_present
+      expect(response.parsed_body.at_css('#new_tag [role="alert"]')).to be_nil
+      expect(response.parsed_body.css("#tag_#{tag.id}").size).to eq(1)
+    end
+
+    it 'shows a failed rename of a tag that is not on the first page above the list' do
+      tag = create(:tag, title: 'old one', created_at: 1.year.ago)
+      create_list(:tag, 8)
+
+      patch "/en/management/tags/#{tag.id}", params: { tag: { title: '' } }
+
+      row = response.parsed_body.at_css("#tag_#{tag.id}")
+      expect(row.at_css('[role="alert"]').text).to include(blank_title_error)
+    end
   end
 
   describe 'a failed post save' do
@@ -114,7 +158,7 @@ describe 'what the admin says after an action' do
     # then re-read from the database — so a rejected save quietly restored the pre-edit text.
     # The request is /en, so uk is the *other* language — the one drawn through #current_data.
     it 'gives the other language back what was typed into it, not what the database still holds' do
-      existing.post_translations.find_or_initialize_by(locale: 'uk')
+      existing.translations.find_or_initialize_by(locale: 'uk')
               .update!(title: 'stored in the database')
 
       patch "/en/management/posts/#{existing.id}", params: {

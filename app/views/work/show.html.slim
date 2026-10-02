@@ -30,9 +30,8 @@ article.wk-case data-controller="track-jump"
 
   section.wk-case__strip
     .wk-metrics
-      / Each figure is a button that copies "2.14M — users across 2,488 chats". Recruiters
-      / retype these into notes and messages by hand; this is the cheapest thing on the page
-      / and the one most likely to be used.
+      / Each figure is a button that copies "<value> — <label>": recruiters retype these into
+      / notes and messages by hand.
       - @case.metrics.each do |metric|
         / The accessible name says what pressing it does; the figure itself is the visible label.
         button.wk-metric[type="button" data-controller="copy" data-action="copy#copy"
@@ -82,7 +81,7 @@ article.wk-case data-controller="track-jump"
       .wk-case__scope= rich(@case.scope_note)
 
   - if @team.any?
-    = render 'work/team', team: @team, slug: @case.slug
+    = render CaseTeamComponent.new(team: @team, slug: @case.slug)
 
   / The page whose job is to convince someone ended at "here is the next case". A reader who
   / has just read 2,000 words of evidence should not have to go looking for the way to say so.
@@ -90,7 +89,7 @@ article.wk-case data-controller="track-jump"
     p.wk-case__cta-line= t('work.case.cta')
     .wk-case__cta-links
       = link_to t('work.case.cta_contact'), contact_path, class: 'rc-button rc-button--primary'
-      - email = CVProfile.current.contact_rows.find { |key, _, _| key == 'email' }
+      - email = Team.owner_cv.contact_rows.find { |key, _, _| key == 'email' }
       - if email
         = link_to email[1], email[2], class: 'rc-button'
 

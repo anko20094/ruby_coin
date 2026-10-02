@@ -2,9 +2,9 @@
 
 require 'rails_helper'
 
-# The number the handoff says should decide the order of /work, and which nothing was counting.
+# The number that should decide the order of /work.
 describe Statistics::CaseViewsQuery, type: :query do
-  subject(:result) { described_class.new.count }
+  subject(:result) { described_class.call }
 
   include_context 'when the cases are imported'
 

@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+# The admin's few glyphs, inline. currentColor, so a control's hover and focus colour the icon
+# too — an <img> of a red SVG could only ever be red. Decorative: the control carries the name.
+module Admin::IconsHelper
+  ICONS = {
+    edit: [
+      '0 0 22 22',
+      'M2.83333 19.1667H4.46667L14.5292 9.10421L12.8958 7.47087L2.83333 17.5334V19.1667Z' \
+      'M19.5167 7.41254L14.5583 2.51254L16.1917 0.879207' \
+      'C16.6389 0.431985 17.1884 0.208374 17.8402 0.208374' \
+      'C18.4912 0.208374 19.0403 0.431985 19.4875 0.879207L21.1208 2.51254' \
+      'C21.5681 2.95976 21.8014 3.49954 21.8208 4.13187' \
+      'C21.8403 4.76343 21.6264 5.30282 21.1792 5.75004L19.5167 7.41254ZM17.825 9.13337' \
+      'L5.45833 21.5H0.5V16.5417L12.8667 4.17504L17.825 9.13337Z'
+    ],
+    delete: [
+      '0 0 18 18',
+      'M2.46634 17.1668L0.833008 15.5335L7.36634 9.00016L0.833008 2.46683L2.46634 0.833496' \
+      'L8.99967 7.36683L15.533 0.833496L17.1663 2.46683L10.633 9.00016L17.1663 15.5335' \
+      'L15.533 17.1668L8.99967 10.6335L2.46634 17.1668Z'
+    ],
+    check: [
+      '0 0 20 15',
+      'M7.14121 15L0.491211 8.34999L2.15371 6.68749L7.14121 11.675L17.8454 0.970825' \
+      'L19.5079 2.63333L7.14121 15Z'
+    ]
+  }.freeze
+
+  def icon(name, size: 15)
+    view_box, path = ICONS.fetch(name)
+
+    tag.svg(class: "mg-icon mg-icon--#{name}", viewBox: view_box, width: size, height: size,
+            aria: { hidden: true }, focusable: 'false', xmlns: 'http://www.w3.org/2000/svg') do
+      tag.path(d: path, fill: 'currentColor')
+    end
+  end
+end

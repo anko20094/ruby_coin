@@ -74,12 +74,14 @@ describe 'the /management editor layout' do
 
     def controllers = form['data-controller'].split
 
+    # post-editor is the one judge of what an edit is; the guard listens to it, not the fields.
     it 'protects a new post, which has no autosave to do it' do
       get '/en/management/posts/new'
 
-      expect(controllers).to include('unsaved-guard')
+      expect(controllers).to include('unsaved-guard', 'post-editor')
       expect(form['data-post-editor-autosave-url-value']).to be_nil
-      expect(form['data-action']).to include('input->unsaved-guard#mark', 'submit->unsaved-guard#release')
+      expect(form['data-action']).to include('post-editor:dirty->unsaved-guard#mark', 'submit->unsaved-guard#release')
+      expect(form['data-action']).not_to include('input->unsaved-guard#mark')
       expect(form['data-unsaved-guard-dirty-value']).to eq('false')
     end
 
@@ -136,6 +138,60 @@ describe 'the /management editor layout' do
       expect(links).to eq('en' => "/en/post/#{post.slug}", 'uk' => "/uk/post/#{post.slug}")
       # One visible at a time; the controller swaps them with the tab.
       expect(response.parsed_body.css('.mg-preview__open:not([hidden])').size).to eq(1)
+    end
+
+    # The pane is worth having only if it is the article, so it uses the public page's classes.
+    it 'renders the article with the classes the public page uses' do
+      entry = I18n.with_locale(:en) do
+        create(:post, title: 'A title', subtitle: 'A lede', description_en: '<p>Body copy.</p>')
+      end
+
+      get preview_management_post_path(entry, locale: 'en')
+
+      expect(response.body).to include('jn-post', 'jn-body', 'jn-body__lede')
+      expect(response.body).to include('Body copy.')
+    end
+  end
+
+  describe 'the editors on the post form' do
+    before { get new_management_post_path(locale: 'uk') }
+
+    # A textarea named after the rich text, not a <trix-editor>: bodies written under Trix still load.
+    it 'renders one TinyMCE editor per locale, on the Action Text field' do
+      I18n.available_locales.each do |locale|
+        field = Post::RICH_TEXT_BODIES.fetch(locale)
+        expect(response.body).to match(/<textarea[^>]+name="post\[#{field}\]"/)
+        expect(response.body).to include("post_description_#{locale}")
+      end
+
+      expect(response.body).to include('data-tinymce-profile-value="post"')
+      expect(response.body).not_to include('trix-editor')
+    end
+
+    # A javascript: URL is inline script, which the admin's script-src refuses on every click.
+    it 'offers the translation as a button, not as a javascript: link' do
+      page = response.parsed_body
+
+      expect(page.at_css('button#translation-button')['type']).to eq('button')
+      expect(page.at_css('[href^="javascript:"]')).to be_nil
+    end
+
+    it 'has a phrase for every state the editor can report' do
+      state = response.parsed_body.at_css('[data-post-editor-target="state"]')
+      phrases = %w[clean dirty saving saved invalid conflict failed].map { |name| state["data-phrase-#{name}"] }
+
+      expect(phrases).to all(be_present)
+    end
+
+    it 'points the editor at the block and upload endpoints, in the reader\'s language' do
+      expect(response.body).to include('data-tinymce-blocks-url-value="/uk/management/journal_blocks"')
+      expect(response.body).to include('data-tinymce-upload-url-value="/uk/management/editor_images"')
+      expect(response.body).to include('aitranslation', 'post-editor')
+
+      # The dialogs are built in JavaScript, so their wording is handed over with them.
+      labels = JSON.parse(response.body[/data-tinymce-labels-value="([^"]+)"/, 1].then { CGI.unescapeHTML(it) })
+      expect(labels.keys).to include(*JournalBlock::KINDS)
+      expect(labels['insert']).to eq(I18n.t('management.editor.tinymce.insert', locale: :uk))
     end
   end
 end

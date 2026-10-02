@@ -2,8 +2,7 @@
 
 require 'rails_helper'
 
-# redesign_plan.md §2 has promised these since the plan was written and nothing was in place:
-# sign-in, password reset and the search screen were all unmetered.
+# Sign-in, password reset and the search screen are metered; a script cannot sit on them.
 describe 'throttling', type: :request do
   # Counters live in fixed windows, so a run that straddles a minute would split its attempts.
   before { travel_to(Time.zone.local(2026, 10, 1, 12, 0, 30)) }
@@ -52,6 +51,19 @@ describe 'throttling', type: :request do
   end
 
   # An attacker rotating IPs against one account is the case the per-IP rule misses.
+  it 'answers in the language of the page that was asked for' do
+    11.times { sign_in_attempt(path: '/uk/users/sign_in') }
+
+    expect(response.body).to include('Забагато запитів', 'Спробуйте ще раз через 60 секунд')
+    expect(response.body).not_to include('Try again')
+  end
+
+  it 'answers in the default language where the path names none' do
+    11.times { sign_in_attempt(path: '/users/sign_in') }
+
+    expect(response.body).to include(I18n.t('throttled', count: 60, locale: I18n.default_locale))
+  end
+
   it 'counts attempts against one account across addresses' do
     11.times { |n| sign_in_attempt(email: 'victim@example.com', ip: "203.0.113.#{n + 20}") }
 
@@ -351,6 +363,30 @@ describe 'throttling', type: :request do
       get robots_path, env: { 'REMOTE_ADDR' => '203.0.113.11' }
 
       expect(response).not_to have_http_status(:too_many_requests)
+    end
+
+    # The editor autosaves and re-renders its preview every couple of seconds.
+    describe 'a signed-in editor' do
+      before { sign_in create(:user, :admin) }
+
+      it 'is not cut off by the backstop while writing in /management and its API' do
+        paths = [management_posts_path(locale: 'en'), '/management/posts', api_tags_path(locale: 'en')]
+        301.times { |n| get paths[n % paths.size], env: { 'REMOTE_ADDR' => '203.0.113.10' } }
+
+        expect(response).not_to have_http_status(:too_many_requests)
+      end
+
+      it 'still counts toward the backstop on the public pages' do
+        301.times { get robots_path, env: { 'REMOTE_ADDR' => '203.0.113.10' } }
+
+        expect(response).to have_http_status(:too_many_requests)
+      end
+    end
+
+    it 'still counts an anonymous request to /management' do
+      301.times { get management_posts_path(locale: 'en'), env: { 'REMOTE_ADDR' => '203.0.113.10' } }
+
+      expect(response).to have_http_status(:too_many_requests)
     end
   end
 end

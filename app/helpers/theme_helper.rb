@@ -23,12 +23,4 @@ module ThemeHelper
   def theme_preloaded_faces
     PRELOADED_FACES.fetch(I18n.locale) { PRELOADED_FACES[:en] }
   end
-
-  # Rails, Devise and Pundit each name the same two states differently. Two tones is all the
-  # design has, so everything lands in one of them rather than growing a colour per key.
-  ALERT_KEYS = %w[alert error danger].freeze
-
-  def flash_tone(type)
-    ALERT_KEYS.include?(type.to_s) ? 'alert' : 'notice'
-  end
 end

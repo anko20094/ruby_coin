@@ -27,12 +27,14 @@ module ProseHelper
 
   # The same string with the markup taken back off, for the places that cannot render it: a
   # <title>, a meta description, an OG card baked to PNG, the text a metric copies to the
-  # clipboard. Without this the reader gets "<b>2.14M</b>" in their paste buffer.
+  # clipboard — otherwise the paste buffer gets "<b>…</b>".
   #
   # Unescaped, because strip_tags escapes what it keeps and every one of those call sites
-  # escapes again on the way out: a role reading "product & clients" arrived in the browser tab
-  # as "product &amp; clients", and in a share card as "&amp;amp;".
-  def plain(value)
-    CGI.unescapeHTML(strip_tags(value.to_s)).strip
+  # escapes again on the way out — "&" would arrive as "&amp;".
+  delegate :plain, to: :ProseHelper
+
+  # The same, outside a view: the palette answers JSON from a service.
+  def self.plain(value)
+    CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(value.to_s)).strip
   end
 end

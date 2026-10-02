@@ -53,12 +53,22 @@ class MonogramComponent < ViewComponent::Base
   end
 
   # Beside each 560px photograph sit <name>-120.<ext> and <name>-280.<ext>, so a 26px stone does
-  # not fetch the file a 280px one needs.
-  def photo_responsive
-    smaller = PHOTO_WIDTHS.filter_map do |width|
-      path = photo.sub(/(?=\.\w+\z)/, "-#{width}")
-      [path, "#{width}w"] if Rails.application.assets.load_path.find(path)
+  # not fetch the file a 280px one needs. Which copies exist is looked up once per photograph per
+  # process: a team page draws the same faces dozens of times.
+  SMALLER_COPIES = Concurrent::Map.new
+
+  def self.smaller_copies(photo)
+    SMALLER_COPIES.compute_if_absent(photo) do
+      copies = PHOTO_WIDTHS.filter_map do |width|
+        path = photo.sub(/(?=\.\w+\z)/, "-#{width}")
+        [path, "#{width}w"] if Rails.application.assets.load_path.find(path)
+      end
+      copies.freeze
     end
+  end
+
+  def photo_responsive
+    smaller = self.class.smaller_copies(photo)
     return {} if smaller.empty?
 
     { srcset: smaller.to_h.merge(photo => "#{PHOTO_ORIGINAL_WIDTH}w"), sizes: "#{size}px" }

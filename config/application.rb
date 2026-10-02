@@ -25,15 +25,13 @@ module RubyCoin
     # Nothing opens a cable connection, and the railtie would still mount /cable.
     config.action_cable.mount_path = nil
 
-    config.i18n.available_locales = [:en, :uk]
+    # The one list of locales: the routes and I18nExtended read it from here.
+    config.i18n.available_locales = %i[en uk]
     config.i18n.default_locale = :uk
     config.time_zone = 'Europe/Kyiv'
     # config.active_record.default_timezone = :local
-    # In-process, because the only jobs this app enqueues are Active Storage's own analyse
-    # and purge housekeeping. It used to say :sidekiq — with no Sidekiq worker in the Procfile
-    # or in any deploy file, so those jobs were queued into nothing and never ran. Solid Queue
-    # is the intended destination (redesign_plan.md §2); it needs a worker process and a
-    # systemd unit on the server, so it is a deploy change rather than a code change.
+    # In-process: the only jobs are Active Storage's analyse/purge housekeeping. Solid Queue
+    # is the goal (docs/decisions.md), but it needs a worker and a systemd unit — a deploy change.
     config.active_job.queue_adapter = :async
 
     # ImageMagick, not libvips. Rails 8 defaults to :vips, and this app has never needed it:
@@ -54,10 +52,9 @@ module RubyCoin
   end
 end
 
-# "cv" is an abbreviation everywhere it appears on this site: CVProfile, CV::Importer,
-# CVController. One acronym covers all of them, because both inflectors that matter here go
-# through camelize — Rails' autoloader inflector and the one routing uses to turn "cv" into a
-# controller class.
+# "cv" is an abbreviation everywhere it appears on this site: Person::CV, CVController. One
+# acronym covers all of them, because both inflectors that matter here go through camelize —
+# Rails' autoloader inflector and the one routing uses to turn "cv" into a controller class.
 #
 # It has to be declared here rather than in config/initializers/inflections.rb: initializers
 # run after the autoloader has already worked out the constant names for app/models.

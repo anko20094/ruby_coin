@@ -17,7 +17,7 @@ class Posts::Search < BaseService
   def call
     return if params[:query].blank?
 
-    Post.active.unscope(:order).translated_in(I18n.locale).public_send(search_scope, params[:query])
+    Post.active.translated_in(I18n.locale).public_send(search_scope, params[:query])
   end
 
   # The old version compared against `SEARCH.keys.to_s`, so it was matching a field name

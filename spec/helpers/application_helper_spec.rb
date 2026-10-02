@@ -1,19 +1,25 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'pagy/classes/request'
 
 RSpec.describe ApplicationHelper, type: :helper do
-  describe '#pagy_bootstrap_nav' do
-    it 'renders bootstrap navigation without raising NoMethodError or access error' do
-      # Create a Pagy::Request using the helper's request object
-      pagy_request = Pagy::Request.new(request: helper.request)
-      pagy = Pagy::Offset.new(count: 100, page: 2, request: pagy_request)
+  describe '#flash_stream' do
+    let(:message) { I18n.t('management.tags.create.success') }
 
-      html = nil
-      expect { html = helper.pagy_bootstrap_nav(pagy) }.not_to raise_error
-      expect(html).to include('class="pagination"')
-      expect(html).to include('pagy-bootstrap')
+    it 'replaces the admin flash frame with the current messages' do
+      flash[:notice] = message
+
+      html = helper.flash_stream
+
+      expect(html).to include('action="replace"', 'target="flash_message"')
+      expect(html).to include('<turbo-frame id="flash_message">', 'rc-flash__item--notice', message)
+    end
+  end
+
+  describe '#full_title' do
+    it 'puts the site name after the page title' do
+      expect(helper.full_title('Tags')).to eq("Tags | #{MetaHelper::SITE_NAME}")
+      expect(helper.full_title).to eq(MetaHelper::SITE_NAME)
     end
   end
 end

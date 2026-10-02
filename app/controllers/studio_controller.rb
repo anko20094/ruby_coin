@@ -8,6 +8,6 @@ class StudioController < ApplicationController
     @people = Team.crew
     @alumni = Team.alumni
 
-    cache_publicly(Team.version)
+    cache_publicly
   end
 end

@@ -67,7 +67,6 @@ end
 
 group :test do
   gem 'capybara'
-  gem 'rails-controller-testing'
   gem 'shoulda-matchers'
   gem 'vcr', '~> 6.3'
   gem 'webmock', '~> 3.26'

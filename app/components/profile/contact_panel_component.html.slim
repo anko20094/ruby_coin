@@ -1,0 +1,10 @@
+.pf-contact
+  - if rows.any?
+    .pf-contact__label.is-ruby= t('profile.contact')
+  - rows.each do |key, label, href|
+    .pf-contact__row
+      span.pf-contact__key= key
+      = link_to label, href, class: 'pf-contact__value', target: '_blank', rel: 'noreferrer'
+  - facts.each do |key, value|
+    .pf-contact__label= t("profile.#{key}")
+    div= rich(value)

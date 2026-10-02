@@ -1,6 +1,7 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
-// The designed error page (handoff §9a). Not a 9-byte "Not Found" from the middleware:
+// The designed error page. Not a 9-byte "Not Found" from the middleware:
 // the reader is still on the site, so the page looks like the site and offers the two
 // places worth going.
 
@@ -65,7 +66,7 @@
   }
 }
 
-@media (max-width: 700px) {
+@include bp.below(md) {
   .er-page { padding: 72px 20px 96px; }
 
   .er-title { font-size: 46px; }

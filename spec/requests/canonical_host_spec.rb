@@ -8,7 +8,6 @@ require 'rails_helper'
 describe 'the canonical host', type: :request do
   include_context 'when carrierwave cleanup'
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   let(:site) { 'https://rubyco.in' }
   let(:forged) { { 'Host' => 'evil.example', 'X-Forwarded-Host' => 'evil.example' } }
@@ -28,7 +27,7 @@ describe 'the canonical host', type: :request do
 
     expect(response.body).to include(%(<link href="#{site}/en/work/dna" rel="canonical" />))
     expect(response.body).to include(%(href="#{site}/uk/work/dna"))
-    expect(response.body).to include(%(content="#{site}/og/dna-en.png"))
+    expect(response.body).to include(%(content="#{site}/og/dna-en.png?v=#{OgCards.recorded.fetch('dna-en')}"))
     expect(response.body).not_to include('evil.example')
   end
 

@@ -125,15 +125,17 @@ RSpec.describe 'Routes' do
   # Users::SessionsController was 100% commented-out boilerplate, so the devise_for override
   # pointed at a class that added nothing. Devise's own controller answers now.
   describe 'Devise routes' do
-    describe 'GET /users/sign_up' do
-      it 'routes to users/registrations#new' do
-        expect(get: '/users/sign_up').to route_to('users/registrations#new')
+    # Registration is closed: the sign-up form post has no route; the screen redirects home.
+
+    describe 'POST /users' do
+      it 'is not routable' do
+        expect(post: '/users').not_to be_routable
       end
     end
 
-    describe 'POST /users' do
-      it 'routes to users/registrations#create' do
-        expect(post: '/users').to route_to('users/registrations#create')
+    describe 'GET /users/edit' do
+      it 'routes to users/registrations#edit' do
+        expect(get: '/users/edit').to route_to('users/registrations#edit')
       end
     end
 

@@ -13,10 +13,4 @@ end
 
 RSpec.configure do |config|
   config.include BrowserHeaders, type: :request
-  config.include BrowserHeaders, type: :controller
-
-  # Controller specs go through the controller directly, so set it on the request object.
-  config.before(type: :controller) do
-    request.headers['User-Agent'] = BrowserHeaders::USER_AGENT if respond_to?(:request) && request
-  end
 end

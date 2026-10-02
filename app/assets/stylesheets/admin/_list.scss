@@ -1,6 +1,7 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
-// The list screen: filter rail, then a sortable table. Handoff §8.
+// The list screen: filter rail, then a sortable table.
 .mg-rail {
   display: flex;
   align-items: center;
@@ -62,7 +63,11 @@
   border-radius: var(--radius-card);
   background: var(--paper);
 
-  &:focus-within { border-color: var(--ink); }
+  // The input inside draws no outline of its own; the box it sits in carries the ring.
+  &:focus-within {
+    border-color: var(--ink);
+    @include controls.focus-ring(1px);
+  }
 }
 
 .mg-search__glyph {
@@ -161,8 +166,7 @@
   margin-top: 2px;
 }
 
-// Status. The model has two states, so there are two pills — the handoff is explicit that
-// four labels must not be shown over two states.
+// Status. The model has two states, so there are two pills — never more labels than states.
 .mg-status {
   display: inline-flex;
   align-items: center;
@@ -196,8 +200,8 @@
   opacity: 0.7;
 }
 
-// The language pair: which of uk/en this row actually has, filled when present. This is the
-// one new affordance the handoff singles out as earning its place.
+// The language pair: which of uk/en this row actually has, filled when present — a missing
+// translation is visible from the list without opening the row.
 .mg-langs {
   display: inline-flex;
   align-items: center;
@@ -316,7 +320,7 @@
   }
 }
 
-@media (max-width: 1100px) {
+@include bp.below(1100px) {
   .mg-table th:nth-child(5),
   .mg-table td:nth-child(5),
   .mg-table th:nth-child(6),
@@ -328,9 +332,15 @@
   .mg-table tbody tr { transition: none; }
 }
 
-// The statistics screen. It was a Bootstrap table inside .container-wrapper from the old
-// theme; this is the same information on the admin's own type and rules.
+// The statistics screen.
 .mg-stats { display: flex; flex-direction: column; gap: 36px; }
+
+// Rows of a report are links across a whole line; the line is the target.
+.mg-stats a {
+  @include controls.hit-row(32px);
+
+  min-width: 32px;
+}
 
 .mg-stats__totals {
   display: grid;
@@ -365,6 +375,79 @@
   margin: 0 0 12px;
 }
 
-@media (max-width: 700px) {
+@include bp.below(md) {
   .mg-stats__totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+// The case list: the posts table's shape, with the case's own number as the first column.
+.mg-cases__mark {
+  width: 1%;
+  color: var(--ruby);
+}
+
+// The tag screen: the list beside the form that adds to it.
+.mg-tag-screen {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+  max-width: 1000px;
+}
+
+.mg-tag-list {
+  display: grid;
+  gap: 6px;
+}
+
+.mg-tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 6px 4px 14px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+}
+
+.mg-tag-row__title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.mg-tag-row__actions {
+  display: flex;
+  gap: 4px;
+}
+
+// The rename form sits inside the row's frame and takes the row's place.
+.mg-tag-editor {
+  position: relative;
+  width: 100%;
+
+  .mg-input { padding-right: 84px; }
+}
+
+.mg-tag-editor__actions {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  transform: translateY(-50%);
+}
+
+.mg-tag-create {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+@include bp.below(lg) {
+  .mg-tag-screen { grid-template-columns: minmax(0, 1fr); }
+
+  .mg-tag-screen__create { order: -1; }
 }

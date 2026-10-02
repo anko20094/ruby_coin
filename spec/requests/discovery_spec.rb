@@ -7,7 +7,6 @@ require 'rails_helper'
 describe 'discovery', type: :request do
   include_context 'when carrierwave cleanup'
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   let!(:post_record) { I18n.with_locale(:en) { create(:post, status: 'active', title: 'A listed entry') } }
 
@@ -42,6 +41,10 @@ describe 'discovery', type: :request do
       expect(response.body).to include('<loc>http://www.example.com/uk/team</loc>')
       expect(response.body).to include('<loc>http://www.example.com/en/team/danyil</loc>')
       expect(response.body).to include('<loc>http://www.example.com/en/faq</loc>')
+    end
+
+    it 'leaves out the search screen, which robots.txt disallows' do
+      expect(response.body).not_to include('/search<')
     end
 
     it 'never lists a hidden post' do

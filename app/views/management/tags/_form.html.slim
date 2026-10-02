@@ -1,8 +1,11 @@
-= turbo_frame_tag @tag do
-  = form_with model: [:management, @tag], class: "form-editor-tag" do |f|
-    .tag-editor
-      = f.text_field :title, class: 'standart-input', placeholder: t('.title_label'), aria: { label: t('.title_label') }
-      .tag-editor__actions
-        = button_tag '', type: 'submit', class: 'save-tag', aria: { label: t('global.button.save') }
-        = link_to '', management_tags_path, class: 'cancel-tag-icon', aria: { label: t('global.button.cancel') },
-          data: { turbo_frame: '_top' }
+- tag = local_assigns.fetch(:tag, @tag)
+= turbo_frame_tag tag do
+  = render ErrorsComponent.new(object: tag, tone: :admin)
+  = form_with model: [:management, tag], class: 'mg-tag-editor' do |f|
+    = f.text_field :title, class: 'mg-input', placeholder: t('.title_label'), aria: { label: t('.title_label') }
+    .mg-tag-editor__actions
+      = button_tag type: 'submit', class: 'mg-icon-btn mg-icon-btn--ok', aria: { label: t('global.button.save') } do
+        = icon(:check)
+      = link_to management_tags_path, class: 'mg-icon-btn mg-icon-btn--danger', aria: { label: t('global.button.cancel') },
+        data: { turbo_frame: '_top' } do
+        = icon(:delete)

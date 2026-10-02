@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe Team::Check do
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   let(:tempfiles) { [] }
 
@@ -47,12 +46,18 @@ RSpec.describe Team::Check do
 
   after { tempfiles.each(&:close!) }
 
-  it 'finds nothing wrong with the roster that ships, and says which CV is a placeholder' do
+  it 'finds nothing wrong with the roster that ships, which has no placeholder CV left' do
     result = described_class.call
 
     expect(result.problems).to eq([])
     expect(result).to be_ok
-    expect(result.notes).to include(a_string_matching(/placeholder CV/))
+    expect(result.notes).not_to include(a_string_matching(/placeholder CV/))
+  end
+
+  it 'says which CV is a placeholder when one is in the file' do
+    allow(Team).to receive(:everyone).and_return(Team.everyone + [person(id: 'stand-in', placeholder: true)])
+
+    expect(described_class.call.notes).to include('1 placeholder CV — stand-in')
   end
 
   describe 'a person id written twice' do
@@ -146,6 +151,10 @@ RSpec.describe Team::Check do
     it 'is reported when the two languages hold the same text' do
       expect(problems_for(person(blurb: 'Writes code.')))
         .to include(a_string_matching(/ghost\.blurb is the same string/))
+    end
+
+    it 'lets a name read the same in both, because a product name is not translated' do
+      expect(problems_for(person(name: pair('Claude', 'Claude'))).grep(/ghost\.name/)).to eq([])
     end
   end
 
@@ -322,6 +331,20 @@ RSpec.describe Team::Check do
       allow(Team).to receive(:contributions).and_return('dna' => [credit], 'ghost-project' => [credit])
 
       expect(described_class.call.problems).to include(a_string_matching(/ghost-project is credited but is not a case/))
+    end
+
+    it 'is reported for a CV entry naming a project that is not a case' do
+      cv = { 'experience' => [{ 'org' => 'X', 'cases' => %w[dna ghost-project] }] }
+
+      expect(problems_for(person(cv:))).to include(a_string_matching(/ghost cv names ghost-project, which is not/))
+    end
+
+    it 'reads the cases from the database once' do
+      allow(Case).to receive(:slugs).and_call_original
+
+      described_class.call
+
+      expect(Case).to have_received(:slugs).once
     end
 
     it 'is reported for a case with nobody on it' do

@@ -17,11 +17,14 @@ Rails.application.routes.draw do
 
   # Every locale lives in the path. The constraint is anchored to the whole segment, so
   # /enterprise is a 404 rather than the home page under a nonsense locale.
-  scope '/(:locale)', locale: /uk|en/ do
+  scope '/(:locale)', locale: Regexp.union(I18n.available_locales.map(&:to_s)) do
+    # Registration is closed: an account, once it exists, can be edited. An old sign-up link
+    # lands on the home page instead of a 404; posting a sign-up form still has no route.
+    get 'users/sign_up', to: redirect { |params, _request| "/#{params[:locale] || I18n.default_locale}" }
     devise_for :users, skip: :registrations
     devise_scope :user do
-      resource :registration, only: %i[new create edit update], path: 'users', path_names: { new: 'sign_up' },
-                              as: :user_registration, controller: 'users/registrations'
+      resource :registration, only: %i[edit update], path: 'users', as: :user_registration,
+                              controller: 'users/registrations'
     end
 
     # A page has one address: `format: false` on the pages below keeps /.env, /en.foo and
@@ -62,9 +65,6 @@ Rails.application.routes.draw do
       get 'statistics', to: 'statistics#index', as: 'statistics'
 
       # No show screen: the list is the screen, and editing is where a post is looked at.
-      # It used to be routed at a template that rendered a partial deleted years ago, so
-      # every "delete" link in the list — a GET to this URL, because Turbo Drive is off —
-      # landed on a 500.
       resources :posts, except: :show do
         post 'translate', on: :collection
         # The editor autosaves here and reloads the preview frame afterwards.
@@ -77,9 +77,9 @@ Rails.application.routes.draw do
       resources :tags, except: :show
       resources :cases, except: :show
 
-      # No CV route. The CV is config/portfolio/cv.yml, imported by `rake cv:import` — the
+      # No CV route. The CV is config/portfolio/cv.yml, read as it is on every page — the
       # one piece of content here whose history matters, and git keeps that better than a
-      # JSONB column. See redesign_plan.md §12.5.
+      # JSONB column.
 
       # The editor's block menu posts here to mint a block and get its sgid back.
       resources :journal_blocks, only: :create

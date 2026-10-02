@@ -3,7 +3,7 @@
 # One row of the journal index: number · date · title · byline over tags.
 #
 # The whole row is a single <a>, not a div with a click handler — keyboard, middle-click and
-# "open in new tab" all have to work (handoff §11).
+# "open in new tab" all have to work.
 class JournalEntryComponent < ViewComponent::Base
   def initialize(post:, first: false)
     @post = post

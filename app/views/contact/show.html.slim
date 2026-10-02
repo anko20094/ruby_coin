@@ -1,5 +1,5 @@
 - content_for :title, full_title(t('contact.show.title'))
-- page_meta description: t('contact.show.lede')
+- page_meta description: t('contact.show.meta_description')
 
 .ct-page
   header.ct-page__header
@@ -16,7 +16,7 @@
 
   p.ct-page__lede= t('contact.show.lede')
 
-  / Whole rows are links, so keyboard and middle-click work (handoff §11).
+  / Whole rows are links, so keyboard and middle-click work.
   .ct-channels
     - @profile.contact_rows.each do |key, label, href|
       = link_to href, class: 'ct-channel', target: '_blank', rel: 'noreferrer' do

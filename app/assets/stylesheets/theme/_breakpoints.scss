@@ -1,0 +1,32 @@
+@use 'sass:map';
+@use 'sass:meta';
+
+// The widths the layouts change at. A name where the value is part of the scale; a raw px
+// value is still accepted for the few one-off steps, so every query goes through one mixin.
+$scale: (
+  xs: 480px,
+  sm: 560px,
+  md: 700px,
+  nav: 760px, // the top bar trades its row of links for a drawer
+  lg: 900px,
+  xl: 1200px,
+);
+
+@function width($bp) {
+  @if meta.type-of($bp) == 'number' { @return $bp; }
+  @if not map.has-key($scale, $bp) { @error 'Unknown breakpoint `#{$bp}`.'; }
+  @return map.get($scale, $bp);
+}
+
+// $container: true repeats the rules for a size container as well — the admin's mobile
+// preview is a 390px container on a wide screen, and the article has to answer to it.
+@mixin below($bp, $container: false) {
+  @media (max-width: width($bp)) { @content; }
+  @if $container {
+    @container (max-width: #{width($bp)}) { @content; }
+  }
+}
+
+@mixin above($bp) {
+  @media (min-width: width($bp) + 1px) { @content; }
+}

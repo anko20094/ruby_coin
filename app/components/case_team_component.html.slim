@@ -1,0 +1,28 @@
+section.wk-case__team
+  = render TrackTagComponent.new(label: label, tone: :soft, heading: :h2)
+
+  - if (one = solo)
+    .wk-solo.hover-row
+      = render MonogramComponent.of(one.person, size: 72)
+      .wk-solo__body
+        h3.wk-solo__title= t('work.case.team_solo')
+        .wk-solo__meta= [one.person.name, one.role, one.period].compact_blank.join(' · ')
+        = render Profile::DidComponent.new(lines: one.did, dense: true)
+        / Commercial work had a wider team; it was the client's, and the case page already
+        / prints how far down the contributor list this one name sits.
+        - if one.outside.present?
+          .wk-solo__outside= rich(one.outside)
+      = link_to person_link(one), class: 'wk-solo__open wk-card-link' do
+        = "#{t('work.case.open_cv')} "
+        span aria-hidden="true" →
+  - else
+    .wk-team
+      - team.each do |contribution|
+        .wk-teammate.hover-row
+          .wk-teammate__head
+            = render MonogramComponent.of(contribution.person, size: 52, ring: :mute)
+            .wk-teammate__who
+              h3.wk-teammate__name
+                = link_to contribution.person.name, person_link(contribution), class: 'wk-card-link'
+              .wk-teammate__role= [contribution.role, contribution.period].compact_blank.join(' · ')
+          = render Profile::DidComponent.new(lines: contribution.did, dense: true)

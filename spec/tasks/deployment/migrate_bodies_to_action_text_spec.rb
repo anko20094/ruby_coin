@@ -30,6 +30,16 @@ RSpec.describe 'after_party:migrate_bodies_to_action_text' do
     expect(body_of(post, :uk).to_plain_text).to eq('Українська стаття')
   end
 
+  it 'names the bodies that show an image over plain http, which the https site will block' do
+    post = legacy_post(english: '<p>x<img src="http://old.example/a.png"><img src="https://ok.example/b.png"></p>')
+
+    run = run_task(task)
+
+    expect(run.stdout).to include("#{post.id}/en: http://old.example/a.png")
+    expect(run.stdout).not_to include('https://ok.example/b.png')
+    expect(recorded.count).to eq(1)
+  end
+
   it 'mirrors each body into the column search reads' do
     post = legacy_post
 

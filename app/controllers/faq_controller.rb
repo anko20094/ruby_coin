@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-# /faq is restyled onto the new theme but stays out of the nav (redesign_plan.md §2).
+# /faq is restyled onto the new theme but stays out of the nav (docs/decisions.md).
 class FaqController < ApplicationController
-  layout 'theme'
-
   def index
     @entries = faq_entries
 

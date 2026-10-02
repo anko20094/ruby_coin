@@ -1,10 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Select a passage, press Q, get it as a card (handoff §9a).
-//
-// It is the one playful moment on the site, and it argues for a product at the same time:
-// ImageMaker renders exactly these cards for 430k Telegram users, which is case 05. Kept
-// because the handoff asks for it to be kept.
+// Select a passage, press Q, get it as a card — the site's one playful moment, and a demo of
+// the kind of card ImageMaker renders.
 //
 // Deliberately quiet: nothing appears until there is a real selection, nothing fires while
 // someone is typing, and the whole thing is inert under prefers-reduced-motion except that it

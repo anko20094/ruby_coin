@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
 class BaseService
-  # Keywords pass through too — Search::Palette takes the route helpers that way.
-  def self.call(*, **)
-    service = new(*, **)
-
-    service.__send__(:call) if service.respond_to?(:call)
-  end
-
-  private
+  # Arguments pass through as given — Search::Palette takes the route helpers as keywords.
+  def self.call(...) = new(...).call
 
   def call
-    raise NotImplementedError
+    raise NotImplementedError, "#{self.class} must define #call"
   end
 end

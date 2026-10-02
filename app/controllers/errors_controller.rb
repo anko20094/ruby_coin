@@ -7,8 +7,6 @@
 # Rendered inside the real layout, so a reader who mistypes a URL is still on the site: the
 # nav, the footer and the way out are all where they were.
 class ErrorsController < ApplicationController
-  layout 'theme'
-
   # Rails rewrites path_info to "/404" before dispatching here and keeps the address the
   # reader actually asked for in this header. It is the only way back to the locale they were
   # browsing in — the /:locale segment is gone by the time this controller runs.

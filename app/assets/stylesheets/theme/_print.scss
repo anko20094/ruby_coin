@@ -51,8 +51,8 @@
 
   // The sidebar is sticky on screen. On paper it becomes a block near the top: the two
   // columns are one flow, and the one thing a printed CV must carry on its first page is how
-  // to answer it. The handoff asks for it "after the summary", which two grid children cannot
-  // interleave — first is the closest, and it is where a CV usually puts contacts anyway.
+  // to answer it. Two grid children cannot interleave, so it goes first — where a CV usually
+  // puts contacts anyway.
   .split-grid {
     display: flex;
     flex-direction: column;

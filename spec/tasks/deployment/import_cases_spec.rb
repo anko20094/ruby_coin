@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'the cases deployment tasks' do
   let(:mismatch) do
-    Cases::Importer::Result.new(imported: [], mismatches: ['dna.mark: expected 2, stored "2"'], strays: [])
+    Cases::Importer::Result.new(imported: [], kept: [], mismatches: ['dna.mark: expected 2, stored "2"'], strays: [])
   end
 
   describe 'after_party:import_cases' do
@@ -13,7 +13,7 @@ RSpec.describe 'the cases deployment tasks' do
     it 'loads the seven cases and records itself' do
       run = run_task(task)
 
-      expect(run.stdout).to include('cases imported: 7', 'every field matches the yaml')
+      expect(run.stdout).to include('cases imported: 7, kept: 0', 'every field matches the yaml')
       expect(Case.count).to eq(7)
       expect(AfterParty::TaskRecord.where(version: '20260822131500').count).to eq(1)
     end
@@ -36,34 +36,25 @@ RSpec.describe 'the cases deployment tasks' do
       expect(run.stderr).to include('the copy does not match the source', 'dna.mark')
       expect(AfterParty::TaskRecord.where(version: '20260822131500')).to be_empty
     end
-  end
 
-  describe 'after_party:reimport_cases' do
-    let(:task) { 'after_party:reimport_cases' }
-
-    it 'puts the yaml back over a case edited in the admin' do
+    it 'keeps a case edited in the admin' do
       Cases::Importer.call
       Case.find_by!(slug: 'dna').update_columns(title: { 'en' => 'EDITED IN ADMIN', 'uk' => 'ПРАВЛЕНО' })
+
+      run = run_task(task)
+
+      expect(run.stdout).to include('cases imported: 0, kept: 7')
+      expect(Case.find_by!(slug: 'dna')[:title]['en']).to eq('EDITED IN ADMIN')
+    end
+
+    it 'puts the yaml back over an edited case with FORCE' do
+      Cases::Importer.call
+      Case.find_by!(slug: 'dna').update_columns(title: { 'en' => 'EDITED IN ADMIN', 'uk' => 'ПРАВЛЕНО' })
+      with_env(FORCE: '1')
 
       run_task(task)
 
       expect(Case.find_by!(slug: 'dna')[:title]['en']).not_to eq('EDITED IN ADMIN')
-    end
-
-    it 'records itself once the copy matches' do
-      run = run_task(task)
-
-      expect(run.stdout).to include('cases: 7 imported', 'every field matches the yaml')
-      expect(AfterParty::TaskRecord.where(version: '20260913091000').count).to eq(1)
-    end
-
-    it 'refuses to record itself when the copy does not match' do
-      allow(Cases::Importer).to receive(:call).and_return(mismatch)
-
-      run = run_task(task)
-
-      expect(run.exit_status).to eq(1)
-      expect(AfterParty::TaskRecord.where(version: '20260913091000')).to be_empty
     end
   end
 end

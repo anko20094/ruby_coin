@@ -1,12 +1,14 @@
+# Copy to config/database.yml (git-ignored). The defaults match the `dev` role the README creates;
+# set DB_* in .env to use another one. DATABASE_URL, when set (CI does), overrides all of this.
 default: &default
   adapter: postgresql
-  username: dev
-  password: dev
-  host: localhost
-  port: 5432
+  username: <%= ENV.fetch('DB_USERNAME', 'dev') %>
+  password: <%= ENV.fetch('DB_PASSWORD', 'dev') %>
+  host: <%= ENV.fetch('DB_HOST', 'localhost') %>
+  port: <%= ENV.fetch('DB_PORT', 5432) %>
   encoding: utf8
   reconnect: true
-  pool: 5
+  pool: <%= ENV.fetch('RAILS_MAX_THREADS', 5) %>
 
 development:
   <<: *default

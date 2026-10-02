@@ -2,8 +2,7 @@
 
 require 'rails_helper'
 
-# The initializer was the generated stub with all 27 lines commented out, so no policy header
-# was sent on any response.
+# Every response carries the policy from config/initializers/content_security_policy.rb.
 describe 'content security policy', type: :request do
   def policy
     response.headers['Content-Security-Policy'].to_s
@@ -25,6 +24,15 @@ describe 'content security policy', type: :request do
 
   # A style attribute cannot carry a nonce, and the site has them — the ruby's size is
   # server-rendered, the progress bar and the quote hint are written by their controllers.
+  # The old TinyMCE inserted images by their external address, and those bodies kept the <img src>.
+  it 'lets a journal body show an image from another https host, but not from plain http' do
+    get '/en/journal'
+
+    img_src = policy[/img-src ([^;]*)/, 1].to_s.split
+    expect(img_src).to include("'self'", 'https:', 'data:', 'blob:')
+    expect(img_src).not_to include('http:', '*')
+  end
+
   it 'allows style attributes, which are the only inline styling the site uses' do
     get '/en/journal'
 
@@ -32,7 +40,7 @@ describe 'content security policy', type: :request do
   end
 
   # Nothing is requested from either host until a reader clicks an embed; this is what lets the
-  # frame appear when they do. Listed as a W3 loose end in redesign_plan.md.
+  # frame appear when they do.
   it 'lets a clicked embed load, and nothing else frame the page' do
     get '/en/journal'
 

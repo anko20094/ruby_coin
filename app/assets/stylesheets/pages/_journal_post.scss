@@ -1,4 +1,8 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+
+// Also answer to a size container (the admin's mobile preview), not only the viewport.
+$narrow-container: false !default;
 
 // /post/:slug — one column at 760px. The measure is the design; do not widen it.
 $post-max: 760px;
@@ -294,7 +298,7 @@ $post-max: 760px;
   .gi { color: var(--code-string); }
 }
 
-// Callouts. Two tones, per handoff §5: note carries the ink rule, warn the ruby one.
+// Callouts. Two tones: note carries the ink rule, warn the ruby one.
 .jn-callout {
   margin: 24px 0;
   padding: 16px 20px;
@@ -475,8 +479,33 @@ $post-max: 760px;
   line-height: 1.2;
 }
 
-@media (max-width: 560px) {
+@include bp.below(sm) {
   .jn-steps { grid-template-columns: 1fr; }
 
   .jn-step--next { text-align: left; }
+}
+
+// Narrow screens. admin.scss sets $narrow-container so the editor's mobile preview, a 390px
+// container on a wide screen, gets these rules as well.
+@include bp.below(lg, $container: $narrow-container) {
+  .jn-post__title { font-size: 44px; }
+
+  .jn-related__row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@include bp.below(sm, $container: $narrow-container) {
+  .jn-post { padding: 40px 20px; }
+
+  .jn-post__title { font-size: 34px; }
+
+  .jn-post__cover img { height: 220px; }
+
+  .jn-body { font-size: 17px; }
+
+  .jn-body__lede { font-size: 24px; }
+
+  .jn-body h2,
+  .jn-body h3 { font-size: 26px; }
+
+  .jn-related__row { grid-template-columns: 1fr; }
 }

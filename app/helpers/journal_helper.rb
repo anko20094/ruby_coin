@@ -3,13 +3,22 @@
 module JournalHelper
   # The editor's code-sample list is Prism's, and Prism calls HTML "markup".
   LEXER_ALIASES = { 'markup' => 'html' }.freeze
+  # The file store is kept across releases and only drops an entry when it is read past its
+  # expiry, so every entry gets one: a body nobody opens for a week goes, instead of staying on
+  # disk for good.
+  BODY_TTL = 1.week
 
-  # The rendered body, with code blocks highlighted server-side.
+  # The rendered body, with code blocks highlighted server-side. Cached on the rich text row,
+  # which moves on every edit, and on the release (HttpCaching.release), which moves on every
+  # deploy — the highlighting and the embed markup are code, and a hand-bumped version number
+  # was one more thing to forget. Rouge over every listing is the costly part of the page.
   def journal_body(post, locale = I18n.locale)
-    fragment = Nokogiri::HTML5.fragment(post.rich_body(locale).to_s)
-    fragment.css('pre').each { |node| highlight_code_block(node) }
-    fragment.css('.jn-embed').each { |node| activate_embed(node) }
-    fragment.to_html.html_safe # rubocop:disable Rails/OutputSafety -- Action Text sanitises on save
+    rich_text = post.rich_body(locale)
+    return render_journal_body(rich_text) unless rich_text.persisted?
+
+    key = ['journal_body', HttpCaching.release, I18n.locale, rich_text]
+    Rails.cache.fetch(key, expires_in: BODY_TTL) { render_journal_body(rich_text).to_str }
+         .html_safe # rubocop:disable Rails/OutputSafety -- our own render, cached as a string
   end
 
   # Used by the code block partial, and by the plain <pre> pass below, so a listing looks the
@@ -43,6 +52,13 @@ module JournalHelper
   end
 
   private
+
+  def render_journal_body(rich_text)
+    fragment = Nokogiri::HTML5.fragment(rich_text.to_s)
+    fragment.css('pre').each { |node| highlight_code_block(node) }
+    fragment.css('.jn-embed').each { |node| activate_embed(node) }
+    fragment.to_html.html_safe # rubocop:disable Rails/OutputSafety -- Action Text sanitises on save
+  end
 
   # Action Text's sanitiser strips data attributes, target and rel from rendered content, so
   # the embed partial emits a plain link and the interactive wiring is put back here — where

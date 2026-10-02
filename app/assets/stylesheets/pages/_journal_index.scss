@@ -1,8 +1,8 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
-// /journal — the entry list. Max width 1100px, padding 60px 36px, per handoff §5.
-// The maxima live here rather than in theme/_tokens.scss, which stays byte-identical to
-// the bundle's tokens.css.
+// /journal — the entry list. The page maximum lives here, next to the page it shapes,
+// rather than in theme/_tokens.scss.
 $journal-max: 1100px;
 
 .jn-index {
@@ -258,7 +258,7 @@ $journal-max: 1100px;
   .hover-link { @include controls.hit-row(32px); }
 }
 
-@media (max-width: 560px) {
+@include bp.below(sm) {
   .jn-search__input { font-size: 16px; }
 }
 
@@ -274,4 +274,48 @@ $journal-max: 1100px;
   gap: 12px;
   margin-bottom: 18px;
   flex-wrap: wrap;
+}
+
+// Narrow screens. The four-column entry row cannot survive below ~900px, and the display
+// sizes have to come down before the 375px floor.
+@include bp.below(lg) {
+  .jn-index__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jn-index__title { font-size: 60px; }
+
+  .jn-index__anchor { order: -1; }
+
+  // Number and title on the first line, date and byline under them.
+  .jn-entry {
+    grid-template-columns: 70px 1fr;
+    grid-template-areas:
+      'number title'
+      'date   meta';
+    row-gap: 6px;
+  }
+
+  .jn-entry__meta { text-align: right; }
+}
+
+@include bp.below(sm) {
+  .jn-index { padding: 40px 20px; }
+
+  .jn-index__title { font-size: 44px; }
+
+  .jn-index__lede { font-size: 16px; }
+
+  .jn-entry {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'number'
+      'title'
+      'date'
+      'meta';
+    padding: 16px 0;
+  }
+
+  .jn-entry__meta { text-align: left; }
 }

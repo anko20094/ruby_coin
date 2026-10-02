@@ -42,13 +42,15 @@ over-report; an unverified finding is not allowed to ship as High/Critical. Qual
 
 ## Phase 1 — Context & surface profiling
 
-1. PR metadata + body → linked issue/ticket, plus any plan the PR follows (`redesign_plan.md`,
-   `design_handoff_rubycoin_site/`, `tech_audit.md`). Fetch the issue and comments if linked.
+1. PR metadata + body → linked issue/ticket, plus any plan the PR follows (`docs/decisions.md`,
+   `docs/redesign_plan.md`, `design_handoff_rubycoin_site/`, `docs/architecture.md`). Fetch the issue
+   and comments if linked.
 2. **Extract checkable invariants** — turn every "must do X / behaves like Y" into a spec checklist
    line (redirects that must keep indexed URLs alive, locale parity, canonical URLs, sitemap entries).
-   In `redesign_plan.md` a later section wins over an earlier one; the pointer at the top of the
-   file names the superseded sections, and a row they cover is not an invariant.
-3. Read **`CLAUDE.md`, `README.md`, `tech_audit.md`, `.rubocop.yml`, `.overcommit.yml`,
+   `docs/decisions.md` lists the decisions in force. `docs/redesign_plan.md` is the archive: there a
+   later section wins over an earlier one, the pointer at the top names the superseded sections, and a
+   row they cover is not an invariant.
+3. Read **`CLAUDE.md`, `README.md`, `docs/architecture.md`, `.rubocop.yml`, `.overcommit.yml`,
    `.github/workflows/ci.yml`** and the sibling files of every changed file → the *actual* conventions.
 4. Compute the diff vs base; build a **file-area map**. Classify presence of: `app/views` +
    `app/components` (Slim/ViewComponent), `app/javascript` + `app/assets` (Stimulus/Turbo/SCSS),
@@ -77,7 +79,7 @@ owner and does **not** write it up. This ownership matrix is the anti-duplicatio
 |---|---|---|---|
 | **1. Spec & soundness** | Does the code satisfy each invariant? Right *approach* for the existing architecture; no regression of existing behaviour | impl micro-details (→#5), style | indexed URLs keep resolving (`/post/:id`, `/search`, FriendlyId history), both locales |
 | **2. Security** | authz on **every** action (`authorize` / `verify_authorized`, `management` gating, `policy_scope`), strong params / mass assignment, IDOR, XSS (`html_safe`, `raw`, `sanitize`, TinyMCE output), SQL injection (`where("…#{}")`, `pg_search`), open redirects (locale/`return_to`), CSRF, CarrierWave content-type/extension allow-lists, secrets in repo/credentials, `Rack::Attack` coverage of new public POSTs, Devise config | perf, style | admin-only routes behind a policy; user-supplied HTML on public render |
-| **3. Data-safety / concurrency** | transactions, races/TOCTOU (slug uniqueness, find-or-create), idempotency of importers (`Cases::Importer`, `CV::Importer`) and rake/`after_party` tasks, retries, partial failure, outbound HTTP timeouts & error handling | indexes (→#4) | `ChatgptService` / `HTTParty` calls without timeout; tasks that are not re-runnable |
+| **3. Data-safety / concurrency** | transactions, races/TOCTOU (slug uniqueness, find-or-create), idempotency of importers (`Cases::Importer`) and rake/`after_party` tasks, retries, partial failure, outbound HTTP timeouts & error handling | indexes (→#4) | `ChatgptService` / `HTTParty` calls without timeout; tasks that are not re-runnable |
 | **4. Persistence** | migration order/safety (`algorithm: :concurrently`, `disable_ddl_transaction!`, reversible), **DB constraint ↔ model validation ↔ NULL semantics** mirroring, `schema.rb` drift, FK/cascade, **N+1 & missing indexes** (`includes`, `strict_loading`, view-level queries), Mobility columns/backend consistency, `pg_search` scopes | business logic | back-dated migrations, data changes inside schema migrations (belongs in `after_party`) |
 | **5. Logic & failure modes** | happy/edge/error paths work; nil/blank; `rescue` specificity; state holes; `params[:locale]` handling and fallbacks; pagination edges (Pagy); empty states; 404 vs 500 (`ErrorsController`) | perf (→#4), style | missing translation for one locale; missing slug history; bad `Accept`/format |
 | **6. Architecture, style & i18n** | layer placement (fat controller/model, logic in views/components), `BaseService.call` / `BaseQuery#all` / `BaseValidator` usage, Pundit for authz, Blueprinter for JSON, ViewComponent vs partial, **wire-or-omit / dead code**, naming, DRY; **i18n**: hardcoded user-facing strings, **`uk`/`en` key parity** in `config/locales`, missing keys, Mobility attributes for content; RuboCop/Fasterer would-fail items; the global comment rule (no narrated history, no restating code) | perf (→#4), correctness (→#5) | `raise_on_missing_translations` is off, so a missing key renders silently — flag it |

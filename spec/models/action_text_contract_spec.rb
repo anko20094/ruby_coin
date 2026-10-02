@@ -12,7 +12,7 @@ require 'rails_helper'
 #
 # Every sample below is real TinyMCE output. Anything the toolbar or the Insert menu can
 # produce belongs here; anything that cannot survive belongs out of the configuration, and
-# both halves are named in app/javascript/controllers/tinymce_controller.js.
+# both halves are named in app/javascript/admin/tinymce/profiles.js.
 describe 'the Action Text contract' do # rubocop:disable RSpec/DescribeClass
   # Nokogiri re-serialises, which puts newlines inside a <tr> and a nested <ul>. What is being
   # asserted is which tags and attributes survive, not the whitespace between them.
@@ -72,8 +72,8 @@ describe 'the Action Text contract' do # rubocop:disable RSpec/DescribeClass
 
   # The configuration is JavaScript, so it is read as text, as tinymce_assets_spec does.
   describe 'what the post editor offers' do
-    let(:source) { Rails.root.join('app', 'javascript', 'controllers', 'tinymce_controller.js').read }
-    let(:post_profile) { source[/postSettings\(\) \{.*?\n  \}\n/m] }
+    let(:source) { Rails.root.join('app', 'javascript', 'admin', 'tinymce', 'profiles.js').read }
+    let(:post_profile) { source[/export const postSettings = .*?\n\}\)\n/m] }
 
     def quoted(text) = text.scan(/"([^"]+)"/).flatten
 
@@ -100,7 +100,7 @@ describe 'the Action Text contract' do # rubocop:disable RSpec/DescribeClass
     end
 
     it 'takes the case editor\'s elements from the server, where the sanitiser list is' do
-      expect(source).to include('valid_elements: this.validElementsValue')
+      expect(source).to include('valid_elements: validElements')
     end
   end
 

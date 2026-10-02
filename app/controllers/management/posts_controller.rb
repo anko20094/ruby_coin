@@ -20,7 +20,7 @@ module Management
     before_action :normalize_main_post_param, only: %i[create update autosave]
 
     def index
-      @counts = Post.group(:status).count
+      @counts = post_counts
       @pagy, @posts = pagy(listed_posts, limit: PER_PAGE, raise_range_error: true)
     end
 
@@ -30,7 +30,7 @@ module Management
 
     def create
       @post = current_user.posts.build
-      authorize @post
+      authorize [:management, @post]
 
       if persist
         flash[:success] = t('.success')
@@ -108,8 +108,9 @@ module Management
 
     private
 
-    # One transaction: the post and its other-language rows are a single save, so a refusal from
-    # either leaves nothing behind. A refused save also leaves the form's version as it came.
+    # One save: the other-language title and subtitle are assigned through Mobility before it, so
+    # a refusal from either leaves nothing behind. A refused save also leaves the form's version
+    # as it came.
     def persist
       attributes = post_params
       loaded_version = nil
@@ -119,11 +120,10 @@ module Management
         # Inside the transaction: the tag writer commits its own rows the moment it is assigned.
         @post.assign_attributes(attributes)
         loaded_version = @post.lock_version
-        saved = @post.save
+        saved = Posts::Translator.call(@post, localization_params) && @post.save
         # An edit of only the other language changes no column on posts, so nothing else would
         # check the version it carries or move updated_at.
         @post.touch if saved && !@post.saved_changes?
-        saved &&= Posts::Translator.call(@post, localization_params)
         raise ActiveRecord::Rollback unless saved
       end
 
@@ -136,10 +136,7 @@ module Management
       posts = posts.where(status: params[:status]) if Post.statuses.key?(params[:status])
       posts = posts.search_everywhere(params[:query]) if params[:query].present?
       posts = posts.reorder(sort_column => sort_direction) unless rank_ordered?
-      # Both translation associations: `post.title` reads Mobility's :translations, while
-      # `translated_locales` reads the app's own :post_translations.
-      posts.includes(:tags, :user, :translations, :post_translations,
-                     :rich_text_description_en, :rich_text_description_uk)
+      posts.includes(:tags, :user, :translations, :rich_text_description_en, :rich_text_description_uk)
     end
 
     # While searching without an explicit sort, pg_search's own relevance order is the useful

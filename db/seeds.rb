@@ -26,7 +26,7 @@ end
 admin = User.find_or_initialize_by(email: email || 'admin@rubyco.in')
 if admin.new_record?
   admin.password = password || SecureRandom.base64(12)
-  admin.nickname = 'danyil'
+  admin.nickname = ENV['SEED_ADMIN_NICKNAME'].presence || 'danyil'
   admin.role = :admin
   admin.save!
   say "password: #{admin.password}" if password.nil?
@@ -36,13 +36,11 @@ say "admin: #{admin.email}"
 return unless Rails.env.local?
 
 # --- the portfolio ------------------------------------------------------------------------
-# Cases and the CV are real content, and the handoff forbids retyping any of it by hand, so
-# the same importers the deploy runs are the only way it gets in.
-imports = [Cases::Importer.call, CV::Importer.call]
-unless imports.all?(&:clean?)
-  abort "  the portfolio does not match its yaml:\n    #{imports.flat_map(&:mismatches).join("\n    ")}"
-end
-say "cases: #{Case.count} · profile: #{CVProfile.current.name}"
+# Cases are real content, never retyped by hand: the same importer the deploy runs loads them
+# from cases.yml. The CV is read from cv.yml as it is.
+import = Cases::Importer.call
+abort "  the cases do not match their yaml:\n    #{import.mismatches.join("\n    ")}" unless import.ok?
+say "cases: #{Case.count} · profile: #{Team.owner_cv.name}"
 
 # --- the journal --------------------------------------------------------------------------
 TAGS = %w[rails hotwire postgres activerecord viewcomponent turbo].freeze
@@ -105,7 +103,7 @@ LEDE = {
   uk: 'Засіяний текст. Це не те, що я справді писав.'
 }.freeze
 
-cover = Rails.root.join('app/assets/images/work-portrait.jpg') # rubocop:disable Rails/FilePath
+cover = Rails.root.join('db/seeds/files/work-portrait.jpg') # rubocop:disable Rails/FilePath
 
 # Every post needs a cover and covers go through ImageMagick, so ask it to read one image up
 # front rather than finding out nine rows in. This replaces a `rescue CarrierWave::Processing\

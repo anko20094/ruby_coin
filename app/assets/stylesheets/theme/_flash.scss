@@ -1,0 +1,51 @@
+@use 'controls';
+
+// FlashComponent's messages. Both layouts load this; each places the region itself
+// (theme/chrome/_flash.scss on the site, .mg-flash in the admin).
+.rc-flash__item {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--ink-mute);
+  border-left-width: 3px;
+  border-radius: var(--radius-chip);
+  font-size: 15px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &--alert {
+    border-left-color: var(--ruby);
+    background: var(--ruby-mute);
+  }
+
+  &--notice {
+    border-left-color: var(--ink);
+    background: var(--paper-warm);
+  }
+
+  &.is-leaving {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+.rc-flash__text { flex: 1; }
+
+.rc-flash__close {
+  @include controls.hit-square(32px, 44px);
+
+  flex: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ink-soft);
+  border-radius: var(--radius-chip-sm);
+
+  &:hover { color: var(--ruby); }
+}

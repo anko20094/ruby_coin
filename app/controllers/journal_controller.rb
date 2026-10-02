@@ -3,8 +3,6 @@
 # The article stream on the new theme. A re-skin of Post — no new data, except the stored
 # entry number.
 class JournalController < ApplicationController
-  layout 'theme'
-
   PER_PAGE = 20
 
   # Which half of a post to look in. 'all' first, because it is the default.
@@ -13,7 +11,7 @@ class JournalController < ApplicationController
   # One entry per Post::ORDER_TYPES, so adding an ordering means adding it in both places or
   # the fetch falls back rather than raising.
   ORDERS = {
-    'new' => -> { Post.active },
+    'new' => -> { Post.active.ordered },
     'oldest' => -> { Post.oldest },
     'best' => -> { Post.best }
   }.freeze
@@ -22,7 +20,7 @@ class JournalController < ApplicationController
   before_action :redirect_to_current_address, only: :show
 
   def index
-    readable = Post.active.unscope(:order).translated_in(I18n.locale)
+    readable = Post.active.translated_in(I18n.locale)
     @tags = Tag.joins(:posts).where(posts: { id: readable.select(:id) }).distinct.order(:title)
     # Looked up in Tag, not in @tags: a tag whose posts are all hidden has no chip but a
     # bookmarked link to it should say "no entries", not silently list everything.
@@ -41,6 +39,10 @@ class JournalController < ApplicationController
     # it was written.
     @previous_entry = Post.before(@post).translated_in(I18n.locale).includes(:translations).first
     @next_entry = Post.after(@post).translated_in(I18n.locale).includes(:translations).first
+
+    # After the view is recorded, as on /work/:slug: a reader whose browser revalidates still
+    # counts. The rich text touches the post, so @post covers the body.
+    cache_publicly(@post, @post.user, @post.tags, @related, @related.flat_map(&:tags), @previous_entry, @next_entry)
   end
 
   # Search moved here from home#search when the front page stopped being the article stream.
@@ -68,9 +70,6 @@ class JournalController < ApplicationController
   def filtered_posts
     posts = ORDERS.fetch(@order) { ORDERS['new'] }.call.translated_in(I18n.locale)
     posts = posts.where(id: @active_tag.posts.select(:id)) if @active_tag
-    # :translations, not :post_translations — Mobility's Table backend reads the association
-    # it defines, so preloading only the app's own name left one Post::Translation query per
-    # row on this page. Both are named where both are read (the admin list).
     posts.includes(:tags, :user, :translations)
   end
 
