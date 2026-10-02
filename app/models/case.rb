@@ -3,9 +3,8 @@
 # One project on /work. Seven of them today, ordered, each with two registers: the plain-words
 # track and the engineering track.
 #
-# Content was YAML (config/portfolio/cases.yml) until W4 and is still imported from it — see
-# lib/tasks/deployment/*_import_cases.rake. The YAML stays as the import source, so a verified
-# figure is never retyped by hand.
+# The table is the source of truth. config/portfolio/cases.yml seeds the cases it is missing
+# (Cases::Importer), so a verified figure is never retyped by hand, and never overwrites an edit.
 #
 # Every translated field is JSONB holding {"en" => …, "uk" => …}. Readers return the current
 # locale; the raw hash is always available as self[:field], which is what the admin form edits
@@ -39,11 +38,11 @@ class Case < ApplicationRecord
   }.freeze
 
   structured_json STRUCTURES
+  localised_scalars LOCALISED_SCALARS
 
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/ }
   validates :mark, presence: true
   validates :position, numericality: { only_integer: true, greater_than: 0, less_than: 1_000_000 }
-  validate :scalars_carry_both_languages
   validate :rows_carry_both_languages
   validate :slug_kept_while_named, on: :update
   before_destroy :refuse_while_named, prepend: true
@@ -57,19 +56,13 @@ class Case < ApplicationRecord
 
     # The year the oldest project here started — what the home page means by "shipping since".
     # Taken from the content rather than typed into the copy, so it cannot drift from the work.
-    def first_year
-      pluck(:year).filter_map { |year| year.to_s[/\d{4}/] }.min
-    end
-  end
-
-  LOCALISED_SCALARS.each do |field|
-    define_method(field) { localised(self[field]) }
-
-    I18n.available_locales.each do |locale|
-      define_method(:"#{field}_#{locale}") { pair_of(self[field])[locale.to_s] }
-      define_method(:"#{field}_#{locale}=") do |value|
-        self[field] = pair_of(self[field]).merge(locale.to_s => value)
-      end
+    #
+    # `year` is a language pair or a bare string ("2022—present"); a caller that already has the
+    # rows passes them, so the home page asks once for every case it prints.
+    def first_year(cases = nil)
+      (cases || all).pluck(:year)
+                    .flat_map { |year| year.is_a?(Hash) ? year.values : [year] }
+                    .filter_map { |text| text.to_s[/\d{4}/] }.min
     end
   end
 
@@ -106,31 +99,17 @@ class Case < ApplicationRecord
 
   private
 
-  # The handoff's editorial rule: never one language alone. A bare string satisfies it — some of
-  # these fields are the same characters in both languages ("2023—2026"), and LocalisedJson
-  # hands a plain string to whichever locale asks.
-  def scalars_carry_both_languages
-    LOCALISED_SCALARS.each do |field|
-      errors.add(field, :blank) if missing_languages(self[field]).any?
-    end
-  end
-
-  # team.yml credits and the owner's CV entries name a case by its slug, and nothing follows a
-  # rename or a delete: the credits and links simply stop resolving.
+  # team.yml credits and the CVs' career entries name a case by its slug, and nothing follows a
+  # rename or a delete: the credits and links simply stop resolving. See Portfolio::References.
   def slug_kept_while_named
-    errors.add(:slug, :named_elsewhere) if slug_changed? && named_elsewhere?(slug_was)
+    errors.add(:slug, :named_elsewhere) if slug_changed? && Portfolio::References.named?(slug_was)
   end
 
   def refuse_while_named
-    return unless named_elsewhere?(slug)
+    return unless Portfolio::References.named?(slug)
 
     errors.add(:slug, :named_elsewhere)
     throw :abort
-  end
-
-  def named_elsewhere?(name)
-    Team.credited_slugs.include?(name) ||
-      CVProfile.current.experience_rows.any? { |row| Array(row['case_slugs']).include?(name) }
   end
 
   def rows_carry_both_languages

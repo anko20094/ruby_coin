@@ -8,6 +8,9 @@
 # Action Text sanitises on save, so a body can survive with less markup than it had. The
 # report names every post that lost tags and every post that lost text, because those are
 # two different problems: dropped tags are a formatting regression, dropped text is data loss.
+# It also names every body with an <img> on plain http://: the old TinyMCE inserted images by
+# their address, the CSP allows them over https only, and an https page would block them as
+# mixed content anyway. Report only — the address is the author's to fix.
 #
 # Writes the rich texts directly, not through Post#save, so a post that fails the model's
 # validations cannot stop the ones after it. Failures are listed and the task exits non-zero.
@@ -17,14 +20,17 @@ namespace :after_party do
     force = ENV['FORCE'].present?
     text_of = ->(html) { Nokogiri::HTML5.fragment(html.to_s).text.gsub(/\s+/, ' ').strip }
     tags_of = ->(html) { Nokogiri::HTML5.fragment(html.to_s).css('*').map(&:name).tally }
+    insecure_images_of = lambda do |html|
+      Nokogiri::HTML5.fragment(html.to_s).css('img[src]').map { |img| img['src'].strip }.grep(%r{\Ahttp://}i)
+    end
 
     stats = {
       written: 0, skipped_present: 0, skipped_blank: 0,
-      text_loss: [], tag_loss: [], one_language: [], failed: []
+      text_loss: [], tag_loss: [], one_language: [], insecure_images: [], failed: []
     }
 
     Post.find_each do |post|
-      bodies = I18n.available_locales.index_with { |locale| post.post_translations.find_by(locale:)&.description }
+      bodies = I18n.available_locales.index_with { |locale| PostTranslation.find_by(post:, locale:)&.description }
       legacy = bodies.compact_blank
 
       stats[:skipped_blank] += bodies.size - legacy.size
@@ -62,6 +68,9 @@ namespace :after_party do
 
         lost = tags_of.call(body).reject { |tag, count| tags_of.call(saved)[tag].to_i >= count }
         stats[:tag_loss] << "#{post.id}/#{locale}: lost #{lost.keys.join(', ')}" if lost.any?
+
+        insecure = insecure_images_of.call(saved)
+        stats[:insecure_images] << "#{post.id}/#{locale}: #{insecure.join(' ')}" if insecure.any?
       end
     end
 
@@ -70,6 +79,7 @@ namespace :after_party do
     puts "posts with only one language: #{stats[:one_language].join(', ').presence || 'none'}"
     puts "text changed: #{stats[:text_loss].presence&.join("\n  ") || 'none'}"
     puts "markup dropped: #{stats[:tag_loss].presence&.join("\n  ") || 'none'}"
+    puts "images on plain http (blocked on the https site): #{stats[:insecure_images].presence&.join("\n  ") || 'none'}"
 
     abort "posts that could not be written:\n  #{stats[:failed].join("\n  ")}" if stats[:failed].any?
 

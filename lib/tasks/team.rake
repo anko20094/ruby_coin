@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # The roster is two YAML files with no schema, and editing them is the one content change that
-# names real people. The rules are Team::Check's and spec/requests/roster_integrity_spec.rb runs
+# names real people. The rules are Team::Check's and spec/content/roster_integrity_spec.rb runs
 # them too, but nobody runs the suite to answer "did I break the file". This does, in under a
 # second, and it prints who is where while it is at it.
 #

@@ -15,6 +15,10 @@ RSpec.describe Management::PostPolicy do
     expect(Pundit::PolicyFinder.new([:management, Post]).policy).to eq(described_class)
   end
 
+  it 'is also the policy a namespaced Post instance resolves to' do
+    expect(Pundit::PolicyFinder.new([:management, Post.new]).policy).to eq(described_class)
+  end
+
   context 'when the user is an admin' do
     let(:user) { build(:user, :admin) }
 
@@ -38,5 +42,13 @@ RSpec.describe Management::PostPolicy do
     let(:user) { nil }
 
     it { expect(policy).to forbid_actions(reads + writes) }
+  end
+
+  describe Management::PostPolicy::Scope do
+    it 'resolves to every post' do
+      post = create(:post)
+
+      expect(described_class.new(nil, Post).resolve).to include(post)
+    end
   end
 end

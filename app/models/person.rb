@@ -70,10 +70,10 @@ class Person
   def owner? = @attributes['cv_file'].present?
 
   # As written in the file: "2026·08·18". The owner's CV is the document in cv.yml, so his date
-  # comes from the imported record rather than from a second copy here — two copies of the same
-  # date drift the first time one of them is updated, and this one gates the staleness chip.
+  # comes from there rather than from a second copy here — two copies of the same date drift the
+  # first time one of them is updated, and this one gates the staleness chip.
   def updated
-    return Current.cv_profile&.figures_as_of if owner?
+    return cv.figures_as_of if owner?
 
     @attributes['updated']
   end
@@ -84,10 +84,9 @@ class Person
     nil
   end
 
-  # CVProfile for the owner — nil until the row is imported, so an empty database shows the
-  # same pending state a new hire does — and the YAML block for everyone else.
+  # cv.yml for the owner, the people.yml block for everyone else.
   def cv
-    owner? ? Current.cv_profile : yaml_cv
+    owner? ? Team.owner_cv : yaml_cv
   end
 
   def cv? = cv.present?

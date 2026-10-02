@@ -23,7 +23,7 @@ RSpec.describe 'Post view tracking', type: :request do
     it 'are the ones the statistics count' do
       get post_path(locale: 'en', id: read.slug), headers: browser_headers
 
-      expect(Statistics::PostViewsQuery.new.count).to eq([[read, 1]])
+      expect(Statistics::PostViewsQuery.call).to eq([[read, 1]])
     end
   end
 

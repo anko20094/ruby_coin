@@ -15,7 +15,7 @@ module DataTasks
 
   def run_task(name)
     DataTasks.load!
-    Rake::Task.tasks.select { |task| task.name.match?(/\A(after_party|cv|team):/) }.each(&:reenable)
+    Rake::Task.tasks.select { |task| task.name.match?(/\A(after_party|cleanup|covers|team):/) }.each(&:reenable)
 
     capture { Rake::Task[name].invoke }
   end
@@ -50,7 +50,11 @@ module DataTasks
     @env_overrides = (@env_overrides || {}).merge(variables.transform_keys(&:to_s))
 
     allow(ENV).to receive(:[]).and_call_original
-    @env_overrides.each { |name, value| allow(ENV).to receive(:[]).with(name).and_return(value) }
+    allow(ENV).to receive(:fetch).and_call_original
+    @env_overrides.each do |name, value|
+      allow(ENV).to receive(:[]).with(name).and_return(value)
+      allow(ENV).to receive(:fetch).with(name, anything) { |_, default| value.nil? ? default : value }
+    end
   end
 end
 

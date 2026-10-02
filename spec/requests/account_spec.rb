@@ -58,16 +58,25 @@ describe 'the one account', :jobs, type: :request do
   end
 
   describe 'registration' do
-    it 'stays closed' do
-      get new_user_registration_path(locale: 'en')
+    include_context 'when errors render as pages'
 
-      expect(response).to redirect_to(new_user_session_path)
+    it 'stays closed: the sign-up address sends you home' do
+      get '/en/users/sign_up'
+
+      expect(response).to redirect_to('/en')
+    end
+
+    it 'sends a locale-less sign-up address to the default locale' do
+      get '/users/sign_up'
+
+      expect(response).to redirect_to("/#{I18n.default_locale}")
     end
 
     it 'cannot be posted to' do
-      attempt = -> { post user_registration_path(locale: 'en'), params: { user: { email: 'a@example.com' } } }
+      attempt = -> { post '/en/users', params: { user: { email: 'a@example.com' } } }
 
       expect(&attempt).not_to change(User, :count)
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

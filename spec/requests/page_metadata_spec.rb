@@ -2,12 +2,11 @@
 
 require 'rails_helper'
 
-# The site exists to be linked to. Before this every one of those links unfurled as a grey
-# rectangle: no description, no Open Graph, no Twitter card, no canonical, no hreflang.
+# The site exists to be linked to, so every page carries a description, Open Graph, Twitter
+# card, canonical and hreflang.
 describe 'page metadata', type: :request do
   include_context 'when carrierwave cleanup'
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   def meta(name)
     response.body[/<meta [^>]*(?:property|name)="#{Regexp.escape(name)}"[^>]*>/]
@@ -17,11 +16,14 @@ describe 'page metadata', type: :request do
     meta(name)&.[](/content="([^"]*)"/, 1)
   end
 
+  # The card's recorded digest rides on its URL, so a re-rendered card is fetched again.
+  def card_url(name) = "http://www.example.com/og/#{name}.png?v=#{OgCards.recorded.fetch(name)}"
+
   describe 'a case page' do
     before { get '/en/work/dna' }
 
     it 'unfurls with its own card, not a grey nothing' do
-      expect(content_of('og:image')).to eq('http://www.example.com/og/dna-en.png')
+      expect(content_of('og:image')).to eq(card_url('dna-en'))
       expect(content_of('og:image:width')).to eq('1200')
       expect(content_of('twitter:card')).to eq('summary_large_image')
     end
@@ -52,7 +54,7 @@ describe 'page metadata', type: :request do
       I18n.with_locale(:en) { create(:post, status: 'active', title: 'An entry', subtitle: 'Its lede') }
     end
 
-    # The handoff asks journal posts to unfurl with their existing cover image.
+    # A journal post unfurls with its own cover image rather than the site card.
     it 'unfurls with its own cover' do
       get post_path(post_record, locale: 'en')
 
@@ -69,7 +71,7 @@ describe 'page metadata', type: :request do
 
       expect(content_of('og:type')).to eq('website')
       expect(response.body).not_to include('"@type":"ProfilePage"')
-      expect(content_of('og:image')).to eq('http://www.example.com/og/site-en.png')
+      expect(content_of('og:image')).to eq(card_url('site-en'))
     end
   end
 
@@ -102,8 +104,8 @@ describe 'page metadata', type: :request do
     it 'writes an ampersand once, in the tab and in a share preview' do
       get '/en/team/mykhailo'
 
-      expect(response.body).to include('<title>Mykhail Yun · cofounder · product &amp; clients | rubyco.in</title>')
-      expect(content_of('og:title')).to eq('Mykhail Yun · cofounder · product &amp; clients | rubyco.in')
+      expect(response.body).to include('<title>Mykhail Yun · co-founder · product &amp; clients | rubyco.in</title>')
+      expect(content_of('og:title')).to eq('Mykhail Yun · co-founder · product &amp; clients | rubyco.in')
       expect(response.body).not_to include('&amp;amp;')
     end
 
@@ -119,7 +121,7 @@ describe 'page metadata', type: :request do
   it 'gives the Ukrainian pages the Ukrainian card and locale' do
     get '/uk/work/dna'
 
-    expect(content_of('og:image')).to eq('http://www.example.com/og/dna-uk.png')
+    expect(content_of('og:image')).to eq(card_url('dna-uk'))
     expect(content_of('og:locale')).to eq('uk_UA')
   end
 
@@ -139,8 +141,8 @@ describe 'page metadata', type: :request do
 
     get '/en/work/brand-new'
 
-    expect(content_of('og:image')).to eq('http://www.example.com/og/site-en.png')
-    expect(content_of('twitter:image')).to eq('http://www.example.com/og/site-en.png')
+    expect(content_of('og:image')).to eq(card_url('site-en'))
+    expect(content_of('twitter:image')).to eq(card_url('site-en'))
   end
 
   # A paginated or filtered list is a different list, not a copy of the first one; the person

@@ -1,17 +1,10 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
-  # Pagy 43+: provide compatibility wrapper for existing views
-  def pagy_bootstrap_nav(pagy, classes: 'pagination', **)
-    pagy.series_nav(:bootstrap, classes:, **).html_safe # rubocop:disable Rails/OutputSafety
-  end
-
-  # Replace, not prepend, and aimed at the frame that actually exists. This used to target
-  # id="flash", which is rendered nowhere in the app — Turbo drops a stream whose target is
-  # missing, silently, so every tag create/update/destroy and every post destroy acknowledged
-  # nothing. `shared/flash` *is* the frame, so it replaces itself rather than nesting.
+  # Replace, not prepend: the admin layout renders FlashComponent as the frame
+  # `flash_message`, so the stream swaps the whole region for the new messages.
   def flash_stream
-    turbo_stream.replace 'flash_message', partial: 'shared/flash'
+    turbo_stream.replace 'flash_message', FlashComponent.new(flash:, frame_id: 'flash_message')
   end
 
   # The brand in a document title is the wordmark the site actually shows — "rubyco.in", not

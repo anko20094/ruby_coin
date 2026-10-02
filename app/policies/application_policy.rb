@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Deny by default: a policy opens exactly the actions it names, so a new controller that forgets
+# its own policy cannot fall through to a permissive read.
 class ApplicationPolicy
   attr_reader :user, :record
 
@@ -9,11 +11,11 @@ class ApplicationPolicy
   end
 
   def index?
-    true
+    false
   end
 
   def show?
-    true
+    false
   end
 
   def create?

@@ -10,7 +10,7 @@ module Statistics
   class PostViewsQuery < BaseQuery
     LIMIT = 50
 
-    def count
+    def call
       counts = Ahoy::Event.where(name: 'Viewed Post')
                           .group(Arel.sql("properties->>'post_id'"))
                           .order(Arel.sql('count_all DESC'))

@@ -3,13 +3,11 @@
 # The front door. Everything on it is real content: the hero reads from the CV, the latest
 # entry from the journal, the three cards from the cases.
 class HomeController < ApplicationController
-  layout 'theme'
-
   RECENT_CASES = 3
 
   # The old front page was the article stream, so its pagination and tag filter lived on these
   # query strings (page, tag_ids, order). They are gone for good now that / is the home page —
-  # 301, and carry what they meant across to /journal. (redesign_plan.md §4.3)
+  # 301, and carry what they meant across to /journal.
   LEGACY_PER_PAGE = 6
 
   # Ahead of the locale redirect: an old address is one permanent hop, not a 302 and then a 301.
@@ -17,11 +15,15 @@ class HomeController < ApplicationController
 
   def index
     readable = Post.translated_in(I18n.locale).includes(:tags, :user, :translations)
-    @latest = readable.main.first || readable.active.first
-    @cases = Case.ordered.limit(RECENT_CASES)
+    @latest = readable.main.first || readable.active.ordered.first
+    # Seven rows: one load answers the cards, the count and the year.
+    cases = Case.ordered.to_a
+    @cases = cases.first(RECENT_CASES)
     @people = Team.crew
-    @projects_count = Case.count
-    @first_year = Case.first_year
+    @projects_count = cases.size
+    @first_year = Case.first_year(cases)
+
+    cache_publicly(cases, @latest, @latest&.tags, @latest&.user)
   end
 
   private

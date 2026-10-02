@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Statistics
-  # Views per case — the number the handoff says should decide what sits at the top of /work.
+  # Views per case — the number that should decide what sits at the top of /work.
   class CaseViewsQuery < BaseQuery
-    def count
+    def call
       counts = Ahoy::Event.where(name: 'Viewed Case')
                           .group(Arel.sql("properties->>'case_id'"))
                           .count

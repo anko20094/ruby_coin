@@ -17,6 +17,8 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from Pagy::RangeError, with: :redirect_to_last_page
 
+  private
+
   def set_pagy_locale
     # Pagy 43 internal i18n is thread-local; keep it in sync with Rails I18n
     Pagy::I18n.locale = I18n.locale.to_s
@@ -31,8 +33,6 @@ class ApplicationController < ActionController::Base
     flash[:alert] = t('application_controller.alert')
     redirect_to(root_path)
   end
-
-  private
 
   # A page past the last one has no entries, so it goes to the last page that has. Reached only
   # by a list that passes `raise_range_error: true`.

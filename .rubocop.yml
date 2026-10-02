@@ -222,6 +222,7 @@ RSpec/MessageSpies:
 
 RSpec/DescribeClass:
   Exclude:
+    - 'spec/content/*.rb'
     - 'spec/tasks/deployment/*.rb'
 
 RSpec/ContextWording:

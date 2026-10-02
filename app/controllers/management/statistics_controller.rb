@@ -1,27 +1,26 @@
 # frozen_string_literal: true
 
 module Management
-  # What gets read. The screen used to answer only "how many post views in total" and split
-  # each post's count across every title it had ever carried; it could not answer the question
-  # the handoff says should decide the order of /work — which cases recruiters open.
+  # What gets read: views per post and per case — the latter being what should decide the
+  # order of /work.
   class StatisticsController < ApplicationController
     before_action :authorize_policy
 
     def index
       @totals = {
-        today: Statistics::DailyViewsQuery.new.count,
-        month: Statistics::MonthlyViewsQuery.new.count,
-        year: Statistics::YearlyViewsQuery.new.count,
-        all: Statistics::TotalViewsQuery.new.count
+        today: Statistics::ViewsQuery.call(:day),
+        month: Statistics::ViewsQuery.call(:month),
+        year: Statistics::ViewsQuery.call(:year),
+        all: Statistics::ViewsQuery.call
       }
-      @post_views = Statistics::PostViewsQuery.new.count
-      @case_views = Statistics::CaseViewsQuery.new.count
+      @post_views = Statistics::PostViewsQuery.call
+      @case_views = Statistics::CaseViewsQuery.call
     end
 
     private
 
     def authorize_policy
-      authorize :statistics
+      authorize [:management, :statistics]
     end
   end
 end

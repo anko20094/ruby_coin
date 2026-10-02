@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 describe Statistics::PostViewsQuery, type: :query do
-  subject(:result) { described_class.new.count }
+  subject(:result) { described_class.call }
 
   include_context 'when carrierwave cleanup'
 
@@ -44,7 +44,7 @@ describe Statistics::PostViewsQuery, type: :query do
       collect = ->(*, payload) { statements << payload[:sql] }
 
       ActiveSupport::Notifications.subscribed(collect, 'sql.active_record') do
-        described_class.new.count.each { |(post)| post.title }
+        described_class.call.each { |(post)| post.title }
       end
 
       expect(statements.grep(/FROM "post_translations"/).size).to eq(1)

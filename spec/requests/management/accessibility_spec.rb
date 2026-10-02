@@ -33,13 +33,13 @@ describe 'the /management screens for a keyboard and a screen reader' do
 
       expect(current.size).to eq(1)
       expect(current.first['aria-current']).to eq('page')
-      expect(current.first.at_css('.mg-model__name').text).to eq('Post')
+      expect(current.first.at_css('.mg-model__name').text).to eq('Entry')
     end
 
     it 'keeps the model name inside each link, so the collapsed rail still names it' do
       post_link = page.at_css('a.mg-model')
 
-      expect(post_link.at_css('.mg-model__name').text).to eq('Post')
+      expect(post_link.at_css('.mg-model__name').text).to eq('Entry')
       expect(post_link.at_css('.mg-model__count')).to be_present
     end
   end
@@ -132,21 +132,25 @@ describe 'the /management screens for a keyboard and a screen reader' do
   describe 'the case list' do
     before { get '/en/management/cases' }
 
-    it 'names the case on its edit and delete controls' do
-      row = page.css('.case-row').find { |r| r.at_css('.case-row__title').text.include?('DNA') }
+    def row_for(title)
+      page.css('tr.mg-case-row').find { |row| row.at_css('.mg-title').text.include?(title) }
+    end
 
-      expect(row.at_css('.delete button')['aria-label']).to eq('Delete DNA')
-      expect(row.at_css('.edit a')['aria-label']).to eq('Edit DNA')
+    it 'makes the title the way into the editor and names the case on delete' do
+      row = row_for('DNA')
+
+      expect(row.at_css('a.mg-title-link')['href']).to match(%r{\A/en/management/cases/[^/]+/edit\z})
+      expect(row.at_css('button.mg-action--danger')['aria-label']).to eq('Delete DNA')
     end
 
     it 'names the case in the delete confirmation' do
-      form = page.css('.case-row').find { |r| r.at_css('.case-row__title').text.include?('DNA') }.at_css('.delete form')
+      form = row_for('DNA').at_css('form')
 
       expect(form['data-confirm-message-value']).to eq('Are you sure you want to delete DNA?')
     end
 
     it 'gives every delete control a different name' do
-      labels = page.css('.case-row .delete button').pluck('aria-label')
+      labels = page.css('tr.mg-case-row button.mg-action--danger').pluck('aria-label')
 
       expect(labels.uniq.size).to eq(labels.size)
     end
@@ -193,10 +197,10 @@ describe 'the /management screens for a keyboard and a screen reader' do
     it 'names the tag on its edit and delete controls' do
       get '/en/management/tags'
 
-      row = page.css('.tag').find { |t| t.text.include?('rails') }
+      row = page.css('.mg-tag-row').find { |t| t.text.include?('rails') }
 
-      expect(row.at_css('.edit a')['aria-label']).to eq('Edit rails')
-      expect(row.at_css('.delete button')['aria-label']).to eq('Delete rails')
+      expect(row.at_css('a.mg-icon-btn')['aria-label']).to eq('Edit rails')
+      expect(row.at_css('button.mg-icon-btn')['aria-label']).to eq('Delete rails')
     end
 
     it 'offers no search box that searches nothing' do
@@ -209,7 +213,7 @@ describe 'the /management screens for a keyboard and a screen reader' do
       before { get "/en/management/tags/#{tag.id}/edit" }
 
       it 'saves with a button that has a name' do
-        save = page.at_css('.tag-editor .save-tag')
+        save = page.at_css('.mg-tag-editor button.mg-icon-btn')
 
         expect(save.name).to eq('button')
         expect(save['type']).to eq('submit')
@@ -218,7 +222,7 @@ describe 'the /management screens for a keyboard and a screen reader' do
       end
 
       it 'cancels with a link that has a name and leaves the frame' do
-        cancel = page.at_css('.tag-editor .cancel-tag-icon')
+        cancel = page.at_css('.mg-tag-editor a.mg-icon-btn')
 
         expect(cancel.name).to eq('a')
         expect(cancel['href']).to eq('/en/management/tags')
@@ -227,7 +231,7 @@ describe 'the /management screens for a keyboard and a screen reader' do
       end
 
       it 'names the field' do
-        expect(page.at_css('.tag-editor input[type="text"]')['aria-label'])
+        expect(page.at_css('.mg-tag-editor input[type="text"]')['aria-label'])
           .to eq(I18n.t('management.tags.form.title_label', locale: :en))
       end
     end

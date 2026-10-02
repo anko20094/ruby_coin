@@ -6,7 +6,7 @@ require 'rails_helper'
 
 # Boots the application the way the server does and reads back what it configured. The
 # environment files are not loaded in test, so nothing else sees them.
-RSpec.describe 'the production environment' do # rubocop:disable RSpec/DescribeClass
+RSpec.describe 'the production environment', :slow do # rubocop:disable RSpec/DescribeClass
   probe = <<~RUBY
     require 'json'
     deflater = Rails.application.middleware.find { |middleware| middleware.klass == Rack::Deflater }

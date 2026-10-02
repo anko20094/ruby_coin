@@ -21,6 +21,9 @@ class PhotoUploader < CarrierWave::Uploader::Base
 
   CACHE_TTL = 1.day
 
+  # What ImageMagick reports for a file that needs no rotation.
+  UPRIGHT = ['', 'Undefined', 'TopLeft'].freeze
+
   before :cache, :purge_stale_cache
 
   process :normalize
@@ -58,6 +61,17 @@ class PhotoUploader < CarrierWave::Uploader::Base
       stripped = builder.loader(page: 0).strip
       %w[jpg jpeg].include?(stored_extension) ? stripped.background('white').alpha('remove').alpha('off') : stripped
     end
+  end
+
+  # Whether #normalize would change nothing but the encoding: one frame, upright, no profile
+  # (EXIF, XMP, ICC) and no comment left. Re-encoding a JPEG that already is all that only loses
+  # quality, so a rebuild asks this first and leaves such an original as it is.
+  def normalized?
+    image = ::MiniMagick::Image.new(current_path)
+    data = Array.wrap(image.data).first || {}
+
+    image.layers.size == 1 && data['profiles'].blank? && UPRIGHT.include?(data['orientation'].to_s) &&
+      !data.fetch('properties') { {} }.key?('comment')
   end
 
   # Crop to the version's shape, then shrink to fit it, never enlarge: a cover smaller than

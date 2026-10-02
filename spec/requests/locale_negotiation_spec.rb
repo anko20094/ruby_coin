@@ -7,7 +7,6 @@ require 'rails_helper'
 # one a printed CV carries, so an English-speaking recruiter landed on a Ukrainian page.
 describe 'locale negotiation', type: :request do
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   it 'sends a browser that prefers English to the English page' do
     get '/work', headers: { 'Accept-Language' => 'en-GB,en;q=0.9' }
@@ -23,6 +22,25 @@ describe 'locale negotiation', type: :request do
 
   it 'honours quality values rather than header order' do
     get '/work', headers: { 'Accept-Language' => 'uk;q=0.3,en;q=0.9' }
+
+    expect(response).to redirect_to('/en/work')
+  end
+
+  # q=0 is "not acceptable", not "no preference given".
+  it 'does not pick a language the browser marked q=0' do
+    get '/work', headers: { 'Accept-Language' => 'en;q=0, uk;q=0.5' }
+
+    expect(response).to redirect_to('/uk/work')
+  end
+
+  it 'counts a language with no q as the most wanted' do
+    get '/work', headers: { 'Accept-Language' => 'uk;q=0.9, en' }
+
+    expect(response).to redirect_to('/en/work')
+  end
+
+  it 'keeps the order of languages the browser weighed the same' do
+    get '/work', headers: { 'Accept-Language' => 'de, en;q=0.5, uk;q=0.5' }
 
     expect(response).to redirect_to('/en/work')
   end

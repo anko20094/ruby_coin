@@ -2,13 +2,10 @@
 
 require 'rails_helper'
 
-# ⌘K (handoff §9a). The handoff is explicit that it should be backed by the existing /search
-# PgSearch action rather than filtering in memory — the prototype only did that for want of a
-# server.
+# ⌘K. Backed by the same PgSearch as /search, not by filtering in memory.
 describe 'the command palette', type: :request do
   include_context 'when carrierwave cleanup'
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   let!(:post_record) do
     I18n.with_locale(:en) { create(:post, status: 'active', title: 'Counting views properly') }
@@ -54,7 +51,7 @@ describe 'the command palette', type: :request do
   # surface — the footer, the eyebrow — calls it команда.
   it 'finds a page by the other name the site prints for it' do
     expect(palette('команда', locale: 'uk').pluck('url')).to include(team_path(locale: 'uk'))
-    expect(palette('crew').pluck('url')).to include(team_path(locale: 'en'))
+    expect(palette('the team').pluck('url')).to include(team_path(locale: 'en'))
   end
 
   it 'finds the pages themselves' do
@@ -65,14 +62,14 @@ describe 'the command palette', type: :request do
 
   # The browser prints a row with textContent, so an entity arrives as its own characters.
   it 'answers with text rather than with entities' do
-    expect(palette('mykhailo').first['hint']).to eq('cofounder · product & clients')
+    expect(palette('mykhailo').first['hint']).to eq('co-founder · product & clients')
   end
 
   # The badge beside each row is read, so it is translated; `kind` stays the machine word.
   it 'labels each row in the reader\'s language' do
     expect(palette('dna').first['kind']).to eq('case')
-    expect(palette('dna').first['label']).to eq('case')
-    expect(palette('dna', locale: 'uk').first['label']).to eq('кейс')
+    expect(palette('dna').first['label']).to eq('project')
+    expect(palette('dna', locale: 'uk').first['label']).to eq('проєкт')
   end
 
   it 'never offers a hidden entry' do

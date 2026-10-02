@@ -3,12 +3,6 @@
 # A list of rows kept in one JSONB column, declared once so the model, the admin form and the
 # importer agree on the shape.
 #
-# This was Case's, and it is here because the CV turned out to be the same thing. A CV is one
-# document with three ordered lists inside it — career, stack groups, strengths — and it used
-# to be a table of ten rows with its own model, controller, policy and CRUD screens, so
-# changing two words meant a page navigation and reordering meant typing a number into a
-# field. See redesign_plan.md §12.1.
-#
 # A field kind is one of:
 #
 #   :plain     — one value, the same in both languages (a date range, a figure)

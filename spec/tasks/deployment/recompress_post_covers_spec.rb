@@ -37,7 +37,7 @@ RSpec.describe 'after_party:recompress_post_covers' do
     expect(recorded.count).to eq(1)
   end
 
-  it 'names a cover it cannot process and carries on with the rest' do
+  it 'names a cover it cannot process, carries on with the rest and does not hold the deploy' do
     bad = post
     create(:post)
     allow_any_instance_of(PhotoUploader).to receive(:recreate_versions!).and_wrap_original do |original, *args|
@@ -48,10 +48,10 @@ RSpec.describe 'after_party:recompress_post_covers' do
 
     run = run_task(task)
 
-    expect(run.stderr).to include("post ##{bad.id}", 'boom')
+    expect(run.stderr).to include("post ##{bad.id}", 'boom', "covers:rebuild IDS=#{bad.id}")
     expect(run.stdout).to include('covers rebuilt: 1', 'failed: 1')
-    expect(run).to be_aborted
-    expect(recorded).to be_empty
+    expect(run).not_to be_aborted
+    expect(recorded.count).to eq(1)
   end
 
   it 'writes nothing to disk under DRY_RUN, counts the covers, and does not record itself' do

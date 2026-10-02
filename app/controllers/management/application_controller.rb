@@ -27,5 +27,13 @@ module Management
       policy.style_src_elem :self, :unsafe_inline
       policy.frame_src :self
     end
+
+    helper_method :post_counts
+
+    private
+
+    # Posts per status, read once per request: the posts list's filter tabs and the sidebar both
+    # print them.
+    def post_counts = @post_counts ||= Post.group(:status).count
   end
 end

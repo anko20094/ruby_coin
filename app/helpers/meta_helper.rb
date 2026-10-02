@@ -12,16 +12,21 @@
 # view context — the same thing content_for does, but holding a hash rather than a buffer.
 module MetaHelper
   SITE_NAME = 'rubyco.in'
-  DESCRIPTION_LIMIT = 200
+  DESCRIPTION_LIMIT = 160
 
   # rubocop:disable Rails/HelperInstanceVariable
   # `person` names who a profile page is about. Without it every profile page would describe
-  # the owner: the schema read CVProfile directly, so /team/natalia would have told a search
+  # the owner: the schema read the owner's CV directly, so /team/natalia would have told a search
   # engine it was Danyil's page.
-  def page_meta(description: nil, image: nil, type: 'website', published_at: nil, updated_at: nil, person: nil)
+  #
+  # `locales` is the languages a page exists in, when that is fewer than all of them (an entry
+  # written in one); `canonical_query` the parameters that choose which list a page is.
+  def page_meta(description: nil, image: nil, type: 'website', published_at: nil, updated_at: nil, person: nil,
+                locales: nil, canonical_query: nil)
     @page_meta = {
       description: description, image: image, type: type,
-      published_at: published_at, updated_at: updated_at, person: person
+      published_at: published_at, updated_at: updated_at, person: person,
+      locales: locales, canonical_query: canonical_query
     }.compact
   end
 
@@ -29,7 +34,7 @@ module MetaHelper
   # attribute, which escapes it again. strip_tags alone left the entities in, so a role reading
   # "product & clients" was served to Telegram and Slack as "product &amp;amp; clients".
   def meta_description
-    text = @page_meta&.dig(:description).presence || CVProfile.current.summary
+    text = @page_meta&.dig(:description).presence || Team.owner_cv.summary
     plain(text).squish.truncate(DESCRIPTION_LIMIT, separator: ' ')
   end
 
@@ -42,7 +47,7 @@ module MetaHelper
   # An absolute URL, because a share card is fetched by someone else's server.
   def meta_image
     path = @page_meta&.dig(:image).presence || "/og/site-#{I18n.locale}.png"
-    path.start_with?('http') ? path : absolute_url(path)
+    path.start_with?('http') ? path : absolute_url(path, card_version(path))
   end
 
   # Cards are baked by `rake og:cards`, so a case added in the admin has none until that runs;
@@ -68,13 +73,21 @@ module MetaHelper
     end
   end
 
-  # The languages this page exists in: an entry is only in the ones it has text for, and the
+  # The languages this page exists in: all of them unless the page said otherwise, and the
   # language being read is always listed.
   def page_locales
-    return I18nExtended::AVAILABLE_LOCALES unless controller_path == 'journal' && action_name == 'show'
+    written = @page_meta&.dig(:locales)
+    return I18nExtended::AVAILABLE_LOCALES if written.nil?
 
-    written = @post.translated_locales.map(&:to_s) | [I18n.locale.to_s]
+    written = written.map(&:to_s) | [I18n.locale.to_s]
     I18nExtended::AVAILABLE_LOCALES.select { |locale| written.include?(locale) }
+  end
+
+  # The parameters that make a list a different list: a later page, a tag. A first page and a
+  # tag that does not exist are not addresses of their own.
+  def listing_query(tag: nil)
+    page = request.query_parameters['page'].to_s.to_i
+    { 'page' => (page if page > 1), 'tag_id' => tag&.id }.compact
   end
 
   # Schema.org, so a search engine can tell a person from an article from a portfolio.
@@ -99,14 +112,15 @@ module MetaHelper
     url.to_s
   end
 
-  def canonical_query
-    return {} unless controller_path == 'journal' && %w[index search].include?(action_name)
+  def canonical_query = @page_meta&.dig(:canonical_query) || {}
 
-    query = {}
-    page = request.query_parameters['page'].to_s.to_i
-    query['page'] = page if page > 1
-    query['tag_id'] = @active_tag.id if @active_tag
-    query
+  # A re-rendered card keeps its file name, and the services that unfurl a link cache the image
+  # by URL; the card's recorded digest makes the new one a new address.
+  def card_version(path)
+    name = path[%r{\A/og/([\w-]+)\.png\z}, 1]
+    digest = OgCards.recorded[name] if name
+
+    digest ? { 'v' => digest } : {}
   end
 
   def article_schema
@@ -115,7 +129,7 @@ module MetaHelper
       headline: meta_title, description: meta_description, image: meta_image,
       url: canonical_url, inLanguage: I18n.locale.to_s,
       datePublished: meta_published_at&.iso8601, dateModified: meta_updated_at&.iso8601,
-      author: { '@type' => 'Person', name: CVProfile.current.name }
+      author: { '@type' => 'Person', name: Team.owner_cv.name }
     }.compact
   end
 
@@ -135,12 +149,9 @@ module MetaHelper
 
   # /cv is the owner's page, so it describes the CV itself.
   def owner_subject
-    profile = CVProfile.current
+    profile = Team.owner_cv
 
-    {
-      name: profile.name, role: profile.role, description: profile.summary,
-      links: profile.contact_rows.filter_map { |_, _, href| href unless href.to_s.start_with?('mailto:') }
-    }
+    { name: profile.name, role: profile.role, description: profile.summary, links: Team.owner&.public_links }
   end
   # rubocop:enable Rails/HelperInstanceVariable
 end

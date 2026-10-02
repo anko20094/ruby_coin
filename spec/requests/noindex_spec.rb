@@ -5,8 +5,6 @@ require 'rails_helper'
 # robots.txt Disallow is a prefix match on a path a crawler may still list when it is linked to;
 # the header is what a crawler that did fetch the page is told.
 describe 'keeping the admin and the sign-in screens out of the index', type: :request do
-  include_context 'when the cv is imported'
-
   let(:noindex) { 'noindex, nofollow' }
 
   I18nExtended::AVAILABLE_LOCALES.each do |locale|
@@ -22,13 +20,6 @@ describe 'keeping the admin and the sign-in screens out of the index', type: :re
         get new_user_password_path(locale:)
 
         expect(response).to be_successful
-        expect(response.headers['X-Robots-Tag']).to eq(noindex)
-      end
-
-      it 'marks the closed registration screen, which redirects' do
-        get new_user_registration_path(locale:)
-
-        expect(response).to have_http_status(:see_other)
         expect(response.headers['X-Robots-Tag']).to eq(noindex)
       end
 

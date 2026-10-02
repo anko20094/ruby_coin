@@ -159,6 +159,16 @@ describe PhotoUploader do
         expect(image(path).exif).to be_empty
       end
     end
+
+    # A rebuild asks this before normalising again, so a JPEG is never re-encoded twice.
+    it 'calls an original normalised only once it has been' do
+      raw = described_class.new(Post.new(id: 987_654), :photo)
+      raw.retrieve_from_store!('x')
+      allow(raw).to receive(:current_path).and_return(phone.to_s)
+      expect(raw.normalized?).to be(false)
+
+      expect(store(phone).normalized?).to be(true)
+    end
   end
 
   describe 'names' do

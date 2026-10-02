@@ -14,6 +14,12 @@ RSpec.describe Post do
 
   describe 'enums' do
     it { is_expected.to define_enum_for(:status).with_values(active: 0, inactive: 1) }
+
+    # The caller picks the order, so a search ranks by relevance without unscoping one.
+    it 'scopes by status without an order' do
+      expect(described_class.active.order_values).to be_empty
+      expect(described_class.inactive.order_values).to be_empty
+    end
   end
 
   describe 'validations' do
@@ -354,12 +360,12 @@ RSpec.describe Post do
       I18n.with_locale(:en) { post.update!(title: 'English title', subtitle: 'English lede') }
       I18n.with_locale(:uk) { post.update!(title: 'Український заголовок', subtitle: 'Український лід') }
 
-      expect(post.reload.post_translations.pluck(:locale).sort).to eq(%w[en uk])
-      expect(post.translations.count).to eq(post.post_translations.count)
+      expect(post.reload.translations.pluck(:locale).sort).to eq(%w[en uk])
+      expect(post.translations.count).to eq(PostTranslation.where(post_id: post.id).count)
     end
 
     it 'does not read the legacy body column on a preload, though it stays in the table' do
-      post.post_translations.update_all(description: '<p>the body from before Action Text</p>')
+      PostTranslation.where(post_id: post.id).update_all(description: '<p>the body from before Action Text</p>')
 
       loaded = described_class.includes(:translations).find(post.id).translations.first
 
@@ -379,7 +385,7 @@ RSpec.describe Post do
     # Deliberate: an untranslated post has to render empty so the gap is visible, rather than
     # quietly showing the other language.
     it 'does not fall back to another locale' do
-      post.post_translations.where(locale: 'en').delete_all
+      post.translations.where(locale: 'en').delete_all
 
       expect(I18n.with_locale(:en) { post.reload.title }).to be_nil
     end
@@ -404,7 +410,7 @@ RSpec.describe Post do
     it 'drops a locale that is missing its subtitle' do
       I18n.with_locale(:en) { post.update!(title: 'Title', subtitle: 'Lede') }
       I18n.with_locale(:uk) { post.update!(title: 'Заголовок', subtitle: 'Лід') }
-      post.post_translations.find_by(locale: 'en').update!(subtitle: nil)
+      post.translations.find_by(locale: 'en').update!(subtitle: nil)
 
       expect(post.reload.translated_locales).to eq([:uk])
     end
@@ -471,11 +477,51 @@ RSpec.describe Post do
 
     it 'needs a title, a subtitle and a stored body in the language' do
       I18n.with_locale(:uk) { no_body_in_uk.update!(title: 'Є лише заголовок', subtitle: 'Є підзаголовок') }
-      no_body_in_uk.update_columns(search_body_uk: nil)
+      ActionText::RichText.where(record: no_body_in_uk, name: 'description_uk').delete_all
 
       expect(described_class.translated_in(:uk)).to include(full)
       expect(described_class.translated_in(:uk)).not_to include(no_body_in_uk)
       expect(described_class.translated_in(:en)).to include(full, no_body_in_uk)
+    end
+
+    # The list reads the scope, the entry page reads the predicate. They disagreed: an entry that
+    # was only a picture opened in a language and was never listed in it.
+    describe 'and #translated_in?, which must agree with it' do
+      def readable(post, locale)
+        [described_class.translated_in(locale).exists?(post.id), described_class.find(post.id).translated_in?(locale)]
+      end
+
+      def with_uk_body(html)
+        ActionText::RichText.where(record: full, name: 'description_uk').update_all(body: html)
+        # What #mirror_search_bodies would have stored for it.
+        full.update_columns(search_body_uk: ActionText::Content.new(html).to_plain_text)
+        full
+      end
+
+      {
+        'a body of words' => ['<p>Слова</p>', true],
+        'a body that is only an image' => ['<p><img src="https://example.com/a.png"></p>', true],
+        'a body that is only whitespace' => ["  \n ", false],
+        'an empty body' => ['', false]
+      }.each do |name, (html, expected)|
+        it "says the same for #{name}" do
+          post = with_uk_body(html)
+
+          expect(readable(post, :uk)).to eq([expected, expected])
+        end
+      end
+
+      it 'says the same for a post with no body row in the language' do
+        ActionText::RichText.where(record: full, name: 'description_uk').delete_all
+
+        expect(readable(full, :uk)).to eq([false, false])
+      end
+
+      it 'says the same for a post with no subtitle in the language' do
+        full.translations.find_by!(locale: 'uk').update_columns(subtitle: '')
+
+        expect(readable(full, :uk)).to eq([false, false])
+      end
     end
   end
 end
