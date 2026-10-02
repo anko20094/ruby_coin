@@ -9,11 +9,11 @@ cases:
     mark: "01"
     own: false
     year:
-      en: "2023—2026"
-      uk: "2023—2026"
+      en: "2023–2026"
+      uk: "2023–2026"
     sector:
-      en: "proptech · usa"
-      uk: "proptech · сша"
+      en: "proptech · USA"
+      uk: "proptech · США"
     status:
       en: "commercial · team of 14"
       uk: "комерційний · команда з 14"
@@ -28,7 +28,7 @@ cases:
       uk: "Senior Backend Engineer · #2 з 14 контриб’юторів · автор третього pull request у репозиторії"
     stack:
       - "Rails 7.2"
-      - "PostgreSQL · 60 partitions"
+      - "PostgreSQL · 80 partitions"
       - "pg_trgm · citext"
       - "OpenSearch"
       - "Sidekiq · Redis"
@@ -39,7 +39,7 @@ cases:
           uk: "295"
         label:
           en: "commits merged to mainline — 20% of the repository"
-          uk: "комітів у мейнлайні — 20% репозиторію"
+          uk: "комітів у мейнлайні — 20 % репозиторію"
       - value:
           en: "#2 / 14"
           uk: "#2 / 14"
@@ -51,10 +51,10 @@ cases:
           uk: "64"
         label:
           en: "schema migrations — 22.5% of all in the repo"
-          uk: "міграції схеми — 22.5% усіх у репо"
+          uk: "міграції схеми — 22,5 % усіх у репо"
       - value:
           en: "20.5%"
-          uk: "20,5%"
+          uk: "20,5 %"
         label:
           en: "of the live application code is still mine"
           uk: "живого коду застосунку досі мій"
@@ -64,7 +64,7 @@ cases:
         uk: "Увесь бізнес ріелтора — це люди, які про нього забули"
       body:
         - en: "A US realtor lives on repeat business: the person you sold a house to will sell it again in five to seven years, and refinance twice in between. By then the client has forgotten you exist."
-          uk: "Американський ріелтор живе з повторних угод: людина, якій ти продав будинок, продасть його знову через 5–7 років і двічі рефінансує іпотеку між тим. На той момент клієнт уже не пам’ятає, що ти існуєш."
+          uk: "Американський ріелтор живе з повторних угод: людина, якій ви продали будинок, продасть його знову через 5–7 років і двічі рефінансує іпотеку між тим. На той момент клієнт уже не пам’ятає, що ти існуєш."
         - en: "This service is the platform’s intelligence layer. It ingests every recorded sale and mortgage in the country over eight years of history and turns that into something an agent can act on: who is selling in their area, who they compete with, who they should partner with — and which of their own past clients just did a deal through somebody else."
           uk: "Цей сервіс — аналітичний шар платформи. Він завантажує всі зареєстровані угоди й іпотеки країни за вісім років історії й перетворює це на те, з чим агент може працювати: хто продає в його районі, з ким він конкурує, з ким варто партнеритися — і хто з його власних колишніх клієнтів щойно зробив угоду через когось іншого."
         - en: "Two facts make it hard. The data arrives dirty, from dozens of government registries, MLS databases and paid providers, in different shapes and with the same person spelled five ways. And every external lookup costs real money, so the system has to remember what it already knows."
@@ -103,19 +103,19 @@ cases:
             uk: "PostgreSQL під навантаженням"
           body:
             en: "<b>RANGE partitioning</b> of the month-stats tables, plus the 2025 and 2026 year partitions on sales and loans — the original sales/loans conversion was a colleague’s. <b>Read/write splitting in production traffic</b> via <code>connects_to</code>: roles wired up, the database selector placed correctly in the middleware stack, and the writing role forced at the exact points where read-after-write broke. 3 619 lines across four merged commits."
-            uk: "<b>RANGE-партиціювання</b> місячних агрегатів, а також партиції 2025 і 2026 років для угод та іпотек — початкове переведення угод і іпотек робив колега. <b>Розведення читання й запису в продовому трафіку</b> через <code>connects_to</code>: роли, правильне місце селектора в middleware-стеку і точковий примус <code>writing</code> там, де ламався read-after-write. 3 619 рядків у чотирьох змерджених комітах."
+            uk: "<b>RANGE-партиціювання</b> місячних агрегатів, а також партиції 2025 і 2026 років для угод та іпотек — початкове переведення угод і іпотек робив колега. <b>Розведення читання й запису в робочому трафіку</b> через <code>connects_to</code>: роли, правильне місце селектора в middleware-стеку і точковий примус <code>writing</code> там, де ламався read-after-write. 3 619 рядків у чотирьох змерджених комітах."
         - title:
             en: "A new data supplier, end to end"
             uk: "Нове джерело даних, наскрізно"
           body:
             en: "A pipeline built from nothing for a new market-data feed: S3 download → parse → validate → batched upsert → merge into existing sales, guarding against overwriting co-listing data. Three large PRs of 2.4–3.1k lines, plus a three-level fallback matcher for agent contacts."
-            uk: "Пайплайн з нуля під нового постачальника ринкових даних: завантаження з S3 → парсинг → валідація → батчевий upsert → мерджинг із наявними угодами із захистом від перезапису co-listing. Три великі PR по 2.4–3.1 тис. рядків, плюс трирівневий фолбек-матчинг контактів агентів."
+            uk: "Пайплайн з нуля під нового постачальника ринкових даних: завантаження з S3 → парсинг → валідація → батчевий upsert → мерджинг із наявними угодами із захистом від перезапису co-listing. Три великі PR по 2,4–3,1 тис. рядків, плюс трирівневий фолбек-матчинг контактів агентів."
         - title:
             en: "Search that got smaller"
             uk: "Пошук, який поменшав"
           body:
             en: "OpenSearch filters, sorting and relevance for agent search. Reindexing moved off model callbacks onto a queue with a periodic job, and an OOM during bulk reindex fixed by changing mode and throttling. One search PR deleted <b>7 919 lines</b>, of which 7 131 were recorded HTTP cassettes: simplification, not accumulation."
-            uk: "Фільтри, сортування й релевантність пошуку агентів на OpenSearch. Реіндексацію знято з колбеків моделі на чергу з періодичною джобою, а OOM під масовою реіндексацією полікувано зміною режиму й тротлінгом. Один PR по пошуку видалив <b>7 919 рядків</b>, із яких 7 131 — записані HTTP-касети: спрощення, а не накопичення."
+            uk: "Фільтри, сортування й релевантність пошуку агентів на OpenSearch. Реіндексацію знято з колбеків моделі на чергу з періодичною джобою, а OOM під масовою реіндексацією виправлено зміною режиму й тротлінгом. Один PR по пошуку видалив <b>7 919 рядків</b>, із яких 7 131 — записані HTTP-касети: спрощення, а не накопичення."
         - title:
             en: "Scoring, and knowing when not to pay for it"
             uk: "Скоринг — і коли за нього не платити"
@@ -137,7 +137,7 @@ cases:
           uk: "тікетів закрито наскрізно"
       - value:
           en: "91.9%"
-          uk: "91,9%"
+          uk: "91,9 %"
         label:
           en: "of my PRs touch specs"
           uk: "моїх PR чіпають тести"
@@ -154,8 +154,8 @@ cases:
     mark: "02"
     own: true
     year:
-      en: "2023—2026"
-      uk: "2023—2026"
+      en: "2023–2026"
+      uk: "2023–2026"
     sector:
       en: "content automation"
       uk: "автоматизація контенту"
@@ -167,10 +167,10 @@ cases:
       uk: "DNA"
     tagline:
       en: "A media business runs dozens of Telegram channels. This platform runs them for it — collecting, cleaning, rewriting, scheduling, publishing and billing, unattended."
-      uk: "Медіабізнес веде десятки Telegram-каналів. Ця платформа веде їх за нього — збирає, чистить, переписує, планує, публікує й білить, без наглядача."
+      uk: "Медіабізнес веде десятки Telegram-каналів. Ця платформа веде їх за нього — збирає, чистить, переписує, планує, публікує й виставляє рахунки, без наглядача."
     role:
       en: "Tech lead · architect · PM · devops"
-      uk: "Tech lead · архітектор · PM · devops"
+      uk: "Техлід · архітектор · PM · devops"
     stack:
       - "Rails 8.1 · Ruby 3.4"
       - "PostgreSQL 18"
@@ -185,7 +185,7 @@ cases:
           uk: "33 млн+"
         label:
           en: "combined reach of managed channels"
-          uk: "сукупний охват керованих каналів"
+          uk: "сукупне охоплення керованих каналів"
       - value:
           en: "10k+"
           uk: "10 тис.+"
@@ -217,13 +217,13 @@ cases:
           uk: "<b>Чому це справді складно.</b> В Telegram немає офіційного API для такого. Платформа тримає парк із 61 живого акаунта на низькорівневому протоколі — і Telegram може забанити будь-який за дивну поведінку. Тож більшість інженерії тут — не «зробити фічу», а «не зламатися»: бюджети частоти, розділення відбитків, обробка банів, відновлення сесій — система лікує себе, поки власник спить."
     mine:
       - en: "<b>Designed and built the platform from zero</b> — architecture, product decisions, the roadmap, and 90% of merge commits."
-        uk: "<b>Спроєктував і побудував платформу з нуля</b> — архітектура, продуктові рішення, роадмап і 90% merge-комітів."
+        uk: "<b>Спроєктував і побудував платформу з нуля</b> — архітектура, продуктові рішення, роадмап і 90 % merge-комітів."
       - en: "<b>Led a team of up to six</b> and owned 93% of production releases — 429 deploys."
-        uk: "<b>Вів команду до шести людей</b> і випустив 93% продових релізів — 429 деплоїв."
+        uk: "<b>Вів команду до шести людей</b> і випустив 93 % релізів у продакшн — 429 деплоїв."
       - en: "<b>Ran the platform migrations personally:</b> Python/Pyrogram → Ruby/TDLib, Rails 7.2 → 8.1, PostgreSQL 16 → 18."
         uk: "<b>Провів платформні міграції особисто:</b> Python/Pyrogram → Ruby/TDLib, Rails 7.2 → 8.1, PostgreSQL 16 → 18."
       - en: "<b>Built the billing and the per-customer bot factory</b> — the part that turns a tool into a business."
-        uk: "<b>Зробив біллінг і фабрику ботів під кожного клієнта</b> — те, що перетворює інструмент на бізнес."
+        uk: "<b>Зробив білінг і фабрику ботів під кожного клієнта</b> — те, що перетворює інструмент на бізнес."
     engineering:
       heading:
         en: "A headless monolith with five routes and a self-healing userbot fleet"
@@ -237,7 +237,7 @@ cases:
             uk: "Headless-моноліт"
           body:
             en: "No views, no JS build, no REST API — <b>five routes total</b>. The whole admin and user panel is a state machine inside Telegram: 200k lines of Ruby, 1,100+ service objects, 45 tables."
-            uk: "Ні в’юшок, ні JS-білду, ні REST API — <b>усього п’ять роутів</b>. Уся адмінка й панель користувача — це стейт-машина всередині Telegram: 200 тис. рядків Ruby, 1 100+ сервісних об’єктів, 45 таблиць."
+            uk: "Ні шаблонів (views), ні JS-збірки, ні REST API — <b>усього п’ять роутів</b>. Уся адмінка й панель користувача — це стейт-машина всередині Telegram: 200 тис. рядків Ruby, 1 100+ сервісних об’єктів, 45 таблиць."
         - title:
             en: "Two delivery pipelines"
             uk: "Два пайплайни доставки"
@@ -283,7 +283,7 @@ cases:
           uk: "тікетів · 6 800 год залоговано"
       - value:
           en: "90%"
-          uk: "90%"
+          uk: "90 %"
         label:
           en: "of merge commits"
           uk: "merge-комітів"
@@ -295,13 +295,13 @@ cases:
           uk: "власних перевірок моніторингу"
     scope_note:
       en: "<b>On the reach figure:</b> 33M+ is the sum of subscriber counts across managed channels, not unique people — around 7M distinct Telegram accounts have passed through the platform. I state both because the first number flatters and the second is true."
-      uk: "<b>Про цифру охвату:</b> 33 млн+ — це сума підписників керованих каналів, а не унікальні люди — через платформу пройшло близько 7 млн різних Telegram-акаунтів. Наводжу обидві, бо перша лестить, а друга правдива."
+      uk: "<b>Про цифру охоплення:</b> 33 млн+ — це сума підписників керованих каналів, а не унікальні люди — через платформу пройшло близько 7 млн різних Telegram-акаунтів. Наводжу обидві, бо перша лестить, а друга правдива."
   - slug: "wardybot"
     mark: "03"
     own: true
     year:
-      en: "2023—present"
-      uk: "2023—дотепер"
+      en: "2023–present"
+      uk: "2023–дотепер"
     sector:
       en: "community platform"
       uk: "платформа спільнот"
@@ -316,7 +316,7 @@ cases:
       uk: "Модерація, антиспам та ігрові механіки для великих Telegram-чатів — 2,1 мільйона користувачів на одному сервері за $24 на місяць."
     role:
       en: "Tech lead · architect · product owner · devops"
-      uk: "Tech lead · архітектор · product owner · devops"
+      uk: "Техлід · архітектор · product owner · devops"
     stack:
       - "Rails 8.1 · Ruby 3.4"
       - "PostgreSQL 18"
@@ -368,7 +368,7 @@ cases:
       - en: "<b>Owned production alone:</b> all 196 deploys, the runbooks, the incident response."
         uk: "<b>Продакшн вів сам:</b> усі 196 деплоїв, ранбуки, реакція на інциденти."
       - en: "<b>Owned the business model:</b> subscriptions, two internal currencies, Telegram Stars payments with refunds — and, while the multi-tenant core ran, <b>17 white-label bots</b> on it."
-        uk: "<b>Володів бізнес-моделлю:</b> підписки, дві внутрішні валюти, оплати Telegram Stars із поверненнями — і, поки працювало мультитенантне ядро, <b>17 white-label ботів</b> на ньому."
+        uk: "<b>Відповідав за бізнес-модель:</b> підписки, дві внутрішні валюти, оплати Telegram Stars із поверненнями — і, поки працювало мультитенантне ядро, <b>17 white-label ботів</b> на ньому."
     engineering:
       heading:
         en: "One Rails process, N bots, four currencies and a ledger that cannot drift"
@@ -406,7 +406,7 @@ cases:
             uk: "Модерація перед роутингом"
           body:
             en: "Eight validators in sequence; only the ones that must delete instantly run synchronously. Anti-spam expands <b>64 homoglyphs into regex classes</b>, so <code>ПpNB1т</code> is still caught."
-            uk: "Вісім валідаторів послідовно; синхронно виконуються лише ті, що мусять видалити негайно. Антиспам розкриває <b>64 гомоглифи в regex-класи</b>, тож <code>ПpNB1т</code> усе одно ловиться."
+            uk: "Вісім валідаторів послідовно; синхронно виконуються лише ті, що мусять видалити негайно. Антиспам розкриває <b>64 гомогліфи в regex-класи</b>, тож <code>ПpNB1т</code> усе одно ловиться."
         - title:
             en: "Cross-language RPC · AI billed at cost"
             uk: "Міжмовний RPC · AI за собівартістю"
@@ -445,11 +445,11 @@ cases:
     mark: "04"
     own: false
     year:
-      en: "2022—2025"
-      uk: "2022—2025"
+      en: "2022–2025"
+      uk: "2022–2025"
     sector:
-      en: "proptech · usa"
-      uk: "proptech · сша"
+      en: "proptech · USA"
+      uk: "proptech · США"
     status:
       en: "commercial · 34 contributors"
       uk: "комерційний · 34 контриб’ютори"
@@ -458,7 +458,7 @@ cases:
       uk: "myHomeIQ · Leads"
     tagline:
       en: "The product customers log into and pay for — an eight-year Rails codebase where I owned the money, the permissions and the seam to the other service."
-      uk: "Продукт, у який клієнти логіняться і за який платять — восьмирічна Rails-кодова база, де моїми були гроші, права доступу і шов між двома сервісами."
+      uk: "Продукт, у який клієнти логіняться і за який платять — восьмирічна Rails-кодова база, де моїми були гроші, права доступу і стик між двома сервісами."
     role:
       en: "Senior Backend Engineer · 9th of 34 contributors"
       uk: "Senior Backend Engineer · 9-й з 34 контриб’юторів"
@@ -503,12 +503,12 @@ cases:
         - en: "This is the half of myHomeIQ that has customers in it. An agent uploads their past clients, and the platform sends every homeowner a monthly branded report — what the house is worth now, how much of the mortgage is paid off, what refinancing would save, what they could buy if they sold. The agent stays visible for years without lifting a finger."
           uk: "Це та половина myHomeIQ, у якій є клієнти. Агент завантажує своїх колишніх клієнтів, і платформа щомісяця надсилає кожному власнику будинку брендований звіт — скільки будинок коштує зараз, скільки іпотеки виплачено, що дало б рефінансування, що можна купити, якщо продати. Агент лишається на очах роками, не роблячи нічого."
         - en: "<b>Billing errors show up on a customer’s bank statement.</b> Subscriptions, plan upgrades, refunds, lockout for non-payment — there is no “almost right” here. <b>Permissions are a matrix, not a flag:</b> nine roles against twelve plans, plus enterprise and white-label, down to rights on a single lead."
-          uk: "<b>Помилки біллінгу видно у виписці клієнта.</b> Підписки, апгрейди планів, повернення, блокування за неоплату — тут не буває «майже правильно». <b>Права — це матриця, а не прапорець:</b> дев’ять ролей проти дванадцяти планів, плюс enterprise і white-label, аж до прав на конкретний лід."
+          uk: "<b>Помилки білінгу видно у виписці клієнта.</b> Підписки, апгрейди планів, повернення, блокування за неоплату — тут не буває «майже правильно». <b>Права — це матриця, а не прапорець:</b> дев’ять ролей проти дванадцяти планів, плюс enterprise і white-label, аж до прав на конкретний лід."
         - en: "And the two services share no database and no message broker, so consistency had to be designed rather than assumed. I wrote both sides of that integration — which is what someone does when they can see the whole system, not just their slice of it."
           uk: "А два сервіси не мають ні спільної бази, ні спільного брокера — тож консистентність треба було спроєктувати, а не припустити. Я написав обидві сторони цієї інтеграції: так робить той, хто бачить систему цілком, а не лише свою ділянку."
     mine:
       - en: "<b>Stripe billing</b> — charge-day logic, lockout and automatic unlock on payment, duplicate invoice suppression on upgrade."
-        uk: "<b>Біллінг на Stripe</b> — логіка дня списання, блокування й автоматичне розблокування після оплати, гасіння дублікатів інвойсів при апгрейді."
+        uk: "<b>Білінг на Stripe</b> — логіка дня списання, блокування й автоматичне розблокування після оплати, гасіння дублікатів інвойсів при апгрейді."
       - en: "<b>Access control</b> across a 9-roles × 12-plans matrix, including a brand-new customer role threaded through every part of it."
         uk: "<b>Контроль доступу</b> в матриці 9 ролей × 12 планів, включно з новою роллю клієнта, протягнутою через усі її частини."
       - en: "<b>Both sides of the cross-service integration:</b> SSO, profile, partnership and licence sync, deletion webhooks."
@@ -534,7 +534,7 @@ cases:
             uk: "Нова роль, протягнута наскрізь"
           body:
             en: "Title-company users introduced across billing rights, report access, white label, enterprise limits and traffic control — alongside a refactor of the <b>Pundit policy hierarchy</b> that pulled shared rules up and cut duplication between roles. A permission regression is silent until it is a security incident, so every change shipped with a large spec matrix."
-            uk: "Користувачі title-компаній додані через права біллінгу, доступ до звітів, white label, enterprise-ліміти й контроль трафіку — разом із рефакторингом <b>ієрархії політик Pundit</b>, який підняв спільні правила вгору й прибрав дублювання. Регресія в правах тиха, поки не стає інцидентом безпеки, тож кожна зміна йшла з великою матрицею тестів."
+            uk: "Користувачі title-компаній додані через права білінгу, доступ до звітів, white label, enterprise-ліміти й контроль трафіку — разом із рефакторингом <b>ієрархії політик Pundit</b>, який підняв спільні правила вгору й прибрав дублювання. Регресія в правах тиха, поки не стає інцидентом безпеки, тож кожна зміна йшла з великою матрицею тестів."
         - title:
             en: "Client-base imports · 6,256 lines"
             uk: "Імпорт клієнтських баз · 6 256 рядків"
@@ -580,19 +580,19 @@ cases:
           uk: "рядків · мій найбільший коміт"
       - value:
           en: "100%"
-          uk: "100%"
+          uk: "100 %"
         label:
           en: "of my public API endpoints documented"
           uk: "моїх публічних API-ендпоінтів з документацією"
     scope_note:
       en: "<b>Scope, honestly.</b> This is a codebase from 2018 with 34 contributors — I am the 9th by volume and did not architect it. What I can claim is ownership of specific high-risk areas inside it, and that every endpoint I added is documented and specced."
-      uk: "<b>Про межі — чесно.</b> Це кодова база з 2018 року з 34 контриб’юторами — я 9-й за обсягом і не проєктував її. Що я справді можу заявити — володіння конкретними високоризиковими зонами всередині й те, що кожен доданий мною ендпоінт задокументований і покритий тестами."
+      uk: "<b>Про межі — чесно.</b> Це кодова база з 2018 року з 34 контриб’юторами — я 9-й за обсягом і не проєктував її. Що я справді можу заявити — відповідальність за конкретні високоризикові зони всередині й те, що кожен доданий мною ендпоінт задокументований і покритий тестами."
   - slug: "imagemaker"
     mark: "05"
     own: true
     year:
-      en: "2022—present"
-      uk: "2022—дотепер"
+      en: "2022–present"
+      uk: "2022–дотепер"
     sector:
       en: "render service"
       uk: "сервіс рендеру"
@@ -604,10 +604,10 @@ cases:
       uk: "ImageMaker"
     tagline:
       en: "Reply “quote” to any message and get a designed image back in about a second — and the same service quietly renders for a second product."
-      uk: "Відповідай «цитата» на будь-яке повідомлення й отримуй готове зображення приблизно за секунду — і той самий сервіс тихо рендерить для другого продукту."
+      uk: "Відповідайте «цитата» на будь-яке повідомлення й отримуйте готове зображення приблизно за секунду — і той самий сервіс тихо рендерить для другого продукту."
     role:
       en: "Tech lead · architect · devops"
-      uk: "Tech lead · архітектор · devops"
+      uk: "Техлід · архітектор · devops"
     stack:
       - "Rails 8.1 · Ruby 3.4"
       - "ImageMagick 7 · Pango"
@@ -646,16 +646,16 @@ cases:
         uk: "Люди цитують одне одного скриншотами. Це замінюється одним словом."
       body:
         - en: "In group chats people quote each other with screenshots — ugly, unreadable, and impossible to share outside the app. ImageMaker replaces that with one word: reply “quote” to any message and the bot returns a typeset image with the text, the author’s avatar, their name and the date on a matching background."
-          uk: "У групових чатах люди цитують одне одного скриншотами — некрасиво, нечитабельно, і поза застосунком таким не поділишся. ImageMaker замінює це одним словом: відповідаєш «цитата» на будь-яке повідомлення, і бот повертає верстане зображення з текстом, аватаром автора, його ім’ям і датою на підібраному тлі."
+          uk: "У групових чатах люди цитують одне одного скриншотами — некрасиво, нечитабельно, і поза застосунком таким не поділишся. ImageMaker замінює це одним словом: відповідаєте «цитата» на будь-яке повідомлення, і бот повертає верстане зображення з текстом, аватаром автора, його ім’ям і датою на підібраному тлі."
         - en: "<b>The decision that doubled its value.</b> Instead of leaving it a standalone toy, I turned it into the shared rendering engine for the company’s other product. The same service now answers its own audience and three environments of a different bot on another physical server — one codebase, one team, two product lines."
           uk: "<b>Рішення, яке подвоїло цінність.</b> Замість того щоб лишити це окремою іграшкою, я зробив із нього спільний рендер-рушій для другого продукту компанії. Той самий сервіс тепер обслуговує власну аудиторію і три оточення іншого бота на іншому фізичному сервері — одна кодова база, одна команда, дві продуктові лінійки."
-        - en: "Almost four years in production, 118 thousand new users in the last year alone, and the entire hosting bill is twelve dollars a month. That number is not a brag about frugality; it is the reason half the engineering below exists."
-          uk: "Майже чотири роки в продакшні, 118 тисяч нових користувачів лише за останній рік, і весь рахунок за хостинг — дванадцять доларів на місяць. Ця цифра не про хвастощі економністю; вона про те, чому існує половина інженерії нижче."
+        - en: "In production since December 2022, 118 thousand new users in the last year alone, and the entire hosting bill is twelve dollars a month. That number is not a brag about frugality; it is the reason half the engineering below exists."
+          uk: "У продакшні з грудня 2022-го, 118 тисяч нових користувачів лише за останній рік, і весь рахунок за хостинг — дванадцять доларів на місяць. Ця цифра не про хвастощі економністю; вона про те, чому існує половина інженерії нижче."
     mine:
       - en: "<b>Text has to fit, always.</b> Any language, any length, an emoji-only message, one word 40 characters long — the layout can never overflow or look cramped."
         uk: "<b>Текст мусить вміститися завжди.</b> Будь-яка мова, будь-яка довжина, повідомлення з одних емодзі, одне слово на 40 символів — верстка не має права ні виїхати, ні виглядати затісною."
       - en: "<b>Formatting must survive.</b> Bold, italic, underline, strikethrough, code — Telegram’s markup has to reappear in the rendered image, not disappear into plain text."
-        uk: "<b>Форматування мусить вижити.</b> Жирний, курсив, підкреслення, зачеркнутий, код — розмітка Telegram має з’явитися на зображенні, а не зникнути в плоскому тексті."
+        uk: "<b>Форматування мусить вижити.</b> Жирний, курсив, підкреслений, закреслений, код — розмітка Telegram має з’явитися на зображенні, а не зникнути в плоскому тексті."
       - en: "<b>“Who said this” is genuinely ambiguous.</b> Forwards, hidden senders, channel posts, anonymous admins and service bots each resolve differently."
         uk: "<b>«Хто це сказав» — насправді неоднозначно.</b> Форварди, приховані відправники, пости каналів, анонімні адміни й сервісні боти визначаються по-різному."
       - en: "<b>1.9 GB of RAM.</b> Image rendering is the most memory-hungry thing you can do in Ruby, and it happens on a box smaller than a phone."
@@ -666,11 +666,11 @@ cases:
         uk: "Типографіка через вимірювання і 586 МБ рендеру на сервері з 1,9 ГБ"
       sub:
         en: "Dual-mode runtime, binary-searched type sizing, cascading LLM fallback, every memory kill contained in its own cgroup."
-        uk: "Двохрежимний рантайм, підбір кегля бінарним пошуком, каскадний LLM-фолбек, кожен memory-кіл замкнений у власному cgroup."
+        uk: "Дворежимний рантайм, підбір кегля бінарним пошуком, каскадний LLM-фолбек, кожен memory-кіл замкнений у власному cgroup."
       items:
         - title:
             en: "Dual-mode runtime"
-            uk: "Двохрежимний рантайм"
+            uk: "Дворежимний рантайм"
           body:
             en: "One codebase answers Telegram webhooks <b>and</b> acts as an RPC consumer — correlation-id request-reply over RabbitMQ, images shipped as zlib-compressed base64. The same render path serves its own users and three environments of another product, so a bug fixed here is fixed twice."
             uk: "Одна кодова база відповідає на Telegram-вебхуки <b>і</b> працює як RPC-консюмер — request-reply за correlation-id через RabbitMQ, зображення передаються як zlib-стиснений base64. Той самий шлях рендеру обслуговує власних користувачів і три оточення іншого продукту, тож виправлений тут баг виправлений двічі."
@@ -703,7 +703,7 @@ cases:
             uk: "Форматування виживає · особа автора"
           body:
             en: "Telegram entities become Pango markup: filtered by intersection with the quoted fragment, applied <b>in reverse order</b> so tag insertion doesn’t shift later indices, then escaped in three passes. Forwards, hidden senders, channel and supergroup posts, anonymous admins and service bots each resolve differently — with a fallback chain down to one of 17 placeholder avatars and a circular crop drawn as a mask."
-            uk: "Ентіті Telegram перетворюються в Pango-розмітку: фільтруються перетином із цитованим фрагментом, застосовуються <b>у зворотному порядку</b>, щоб вставка тегів не зсувала наступні індекси, далі — екранування в три проходи. Форварди, приховані відправники, пости каналів і супергруп, анонімні адміни й сервісні боти визначаються по-різному — з ланцюжком фолбеків аж до одного з 17 плейсхолдер-аватарів і круглим кропом через маску."
+            uk: "Сутності (entities) Telegram перетворюються на Pango-розмітку: фільтруються перетином із цитованим фрагментом, застосовуються <b>у зворотному порядку</b>, щоб вставка тегів не зсувала наступні індекси, далі — екранування в три проходи. Форварди, приховані відправники, пости каналів і супергруп, анонімні адміни й сервісні боти визначаються по-різному — з ланцюжком фолбеків аж до одного з 17 плейсхолдер-аватарів і круглим кропом через маску."
     quality:
       - value:
           en: "+118k"
@@ -736,14 +736,14 @@ cases:
     mark: "06"
     own: true
     year:
-      en: "2023—present"
-      uk: "2023—дотепер"
+      en: "2023–present"
+      uk: "2023–дотепер"
     sector:
-      en: "ai assistant"
-      uk: "ai-асистент"
+      en: "AI assistant"
+      uk: "AI-асистент"
     status:
-      en: "built from zero · technical lead & co-founder"
-      uk: "з нуля · технічний лід і співзасновник"
+      en: "built from zero · tech lead & co-founder"
+      uk: "з нуля · техлід і співзасновник"
     title:
       en: "ChatGPT Bot"
       uk: "ChatGPT Bot"
@@ -751,8 +751,8 @@ cases:
       en: "A Ukrainian-language AI assistant in Telegram with a paid tier that actually collects money — 15,000 orders of it."
       uk: "Україномовний AI-асистент у Telegram із платним тарифом, який реально збирає гроші — 15 000 замовлень."
     role:
-      en: "Technical lead & co-founder · full-stack design and implementation"
-      uk: "Технічний лід і співзасновник · повний цикл"
+      en: "Tech lead & co-founder · full-stack design and implementation"
+      uk: "Техлід і співзасновник · повний цикл"
     stack:
       - "Rails 8.1 · Ruby 3.4"
       - "PostgreSQL"
@@ -793,7 +793,7 @@ cases:
         - en: "Cards were declined, phone numbers rejected, the interface was in English. This bot removed all of that: open Telegram, ask a question in Ukrainian, get an answer. Free to start, topped up over the first week, paid if you need more."
           uk: "Картки не проходили, номери телефонів не приймалися, інтерфейс був англійською. Цей бот прибрав усе це: відкрив Telegram, спитав українською, отримав відповідь. Безкоштовно на старті, з доливками за перший тиждень, платно — якщо треба більше."
         - en: "It is deliberately a small product with one job, and it is the clearest commercial proof I can show: <b>289,000 people used it, the product has taken 15,000 paid orders, and the money keeps arriving through automatic renewals.</b> Nobody sends an invoice, nobody reconciles a spreadsheet — the product bills itself."
-          uk: "Це свідомо маленький продукт з однією задачею, і це найясніший комерційний доказ, який я можу показати: <b>289 000 людей ним скористалися, продукт прийняв 15 000 платних замовлень, і гроші продовжують приходити через автоматичні продовження.</b> Ніхто не виставляє інвойси, ніхто не зводить таблиці — продукт білить сам себе."
+          uk: "Це свідомо маленький продукт з однією задачею, і це найясніший комерційний доказ, який я можу показати: <b>289 000 людей ним скористалися, продукт прийняв 15 000 платних замовлень, і гроші продовжують приходити через автоматичні продовження.</b> Ніхто не виставляє інвойси, ніхто не зводить таблиці — продукт сам виставляє рахунки."
         - en: "<b>A detail I like.</b> AI answers are slow, and silence feels broken. So the bot keeps typing — literally: a parallel thread pings the “typing” indicator every seven seconds for the whole duration of the response, so the chat never looks dead."
           uk: "<b>Деталь, яка мені подобається.</b> AI-відповіді повільні, а тишу користувач читає як «зламалося». Тому бот увесь час «друкує» — буквально: паралельний потік пінгує індикатор набору кожні сім секунд протягом усієї відповіді, тож чат ніколи не виглядає мертвим."
     mine:
@@ -802,7 +802,7 @@ cases:
       - en: "<b>Freemium mechanics that survive abuse:</b> four paid durations, a free starting allowance topped up over the first week, and a 300-second duplicate-request throttle."
         uk: "<b>Freemium-механіки, що витримують зловживання:</b> чотири платні тривалості, безкоштовний стартовий ліміт із доливками за перший тиждень і 300-секундний тротлінг дублікатів."
       - en: "<b>Referral accounting:</b> a 15% bonus credited on every purchase by a referred user, with no manual reconciliation."
-        uk: "<b>Реферальний облік:</b> 15% бонусу з кожної покупки залученого користувача, без ручної роботи."
+        uk: "<b>Реферальний облік:</b> 15 % бонусу з кожної покупки залученого користувача, без ручної роботи."
       - en: "<b>Nothing waits for a human.</b> Autopay and the day-one-to-seven notification funnel both run on the scheduler."
         uk: "<b>Ніщо не чекає людини.</b> Autopay і воронка повідомлень першого-сьомого дня — обидва на планувальнику."
     engineering:
@@ -830,7 +830,7 @@ cases:
             uk: "Регулярні платежі наскрізно"
           body:
             en: "Payment-token storage, a <b>daily autopay worker at a fixed hour</b>, and callback handling with <b>status verification before anything is credited</b>. Money code gets the same rule as everywhere else: never trust the callback, verify the state."
-            uk: "Зберігання платіжного токена, <b>щоденний autopay-воркер у фіксовану годину</b> і обробка колбеків із <b>перевіркою статусу перед будь-яким зарахуванням</b>. До грошового коду те саме правило, що й усюди: не вір колбеку, перевір стан."
+            uk: "Зберігання платіжного токена, <b>щоденний autopay-воркер у фіксовану годину</b> і обробка колбеків із <b>перевіркою статусу перед будь-яким зарахуванням</b>. До грошового коду те саме правило, що й усюди: не вірте колбеку, перевіряйте стан."
         - title:
             en: "Freemium mechanics"
             uk: "Freemium-механіки"
@@ -842,7 +842,7 @@ cases:
             uk: "Реферальний облік"
           body:
             en: "A <b>15% bonus credited on every purchase made by a referred user</b>, tracked per account without manual reconciliation. Referral logic is where money quietly leaks; this one balances on its own."
-            uk: "<b>15% бонусу з кожної покупки залученого користувача</b>, облік по акаунтах без ручної звірки. Реферальна логіка — типове місце, де тихо течуть гроші; ця зводиться сама."
+            uk: "<b>15 % бонусу з кожної покупки залученого користувача</b>, облік по акаунтах без ручної звірки. Реферальна логіка — типове місце, де тихо течуть гроші; ця зводиться сама."
         - title:
             en: "Load shape · operator tooling"
             uk: "Форма навантаження · інструменти оператора"
@@ -881,8 +881,8 @@ cases:
     mark: "07"
     own: true
     year:
-      en: "2022—present"
-      uk: "2022—дотепер"
+      en: "2022–present"
+      uk: "2022–дотепер"
     sector:
       en: "publishing · education"
       uk: "видання · освіта"
@@ -897,7 +897,7 @@ cases:
       uk: "Безкоштовні уроки Rails українською на CMS, яку я написав — і полігон, де десять контриб’юторів навчилися здавати код через рев’ю. Ви зараз на ньому."
     role:
       en: "Tech lead · architect · devops · rubyco.in"
-      uk: "Tech lead · архітектор · devops · rubyco.in"
+      uk: "Техлід · архітектор · devops · rubyco.in"
     stack:
       - "Rails 8.1 · Ruby 3.4"
       - "PostgreSQL 17"
@@ -916,8 +916,8 @@ cases:
           en: "31k"
           uk: "31 тис."
         label:
-          en: "visits in seven and a half months of 2026, against 25k in all of 2025"
-          uk: "візитів за сім із половиною місяців 2026 проти 25 тис. за весь 2025"
+          en: "visits from January to mid-August 2026, against 25k in all of 2025"
+          uk: "візитів із січня до середини серпня 2026-го проти 25 тис. за весь 2025-й"
       - value:
           en: "10"
           uk: "10"
@@ -937,39 +937,39 @@ cases:
       body:
         - en: "<b>You are reading this on it.</b> Good programming material in Ukrainian barely existed — beginners had to learn in someone else’s language. RubyCoin is a free bilingual platform of Rails lessons with its own publishing system, search and analytics, and this portfolio is a section of it."
           uk: "<b>Ви читаєте це на ньому.</b> Гарних матеріалів з програмування українською майже не існувало — початківцям доводилося вчитися чужою мовою. RubyCoin — це безкоштовна двомовна платформа уроків Rails із власною системою публікації, пошуком і аналітикою, а це портфоліо — її розділ."
-        - en: "The number I am proudest of is not the traffic, it is the shape of it: <b>no new article has been published since February 2024, and visits are still growing</b> — 31,000 in seven and a half months of 2026 against 24,800 in the whole of 2025, almost entirely organic from Google. That is content quality and technical work compounding, not promotion."
-          uk: "Цифра, якою я найбільше гордий, — не трафік, а його форма: <b>жодної нової статті не публікувалося з лютого 2024-го, а візити досі зростають</b> — 31 000 за сім із половиною місяців 2026-го проти 24 800 за весь 2025-й, майже повністю органіка з Google. Це складний відсоток від якості контенту й технічної роботи, а не промо."
+        - en: "The number I am proudest of is not the traffic, it is the shape of it: <b>no new article has been published since February 2024, and visits are still growing</b> — 31,000 from January to mid-August 2026 against 24,800 in the whole of 2025, almost entirely organic from Google. That is content quality and technical work compounding, not promotion."
+          uk: "Цифра, якою я найбільше гордий, — не трафік, а його форма: <b>жодної нової статті не публікувалося з лютого 2024-го, а візити досі зростають</b> — 31 000 із січня до середини серпня 2026-го проти 24 800 за весь 2025-й, майже повністю органіка з Google. Це складний відсоток від якості контенту й технічної роботи, а не промо."
         - en: "<b>The project as a school.</b> Ten contributors — mostly interns — passed through this codebase. I set the tasks, reviewed the pull requests and owned what reached production. The skill on display is not “wrote code”, it is “built a process in which other people write the code and it doesn’t fall apart”."
           uk: "<b>Проєкт як школа.</b> Десять контриб’юторів — переважно інтернів — пройшли через цю кодову базу. Я ставив задачі, рев’ював pull request’и і відповідав за те, що дійшло до продакшну. Навичка, яку тут видно, — не «писав код», а «побудував процес, у якому код пишуть інші й це не розвалюється»."
     mine:
       - en: "<b>It is the only project here with no commercial pressure</b> — which makes it the honest sample of how I build when nobody is asking for a deadline."
-        uk: "<b>Це єдиний проєкт тут без комерційного тиску</b> — тому він і є честним зразком того, як я будую, коли ніхто не просить дедлайн."
+        uk: "<b>Це єдиний проєкт тут без комерційного тиску</b> — тому він і є чесним зразком того, як я будую, коли ніхто не просить дедлайн."
       - en: "<b>It is the mentoring evidence.</b> Ten people, every pull request reviewed, production owned by me."
-        uk: "<b>Це доказ менторства.</b> Десять людей, кожен pull request прорев’ював, продакшн — на мені."
+        uk: "<b>Це доказ менторства.</b> Десять людей, я переглядав кожен PR, продакшн — на мені."
       - en: "<b>It is the Rails-craft sample:</b> Hotwire used where it earns its place, Turbo Drive deliberately off, upgrades carried live from Rails 7.0 to 8.1."
         uk: "<b>Це зразок Rails-ремесла:</b> Hotwire там, де він виправданий, Turbo Drive свідомо вимкнений, апгрейди проведені живими з Rails 7.0 до 8.1."
-      - en: "<b>It compounds without me.</b> Two and a half years after the last article, the traffic curve is still going up."
-        uk: "<b>Він накопичує без мене.</b> Через два з половиною роки після останньої статті крива трафіку досі йде вгору."
+      - en: "<b>It compounds without me.</b> No new article since February 2024, and the traffic curve is still going up."
+        uk: "<b>Він росте й без мене.</b> З лютого 2024-го не вийшло жодної нової статті, а крива трафіку досі йде вгору."
     engineering:
       heading:
         en: "AI translation that keeps the markup, and analytics with no counter to drift"
         uk: "AI-переклад, що не ламає розмітку, і аналітика без лічильника, який розсинхронізується"
       sub:
         en: "360+ commits, a lint gate of three linters before the suite runs, and AI review with inline comments on the pull request."
-        uk: "360+ комітів, гейт із трьох лінтерів перед прогоном тестів і AI-рев’ю з інлайн-комментарями в pull request."
+        uk: "360+ комітів, гейт із трьох лінтерів перед прогоном тестів і AI-рев’ю з інлайн-коментарями в pull request."
       items:
         - title:
             en: "AI translation that keeps the markup"
             uk: "AI-переклад, що зберігає розмітку"
           body:
             en: "Long articles don’t fit a model context, and naive slicing destroys HTML. So the document is <b>split along heading boundaries</b> into chunks under the token limit, each translated in <b>its own thread</b>, then reassembled by index — headings, lists and code blocks intact. An hour of manual work became one button."
-            uk: "Довгі статті не влазять у контекст моделі, а наївне різання ламає HTML. Тому документ <b>ріжеться по межах заголовків</b> на куски під ліміт токенів, кожен перекладається <b>у власному потоці</b>, далі збирається за індексом — заголовки, списки й блоки коду цілі. Година ручної роботи стала однією кнопкою."
+            uk: "Довгі статті не влазять у контекст моделі, а наївне різання ламає HTML. Тому документ <b>ріжеться по межах заголовків</b> на частини під ліміт токенів, кожен перекладається <b>у власному потоці</b>, далі збирається за індексом — заголовки, списки й блоки коду цілі. Година ручної роботи стала однією кнопкою."
         - title:
             en: "Bilingual on three levels at once"
             uk: "Двомовність на трьох рівнях одночасно"
           body:
             en: "Locale in the URL scope, <b>thread-safe locale switching per request</b>, DB-level content translations — and <b>slug history</b>, so renaming a post never kills an indexed URL. That last one is why the organic traffic curve never has a cliff in it."
-            uk: "Локаль у скоупі URL, <b>потокобезпечне перемикання локалі на кожен запит</b>, переклади контенту на рівні БД — і <b>історія слагів</b>, тож переназвання поста ніколи не вбиває проіндексований URL. Саме через останнє на кривій органічного трафіку немає обриву."
+            uk: "Локаль у скоупі URL, <b>потокобезпечне перемикання локалі на кожен запит</b>, переклади контенту на рівні БД — і <b>історія слагів</b>, тож перейменування запису ніколи не вбиває проіндексований URL. Саме через останнє на кривій органічного трафіку немає обриву."
         - title:
             en: "Own analytics, ranking straight from events"
             uk: "Власна аналітика, рейтинг прямо з подій"
@@ -987,7 +987,7 @@ cases:
             uk: "Дві версії зображення на завантаження — було п’ять"
           body:
             en: "1200×675 for the hero and 520×293 for the card, JPEG at quality 80 with the metadata stripped, so no view downloads a file it will only shrink. Three more versions used to be generated and nothing ever read them. This is most of the reason the home page renders in <b>76 ms at 53 MB resident</b>."
-            uk: "1200×675 для героя і 520×293 для картки, JPEG на 80 із вичищеними метаданими, щоб жоден в’ю не тягнув файл, який усе одно зменшить. Раніше генерувалося ще три версії, і жодна з них нікому не була потрібна. Це більша частина причини, чому головна рендериться за <b>76 мс при 53 МБ resident</b>."
+            uk: "1200×675 для героя і 520×293 для картки, JPEG на 80 із вичищеними метаданими, щоб жоден шаблон не тягнув файл, який усе одно зменшить. Раніше генерувалося ще три версії, і жодна з них нікому не була потрібна. Це більша частина причини, чому головна рендериться за <b>76 мс при 53 МБ resident</b>."
         - title:
             en: "Upgrade discipline"
             uk: "Дисципліна апгрейдів"

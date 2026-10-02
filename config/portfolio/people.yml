@@ -11,14 +11,15 @@
 # cases.yml.
 #
 # Three states exist, and two of them announce themselves:
-#   full         — real content (danyil, claude)
+#   full         — real content (danyil, mykhailo, oleksii, natalia, claude)
 #   placeholder  — `placeholder: true`; real role and real project work, invented dates,
 #                  employers, contacts and education. Prints a ruby dashed banner on the
-#                  page and a `PLACEHOLDER` chip in the roster. Written so the filled
-#                  layout could be judged before the real CVs arrive.
-#                  ⚠️ before launch: grep -n '^ *placeholder: true' — one record, an alumnus.
-#   draft        — `cv: null`; nothing invented at all. A new hire lands in this state on
-#                  day one, and so does anyone whose CV nobody here can keep honest.
+#                  page and a `PLACEHOLDER` chip in the roster. Meant only for judging a
+#                  filled layout before a real CV arrives; no record ships in this state.
+#                  ⚠️ before launch: grep -n '^ *placeholder: true' must come back empty.
+#   draft        — `cv: null`; nothing invented at all (vladyslav, oleksandr). A new hire
+#                  lands in this state on day one, and so does anyone whose CV nobody here
+#                  can keep honest.
 #
 # `cv: null` is a real, shippable state. It means nobody has filled this CV in yet,
 # and the page says so instead of guessing a career for a named colleague. The person
@@ -70,8 +71,8 @@ people:
       en: "Danyil Shkoropad"
       uk: "Даниїл Шкоропад"
     role:
-      en: "cofounder · tech lead"
-      uk: "кофаундер · тех-лід"
+      en: "co-founder · tech lead"
+      uk: "співзасновник · техлід"
     blurb:
       en: "Six years of Rails in production. Made the first commit on five of the seven projects here."
       uk: "Шість років Rails у продакшні. Перший коміт у п’яти з семи проєктів тут — його."
@@ -96,52 +97,52 @@ people:
       en: "Mykhail Yun"
       uk: "Михаїл Юн"
     role:
-      en: "cofounder · product & clients"
-      uk: "кофаундер · продукт і клієнти"
+      en: "co-founder · product & clients"
+      uk: "співзасновник · продукт і клієнти"
     blurb:
       en: "Ideas, specs and the customer conversations behind them. Sells what the rest of us build."
       uk: "Ідеї, ТЗ і розмови з клієнтами за ними. Продає те, що будує решта."
     updated: "2026·09·15"
     cv:
       role:
-        en: "Cofounder · product lead"
-        uk: "Кофаундер · продакт-лід"
+        en: "Co-founder · product lead"
+        uk: "Співзасновник · продакт-лід"
       years:
         en: "4+ years in production"
         uk: "4+ років у продакшні"
       summary:
-        en: "Twelve years in media and social: websites, Telegram channels, YouTube, Instagram, TikTok — properties with more than 200 million followers between them. Developer communities of 60,000 since 2022, and since 2023 a cofounder of RubyCoin and its five products. Product is his in every one of them: the idea, the spec, the economics, the copy, the distribution — everything between a thought and the first user."
-        uk: "Дванадцять років у медіа й SMM: сайти, Telegram-канали, YouTube, Instagram, TikTok — ресурси із сумарною аудиторією 200+ млн. З 2022-го — IT-спільноти на 60 тис. учасників, з 2023-го — кофаундер Rubyco.in і п’яти власних продуктів. Продукт у кожному з них на ньому: ідея, ТЗ, економіка, тексти, дистрибуція — усе між задумом і першим користувачем."
+        en: "Twelve years in media and social: websites, Telegram channels, YouTube, Instagram, TikTok — properties with more than 200 million followers between them. Developer communities of 60,000 since 2022, and since 2023 a co-founder of RubyCoin and its five products. Product is his in every one of them: the idea, the spec, the economics, the copy, the distribution — everything between a thought and the first user."
+        uk: "Дванадцять років у медіа й SMM: сайти, Telegram-канали, YouTube, Instagram, TikTok — ресурси із сумарною аудиторією 200+ млн. З 2022-го — IT-спільноти на 60 тис. учасників, з 2023-го — співзасновник RubyCoin і п’яти власних продуктів. Продукт у кожному з них на ньому: ідея, ТЗ, економіка, тексти, дистрибуція — усе між задумом і першим користувачем."
       location: { en: "Ukraine · remote", uk: "Україна · віддалено" }
       languages: { en: "Ukrainian native · English B2/C1", uk: "Українська — рідна · англійська B2/C1" }
       education:
         en: "International relations and diplomacy · Ivan Franko National University of Lviv · 2021"
         uk: "Факультет міжнародних відносин · Львівський національний університет імені Івана Франка · 2021"
       experience:
-        - period: { en: "2023 — now", uk: "2023 — зараз" }
+        - period: { en: "2023–present", uk: "2023–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
-          title: { en: "Cofounder · product · growth", uk: "Кофаундер · продукт · growth" }
+          title: { en: "Co-founder · product · growth", uk: "Співзасновник · продукт · growth" }
           place: { en: "Ukraine · remote", uk: "Україна · віддалено" }
           body:
             en: "Five products, 2.8M+ users between them. The idea, the spec and the roadmap in each one. Clients, how the work is divided, and review. B2B separately."
-            uk: "П’ять продуктів, 2,8 млн+ користувачів разом. Ідея, ТЗ і roadmap у кожному продукті. Клієнти, розподіл задач, рев’ю. Окремо — B2B."
+            uk: "П’ять продуктів, понад 2,8 млн користувачів разом. Ідея, ТЗ і roadmap у кожному продукті. Клієнти, розподіл задач, рев’ю. Окремо — B2B."
           cases: ["dna", "wardybot", "imagemaker", "chatgpt", "rubycoin"]
-        - period: { en: "2022 — 2024", uk: "2022 — 2024" }
+        - period: { en: "2022–2024", uk: "2022–2024" }
           org: { en: "Developer communities", uk: "IT-спільноти" }
           title: { en: "Python · JavaScript", uk: "Python · JavaScript" }
           place: { en: "Telegram", uk: "Telegram" }
           body:
             en: "Several developer communities, 60,000 members between them. Started and grown from nothing: content, moderation, the community itself."
             uk: "Кілька спільнот розробників, 60 тис. учасників разом. Запуск і зростання з нуля: контент, модерація, ком’юніті."
-        - period: { en: "2014 — 2022", uk: "2014 — 2022" }
+        - period: { en: "2014–2022", uk: "2014–2022" }
           org: { en: "Media and social", uk: "Медіа та SMM" }
           title:
             en: "websites · Telegram · YouTube · Instagram · TikTok"
             uk: "сайти · Telegram · YouTube · Instagram · TikTok"
           body:
             en: "Properties with more than 200 million followers across platforms. Launched and grown from nothing: content strategy, advertising, monetisation, teams of writers and editors. The same work carries this studio’s own products today, alongside a Ukrainian-language channel about AI and technology."
-            uk: "Ресурси із сумарною аудиторією 200+ млн на різних платформах. Запуск і зростання майданчиків з нуля: контент-стратегія, реклама, монетизація, команди авторів і редакторів. Сьогодні та сама робота везе дистрибуцію власних продуктів і українськомовний канал про ШІ та технології."
-        - period: { en: "2012 — 2014", uk: "2012 — 2014" }
+            uk: "Ресурси із сумарною аудиторією 200+ млн на різних платформах. Запуск і зростання майданчиків з нуля: контент-стратегія, реклама, монетизація, команди авторів і редакторів. Сьогодні та сама робота везе дистрибуцію власних продуктів і україномовний канал про ШІ та технології."
+        - period: { en: "2012–2014", uk: "2012–2014" }
           org: { en: "Writing", uk: "Контент" }
           title: { en: "Author", uk: "Автор" }
           body:
@@ -177,7 +178,7 @@ people:
       uk: "бекенд"
     blurb:
       en: "Queues, schedules and the production problems that only show up at 3am."
-      uk: "Черги, розклади й ті продові проблеми, які вилазять о третій ночі."
+      uk: "Черги, розклади й ті проблеми продакшну, які спливають о третій ночі."
     updated: "2026·09·15"
     not_work:
       - { icon: "🎲", label: { en: "board games", uk: "настільні ігри" }, detail: { en: "campaign co-op", uk: "кооперативні кампанії" } }
@@ -191,7 +192,7 @@ people:
         en: "Backend, automation, and keeping production systems running. The work here is queues and schedules: the planning and delivery pipeline, job flow on Sidekiq and Redis, reservation and delayed delivery, and the race conditions, locks and idempotency problems that come with all of it. Before that, support and development of an e-commerce platform on OpenCart and PHP — including MySQL binlog work, data recovery and SQL migrations."
         uk: "Бекенд, автоматизація й те, щоб продакшн продовжував працювати. Тут його робота — це черги й розклади: система планування й доставки постів, job-flow на Sidekiq і Redis, резервування й відкладена доставка, а разом із ними race conditions, локи та ідемпотентність. До цього — підтримка й розвиток e-commerce-платформи на OpenCart і PHP, включно з MySQL binlog, відновленням даних і SQL-міграціями."
       experience:
-        - period: { en: "2024 — now", uk: "2024 — зараз" }
+        - period: { en: "2024–present", uk: "2024–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
           title: { en: "Backend engineer", uk: "Backend-інженер" }
           place: { en: "DNA · WardyBot", uk: "DNA · WardyBot" }
@@ -225,47 +226,10 @@ people:
     blurb:
       en: "Front end where there is one. Will rewrite anything in three lines."
       uk: "Фронт там, де він є. Перепише будь-що в три рядки."
-    placeholder: true
-    updated: "2026·09·09"
-    not_work:
-      - { icon: "🏀", label: { en: "basketball", uk: "баскетбол" } }
-      - { icon: "🎮", label: { en: "games", uk: "комп’ютерні ігри" } }
-      - { icon: "📚", label: { en: "studying", uk: "навчання" } }
-      - { icon: "🚶", label: { en: "walks", uk: "гуляти" } }
-    cv:
-      role: { en: "Fullstack engineer · front end", uk: "Fullstack-інженер · фронтенд" }
-      years: { en: "placeholder · years to be supplied", uk: "плейсхолдер · роки уточнити" }
-      summary:
-        en: "The one who builds the screens on the products that have screens. Vue 3 over Inertia on WardyBot, the management panel on rubyco.in, and a habit of deleting more lines than he adds."
-        uk: "Той, хто робить екрани на продуктах, у яких вони є. Vue 3 через Inertia на WardyBot, панель управління на rubyco.in і звичка видаляти більше рядків, ніж додавати."
-      contact:
-        - ["email", "placeholder@rubyco.in", "mailto:placeholder@rubyco.in"]
-        - ["telegram", "@placeholder", "https://t.me/"]
-      location: { en: "Ukraine · remote", uk: "Україна · віддалено" }
-      languages: { en: "Ukrainian native · English — placeholder", uk: "Українська — рідна · англійська — плейсхолдер" }
-      education: { en: "Placeholder — degree and university to be supplied", uk: "Плейсхолдер — ступінь і виш уточнити" }
-      experience:
-        - period: { en: "2024 — now", uk: "2024 — зараз" }
-          org: { en: "RubyCoin", uk: "RubyCoin" }
-          title: { en: "Fullstack engineer · front end", uk: "Fullstack-інженер · фронтенд" }
-          place: { en: "DNA · WardyBot · ImageMaker · RubyCoin", uk: "DNA · WardyBot · ImageMaker · RubyCoin" }
-          note: { en: "Placeholder dates.", uk: "Дати — плейсхолдер." }
-          body:
-            en: "The WardyBot admin panel, marketplace and duel UI, the DNA posting settings, the <code>/qx</code> command on ImageMaker, and the admin post and tag screens on RubyCoin. <b>Placeholder copy</b> — replace."
-            uk: "Адмінка WardyBot, UI маркетплейсу й дуелей, налаштування публікації в DNA, команда <code>/qx</code> в ImageMaker та екрани постів і тегів в адмінці RubyCoin. <b>Плейсхолдер-текст</b> — замінити."
-          cases: ["dna", "wardybot", "imagemaker", "rubycoin"]
-      stacks:
-        - label: { en: "core", uk: "основне" }
-          items: ["Vue 3", "TypeScript", "Inertia", "Ruby on Rails", "CSS", "esbuild"]
-        - label: { en: "also", uk: "також" }
-          items: ["Hotwire", "PostgreSQL", { en: "placeholder — to be supplied", uk: "плейсхолдер — уточнити" }]
-      strengths:
-        - en: "Will rewrite anything in three lines"
-          uk: "Перепише будь-що в три рядки"
-        - en: "Front end that does not need a rewrite next year"
-          uk: "Фронт, який не треба переписувати наступного року"
-        - en: "Placeholder strength — replace"
-          uk: "Плейсхолдер — замінити"
+    # No CV here, and that is deliberate: the one this record used to carry was a layout
+    # stand-in with invented dates, contacts and education. His credits in team.yml are real,
+    # so the page still opens on them and says the CV is not filled in.
+    cv: null
 
   - id: "natalia"
     short: "NM"
@@ -302,15 +266,15 @@ people:
         en: "Igor Sikorsky Kyiv Polytechnic Institute — BSc, software engineering.<br>Zhytomyr State Technological University — MSc, automated process control."
         uk: "КПІ ім. Ігоря Сікорського — бакалавр, інженерія програмного забезпечення.<br>Житомирська державна технологічна академія — магістр, автоматизоване керування процесами."
       experience:
-        - period: { en: "2024 — now", uk: "2024 — зараз" }
+        - period: { en: "2024–present", uk: "2024–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
           title: { en: "Backend engineer · data", uk: "Backend-інженерка · дані" }
           place: { en: "DNA · WardyBot", uk: "DNA · WardyBot" }
           body:
             en: "The Gemini embedding pass and the <b>HNSW index</b> on the 1536-dimension column it writes to, which is what semantic deduplication runs on. The OpenRouter features, the background jobs behind them, and the backup routine that runs under all of it."
-            uk: "Проходка embeddings на Gemini і <b>HNSW-індекс</b> на 1536-вимірній колонці, у яку вона пише — на цьому працює семантична дедуплікація. Фічі на OpenRouter, фонові джоби за ними й рутина бекапів, що працює під усім цим."
+            uk: "Генерація embeddings на Gemini і <b>HNSW-індекс</b> на 1536-вимірній колонці, у яку вона пише — на цьому працює семантична дедуплікація. Функції на OpenRouter, фонові джоби за ними й рутина бекапів, що працює під усім цим."
           cases: ["dna", "wardybot"]
-        - period: { en: "2023 — now", uk: "2023 — зараз" }
+        - period: { en: "2023–present", uk: "2023–дотепер" }
           org: { en: "V. M. Glushkov Institute of Cybernetics, NAS of Ukraine", uk: "Інститут кібернетики ім. В. М. Глушкова НАН України" }
           title: { en: "Doctoral researcher · software engineer", uk: "Аспірантка · інженерка ПЗ" }
           note:
@@ -328,13 +292,13 @@ people:
           body:
             en: "A Rails application for magnetic anomaly detection and signal analysis, written for the research above."
             uk: "Rails-застосунок для виявлення магнітних аномалій і аналізу сигналу, написаний під дослідження вище."
-        - period: { en: "2022 — 2023", uk: "2022 — 2023" }
+        - period: { en: "2022–2023", uk: "2022–2023" }
           org: { en: "Consilis · EPAM University Program", uk: "Consilis · EPAM University Program" }
           title: { en: "Ruby and Rails trainee", uk: "Стажерка Ruby і Rails" }
           body:
             en: "Backend for a charity swap application on Rails 7 with Devise, Redis and PostgreSQL, covered with RSpec and Capybara; before that, Ruby CLI applications written to be read — clean objects, no repetition, RuboCop clean."
             uk: "Бекенд застосунку для благодійного обміну на Rails 7 із Devise, Redis і PostgreSQL, покритий RSpec і Capybara; до того — консольні застосунки на Ruby, написані так, щоб їх читали: чисті об’єкти, без повторів, RuboCop без зауважень."
-        - period: { en: "2010 — 2022", uk: "2010 — 2022" }
+        - period: { en: "2010–2022", uk: "2010–2022" }
           org: { en: "Before the code", uk: "До коду" }
           title: { en: "Process engineer · inspector · sole proprietor", uk: "Інженерка процесів · інспекторка · ФОП" }
           body:
@@ -369,16 +333,16 @@ people:
     updated: "2026·09·14"
     cv: null
 
-  # Seventh member of the roster, and not a person. `machine: true` puts a small ruby
+  # The last of the crew, and not a person. `machine: true` puts a small ruby
   # "CI" flag on the monogram — the reader is told what this is, immediately, without
   # a footnote. Everything claimed below is something that actually runs in CI.
   - id: "claude"
     short: "C"
-    photo: "claude.png"
+    photo: "claude.jpg"
     machine: true
     name:
       en: "Claude"
-      uk: "Клод"
+      uk: "Claude"
     role:
       en: "automated reviewer"
       uk: "автоматичний рев’ювер"
@@ -408,12 +372,12 @@ people:
         uk: "де підняли раннер"
       languages:
         en: "Ruby · TypeScript · SQL · YAML · your commit messages"
-        uk: "Ruby · TypeScript · SQL · YAML · ваші меседжі комітів"
+        uk: "Ruby · TypeScript · SQL · YAML · ваші повідомлення комітів"
       education:
         en: "trained, not educated"
         uk: "натренований, не освічений"
       experience:
-        - period: { en: "2026 — now", uk: "2026 — зараз" }
+        - period: { en: "2026–present", uk: "2026–дотепер" }
           org:
             en: "RubyCoin · four products"
             uk: "RubyCoin · чотири продукти"
@@ -441,13 +405,13 @@ people:
           items: [{ en: "production access", uk: "доступу до продакшну" }, { en: "merge rights", uk: "права мерджити" }, { en: "an opinion about tabs", uk: "думки про табуляцію" }]
       strengths:
         - en: "Catches the N+1 you stopped seeing on pull request #400"
-          uk: "Ловить N+1, який ти перестав бачити на PR #400"
+          uk: "Ловить N+1, який ви перестали бачити на PR #400"
         - en: "Never gets tired, never gets political about a diff"
           uk: "Не втомлюється й не політизує дифи"
         - en: "Does not know your production data, and should not"
-          uk: "Не знає ваших продових даних — і не має знати"
+          uk: "Не знає ваших даних із продакшну — і не має знати"
         - en: "Cheaper than the bug it prevents"
-          uk: "Дешевший за баг, який запобігає"
+          uk: "Дешевший за баг, якому запобігає"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # not_work
@@ -456,7 +420,8 @@ people:
 # studio as a whole. It moved here because a studio does not play volleyball on
 # Tuesdays — one specific person does.
 #
-# It is optional and renders only when present — all six records have one today.
+# It is optional and renders only when present — danyil, oleksii, natalia and claude have
+# one today.
 #
 # Each entry is `{ icon, label: {en, uk}, detail: {en, uk} }`; `detail` is OPTIONAL.
 # It was briefly a flat ["label", "detail", "emoji"] tuple, which made this the one
@@ -464,7 +429,7 @@ people:
 # from the people themselves, in Ukrainian. Never store a user-visible string here in
 # one language.
 #
-# Only Danyil and Claude carry details; when absent the mono line is not rendered at all,
+# `detail` is filled in only where the person gave one; when absent the mono line is not rendered at all,
 # so "ігри" stands alone rather than sitting above a blank row. Ask before inventing one.
 
   # Alumni who are only names. No `short`, no role, no blurb, no CV: nobody here can keep any of
