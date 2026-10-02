@@ -1,5 +1,7 @@
 # rubyco.in — план повного редизайну
 
+> Архів: історія рішень і як до них дійшли. Чинні рішення — у [`decisions.md`](decisions.md).
+
 Джерела: `design_handoff_rubycoin_site/README.md` (бандл на робочому столі) + Phase 5 Tech
 Handoff (`phase5-handoff.jsx`). Цей файл — робочий план, не переказ. Оновлено 2026-10-01.
 
