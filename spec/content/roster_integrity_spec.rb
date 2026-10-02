@@ -138,6 +138,18 @@ describe 'the roster content' do
   describe 'the page behind a name' do
     include_context 'when errors render as pages'
 
+    # No alumnus in the shipped file is credited on a project today, so one who is stands in:
+    # vladyslav, off the crew and keeping his credits.
+    let(:credited_alumnus) do
+      Person.new('id' => 'vladyslav', 'status' => 'alumni', 'name' => { 'en' => 'Vladyslav', 'uk' => 'Владислав' })
+    end
+
+    before do
+      allow(Team).to(receive(:roster).and_wrap_original do |original|
+        original.call.merge('vladyslav' => credited_alumnus)
+      end)
+    end
+
     it 'opens for the crew, and for an alumnus only when something is behind the name' do
       expect(Team.alumni.reject(&:page?)).to be_present, 'every alumnus has a page, so this rule proves nothing'
       expect(Team.alumni.select(&:page?)).to be_present

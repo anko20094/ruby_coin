@@ -63,13 +63,13 @@ contributions:
         - en: "Billing screens and the customer-facing bot factory flows."
           uk: "Екрани білінгу й флоу фабрики ботів під клієнта."
     - person: "oleksandr"
-      role: { en: "fullstack", uk: "фулстек" }
+      role: { en: "backend · reviewer", uk: "бекенд · рев’ювер" }
       period: "2025–2026"
       did:
-        - en: "Post creation and the per-channel posting settings — the screens a customer spends their day in."
-          uk: "Створення постів і налаштування публікації на канал — екрани, у яких клієнт проводить день."
-        - en: "Worked on the ad-stripping and rewrite rules, and on the ad-reservation service."
-          uk: "Працював над правилами вичищення реклами й переписування та над сервісом бронювання рекламних слотів."
+        - en: "The customer’s own posts — creation, schedule, per-channel settings — and the ad-reservation service."
+          uk: "Власні пости клієнта — створення, розклад, налаштування на канал — і сервіс бронювання реклами."
+        - en: "Premium payment menus and the free/premium split; reviewed 105 of his colleagues’ pull requests."
+          uk: "Меню оплати преміуму й розподіл безкоштовного та преміум-функціоналу; рев’ю 105 pull request’ів колег."
     - person: "claude"
       role: { en: "pull request review", uk: "рев’ю pull request’ів" }
       period: "2026"
@@ -89,13 +89,13 @@ contributions:
         - en: "Set the process ten developers work inside: ticket branches, review, CI, mandatory tests."
           uk: "Поставив процес, у якому працюють десять розробників: тікет-бранчі, рев’ю, CI, обов’язкові тести."
     - person: "oleksandr"
-      role: { en: "frontend · Vue 3", uk: "фронтенд · Vue 3" }
+      role: { en: "fullstack", uk: "фулстек" }
       period: "2024–2026"
       did:
-        - en: "The admin panel on Vue 3 + TypeScript over Inertia — the only screen-based surface here."
-          uk: "Адмінка на Vue 3 + TypeScript через Inertia — єдина екранна поверхня тут."
-        - en: "Marketplace and collectibles UI, including the duel flow."
-          uk: "UI маркетплейсу й колекційних предметів, включно з флоу дуелей."
+        - en: "Skins — the collectibles with their shop, drops, sales and moderation — plus duels and the captcha quiz at the door."
+          uk: "Скіни — колекційні предмети з магазином, дропами, продажем і модерацією, — а ще дуелі та капча-вікторина на вході."
+        - en: "The web admin on Vue 3 + TypeScript, and the Mini App’s move to React with its premium shop."
+          uk: "Веб-адмінка на Vue 3 + TypeScript і переїзд Mini App на React разом із преміум-магазином."
     - person: "oleksii"
       role: { en: "fullstack", uk: "фулстек" }
       period: "2024–2025"
@@ -169,13 +169,13 @@ contributions:
         - en: "Part of the type measurement and the text formatting the rendered image depends on."
           uk: "Частина вимірів кегля й форматування тексту, на яких тримається зображення."
     - person: "oleksandr"
-      role: { en: "fullstack", uk: "фулстек" }
-      period: "2025"
+      role: { en: "backend", uk: "бекенд" }
+      period: "2025–2026"
       did:
         - en: "The <code>/qx</code> command — ready-made author quotes, which is the half of the service the second product calls."
           uk: "Команда <code>/qx</code> — готові цитати авторів, тобто та половина сервісу, яку викликає другий продукт."
-        - en: "Per-user quote settings and the <code>/stat</code> command behind them."
-          uk: "Налаштування цитат на користувача і команда <code>/stat</code> за ними."
+        - en: "Per-user quote settings, AI-picked backgrounds and the admin <code>/stat</code> command."
+          uk: "Налаштування цитат на користувача, фони, які підбирає AI, і адмінська команда <code>/stat</code>."
     - person: "mykhailo"
       role: { en: "co-founder · product", uk: "співзасновник · продукт" }
       period: "2022–2026"
@@ -223,10 +223,10 @@ contributions:
       role: { en: "fullstack", uk: "фулстек" }
       period: "2023–2024"
       did:
-        - en: "The admin post and tag screens, back when the site still had an admin framework."
-          uk: "Екрани постів і тегів в адмінці — ще тоді, коли на сайті був адмін-фреймворк."
-        - en: "The after_party task that regenerated every photo format across the archive."
-          uk: "Таск after_party, що перегенерував усі формати фото по архіву."
+        - en: "Slug history on FriendlyId — a renamed post keeps answering at its old URL."
+          uk: "Історія слагів на FriendlyId — перейменований пост і далі відповідає за старою адресою."
+        - en: "The home-page tag filter on Tom Select, and the after_party task that regenerated every photo format."
+          uk: "Фільтр за тегами на головній на Tom Select і таск after_party, що перегенерував усі формати фото."
     - person: "mykhailo"
       role: { en: "co-founder · product", uk: "співзасновник · продукт" }
       period: "2022–2026"
