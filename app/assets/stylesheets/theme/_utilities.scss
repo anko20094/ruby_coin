@@ -1,0 +1,23 @@
+// Global utility classes, used across pages and the admin.
+
+/* every figure on the page */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+/* interaction — this is all of it */
+.hover-row  { transition: background 0.15s; }
+.hover-row:hover { background: var(--paper-warm); }
+.hover-link { transition: color 0.18s; }
+.hover-link:hover { color: var(--ruby); }
+
+@keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.page-in { animation: pageIn 0.4s cubic-bezier(0.2, 0.7, 0.3, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-in { animation: none; }
+  .hover-row, .hover-link { transition: none; }
+}
+
+/* The palette shortcut is ⌘K on Apple platforms and Ctrl K elsewhere; theme.js says which.
+   Without script the ⌘ stays, as it always did. */
+html:not([data-platform='other']) .rc-key-ctrl,
+html[data-platform='other'] .rc-key-cmd { display: none; }

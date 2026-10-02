@@ -1,46 +1,36 @@
 // /management. Everything the admin needs and nothing the public site does.
 //
-// This was two entries: application.js for the old Bootstrap layout, and this. The Devise
-// screens were the last pages on that layout and have moved to the theme, so there is nothing
-// left for a second bundle to serve.
-import { application } from "./controllers/application"
+// admin/  — controllers only the admin screens use.
+// shared/ — controllers both bundles register (theme.js takes the same files).
+import { Application } from "@hotwired/stimulus"
 
 // Turbo earns its place here and nowhere else: the tag screen answers in frames and streams,
 // and the editor reloads its preview into one. Drive stays off, by decision.
 import "@hotwired/turbo-rails"
 Turbo.session.drive = false
 
-import FlashController from "./controllers/flash_controller"
-application.register("flash", FlashController)
+import ConfirmController from "./shared/confirm_controller"
+import DismissController from "./shared/dismiss_controller"
+import AitranslationController from "./admin/aitranslation_controller"
+import PostEditorController from "./admin/post_editor_controller"
+import EditorLayoutController from "./admin/editor_layout_controller"
+import TomselectController from "./admin/tomselect_controller"
+import TinymceController from "./admin/tinymce_controller"
+import StructureRowsController from "./admin/structure_rows_controller"
+import UnsavedGuardController from "./admin/unsaved_guard_controller"
+import SidebarController from "./admin/sidebar_controller"
 
-import AitranslationController from "./controllers/aitranslation_controller"
-application.register("aitranslation", AitranslationController)
-
-import ConfirmController from "./controllers/confirm_controller"
+const application = Application.start()
 application.register("confirm", ConfirmController)
-
-import PostEditorController from "./controllers/post_editor_controller"
+application.register("dismiss", DismissController)
+application.register("aitranslation", AitranslationController)
 application.register("post-editor", PostEditorController)
-
-import TomselectController from "./controllers/tomselect_controller"
+application.register("editor-layout", EditorLayoutController)
 application.register("tomselect", TomselectController)
-
-import TinymceController from "./controllers/tinymce_controller"
 application.register("tinymce", TinymceController)
-
-import StructureRowsController from "./controllers/structure_rows_controller"
 application.register("structure-rows", StructureRowsController)
-
-import UnsavedGuardController from "./controllers/unsaved_guard_controller"
 application.register("unsaved-guard", UnsavedGuardController)
-
-import SidebarController from "./controllers/sidebar_controller"
 application.register("sidebar", SidebarController)
 
-// No Bootstrap JS either. The dropdown went with the old post index, the modal with the delete
-// confirmation that is a button_to and confirm_controller now, and the collapse with the old
-// navbar — the sidebar has its own Stimulus controller.
-//
-// No editor import here. TinyMCE is self-hosted under public/tinymce and loads itself — core,
-// theme, icons, plugins and skin — the first time a screen on the page has a textarea asking
-// for it. Bundling it would put 500 KB of editor into every admin screen, list pages included.
+// No editor import: TinyMCE is self-hosted under public/tinymce and loads itself the first
+// time a screen has a textarea asking for it, so list pages never carry 500 KB of editor.

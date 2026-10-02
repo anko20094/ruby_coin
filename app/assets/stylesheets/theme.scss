@@ -1,15 +1,12 @@
-// The redesign's stylesheet entry — built to app/assets/builds/theme.css.
-//
-// Deliberately independent of application.bootstrap.scss: the redesign runs on
-// its own type and colour system and shares no components with the Bootstrap
-// pages. Both entries live side by side until the last page moves over; see
-// redesign_plan.md §4.1 for why Bootstrap cannot leave before the admin does.
+// The public site's stylesheet entry — built to app/assets/builds/theme.css. The admin has
+// its own entry (admin.scss), which imports the same theme/tokens.
 //
 // theme/  — the design system: tokens, faces, reset, shared components, chrome, and the
 //            profile blocks /cv and /team/:person both render.
 // pages/  — one file per screen, prefixed wk- (work), jn- (journal), tm- (team), and so on.
 
 @use 'theme/tokens';
+@use 'theme/utilities';
 @use 'theme/fonts';
 @use 'theme/base';
 @use 'theme/components';
@@ -24,11 +21,9 @@
 
 @use 'pages/journal_index';
 @use 'pages/journal_post';
-@use 'pages/journal_responsive';
 
 @use 'pages/work_index';
 @use 'pages/work_case';
-@use 'pages/work_responsive';
 
 @use 'pages/cv';
 @use 'pages/team';

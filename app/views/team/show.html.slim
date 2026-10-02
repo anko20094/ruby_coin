@@ -44,14 +44,14 @@
             = [@context.role, @context.period].compact_blank.join(' · ')
             - if @context.solo?
               = " · #{t('profile.solo_project')}"
-          = render 'people/did', lines: @context.did
+          = render Profile::DidComponent.new(lines: @context.did)
 
       - if cv
-        = render 'people/summary', cv: cv
-        = render 'people/career', cv: cv
-        = render 'people/stack', cv: cv
+        = render Profile::SummaryComponent.new(profile: cv)
+        = render Profile::CareerComponent.new(profile: cv)
+        = render Profile::StackComponent.new(profile: cv)
       - else
-        = render 'people/pending'
+        = render Profile::PendingComponent.new
 
       section.pf-block.pf-block--worked
         = render TrackTagComponent.new(label: "#{t('profile.worked_on')} · #{@contributions.size}",
@@ -84,7 +84,7 @@
     aside.split-aside
       = render MonogramComponent.of(@person, size: 280, ring: :mute)
       - if cv
-        = render 'people/contact_panel', cv: cv
+        = render Profile::ContactPanelComponent.new(profile: cv)
       - else
         / Dashed em-dashes rather than an absent panel: the shape of the page is the same
         / whether or not anyone has written the CV yet.

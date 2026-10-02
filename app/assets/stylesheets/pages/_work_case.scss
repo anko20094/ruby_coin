@@ -1,4 +1,6 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+@use 'work_prose';
 
 .wk-case__header {
   max-width: var(--case-max);
@@ -89,16 +91,6 @@
   gap: 40px;
   align-items: start;
   margin-top: 26px;
-}
-
-.wk-prose {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  font-family: var(--font-body);
-  font-size: 18px;
-  line-height: 1.65;
-  max-width: 68ch;
 }
 
 .wk-case__panels {
@@ -359,6 +351,30 @@
   .pf-did { margin-top: 13px; }
 }
 
+// The card's one link is the name (or "open CV"); its ::after covers the card, so the whole
+// card is still the target and the focus ring is drawn around the card rather than the word.
+.wk-teammate,
+.wk-solo { position: relative; }
+
+.wk-card-link {
+  color: inherit;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &:focus-visible { outline: none; }
+}
+
+.wk-teammate:has(.wk-card-link:focus-visible),
+.wk-solo:has(.wk-card-link:focus-visible) {
+  outline: 2px solid var(--ruby);
+  outline-offset: 3px;
+}
+
 .wk-teammate__head {
   display: flex;
   align-items: center;
@@ -436,7 +452,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 620px) {
+@include bp.below(620px) {
   .wk-solo {
     flex-wrap: wrap;
     gap: 14px;
@@ -474,7 +490,7 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 700px) {
+@include bp.below(md) {
   .wk-case__cta { padding-top: 32px; margin-top: 40px; }
 
   .wk-case__cta-line { font-size: 24px; }
@@ -482,4 +498,37 @@
 
 @media (prefers-reduced-motion: reduce) {
   .wk-case__skip { transition: none; }
+}
+
+// ≤900px — the columns become one and the headlines scale down.
+@include bp.below(lg) {
+  .wk-case__header,
+  .wk-case__plain,
+  .wk-case__strip,
+  .wk-case__team,
+  .wk-case__cta,
+  .wk-case__pager,
+  .wk-case__band-inner { --page-pad: 22px; }
+
+  .wk-case__header { padding-top: 36px; }
+
+  .wk-case__title,
+  .wk-case__title.is-long { font-size: 40px; }
+
+  .wk-case__tagline { font-size: 21px; }
+
+  .wk-case__columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  .wk-case__heading { font-size: 34px; }
+
+  .wk-case__heading.is-small { font-size: 30px; }
+
+  .wk-cards { grid-template-columns: minmax(0, 1fr); }
+
+  .wk-case__pager-cards { grid-template-columns: minmax(0, 1fr); }
+
+  .wk-pager-card--next { text-align: left; }
 }

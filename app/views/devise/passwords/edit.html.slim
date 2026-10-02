@@ -4,7 +4,7 @@
 .au-page
   h1.au-page__title= t('.title')
 
-  = render 'devise/shared/errors', resource: resource
+  = render ErrorsComponent.new(object: resource, tone: :site)
 
   = form_for(resource, as: resource_name, url: password_path(resource_name),
              html: { method: :put, class: 'au-form' }) do |f|
@@ -14,10 +14,10 @@
       = f.label :password, t('.new_password'), class: 'au-label'
       - if @minimum_password_length
         .au-hint= t('.minimum', count: @minimum_password_length)
-      = f.password_field :password, autofocus: true, autocomplete: 'new-password', class: 'au-input'
+      = render 'devise/shared/password_input', f: f, field: :password, autocomplete: 'new-password', autofocus: true
 
     .au-field
       = f.label :password_confirmation, t('.confirm_password'), class: 'au-label'
-      = f.password_field :password_confirmation, autocomplete: 'new-password', class: 'au-input'
+      = render 'devise/shared/password_input', f: f, field: :password_confirmation, autocomplete: 'new-password'
 
     = f.submit t('.submit'), class: 'rc-button rc-button--primary'

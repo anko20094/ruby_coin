@@ -1,4 +1,5 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
 // /team — the roster — and /team/:person, the one canonical page per person. What the person
 // page shares with /cv lives in theme/_profile.scss; this is the roster and the blocks that
@@ -202,7 +203,7 @@
 
 .tm-worked__period { color: var(--ink-quiet); }
 
-@media (max-width: 620px) {
+@include bp.below(620px) {
   .tm-worked__meta { text-align: left; }
 }
 
@@ -237,14 +238,14 @@
   margin-top: 4px;
 }
 
-@media (max-width: 900px) {
+@include bp.below(lg) {
   .tm-index,
   .tm-person { padding-top: 36px; }
 }
 
 // On a phone the monogram beside the text left the name a 114px column to wrap 27px display
 // type into. The stone goes above instead, and gives up half its size: the words are the card.
-@media (max-width: 480px) {
+@include bp.below(xs) {
   .tm-card {
     flex-direction: column;
     gap: 12px;

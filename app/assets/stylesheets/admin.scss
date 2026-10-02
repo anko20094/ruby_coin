@@ -1,16 +1,21 @@
 // /management stylesheet entry — built to app/assets/builds/admin.css.
 //
 // Shares the site's tokens and the three self-hosted families, and adds only what a working
-// tool needs on top (admin/_tokens.scss). It runs beside application.bootstrap.scss while the
-// screens that have not been re-skinned still need Bootstrap; see redesign_plan.md §4.1.
+// tool needs on top (admin/_tokens.scss). The only stylesheet the admin layout loads.
 @use 'theme/tokens';
+@use 'theme/utilities';
 @use 'theme/fonts';
-
 @use 'admin/tokens' as admin-tokens;
 
-// The preview pane renders the real article, so it needs the real article's styles. This is
-// the whole point of the pane: being actually identical, not approximately.
-@use 'pages/journal_post';
+// Tom Select's structural styles; admin/_forms.scss dresses it as an .mg-input.
+@use 'tom-select/dist/css/tom-select';
+
+@use 'admin/base';
+@use 'theme/flash';
+
+// The preview pane renders the real article, so it needs the real article's styles.
+@use 'pages/journal_post' with ($narrow-container: true);
 @use 'admin/shell';
 @use 'admin/list';
+@use 'admin/forms';
 @use 'admin/editor';

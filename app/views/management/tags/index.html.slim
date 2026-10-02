@@ -1,23 +1,35 @@
 - provide(:title, full_title(t("titles.tags")))
-.admin-panel
-  .admin-panel__content
-    .admin-panel__inner
-      .admin-panel__right.tags
-        .tags__inner
-          .tags__right
-            .inner-title
-              h2.admin__title = t('.tags')
-            = turbo_frame_tag 'tags', class: 'tags' do
-              - if @tags.present?
-                = render @tags
-          .tags__left
-            h2.admin__title
-              = t("labels.create_tag")
-            = turbo_frame_tag @tag, class: 'create_tag' do
-              = form_with model: [:management, Tag.new] do |f|
-                = f.text_field :title, class: 'standart-input', placeholder: t('.placeholders.name'),
-                  aria: { label: t('.placeholders.name') }
-                = f.submit t('global.button.create'), class: 'main-btn'
-          - if @pagy.present? && @pagy.pages > 1
-            .pagination__inner
-              == pagy_bootstrap_nav(@pagy)
+
+.mg-tag-screen
+  section.mg-tag-screen__list
+    h2.mg-section__title= t('.tags')
+    / A failed rename comes back here without Turbo: that tag's row is its form again, with
+    / what was typed and why it was refused — above the list if it is not on this page.
+    - failed_edit = @tag if @tag.persisted? && @tag.errors.any?
+    - if failed_edit && @tags.none? { |tag| tag.id == failed_edit.id }
+      = render 'form', tag: failed_edit
+    = turbo_frame_tag 'tags', class: 'mg-tag-list' do
+      - @tags.each do |tag|
+        - if failed_edit&.id == tag.id
+          = render 'form', tag: failed_edit
+        - else
+          = render tag
+
+    - if @pagy.present? && @pagy.pages > 1
+      nav.mg-pager
+        - if @pagy.previous
+          = link_to '←', management_tags_path(page: @pagy.previous), class: 'mg-pager__step'
+        span= "#{@pagy.page} / #{@pagy.pages}"
+        - if @pagy.next
+          = link_to '→', management_tags_path(page: @pagy.next), class: 'mg-pager__step'
+
+  section.mg-tag-screen__create
+    h2.mg-section__title= t('labels.create_tag')
+    / A failed create comes back here without Turbo, with what was typed and why it was refused.
+    - new_tag = @tag.new_record? ? @tag : Tag.new
+    = turbo_frame_tag new_tag, class: 'create_tag' do
+      = render ErrorsComponent.new(object: new_tag, tone: :admin)
+      = form_with model: [:management, new_tag], class: 'mg-tag-create' do |f|
+        = f.text_field :title, class: 'mg-input', placeholder: t('.placeholders.name'),
+          aria: { label: t('.placeholders.name') }
+        = f.submit t('global.button.create'), class: 'mg-btn mg-btn--primary'

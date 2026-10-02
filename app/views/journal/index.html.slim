@@ -1,5 +1,5 @@
 - content_for :title, full_title(t('journal.index.title'))
-- page_meta description: t('journal.index.lede')
+- page_meta description: t('journal.index.meta_description'), canonical_query: listing_query(tag: @active_tag)
 
 .jn-index
   header.jn-index__header

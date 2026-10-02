@@ -1,3 +1,5 @@
+@use '../theme/breakpoints' as bp;
+
 // /work — the projects, and nothing else. The CV that used to share this page is /cv now.
 .wk-index {
   max-width: var(--case-max);
@@ -146,4 +148,11 @@
   font-size: 10px;
   color: var(--ink-quiet);
   white-space: nowrap;
+}
+
+@include bp.below(lg) {
+  .wk-index {
+    --page-pad: 22px;
+    padding-top: 36px;
+  }
 }

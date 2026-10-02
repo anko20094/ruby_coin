@@ -8,6 +8,52 @@ RSpec.describe JournalHelper do
   around { |example| I18n.with_locale(:en) { example.run } }
 
   describe '#journal_body' do
+    describe 'with a cache store' do
+      around do |example|
+        was = Rails.cache
+        Rails.cache = ActiveSupport::Cache::MemoryStore.new
+        example.run
+      ensure
+        Rails.cache = was
+      end
+
+      let(:post) { create(:post, description_en: '<pre><code class="language-ruby">def first; end</code></pre>') }
+
+      it 'renders a body once and serves it again from the cache' do
+        helper.journal_body(post, :en)
+        allow(Rouge::Lexer).to receive(:find).and_call_original
+
+        expect(helper.journal_body(post, :en)).to include('jn-code__lang">ruby')
+        expect(Rouge::Lexer).not_to have_received(:find)
+      end
+
+      it 'renders again after a deploy, since the highlighting and the embed markup are code' do
+        helper.journal_body(post, :en)
+        allow(HttpCaching).to receive(:release).and_return('the next deploy')
+        allow(Rouge::Lexer).to receive(:find).and_call_original
+
+        helper.journal_body(post, :en)
+
+        expect(Rouge::Lexer).to have_received(:find).at_least(:once)
+      end
+
+      it 'lets an entry age out of the store rather than keeping it for good' do
+        helper.journal_body(post, :en)
+        allow(Rouge::Lexer).to receive(:find).and_call_original
+
+        travel(described_class::BODY_TTL + 1.minute) { helper.journal_body(post, :en) }
+
+        expect(Rouge::Lexer).to have_received(:find).at_least(:once)
+      end
+
+      it 'renders again once the body is edited' do
+        helper.journal_body(post, :en)
+        post.update!(description_en: '<pre><code class="language-ruby">def second; end</code></pre>')
+
+        expect(helper.journal_body(post.reload, :en)).to include('second')
+      end
+    end
+
     it 'highlights a code block and names its language' do
       post = create(:post, description_en: '<pre><code class="language-ruby">def call; end</code></pre>')
 
@@ -49,8 +95,8 @@ RSpec.describe JournalHelper do
     end
 
     it 'finds a lexer for every language the editor offers' do
-      controller = Rails.root.join('app', 'javascript', 'controllers', 'tinymce_controller.js').read
-      offered = controller[/codesample_languages:\s*\[(.*?)\]/m, 1].scan(/value:\s*"([^"]+)"/).flatten
+      profiles = Rails.root.join('app', 'javascript', 'admin', 'tinymce', 'profiles.js').read
+      offered = profiles[/codesample_languages:\s*\[(.*?)\]/m, 1].scan(/value:\s*"([^"]+)"/).flatten
 
       expect(offered).to include('ruby', 'markup')
       expect(offered.reject { |language| helper.__send__(:lexer_named, language) }).to be_empty

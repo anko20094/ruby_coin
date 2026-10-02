@@ -7,6 +7,8 @@ html lang=I18n.locale
       = content_for?(:title) ? yield(:title) : MetaHelper::SITE_NAME
 
     meta[name="viewport" content="width=device-width,initial-scale=1"]
+    / --paper, for the browser chrome around the page.
+    meta[name="theme-color" content="#fbfaf8"]
     = render 'shared/meta'
     / No csrf_meta_tags here on purpose. Nothing on the public theme makes a non-GET request —
     / the only form is the GET search — and the masked token in that tag changes on every
@@ -25,7 +27,7 @@ html lang=I18n.locale
   body.rc-site
     a.rc-skip href="#main"= t('global.skip_to_content')
     = render NavComponent.new
-    = render 'shared/theme_flash'
+    = render FlashComponent.new(flash:)
     main#main.rc-main.page-in tabindex="-1"
       = yield
     = render FooterComponent.new

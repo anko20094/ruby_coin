@@ -1,6 +1,7 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
-// The front page. Max width 1320px, per handoff §4.
+// The front page.
 $home-max: 1320px;
 
 .hm-page {
@@ -102,6 +103,14 @@ $home-max: 1320px;
   letter-spacing: 1px;
   color: var(--ink-quiet);
   margin-top: 12px;
+
+  // Under reduced motion the gem stands still, so the hint would be false.
+  @media (prefers-reduced-motion: reduce) { display: none; }
+}
+
+// The hero caption tells the reader to move a cursor. On a touch screen there is not one.
+@media (hover: none), (pointer: coarse) {
+  .hm-hero__caption { display: none; }
 }
 
 // Latest entry.
@@ -301,7 +310,7 @@ $home-max: 1320px;
 }
 
 // The floating ruby: appears once the hero one has gone, and goes back to it. The overshoot in
-// the transform curve is deliberate (§4).
+// the transform curve is deliberate.
 .hm-top {
   position: fixed;
   right: 24px;
@@ -340,7 +349,7 @@ $home-max: 1320px;
 // One column. Two things matter here and both were got wrong once: the headline comes first,
 // and the gem gets smaller rather than larger — together they had pushed the h1 off a short
 // viewport, so the page opened on a gem and nothing else.
-@media (max-width: 1000px) {
+@include bp.below(1000px) {
   .hm-hero {
     grid-template-columns: minmax(0, 1fr);
     gap: 28px;
@@ -359,7 +368,7 @@ $home-max: 1320px;
   }
 }
 
-@media (max-width: 700px) {
+@include bp.below(md) {
   .hm-hero__lede { font-size: 17px; }
 
   .hm-latest__entry { grid-template-columns: 1fr; }

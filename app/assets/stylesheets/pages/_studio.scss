@@ -1,4 +1,5 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
 // /studio — the same roster as /team at a lower density, and the way into it from the nav.
 .st-page {
@@ -67,12 +68,12 @@
   margin-top: 12px;
 }
 
-@media (max-width: 900px) {
+@include bp.below(lg) {
   .st-page { padding: 36px var(--page-pad); }
 }
 
 // Same reasoning as the roster card: an 88px stone next to a 100px column of prose.
-@media (max-width: 480px) {
+@include bp.below(xs) {
   .st-card {
     flex-direction: column;
     gap: 14px;
@@ -87,7 +88,7 @@
   .st-card { transition: none; }
 }
 
-// Alumni. Dashed, per the handoff: the border says "not a card, nothing to click" before the
+// Alumni. Dashed: the border says "not a card, nothing to click" before the
 // cursor does. A pill is not a control, so it carries no hit target and no hover.
 .st-alumni {
   margin-top: 56px;

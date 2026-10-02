@@ -1,0 +1,36 @@
+.rc-palette[data-controller="palette" data-palette-url-value=search_url
+            data-palette-all-url-value=all_url data-palette-all-label-value=t('global.palette.all')
+            data-palette-none-value=t('global.palette.none')]
+  button.rc-palette__open[type="button" data-action="palette#open" title=t('global.palette.open')]
+    svg.rc-palette__icon[viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"]
+      circle[cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"]
+      path[d="M15.5 15.5 21 21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"]
+    span.rc-palette__label= t('global.palette.open')
+
+  dialog.rc-palette__dialog[data-palette-target="dialog" data-action="click->palette#backdrop"
+                            aria-label=t('global.palette.open')]
+    .rc-palette__field
+      span.rc-palette__glyph aria-hidden="true" ⌕
+      input.rc-palette__input[type="search" data-palette-target="input"
+                              data-action="input->palette#search keydown->palette#navigate"
+                              placeholder=t('global.palette.placeholder')
+                              aria-label=t('global.palette.open')
+                              autocomplete="off" role="combobox" aria-expanded="false"
+                              aria-autocomplete="list" aria-controls="rc-palette-results"]
+
+    #rc-palette-results.rc-palette__results[role="listbox" data-palette-target="results" hidden=true]
+
+    .rc-palette__status[role="status"]
+      p.rc-palette__empty[data-palette-target="empty"]= t('global.palette.empty')
+
+    .rc-palette__legend
+      span
+        kbd ↑
+        kbd ↓
+        = " #{t('global.palette.move')}"
+      span
+        kbd ⏎
+        = " #{t('global.palette.open_result')}"
+      span
+        kbd esc
+        = " #{t('global.palette.close')}"

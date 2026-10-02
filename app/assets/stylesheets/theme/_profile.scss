@@ -1,4 +1,5 @@
 @use 'controls';
+@use 'breakpoints' as bp;
 
 // A profile — the document /cv and /team/:person both render. One set of rules, because they
 // are the same CV at two addresses: one aimed at a recruiter, one at a client asking who will
@@ -42,7 +43,7 @@
   scrollbar-color: color-mix(in oklab, var(--ink-mute) 70%, transparent) transparent;
 }
 
-@media (max-width: 900px) {
+@include bp.below(lg) {
   .split-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 32px;
@@ -325,7 +326,7 @@
 
 // Below this the right-hand meta is crushed rather than aligned, so it left-aligns under the
 // title instead.
-@media (max-width: 620px) {
+@include bp.below(620px) {
   .worked-row {
     grid-template-columns: minmax(0, 1fr);
     gap: 6px;

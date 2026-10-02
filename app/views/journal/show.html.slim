@@ -1,7 +1,6 @@
 - content_for :title, full_title(@post.title)
-/ The handoff asks journal posts to unfurl with their own cover; only where there is none
-/ does the site card stand in.
-- page_meta description: @post.subtitle, image: (@post.photo.presence && @post.photo.medium.url), type: 'article', published_at: @post.created_at, updated_at: @post.updated_at
+/ A post unfurls with its own cover; only where there is none does the site card stand in.
+- page_meta description: @post.subtitle, image: (@post.photo.presence && @post.photo.medium.url), type: 'article', published_at: @post.created_at, updated_at: @post.updated_at, locales: @post.translated_locales
 
 = render 'shared/reading_progress'
 
@@ -18,8 +17,11 @@ article.jn-post
   .jn-post__byline= journal_byline(@post)
 
   - if @post.photo.present?
+    / The first image on the page, so it is fetched first; the sizes are the version's, and
+    / the CSS crops it, so they only reserve the box.
     .jn-post__cover
-      = image_tag @post.photo.medium.url, alt: '', loading: 'lazy'
+      = image_tag @post.photo.medium.url, alt: '', loading: 'eager', fetchpriority: 'high',
+        width: PhotoUploader::MEDIUM.first, height: PhotoUploader::MEDIUM.last
 
   .jn-body
     p.jn-body__lede= @post.subtitle
@@ -61,7 +63,7 @@ article.jn-post
             / missing, and one card without one should not shift the row.
             .jn-related__cover
               - if post.photo.present?
-                = image_tag post.photo.small.url, alt: '', loading: 'lazy'
+                = image_tag post.photo.small.url, alt: '', loading: 'lazy', width: PhotoUploader::SMALL.first, height: PhotoUploader::SMALL.last
             .jn-related__date= post.created_at.strftime('%Y·%m·%d')
             h3.jn-related__title= post.title
             .jn-related__tags= post.tags.first(3).map { |tag| "##{tag.title}" }.join(' ')

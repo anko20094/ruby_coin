@@ -1,9 +1,8 @@
 @use '../theme/controls';
 @use 'a11y';
+@use '../theme/breakpoints' as bp;
 
-// admin.scss deliberately does not pull in theme/_base.scss — that file styles a reading
-// surface. These are the few resets a tool needs, and they have to beat the Bootstrap bundle
-// still loaded beside this one.
+// Resets scoped to the shell, on top of admin/_base.scss.
 .mg-shell {
   a {
     color: inherit;
@@ -17,7 +16,7 @@
 
   table { margin: 0; }
 
-  // Bootstrap's input::placeholder halves the opacity and sets 16px light, which is 2:1 on paper.
+  // Placeholders at a contrast that can be read: the UA grey is 2:1 on paper.
   :is(input, textarea)::placeholder {
     font: inherit;
     color: var(--ink-quiet);
@@ -25,30 +24,25 @@
   }
 }
 
-// Flash sits in the pane rather than floating over the top bar, which is where the Bootstrap
-// rule used to put it.
+// Flash sits in the pane, under the top bar: a full-width strip per message, in the admin's
+// mono. The messages themselves are FlashComponent's (theme/_flash.scss).
 .mg-flash {
-  &:empty { display: none; }
-
-  .alert {
+  .rc-flash__item {
+    align-items: center;
     margin: 0;
     border: 0;
     border-bottom: 1px solid var(--mg-ink-faint);
     border-radius: 0;
-    padding: 10px 22px;
+    padding: 4px 12px 4px 22px;
     font-family: var(--font-mono);
     font-size: 11.5px;
-    background: var(--paper-warm);
-    color: var(--ink);
   }
 
-  .alert-success { background: color-mix(in oklab, var(--mg-ok) 12%, var(--paper)); }
-  .alert-alert,
-  .alert-error { background: var(--ruby-mute); color: var(--ruby); }
+  .rc-flash__item--notice { background: color-mix(in oklab, var(--mg-ok) 12%, var(--paper)); }
+  .rc-flash__item--alert { color: var(--ruby); }
 }
 
-// Sidebar + content pane. Everything is scoped under .mg-shell so it can live beside the
-// Bootstrap bundle the un-reskinned admin screens still use — see redesign_plan.md §4.1.
+// Sidebar + content pane.
 .mg-shell {
   display: flex;
   min-height: 100vh;
@@ -133,7 +127,7 @@
 }
 
 // Clipped rather than display:none, which would leave each link named by its count alone.
-@media (min-width: 901px) {
+@include bp.above(lg) {
   .mg-shell.is-sidebar-collapsed .mg-model__body { @include a11y.visually-hidden; }
 }
 
@@ -399,14 +393,6 @@
   &:focus-visible { top: 12px; }
 }
 
-// The screens that have not been re-skinned yet keep their Bootstrap markup; this just stops
-// it fighting the pane it now sits in.
-.mg-content .admin-panel,
-.mg-content .admin-form {
-  padding: 0;
-  margin: 0;
-}
-
 // An eight-column working list will not fit a phone and should not try to. It scrolls in its
 // own box so the page around it does not, which is the difference between a table you can read
 // sideways and a site that is 273px too wide.
@@ -416,7 +402,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 900px) {
+@include bp.below(lg) {
   .mg-shell { flex-direction: column; }
 
   .mg-sidebar {

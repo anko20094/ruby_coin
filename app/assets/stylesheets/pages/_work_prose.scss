@@ -1,0 +1,17 @@
+@use '../theme/breakpoints' as bp;
+
+// The case page's running text. Its own partial because the TinyMCE case profile sets its
+// editing body in it too (editor_content.scss).
+.wk-prose {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.65;
+  max-width: 68ch;
+}
+
+@include bp.below(lg) {
+  .wk-prose { font-size: 17px; }
+}

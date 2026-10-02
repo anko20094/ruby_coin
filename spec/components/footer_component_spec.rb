@@ -3,8 +3,6 @@
 require 'rails_helper'
 
 describe FooterComponent, type: :component do
-  include_context 'when the cv is imported'
-
   # The roster is not in the main nav, so the footer is one of the two ways to it.
   it 'lists the crew and the CV among the places to go' do
     I18n.with_locale(:en) do
@@ -14,7 +12,7 @@ describe FooterComponent, type: :component do
     end
 
     expect(page.all('.rc-footer__sections a').map(&:text)).to eq(
-      ['journal', 'rss', 'all cases', 'the crew', 'cv', 'faq', 'say hi']
+      ['journal', 'rss', 'all projects', 'the team', 'cv', 'faq', 'contact']
     )
     expect(page).to have_css("a[href='/en/team']")
     expect(page).to have_css("a[href='/en/cv']")

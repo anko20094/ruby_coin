@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The wiring between the admin form and app/javascript/controllers/tinymce_controller.js.
+# The wiring between the admin form and app/javascript/admin/tinymce_controller.js.
 module TinymceHelper
   BASE_URL = '/tinymce'
 
@@ -26,8 +26,7 @@ module TinymceHelper
       tinymce_valid_elements_value: (tinymce_valid_elements if profile == 'case'),
       tinymce_base_url_value: BASE_URL,
       tinymce_cache_suffix_value: tinymce_cache_suffix,
-      tinymce_content_css_value: asset_path('theme.css'),
-      tinymce_editor_css_value: asset_path('editor_content.css'),
+      tinymce_content_css_value: asset_path('editor_content.css'),
       tinymce_labels_value: tinymce_labels.to_json
     }.merge(extra)
   end

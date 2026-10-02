@@ -4,7 +4,7 @@
 .au-page
   h1.au-page__title= t('buttons.forgot_password')
 
-  = render 'devise/shared/errors', resource: resource
+  = render ErrorsComponent.new(object: resource, tone: :site)
 
   = form_for(resource, as: resource_name, url: password_path(resource_name),
              html: { method: :post, class: 'au-form' }) do |f|
