@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 module Ahoy
-  # One view, recorded once per session per subject.
-  #
-  # It used to know only about posts. Cases were invisible — and "which cases do recruiters
-  # actually open" is the question the handoff says should decide what sits at the top of
-  # /work (§9a). Same throttle, same shape, one more subject.
   class EventProcess < BaseService
     EVENTS = { 'Post' => 'Viewed Post', 'Case' => 'Viewed Case' }.freeze
     SESSION_KEY_PREFIX = 'last_visit_'

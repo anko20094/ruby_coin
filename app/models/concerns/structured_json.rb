@@ -1,29 +1,5 @@
 # frozen_string_literal: true
 
-# A list of rows kept in one JSONB column, declared once so the model, the admin form and the
-# importer agree on the shape.
-#
-# This was Case's, and it is here because the CV turned out to be the same thing. A CV is one
-# document with three ordered lists inside it — career, stack groups, strengths — and it used
-# to be a table of ten rows with its own model, controller, policy and CRUD screens, so
-# changing two words meant a page navigation and reordering meant typing a number into a
-# field. See redesign_plan.md §12.1.
-#
-# A field kind is one of:
-#
-#   :plain     — one value, the same in both languages (a date range, a figure)
-#   :localised — {"en" => …, "uk" => …}; a bare string is allowed and reads the same in both
-#   :rich      — the same, but the page prints it through ProseHelper#rich, so the admin gives
-#                it an editor
-#   :list      — an array of plain strings, edited one per line
-#
-# The difference between :localised and :rich is only ever about the form. It is here because
-# the admin was giving an editor to every localised field, and the CV screen booted eighty of
-# them for the one field the CV actually renders as markup — the rest are escaped, so a bolded
-# word would have reached the page as a literal <b>.
-#
-# `fields: nil` means the row *is* one value rather than a hash of them; `row:` says which of
-# the two kinds it is, and defaults to plain text.
 module StructuredJson
   extend ActiveSupport::Concern
   include LocalisedJson

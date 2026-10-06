@@ -44,7 +44,7 @@ task :seed do
 end
 
 namespace :deploy do
-  desc 'Run the pending data tasks and the CV import against the new release'
+  desc 'Run the pending data tasks against the new release'
   task :data do
     next unless fetch(:deploying)
 
@@ -52,7 +52,6 @@ namespace :deploy do
       within release_path do
         with rails_env: fetch(:rails_env) do
           execute :rake, 'after_party:run'
-          execute :rake, 'cv:import'
         end
       end
     end

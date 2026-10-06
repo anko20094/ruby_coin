@@ -6,8 +6,6 @@ require 'rails_helper'
 # second stylesheet, a second bundle, and a second footer carrying a different Telegram handle,
 # a different copyright holder and a dead YouTube link.
 describe 'the way in', :jobs, type: :request do
-  include_context 'when the cv is imported'
-
   describe 'GET /users/sign_in' do
     before { get new_user_session_path(locale: 'en') }
 
@@ -18,7 +16,7 @@ describe 'the way in', :jobs, type: :request do
     end
 
     it 'carries the identity the rest of the site carries' do
-      expect(response.body).to include(I18n.with_locale(:en) { CVProfile.current.name })
+      expect(response.body).to include(I18n.with_locale(:en) { Team.owner_cv.name })
       expect(response.body).not_to include('t.me/ruby4you')
       expect(response.body).not_to include('javascript:void(0)')
     end
@@ -47,25 +45,32 @@ describe 'the way in', :jobs, type: :request do
 
       get '/en/management/tags'
 
-      expect(response.body).to match(%r{/assets/application[-\w]*\.css})
+      expect(response.body).to match(%r{/assets/admin[-\w]*\.css})
       expect(response.body).to match(%r{/assets/admin[-\w]*\.js})
+      expect(response.body).not_to match(%r{/assets/application[-\w]*\.css})
     end
   end
 
   # There is no member area and no email confirmation, so an open sign-up meant anyone could
   # create an account and gain nothing by it.
   describe 'registration' do
-    it 'is closed' do
-      get new_user_registration_path(locale: 'en')
+    include_context 'when errors render as pages'
 
-      expect(response).to redirect_to(new_user_session_path)
-      expect(flash[:alert]).to be_present
+    it 'is closed: the sign-up address sends you home' do
+      get '/en/users/sign_up'
+
+      expect(response).to redirect_to('/en')
+    end
+
+    it 'sends a locale-less sign-up address to the default locale' do
+      get '/users/sign_up'
+
+      expect(response).to redirect_to("/#{I18n.default_locale}")
     end
 
     it 'cannot be posted to either' do
       attempt = lambda do
-        post user_registration_path(locale: 'en'),
-             params: { user: { email: 'stranger@example.com', password: 'password123' } }
+        post '/en/users', params: { user: { email: 'stranger@example.com', password: 'password123' } }
       end
 
       expect(&attempt).not_to change(User, :count)
@@ -74,7 +79,7 @@ describe 'the way in', :jobs, type: :request do
     it 'is not offered anywhere' do
       get new_user_session_path(locale: 'en')
 
-      expect(response.body).not_to include(new_user_registration_path(locale: 'en'))
+      expect(response.body).not_to include('/users/sign_up')
     end
   end
 

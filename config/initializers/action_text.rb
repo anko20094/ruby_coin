@@ -13,7 +13,7 @@
 # `style` is deliberately not on it. It is the one attribute in a sanitiser's allow list that
 # carries real risk, and the site's typography is a design decision rather than a per-post one.
 # TinyMCE is configured to write alignment as a class instead (see the `formats` block in
-# app/javascript/controllers/tinymce_controller.js), and those classes are styled in
+# app/javascript/admin/tinymce/profiles.js), and those classes are styled in
 # app/assets/stylesheets/pages/_journal_post.scss.
 Rails.application.config.after_initialize do
   ActionText::ContentHelper.allowed_tags = Rails::HTML5::SafeListSanitizer.allowed_tags + %w[

@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 module Management
-  # Where the editor's image button puts a file.
-  #
-  # The body is Action Text, so an image inside it is an Active Storage blob and the article
-  # holds its URL. TinyMCE uploads over XHR and expects one thing back — `location` — which
-  # it then writes into the <img src> it inserts.
   class EditorImagesController < ApplicationController
     MAX_BYTES = 8.megabytes
 

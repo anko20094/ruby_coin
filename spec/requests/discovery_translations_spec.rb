@@ -7,7 +7,6 @@ require 'rails_helper'
 describe 'discovery of a post written in one language', type: :request do
   include_context 'when carrierwave cleanup'
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   let!(:bilingual) do
     I18n.with_locale(:en) { create(:post, title: 'Written twice') }.tap do |post|

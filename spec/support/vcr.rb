@@ -63,6 +63,7 @@ if ENV['FIND_UNUSED_VCR_CASSETTES']
   module CassetteReporter
     def insert_cassette(name, options = {})
       USED_CASSETTES << VCR::Cassette.new(name, options).file
+
       super
     end
   end

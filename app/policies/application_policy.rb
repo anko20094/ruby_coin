@@ -9,11 +9,11 @@ class ApplicationPolicy
   end
 
   def index?
-    true
+    false
   end
 
   def show?
-    true
+    false
   end
 
   def create?
@@ -37,6 +37,8 @@ class ApplicationPolicy
   end
 
   class Scope
+    private attr_reader :user, :scope
+
     def initialize(user, scope)
       @user = user
       @scope = scope
@@ -45,10 +47,6 @@ class ApplicationPolicy
     def resolve
       raise NotImplementedError, "You must define #resolve in #{self.class}"
     end
-
-    private
-
-    attr_reader :user, :scope
   end
 
   private

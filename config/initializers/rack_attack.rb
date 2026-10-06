@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-# The throttles redesign_plan.md §2 promises. Nothing was in place: sign-in, the password
-# reset and the search screen were all unmetered, and search is the only public endpoint that
-# runs a full-text query per request.
-#
-# Deliberately generous. This is a personal site, not a target — the point is that a script
-# cannot sit on the sign-in form all night, not that a reader has to think about how fast they
-# click.
 class Rack::Attack
   # Assets are served by the same process in some deployments; they are not what needs metering.
   ASSET_PATHS = %r{\A/(assets|og|packs)/}
@@ -18,6 +11,12 @@ class Rack::Attack
   PASSWORD = %r{/users/password#{FORMAT}}
   SEARCH = %r{/search#{FORMAT}}
   TRANSLATE = %r{/management/posts/translate#{FORMAT}}
+  # The site's own locales: I18n.available_locales still holds every locale rails-i18n ships
+  # while initializers run, and translating the 429 into one of those raises.
+  LOCALES = Regexp.union(Rails.application.config.i18n.available_locales.map(&:to_s))
+  LOCALE = %r{\A/(#{LOCALES})(?=/|\z)}
+  # The admin and the editor's API, under a locale or none.
+  BEHIND_SIGN_IN = %r{\A(?:/(?:#{LOCALES}))?/(?:management|api)(?:[/.]|\z)}
 
   # Its own store: the app's file store only drops a counter when that exact key is read again,
   # and a time-bucketed key never is. A memory store prunes itself and writes nothing to disk.
@@ -33,6 +32,18 @@ class Rack::Attack
     rescue ActionController::BadRequest, ActionDispatch::Http::Parameters::ParseError
       nil
     end
+
+    # Warden runs before this middleware, so the session is already read. Only staff count: an
+    # ordinary account left over from when sign-up was open must not skip the backstop.
+    def staff?
+      warden = env['warden']
+      warden.present? && warden.authenticated?(:user) && warden.user(:user)&.staff_member?
+    end
+
+    # The admin is a signed-in editor, not a crawler.
+    def admin? = path.match?(BEHIND_SIGN_IN) && staff?
+
+    def path_locale = path[LOCALE, 1] || I18n.default_locale
   end
 
   # Off while developing and in the suite unless a spec asks for it: a rate limiter that fires
@@ -67,19 +78,25 @@ class Rack::Attack
   end
 
   # A backstop for everything else. A reader clicking through the whole site never comes close.
+  # A signed-in editor in /management does: the editor autosaves and re-renders its preview
+  # every couple of seconds, so an hour of writing is well past 300 requests in five minutes.
+  # Those requests are behind a password, and the sign-in in front of them has its own limits;
+  # an anonymous request to the same paths still counts.
   throttle('requests/ip', limit: 300, period: 5.minutes) do |request|
-    request.ip unless request.path.match?(ASSET_PATHS)
+    request.ip unless request.path.match?(ASSET_PATHS) || request.admin?
   end
 
-  # Answer in a way a person can act on, and tell a client how long to wait.
+  # Answer in a way a person can act on, in the language of the page they asked for, and tell a
+  # client how long to wait.
   self.throttled_responder = lambda do |request|
     match = request.env['rack.attack.match_data'] || {}
     retry_after = (match[:period] || 60).to_i
+    message = I18n.t('throttled', count: retry_after, locale: request.path_locale)
 
     [
       429,
       { 'content-type' => 'text/plain; charset=utf-8', 'retry-after' => retry_after.to_s },
-      ["Too many requests. Try again in #{retry_after} seconds.\n"]
+      ["#{message}\n"]
     ]
   end
 end

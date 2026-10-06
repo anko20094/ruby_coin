@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class BaseQuery
-  def all
-    raise NotImplementedError, 'You should implement this method in a child class.'
+  def self.call(...) = new(...).call
+
+  def call
+    raise NotImplementedError, "#{self.class} must define #call"
   end
 end

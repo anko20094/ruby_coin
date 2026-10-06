@@ -49,7 +49,7 @@ RSpec.describe 'after_party:recompress_post_covers on stored originals' do
     expect(recorded.count).to eq(1)
   end
 
-  it 'aborts, leaves itself pending and names the post when a cover cannot be read' do
+  it 'names a cover it cannot read, rebuilds the rest and still records itself' do
     broken = create(:post)
     File.write(broken.photo.path, 'not an image')
     healthy = phone_post
@@ -57,10 +57,22 @@ RSpec.describe 'after_party:recompress_post_covers on stored originals' do
     run = processing { run_task(task) }
 
     expect(run.stdout).to include('rebuilt: 1', 'failed: 1')
-    expect(run.stderr).to include("post ##{broken.id}", "posts #{broken.id}")
-    expect(run).to be_aborted
+    expect(run.stderr).to include("post ##{broken.id}", "covers:rebuild IDS=#{broken.id}")
+    expect(run).not_to be_aborted
     expect(exposed?(healthy.reload.photo.path)).to be(false)
-    expect(recorded).to be_empty
+    expect(recorded.count).to eq(1)
+  end
+
+  it 'does not re-encode an original it has already normalised' do
+    post = phone_post(orientation: 6)
+    processing { run_task(task) }
+    recorded.delete_all
+    path = post.reload.photo.path
+    before = [File.binread(path), File.mtime(path)]
+
+    processing { run_task(task) }
+
+    expect([File.binread(path), File.mtime(path)]).to eq(before)
   end
 
   it 'reports a cover whose file is gone without holding the deploy' do
@@ -75,7 +87,8 @@ RSpec.describe 'after_party:recompress_post_covers on stored originals' do
     expect(recorded.count).to eq(1)
   end
 
-  it 'removes the versions the old uploader left beside the original, which carry the same EXIF' do
+  # The release still serving during the deploy asks for exactly these files.
+  it 'leaves the versions the old uploader wrote where they are' do
     post = phone_post
     directory = File.dirname(post.photo.path)
     legacy = %w[lite_x.jpg thumb_x.png large_x.png medium_x.png small_x.png].map { |name| File.join(directory, name) }
@@ -83,8 +96,9 @@ RSpec.describe 'after_party:recompress_post_covers on stored originals' do
 
     processing { run_task(task) }
 
-    expect(legacy.none? { |path| File.exist?(path) }).to be(true)
-    expect(Dir.children(directory).size).to eq(3)
+    expect(legacy.all? { |path| File.exist?(path) }).to be(true)
+    photo = post.reload.photo
+    expect([photo.medium.path, photo.small.path].all? { |path| File.exist?(path) }).to be(true)
   end
 
   it 'records itself when the only posts it skipped are ones with no cover' do

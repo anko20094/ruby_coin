@@ -8,7 +8,6 @@ require 'rails_helper'
 # every response, so no two responses ever matched.
 describe 'HTTP caching', type: :request do
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   pages = %w[/en/work /en/work/dna /en/cv /en/contact /en/faq /en/studio /en/team /en/team/danyil]
 
@@ -45,11 +44,12 @@ describe 'HTTP caching', type: :request do
       expect(response.body).to be_empty
     end
 
-    it "lets the browser keep #{path} for five minutes, and no shared cache" do
+    it "makes the browser revalidate #{path} every time, and keeps it out of shared caches" do
       get path
 
-      expect(response.headers['Cache-Control']).to include("max-age=#{HttpCaching::PAGE_TTL.to_i}", 'private')
+      expect(response.headers['Cache-Control']).to include('max-age=0', 'must-revalidate', 'private')
       expect(response.headers['Cache-Control']).not_to include('public')
+      expect(response.headers['Cache-Control'].scan(/max-age=(\d+)/).flatten.map(&:to_i)).to all(be_zero)
     end
 
     it "expires #{path} when the day turns, because the footer and the draft chip read the clock" do
@@ -70,10 +70,10 @@ describe 'HTTP caching', type: :request do
     end
 
     it "expires #{path} when the CV changes, which the footer prints on every page" do
-      before_import = etag_for(path)
-      CVProfile.current.update!(location: { 'en' => 'Elsewhere', 'uk' => 'Деінде' })
+      before_edit = etag_for(path)
+      allow(Team).to receive(:version).and_return('an edited cv.yml')
 
-      revalidate(path, before_import)
+      revalidate(path, before_edit)
 
       expect(response).to have_http_status(:success)
     end
@@ -166,6 +166,63 @@ describe 'HTTP caching', type: :request do
     expect(response.body).to include('name="csrf-token"')
   end
 
+  describe 'the home page' do
+    it 'answers an unchanged page with 304' do
+      revalidate('/en', etag_for('/en'))
+
+      expect(response).to have_http_status(:not_modified)
+    end
+
+    it 'expires when a case is renamed, since its cards print the titles' do
+      before_edit = etag_for('/en')
+      Case.ordered.first.update!(title: { 'en' => 'Renamed', 'uk' => 'Перейменовано' })
+
+      revalidate('/en', before_edit)
+
+      expect(response).to have_http_status(:success)
+    end
+  end
+
+  describe 'a journal entry' do
+    let!(:entry) { I18n.with_locale(:en) { create(:post, status: 'active', title: 'Cached', subtitle: 'Lede') } }
+    let(:path) { "/en/post/#{entry.slug}" }
+
+    it 'answers an unchanged entry with 304' do
+      revalidate(path, etag_for(path))
+
+      expect(response).to have_http_status(:not_modified)
+    end
+
+    it 'expires when the entry is edited' do
+      before_edit = etag_for(path)
+      I18n.with_locale(:en) { entry.update!(subtitle: 'Another lede') }
+
+      revalidate(path, before_edit)
+
+      expect(response).to have_http_status(:success)
+    end
+
+    # The view is recorded before the freshness check, so a reader the browser revalidates for
+    # is still a reader.
+    it 'still records the view when it answers 304' do
+      etag = etag_for(path)
+      allow(ViewTracking).to receive(:record)
+
+      revalidate(path, etag)
+
+      expect(response).to have_http_status(:not_modified)
+      expect(ViewTracking).to have_received(:record).with(anything, entry)
+    end
+  end
+
+  # cache_publicly adds Team.version itself; a caller passing it as well only hid that.
+  it 'is not handed what it already adds to every page' do
+    callers = Rails.root.glob('app/controllers/**/*.rb')
+                   .select { |file| file.read.match?(/cache_publicly\(.*Team\.version/) }
+
+    expect(callers).to be_empty
+  end
+
   describe 'what a release is made of' do
     let(:sources) { Rails.root.glob(HttpCaching::RELEASE_SOURCES).map { |path| path.relative_path_from(Rails.root).to_s } }
 
@@ -176,6 +233,46 @@ describe 'HTTP caching', type: :request do
       ].each do |file|
         expect(sources).to include(file), "#{file} would not expire a cached page"
       end
+    end
+  end
+
+  describe HttpCaching do
+    around do |example|
+      described_class.instance_variable_set(:@release, nil)
+      example.run
+    ensure
+      described_class.instance_variable_set(:@release, nil)
+    end
+
+    it 'names a deployed release by the commit Capistrano wrote' do
+      allow(Rails.application.config).to receive(:enable_reloading).and_return(false)
+      allow(described_class::REVISION).to receive_messages(file?: true, read: "abc123\n")
+      allow(Rails.root).to receive(:glob).and_call_original
+
+      expect(described_class.release).to eq('abc123')
+      expect(Rails.root).not_to have_received(:glob)
+    end
+
+    it 'only stats the sources in development, and moves when one of them is touched' do
+      allow(Rails.application.config).to receive(:enable_reloading).and_return(true)
+      allow(Digest::SHA256).to receive(:file).and_call_original
+      locale_file = Rails.root.join('config', 'locales', 'en.yml')
+      original_mtime = locale_file.mtime
+
+      before = described_class.release
+      File.utime(original_mtime, Time.now + 3600, locale_file) # rubocop:disable Rails/TimeZone -- File.utime takes a Time
+
+      expect(described_class.release).not_to eq(before)
+      expect(Digest::SHA256).not_to have_received(:file)
+    ensure
+      File.utime(original_mtime, original_mtime, locale_file) if original_mtime
+    end
+
+    it 'hashes the sources where there is no REVISION file' do
+      allow(Rails.application.config).to receive(:enable_reloading).and_return(false)
+      allow(described_class::REVISION).to receive(:file?).and_return(false)
+
+      expect(described_class.release).to match(/\A\h{64}\z/)
     end
   end
 end

@@ -4,8 +4,8 @@
 #
 # The Table backend's defaults already match the schema Globalize left behind: table
 # post_translations, foreign key post_id, association Post#translations. So the swap needed no
-# options and no data migration — see redesign_plan.md §4.2, which is why this was the low-risk
-# route rather than moving the data to JSONB in the same step.
+# options and no data migration, which is why this was the low-risk route rather than moving
+# the data to JSONB in the same step.
 #
 # Two plugins are deliberately left off:
 #
@@ -25,6 +25,9 @@ Mobility.configure do
 
     # Post.i18n, for querying on translated attributes.
     query
+
+    # title_uk, subtitle_en=…: the editor writes the other language in the same save.
+    locale_accessors
 
     cache
 

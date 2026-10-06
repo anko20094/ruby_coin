@@ -1,19 +1,11 @@
 # frozen_string_literal: true
 
-# The roster, and one canonical page per person.
-#
-# Not in the main nav: it is reached from /studio, from the footer, from the foot of every
-# case page and from ⌘K. A person page arrived at through a project pins that project's
-# contribution above the CV, which is the whole point of the design — the visitor came asking
-# "what did this person do on that project" and must not have to scroll for the answer.
 class TeamController < ApplicationController
   def index
     @people = Team.crew
     @order = Case.slugs
 
-    # CVProfile is in the key because the owner's card reads it: his CV is the database row, so
-    # the "CV DRAFT" chip flips when it is imported and nothing else in this key would notice.
-    cache_publicly([Team.version, @order, CVProfile.current])
+    cache_publicly(@order)
   end
 
   def show
@@ -32,6 +24,6 @@ class TeamController < ApplicationController
     # pinned contribution and in every "worked on" row. They are editable in the admin, so a
     # renamed or deleted project has to be able to expire this page; without them the recomputed
     # ETag matches the old one forever and the reader keeps a page naming a project that is gone.
-    cache_publicly([Team.version, @person.id, @context&.slug, CVProfile.current, @cases_by_slug.values])
+    cache_publicly([@person.id, @context&.slug, @cases_by_slug.values])
   end
 end

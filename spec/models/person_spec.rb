@@ -50,72 +50,30 @@ RSpec.describe Person do
   describe 'with the CV that lives in cv.yml' do
     subject(:person) { Team.owner }
 
-    include_context 'when the cv is imported'
-
-    it 'resolves to the one CV in the database, so the two pages cannot drift' do
-      expect(person.cv).to eq(CVProfile.first)
+    it 'resolves to the one document /cv renders, so the two pages cannot drift' do
+      expect(person.cv).to equal(Team.owner_cv)
+      expect(I18n.with_locale(:en) { person.cv.name }).to eq('Danyil Shkoropad')
+      expect(I18n.with_locale(:uk) { person.cv.name }).to eq('Даниїл Шкоропад')
     end
 
-    # An empty table means nobody has imported it yet, and the page says so rather than
-    # rendering a blank career under a filled layout.
-    it 'reads as a draft on a database with no CV in it' do
-      CVProfile.delete_all
+    it 'takes its date from the CV rather than from a second copy in people.yml' do
+      expect(person.updated).to eq(YAML.load_file(Team::PATH.join('cv.yml')).dig('cv', 'updated'))
+    end
 
-      expect(person.cv).to be_nil
-      expect(person).to be_draft
+    it 'reads no CV from the database' do
+      statements = []
+      collect = ->(*, payload) { statements << payload[:sql] unless payload[:name] == 'SCHEMA' }
+
+      ActiveSupport::Notifications.subscribed(collect, 'sql.active_record') do
+        [person.cv, person.updated_on, person.draft?, person.public_links]
+      end
+
+      expect(statements).to be_empty
     end
 
     it 'publishes the contact links the CV already shows' do
       expect(person.public_links).to include('https://github.com/anko20094')
       expect(person.public_links).to all(satisfy { |link| !link.start_with?('mailto:') })
-    end
-  end
-
-  describe 'the owner, asked several things in one request' do
-    subject(:person) { Team.owner }
-
-    include_context 'when the cv is imported'
-
-    def cv_queries(&)
-      statements = []
-      collect = ->(*, payload) { statements << payload[:sql] if payload[:sql].include?('FROM "cv_profiles"') }
-
-      ActiveSupport::Notifications.subscribed(collect, 'sql.active_record', &)
-      statements.size
-    end
-
-    def ask_everything
-      person.cv
-      person.cv?
-      person.updated
-      person.updated_on
-      person.draft?
-      person.page?
-      person.public_links
-    end
-
-    it 'reads the CV from the database once' do
-      expect(cv_queries { ask_everything }).to eq(1)
-    end
-
-    it 'answers every question from the same row' do
-      expect(person.cv).to equal(person.cv)
-      expect(person.updated).to eq(person.cv.figures_as_of)
-    end
-
-    it 'remembers that there is none rather than asking again' do
-      CVProfile.delete_all
-
-      expect(cv_queries { ask_everything }).to eq(1)
-    end
-
-    it 'reads again in the next request' do
-      expect(person.updated).to eq(CVProfile.first.figures_as_of)
-      CVProfile.first.update_columns(figures_as_of: '2030·01·01')
-
-      Current.reset
-
-      expect(person.updated).to eq('2030·01·01')
     end
   end
 

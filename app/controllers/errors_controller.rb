@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
-# The pages behind config.exceptions_app (config/application.rb). That setting has been on
-# since the app was generated, but nothing was routed at /404 or /500 — so every production
-# 404 fell through to an empty body, and public/404.html was never reached.
-#
-# Rendered inside the real layout, so a reader who mistypes a URL is still on the site: the
-# nav, the footer and the way out are all where they were.
 class ErrorsController < ApplicationController
-  layout 'theme'
-
   # Rails rewrites path_info to "/404" before dispatching here and keeps the address the
   # reader actually asked for in this header. It is the only way back to the locale they were
   # browsing in — the /:locale segment is gone by the time this controller runs.

@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 module Api
-  # Read by the tag picker in the post editor and by nothing else, so it lives behind the same
-  # door as the editor. It used to be open: an unauthenticated, unbounded LIKE that returned
-  # the whole tag table for an empty term.
   class TagsController < ApplicationController
     # How many suggestions a picker can usefully show at once.
     LIMIT = 20

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# What one person did on one project — a row of config/portfolio/team.yml. It belongs to the
-# project: a person page is composed by asking for their rows, so a contribution is written
-# once and cannot drift between the two pages.
 class Contribution
   include LocalisedJson
 

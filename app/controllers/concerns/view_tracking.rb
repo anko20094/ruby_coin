@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# One place that decides whether a view is worth recording, so the journal and the portfolio
-# cannot drift apart on the question.
 module ViewTracking
   def self.record(controller, subject)
     return if subject.blank? || controller.current_user&.staff_member?

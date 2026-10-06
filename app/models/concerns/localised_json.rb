@@ -1,12 +1,28 @@
 # frozen_string_literal: true
 
-# Content that carries both languages inside JSONB, as {"en" => …, "uk" => …}.
-#
-# Used by Case and by the CV models. The handoff's YAML stores every translated string this
-# way, so the database keeps the same shape rather than splitting it across a translations
-# table — see redesign_plan.md §4.2 for where that leaves Mobility (Post only).
 module LocalisedJson
   extend ActiveSupport::Concern
+
+  class_methods do
+    # For a model whose JSONB columns hold one string per language: a reader in the current
+    # locale, <field>_<locale> readers and writers for the admin form, and the editorial
+    # rule — never one language alone. A bare string satisfies it: some fields are the
+    # same characters in both languages ("2023—2026").
+    def localised_scalars(fields)
+      fields.each do |field|
+        define_method(field) { localised(self[field]) }
+
+        I18n.available_locales.each do |locale|
+          define_method(:"#{field}_#{locale}") { pair_of(self[field])[locale.to_s] }
+          define_method(:"#{field}_#{locale}=") do |value|
+            self[field] = pair_of(self[field]).merge(locale.to_s => value)
+          end
+        end
+      end
+
+      validate { fields.each { |field| errors.add(field, :blank) if missing_languages(self[field]).any? } }
+    end
+  end
 
   private
 

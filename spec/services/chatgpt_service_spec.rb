@@ -176,5 +176,39 @@ RSpec.describe ChatgptService, type: :service do
         "<h2>Header 2</h2>\n<p>Text 2</p>"
       )
     end
+
+    it 'keeps the text before the first heading as a section of its own' do
+      doc = Nokogiri::HTML('<p>Lead</p><h2>Header</h2><p>Body</p>')
+      sections = service.__send__(:divide_by_tags, doc)
+
+      expect(sections.size).to eq(2)
+      expect(sections.first).to include('Lead')
+      expect(sections.last).to include('Header', 'Body')
+    end
+
+    it 'leaves a deeper heading inside the section it sits in, once' do
+      doc = Nokogiri::HTML('<h2>Parent</h2><p>One</p><h4>Child</h4><p>Two</p><h3>Next</h3><p>Three</p>')
+      sections = service.__send__(:divide_by_tags, doc)
+
+      expect(sections.size).to eq(2)
+      expect(sections.first).to include('Parent', 'One', 'Child', 'Two')
+      expect(sections.join.scan('Child').size).to eq(1)
+      expect(sections.last).to include('Next', 'Three')
+    end
+
+    it 'loses no text of a document without headings' do
+      doc = Nokogiri::HTML('<p>Only</p><p>paragraphs</p>')
+
+      expect(service.__send__(:divide_by_tags, doc).join).to include('Only', 'paragraphs')
+    end
+  end
+
+  describe '#unite_by_tokens' do
+    it 'never sends an empty section when the first one is already over the limit' do
+      service = described_class.new(params)
+      big = 'x' * (described_class::SECTION_LIMIT + 1)
+
+      expect(service.__send__(:unite_by_tokens, [big, '<p>small</p>'])).to eq([big, '<p>small</p>'])
+    end
   end
 end

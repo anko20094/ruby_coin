@@ -336,10 +336,6 @@ GEM
       activesupport (= 8.1.4)
       bundler (>= 1.15.0)
       railties (= 8.1.4)
-    rails-controller-testing (1.0.5)
-      actionpack (>= 5.0.1.rc1)
-      actionview (>= 5.0.1.rc1)
-      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.3.0)
       activesupport (>= 5.0.0)
       minitest
@@ -549,7 +545,6 @@ DEPENDENCIES
   pundit-matchers (~> 4.0)
   rack-attack (~> 6.7)
   rails (~> 8.1)
-  rails-controller-testing
   rails-i18n
   rouge
   rspec-rails

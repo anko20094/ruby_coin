@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# The rules the roster pages rely on, checked against people.yml and team.yml. The raw files are
-# read too: Team builds hashes, and a hash keeps the last of two equal keys without a word.
 class Team::Check < BaseService
   Result = Struct.new(:problems, :notes, keyword_init: true) do
     def ok? = problems.empty?
@@ -43,6 +41,9 @@ class Team::Check < BaseService
   private
 
   def add(message) = @problems << "  #{message}"
+
+  # Read once: the rules below ask for it inside loops over people and projects.
+  def case_slugs = @case_slugs ||= Case.slugs
 
   def duplicates
     @files.each do |name, path|
@@ -102,11 +103,10 @@ class Team::Check < BaseService
     end
   end
 
-  # The owner's CV is a CVProfile, which refuses a scalar in one language when it is saved.
   def cvs
     Team.people.each do |person|
       cv = person.cv
-      next unless cv.is_a?(Person::CV)
+      next if cv.nil?
 
       lost = untranslated { cv.summary(fallback: false) }
       add("#{person.id} cv.summary is missing in #{lost.join(' and ')}") if lost.any?
@@ -129,7 +129,7 @@ class Team::Check < BaseService
     Team.crew.each do |person|
       next if person.updated_on
 
-      hint = ' (it is the imported CV\'s: rake cv:import)' if person.owner?
+      hint = ' (it is cv.yml\'s)' if person.owner?
       add("#{person.id} has no usable `updated:` date#{hint}")
     end
   end
@@ -146,17 +146,15 @@ class Team::Check < BaseService
   # A person page is drawn from the CV and the credits on projects that exist; a record with
   # neither is a link to an empty page.
   def pages
-    slugs = Case.slugs
-
     Team.people.select(&:page?).each do |person|
-      next if person.cv? || person.contributions(order: slugs).any?
+      next if person.cv? || person.contributions(order: case_slugs).any?
 
       add("#{person.id} is linked but their page would be empty: no CV, and no credit on a project that exists")
     end
   end
 
   def contributions
-    Case.slugs.each do |slug|
+    case_slugs.each do |slug|
       Team.for_case(slug).each { |row| contribution(slug, row) }
     end
 
@@ -194,18 +192,22 @@ class Team::Check < BaseService
     known = Team.everyone.map(&:id)
 
     Team.credited_slugs.each do |slug|
-      add("#{slug} is credited but is not a case") unless Case.slugs.include?(slug)
+      add("#{slug} is credited but is not a case") unless case_slugs.include?(slug)
 
       Team.rows_for(slug).each do |row|
         add("#{slug}/#{row.person_id} names nobody in people.yml") unless known.include?(row.person_id)
       end
     end
 
-    Case.slugs.each { |slug| add("#{slug} has nobody on it") if Team.for_case(slug).empty? }
+    case_slugs.each { |slug| add("#{slug} has nobody on it") if Team.for_case(slug).empty? }
+
+    Portfolio::References.cv_entries.each do |person, slug|
+      add("#{person.id} cv names #{slug}, which is not a case") unless case_slugs.include?(slug)
+    end
   end
 
   def solo
-    Case.slugs.each do |slug|
+    case_slugs.each do |slug|
       team = Team.for_case(slug)
       next if team.empty?
 
@@ -226,6 +228,8 @@ class Team::Check < BaseService
   def both(person, field, where)
     lost = untranslated { person.public_send(field, fallback: false) }
     return add("#{where} is missing in #{lost.join(' and ')}") if lost.any?
+    # A name is a proper noun, and a product's name is not translated: Claude is Claude in both.
+    return if field == :name
 
     add("#{where} is the same string in both languages") if in_locales { person.public_send(field) }.uniq.one?
   end

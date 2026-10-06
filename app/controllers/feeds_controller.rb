@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-# The two files a site is expected to have and this one did not: a sitemap, so a crawler is
-# told what exists rather than guessing from links, and a feed, so the Ukrainian Rails readers
-# the journal was built for can follow it without opening the site.
-#
-# Both are generated rather than stored — there are tens of URLs, not thousands — and both are
-# conditionally cacheable off the newest thing in them, so a crawler that asks twice gets a 304
-# the second time.
 class FeedsController < ApplicationController
   ENTRIES = 30
 
@@ -17,7 +10,7 @@ class FeedsController < ApplicationController
   # renders the same document whoever asks.
   def sitemap
     @pages = sitemap_pages
-    @posts = Post.active.limit(200).to_a
+    @posts = Post.active.ordered.limit(200).to_a
     @post_locales = readable_locales(@posts)
     @cases = Case.ordered.to_a
     @people = Team.crew
@@ -29,10 +22,10 @@ class FeedsController < ApplicationController
   end
 
   def feed
-    @posts = Post.active.translated_in(I18n.locale).includes(:tags, :user, :translations).limit(ENTRIES).to_a
+    @posts = Post.active.ordered.translated_in(I18n.locale).includes(:tags, :user, :translations).limit(ENTRIES).to_a
     @updated_at = @posts.filter_map(&:updated_at).max || Time.zone.now
 
-    return unless stale?(etag: [@posts, @posts.flat_map(&:tags).uniq, CVProfile.current, I18n.locale], public: true)
+    return unless stale?(etag: [@posts, @posts.flat_map(&:tags).uniq, Team.version, I18n.locale], public: true)
 
     expires_in 1.hour, public: true
     render formats: :atom
@@ -45,11 +38,10 @@ class FeedsController < ApplicationController
 
   private
 
-  # The static pages, by route name. /search stays out of robots.txt but in here: it is the
-  # address the palette points at, and a crawler told not to crawl it still benefits from
-  # knowing it exists.
+  # The static pages, by route name. Not /search: robots.txt disallows it, and a sitemap that
+  # lists an address robots.txt blocks is one search consoles report as an error.
   def sitemap_pages
-    %i[root journal work team cv studio contact faq search].map { |name| public_send(:"#{name}_path", locale: nil) }
+    %i[root journal work team cv studio contact faq].map { |name| public_send(:"#{name}_path", locale: nil) }
   end
 
   # Post id => the languages it has text in, for the posts that have text in any.

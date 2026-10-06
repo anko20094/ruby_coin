@@ -1,21 +1,5 @@
 # frozen_string_literal: true
 
-# One record from config/portfolio/people.yml: who someone is, and their CV. What they did on
-# a project is a Contribution, kept in team.yml and reached through #contributions.
-#
-# `status:` is how someone joins and leaves without their work leaving with them:
-#
-#   active (default) — on the crew, on every page
-#   alumni           — off the crew, still credited on the cases they worked on
-#   hidden           — off the site entirely; the record and its contributions stay in the file
-#
-# The point of `hidden` is that taking someone down is one word rather than a deletion: their
-# rows in team.yml stay put, the diff says what happened, and putting them back is the same
-# word again. The point of `alumni` is that leaving a studio does not unwrite the code.
-#
-# The CV has three states of its own, and two announce themselves on the page: a full CV; a
-# placeholder (`placeholder: true` — real role, invented dates, a loud banner); and no CV at
-# all (`cv: null`), which renders as "not filled in yet" rather than as an invented career.
 class Person
   include LocalisedJson
 
@@ -70,10 +54,10 @@ class Person
   def owner? = @attributes['cv_file'].present?
 
   # As written in the file: "2026·08·18". The owner's CV is the document in cv.yml, so his date
-  # comes from the imported record rather than from a second copy here — two copies of the same
-  # date drift the first time one of them is updated, and this one gates the staleness chip.
+  # comes from there rather than from a second copy here — two copies of the same date drift the
+  # first time one of them is updated, and this one gates the staleness chip.
   def updated
-    return Current.cv_profile&.figures_as_of if owner?
+    return cv.figures_as_of if owner?
 
     @attributes['updated']
   end
@@ -84,10 +68,9 @@ class Person
     nil
   end
 
-  # CVProfile for the owner — nil until the row is imported, so an empty database shows the
-  # same pending state a new hire does — and the YAML block for everyone else.
+  # cv.yml for the owner, the people.yml block for everyone else.
   def cv
-    owner? ? Current.cv_profile : yaml_cv
+    owner? ? Team.owner_cv : yaml_cv
   end
 
   def cv? = cv.present?

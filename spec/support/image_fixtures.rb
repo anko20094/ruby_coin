@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# Images built on the spot, because the uploaders are judged on bytes: whether the camera's
-# make survived, which way the pixels face, whether the corner is black. MiniMagick draws the
-# picture and #jpeg_with_exif splices in the APP1 segment a phone would have written.
 module ImageFixtures
   CAMERA_MAKE = 'SECRETCAMERA'
   EXIF_MARKER = "Exif\0\0".b.freeze
