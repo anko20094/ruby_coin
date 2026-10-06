@@ -31,15 +31,28 @@ describe 'the studio page', type: :request do
       expect(alumni_block.scan('st-alumni__pill').size).to eq(Team.alumni.size)
     end
 
-    # A bare name gets no link (its page would be invented); a name credited on a case does.
-    it 'links the ones with something behind the name, and only those' do
-      get studio_path(locale: 'en')
+    context 'when an alumnus is credited on a project' do
+      # No alumnus in the shipped roster is credited on a project, so vladyslav stands in as one.
+      let(:credited_alumnus) do
+        Person.new('id' => 'vladyslav', 'status' => 'alumni', 'name' => { 'en' => 'Vladyslav', 'uk' => 'Владислав' })
+      end
 
-      linked = Team.alumni.select(&:page?)
+      before do
+        allow(Team).to(receive(:roster).and_wrap_original do |original|
+          original.call.merge('vladyslav' => credited_alumnus)
+        end)
+      end
 
-      expect(linked).to be_present, 'no alumnus is credited, so this rule proves nothing'
-      expect(alumni_block.scan('<a ').size).to eq(linked.size)
-      linked.each { |person| expect(alumni_block).to include(person_path(person, locale: 'en')) }
+      # A bare name gets no link (its page would be invented); a name credited on a case does.
+      it 'links the ones with something behind the name, and only those' do
+        get studio_path(locale: 'en')
+
+        linked = Team.alumni.select(&:page?)
+
+        expect(linked).to be_present, 'no alumnus is credited, so this rule proves nothing'
+        expect(alumni_block.scan('<a ').size).to eq(linked.size)
+        linked.each { |person| expect(alumni_block).to include(person_path(person, locale: 'en')) }
+      end
     end
 
     it 'translates their names rather than leaving the roster half in Latin' do

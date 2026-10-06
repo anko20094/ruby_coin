@@ -11,13 +11,13 @@
 # cases.yml.
 #
 # Three states exist, and two of them announce themselves:
-#   full         — real content (danyil, mykhailo, oleksii, natalia, claude)
+#   full         — real content (danyil, mykhailo, oleksii, oleksandr, natalia, claude)
 #   placeholder  — `placeholder: true`; real role and real project work, invented dates,
 #                  employers, contacts and education. Prints a ruby dashed banner on the
 #                  page and a `PLACEHOLDER` chip in the roster. Meant only for judging a
 #                  filled layout before a real CV arrives; no record ships in this state.
 #                  ⚠️ before launch: grep -n '^ *placeholder: true' must come back empty.
-#   draft        — `cv: null`; nothing invented at all (vladyslav, oleksandr). A new hire
+#   draft        — `cv: null`; nothing invented at all (vladyslav). A new hire
 #                  lands in this state on day one, and so does anyone whose CV nobody here
 #                  can keep honest.
 #
@@ -215,21 +215,87 @@ people:
 
   - id: "oleksandr"
     short: "OS"
-    status: alumni
     machine: false
     name:
-      en: "Oleksandr"
-      uk: "Олександр"
+      en: "Oleksandr Shemberko"
+      uk: "Олександр Шемберко"
     role:
       en: "fullstack"
       uk: "фулстек"
     blurb:
-      en: "Front end where there is one. Will rewrite anything in three lines."
-      uk: "Фронт там, де він є. Перепише будь-що в три рядки."
-    # No CV here, and that is deliberate: the one this record used to carry was a layout
-    # stand-in with invented dates, contacts and education. His credits in team.yml are real,
-    # so the page still opens on them and says the CV is not filled in.
-    cv: null
+      en: "Captcha, skins and duels in WardyBot; own posts and ad reservations in DNA."
+      uk: "Капча, скіни й дуелі у WardyBot; власні пости й бронювання реклами в DNA."
+    updated: "2026·10·02"
+    # Written from his commits and pull requests in the anko20094 repositories, and nothing
+    # else: no location, languages or education, because nothing here can vouch for them.
+    cv:
+      role: { en: "Fullstack developer", uk: "Фулстек-розробник" }
+      years: { en: "on these products since 2023", uk: "на цих продуктах із 2023-го" }
+      summary:
+        en: "A Rails developer who builds the Telegram side of the studio’s products: the menus, commands and game mechanics people actually use in WardyBot and DNA, and lately the web surfaces around them — an admin on Vue 3 and a Mini App on React. Second by commit count in the WardyBot repository, and in what he ships there the Ruby specs run to almost twice the lines of the Ruby code. Started here in 2023, on this site; in 2026 also built a client demo on generative video and voice — lip-sync models, AI video and speech synthesis."
+        uk: "Rails-розробник, який будує телеграмну частину продуктів студії: меню, команди й ігрові механіки, якими справді користуються у WardyBot і DNA, а останнім часом — і вебповерхні довкола них: адмінку на Vue 3 та Mini App на React. Другий за кількістю комітів у репозиторії WardyBot, і в тому, що він там випускає, рядків Ruby-тестів майже вдвічі більше, ніж рядків Ruby-коду. Почав тут у 2023-му — з цього сайту; у 2026-му ще й зібрав клієнтське демо на генеративному відео й голосі — моделі ліпсинку, AI-відео та синтез мовлення."
+      # GitHub and nothing else, as for every colleague.
+      contact:
+        - ["github", "Shemberko", "https://github.com/Shemberko"]
+      experience:
+        - period: { en: "2026", uk: "2026" }
+          org: { en: "Vindo Studios", uk: "Vindo Studios" }
+          title: { en: "Developer · generative video and voice", uk: "Розробник · генеративне відео й голос" }
+          place: { en: "AI live-dealer demo", uk: "демо AI-круп’є" }
+          body:
+            en: "A web demo of a live-dealer table where the dealer is a video avatar: 163 commits in a month. Ran <b>five lip-sync models</b> side by side instead of picking one from the docs — rejected the photo-driven ones on measured head movement, settled on VEED Lipsync 2.0 and Sync Labs, and later regenerated the whole library on HeyGen — and judged every take by a pixel-difference metric in the mouth area rather than by eye. Dealer footage from <b>Kling</b> and <b>Veo</b>, voices from <b>ElevenLabs</b> and a local TTS, replies through OpenRouter; a speech queue with priorities that never cuts a line off, and game logic decoupled from video timing so a stalled clip cannot stall a round."
+            uk: "Вебдемо столу з живим круп’є, де круп’є — відеоаватар: 163 коміти за місяць. Прогнав <b>п’ять моделей ліпсинку</b> поруч, а не обрав одну за документацією: фотомоделі відкинув за виміряним рухом голови, зупинився на VEED Lipsync 2.0 і Sync Labs, а згодом перегенерував усю бібліотеку на HeyGen, — і кожен дубль оцінював метрикою піксельної різниці в зоні рота, а не на око. Відео круп’є — з <b>Kling</b> і <b>Veo</b>, голоси — з <b>ElevenLabs</b> і локального TTS, відповіді — через OpenRouter; черга мовлення з пріоритетами, яка ніколи не обриває репліку, і ігрова логіка, відв’язана від таймінгу відео, щоб завислий кліп не зупиняв раунд."
+        - period: { en: "2024–present", uk: "2024–дотепер" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Fullstack developer", uk: "Фулстек-розробник" }
+          place: { en: "WardyBot", uk: "WardyBot" }
+          body:
+            en: "370 merged pull requests and the second-largest commit count in the repository. In the bot: the captcha and the captcha quiz at the door, warns, bans and mutes with their menus, broadcasts, role-play commands, and the game layer — duels, the in-chat market, <b>skins</b> with drops, a shop, sales and moderation, achievements and ranks. On the web: the <b>admin on Vue 3 + TypeScript</b> over a JSON API, with ActionCable notifications and Telegram sign-in, and the Mini App’s move to <b>React 19</b> together with its premium shop."
+            uk: "370 змерджених pull request’ів і друге місце за кількістю комітів у репозиторії. У боті: капча й капча-вікторина на вході, попередження, бани й м’юти з їхніми меню, розсилки, RP-команди та ігровий шар — дуелі, внутрішньочатовий ринок, <b>скіни</b> з дропами, магазином, продажем і модерацією, ачівки й ранги. У вебі: <b>адмінка на Vue 3 + TypeScript</b> поверх JSON API зі сповіщеннями через ActionCable і входом через Telegram, а також переїзд Mini App на <b>React 19</b> разом із преміум-магазином."
+          cases: ["wardybot"]
+        - period: { en: "2025–2026", uk: "2025–2026" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Backend developer · reviewer", uk: "Backend-розробник · рев’ювер" }
+          place: { en: "DNA", uk: "DNA" }
+          body:
+            en: "The customer’s own posts from end to end — creation, editing, scheduled and postponed publishing, per-channel settings, premium emoji, captions too long for Telegram — and the <b>ad-reservation</b> service with its archive and the content-plan view. Then the premium tier: payment menus, the free/premium split and the notifications around a subscription. Started the Ruby userbots on <b>TDLib</b> — opened the pull request that brought them in, which Danyil then carried to the end — and patched the tdlib-ruby fork they run on. Reviewed 105 of his colleagues’ pull requests."
+            uk: "Власні пости клієнта від початку до кінця — створення, редагування, публікація за розкладом і відкладена, налаштування на канал, преміум-емодзі, підписи, задовгі для Telegram, — і сервіс <b>бронювання реклами</b> з архівом та переглядом контент-плану. Далі — преміум: меню оплати, розподіл безкоштовного й преміум-функціоналу та сповіщення довкола підписки. Розпочав Ruby-userbot’и на <b>TDLib</b> — відкрив pull request, яким їх завели, а довів їх до кінця Даниїл, — і латав форк tdlib-ruby, на якому вони працюють. Зробив рев’ю 105 pull request’ів колег."
+          cases: ["dna"]
+        - period: { en: "2025–2026", uk: "2025–2026" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Backend developer", uk: "Backend-розробник" }
+          place: { en: "ImageMaker", uk: "ImageMaker" }
+          body:
+            en: "The <code>/qx</code> command with ready-made author quotes and the API path the second product calls, per-user quote settings, AI-picked backgrounds and the admin <code>/stat</code>. In 2026, a Chromium renderer that draws a quote as a Telegram bubble — still an open pull request."
+            uk: "Команда <code>/qx</code> з готовими цитатами авторів і шлях API, який викликає другий продукт, налаштування цитат на користувача, фони, які підбирає AI, і адмінська <code>/stat</code>. У 2026-му — рендер на Chromium, що малює цитату як бульбашку Telegram; поки що це відкритий pull request."
+          cases: ["imagemaker"]
+        - period: { en: "2023–2024", uk: "2023–2024" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Fullstack developer", uk: "Фулстек-розробник" }
+          place: { en: "this site", uk: "цей сайт" }
+          body:
+            en: "Thirteen merged pull requests: <b>slug history</b> on FriendlyId, so a renamed post keeps its old URL, the home-page tag filter on Tom Select with pagination in a Turbo Frame, similar posts, the after_party task that regenerated every photo format, and the policy for confirming users in the admin."
+            uk: "Тринадцять змерджених pull request’ів: <b>історія слагів</b> на FriendlyId, щоб перейменований пост зберігав стару адресу, фільтр за тегами на головній на Tom Select із пагінацією в Turbo Frame, схожі пости, таск after_party, що перегенерував усі формати фото, і політика підтвердження користувачів в адмінці."
+          cases: ["rubycoin"]
+      stacks:
+        - label: { en: "core", uk: "основне" }
+          items: ["Ruby on Rails", "RSpec", "Telegram Bot API", "Vue 3", "TypeScript", "React"]
+        - label: { en: "also", uk: "також" }
+          items: ["TDLib", "PostgreSQL", "Inertia", "Pinia", "ActionCable", "Hotwire · Turbo", "FriendlyId"]
+        - label: { en: "generative media", uk: "генеративні медіа" }
+          items:
+            - { en: "lip-sync: VEED · Sync Labs · HeyGen", uk: "ліпсинк: VEED · Sync Labs · HeyGen" }
+            - "Kling · Veo"
+            - "ElevenLabs · TTS"
+            - "OpenRouter"
+            - "ffmpeg"
+      strengths:
+        - en: "Ships the specs with the feature: in WardyBot, almost twice as many lines of Ruby specs as of Ruby code"
+          uk: "Тести йдуть разом із фічею: у WardyBot рядків Ruby-тестів майже вдвічі більше, ніж Ruby-коду"
+        - en: "Reads other people’s pull requests too — 151 reviews across DNA and WardyBot"
+          uk: "Читає й чужі pull request’и — 151 рев’ю в DNA і WardyBot"
+        - en: "Takes a feature from the bot command to the web screen"
+          uk: "Веде фічу від команди в боті до екрана у вебі"
 
   - id: "natalia"
     short: "NM"

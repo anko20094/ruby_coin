@@ -105,21 +105,33 @@ describe 'the team pages', type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it 'opens an alumnus who is still credited on a project' do
-      expect(Team.person('oleksandr')).to be_alumni.and be_page
+    context 'with an alumnus still credited on a project' do
+      # No alumnus in the shipped roster is credited on a project, so vladyslav stands in as one.
+      let(:credited_alumnus) do
+        Person.new('id' => 'vladyslav', 'status' => 'alumni', 'name' => { 'en' => 'Vladyslav', 'uk' => 'Владислав' })
+      end
 
-      get person_path('oleksandr', locale: 'en')
+      before do
+        allow(Team).to(receive(:roster).and_wrap_original do |original|
+          original.call.merge('vladyslav' => credited_alumnus)
+        end)
+      end
 
-      expect(response).to have_http_status(:success)
-    end
+      it 'opens their page' do
+        expect(Team.person('vladyslav')).to be_alumni.and be_page
 
-    # His CV was a layout stand-in; what is left is the credits, which are real.
-    it 'shows that alumnus as a draft, with nothing invented on the page' do
-      get person_path('oleksandr', locale: 'en')
+        get person_path('vladyslav', locale: 'en')
 
-      expect(Team.person('oleksandr')).not_to be_cv
-      expect(response.body).not_to include('placeholder@', 'pf-placeholder')
-      expect(response.body).to include(I18n.t('profile.pending.title', locale: :en))
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'shows them as a draft, with nothing invented on the page' do
+        get person_path('vladyslav', locale: 'en')
+
+        expect(Team.person('vladyslav')).not_to be_cv
+        expect(response.body).not_to include('pf-placeholder')
+        expect(response.body).to include(I18n.t('profile.pending.title', locale: :en))
+      end
     end
 
     # The visitor asked what this person did on that project; the answer sits above the CV.
