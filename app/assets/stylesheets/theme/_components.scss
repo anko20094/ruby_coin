@@ -1,4 +1,5 @@
 @use 'controls';
+@use 'breakpoints' as bp;
 
 // The track tag — the device that separates the two registers on a case page,
 // and labels the sections of the index. Colour is passed in by tone.
@@ -62,24 +63,31 @@
     color: var(--ink);
   }
 
-  // Journal filter chips: the only chips that are a control rather than a label,
-  // so they are the only ones that fill on hover and when selected.
+  // Journal filter chips: the only chips that are a control rather than a label, so they are
+  // the only ones that answer a hover. Several can be on at once, so "on" is a ruby outline
+  // over a ruby wash rather than a row of solid blocks.
   &--filter {
     font-size: 11px;
     padding: 3px 10px;
     color: var(--ink-soft);
+    border-color: color-mix(in oklab, var(--ink-mute) 70%, transparent);
+    text-decoration: none;
     transition: background 150ms, color 150ms, border-color 150ms;
 
     &:hover {
-      color: var(--paper);
-      background: var(--ink);
-      border-color: var(--ink);
+      color: var(--ruby);
+      border-color: var(--ruby);
     }
 
     &.is-active {
-      color: var(--paper);
-      background: var(--ink);
-      border-color: var(--ink);
+      color: var(--ruby);
+      background: color-mix(in oklab, var(--ruby) 9%, var(--paper));
+      border-color: var(--ruby);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ruby);
+      outline-offset: 2px;
     }
   }
 }
@@ -227,7 +235,7 @@
 .rc-header__anchor { flex: none; }
 
 // Stacked, and the gem stays after the words. It is decoration; it never leads.
-@media (max-width: 900px) {
+@include bp.below(lg) {
   .rc-header {
     flex-direction: column;
     align-items: flex-start;
@@ -330,5 +338,53 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wk-metric.is-copyable::after { transition: none; }
+  .wk-metric.is-copyable::after,
+  .rc-chip--filter { transition: none; }
+}
+
+// A post without a cover gets the stone in its own shade instead of an empty grey box. The
+// slot it sits in sets the size; the stone takes a share of the slot's height.
+.rc-cover-gem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--ruby-mute) 80%, var(--paper)) 0%, var(--paper-warm) 70%);
+
+  .rc-gem {
+    width: auto;
+    height: 58%;
+    max-width: 80%;
+  }
+
+  // In a thumbnail the slot is small enough that the stone should fill most of it.
+  .jn-entry__thumb &,
+  .jn-step__thumb & {
+    .rc-gem { height: 72%; }
+    aspect-ratio: 1;
+  }
+}
+
+// "[J] [K] — navigate · [/] — search" over a list (shared/_list_keys). Only where there is a
+// keyboard to press them on: a phone has none, and the hint would be noise there.
+.rc-keys {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+
+  kbd {
+    font-family: inherit;
+    font-size: 10px;
+    line-height: 1;
+    padding: 3px 5px;
+    border: 1px solid color-mix(in oklab, var(--ink-mute) 55%, transparent);
+    border-radius: var(--radius-chip-sm);
+    color: var(--ink-soft);
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    display: none;
+  }
 }

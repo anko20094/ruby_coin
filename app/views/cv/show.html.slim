@@ -1,5 +1,5 @@
 - content_for :title, full_title(t('cv.show.title'))
-- page_meta description: @profile.summary, image: "/og/site-#{I18n.locale}.png", type: 'profile'
+- page_meta description: t('cv.show.meta_description'), image: "/og/site-#{I18n.locale}.png", type: 'profile'
 
 .cv-page
   header.rc-header
@@ -16,14 +16,14 @@
         button.cv-page__print[type="button" data-controller="print" data-action="print#now"]
           = t('cv.show.print')
 
-  - written = @profile.persisted?
+  - written = @profile.present?
 
   .split-grid
     .split-main
       - if written
-        = render 'people/summary', cv: @profile
+        = render Profile::SummaryComponent.new(profile: @profile)
       - else
-        = render 'people/pending', body: t('cv.show.pending_body')
+        = render Profile::PendingComponent.new(body: t('cv.show.pending_body'))
 
       / The projects are the portfolio's, not the CV's, so they are here either way.
       section.pf-block.pf-block--projects
@@ -32,14 +32,14 @@
         = render 'cv/project_rows', cases: @cases
 
       - if written
-        = render 'people/career', cv: @profile, cases_by_slug: @cases_by_slug
-        = render 'people/stack', cv: @profile
+        = render Profile::CareerComponent.new(profile: @profile, cases_by_slug: @cases_by_slug)
+        = render Profile::StackComponent.new(profile: @profile)
 
     aside.split-aside
       - if @person
         = render MonogramComponent.of(@person, size: 280, ring: :mute)
       - if written
-        = render 'people/contact_panel', cv: @profile
+        = render Profile::ContactPanelComponent.new(profile: @profile)
         .pf-updated
           = "#{t('cv.show.figures')} · #{@profile.figures_as_of}"
           / "on the left" is a screen fact. On paper the sidebar is at the top, and the

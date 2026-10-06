@@ -15,6 +15,13 @@ class GemComponentPreview < ViewComponent::Preview
     render(GemComponent.new(uid: 'preview-hero', variant: :hero, size: size))
   end
 
+  # Every shade side by side. A case or a post takes one by its position or id; the hero
+  # steps through them on a click.
+  # @param size number
+  def tones(size: 96)
+    render_with_template(locals: { size: size.to_i, tones: GemComponent::TONES.size })
+  end
+
   # Scroll rotation only, light fixed. Sits beside section headers.
   # @param size number
   def anchor(size: 90)

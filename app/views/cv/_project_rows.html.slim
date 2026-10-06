@@ -16,7 +16,7 @@
         .cv-row__tagline= rich(kase.tagline, links: false)
         .cv-row__meta= "#{kase.year} · #{kase.sector}"
       .cv-row__metric
-        - headline = kase.metrics.first
+        - headline = kase.headline_metric
         - if headline.present?
           .cv-row__metric-value.num= rich(headline[:value], links: false)
           .cv-row__metric-label= rich(headline[:label], links: false)

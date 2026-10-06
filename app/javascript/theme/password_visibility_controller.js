@@ -1,21 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The reveal button on the sign-in and password screens.
-//
-// It lived in the admin bundle while those screens were on the old layout. They are on the
-// theme now, so it is here — and it reports its state, which a button that changes what is on
-// screen has to do.
 export default class extends Controller {
-  static targets = ["input"]
+  static targets = ["input", "toggle"]
+  static values = { showLabel: String, hideLabel: String }
 
   toggleVisibility(event) {
     event.preventDefault()
 
-    const input = this.inputTarget
-    const revealed = input.type === "text"
+    const revealed = this.inputTarget.type === "password"
+    this.inputTarget.type = revealed ? "text" : "password"
 
-    input.type = revealed ? "password" : "text"
-    event.currentTarget.setAttribute("aria-pressed", String(!revealed))
-    event.currentTarget.classList.toggle("is-active", !revealed)
+    const button = this.hasToggleTarget ? this.toggleTarget : event.currentTarget
+    button.setAttribute("aria-pressed", String(revealed))
+    button.classList.toggle("is-active", revealed)
+    const label = revealed ? this.hideLabelValue : this.showLabelValue
+    if (label) {
+      button.setAttribute("aria-label", label)
+      button.setAttribute("title", label)
+    }
   }
 }

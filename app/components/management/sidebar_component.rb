@@ -1,14 +1,5 @@
 # frozen_string_literal: true
 
-# The /management sidebar: the models this admin actually has, with real counts and a one-line
-# hint each, then the user.
-#
-# The design also drew a ⌘K search, and Settings / Users / Audit / Redirect entries. None of
-# those exist in this application, and a sidebar that lists screens which are not there is
-# worse than a shorter one — so they are not here. When they exist, they belong in this list.
-#
-# The CV is not here either, and that is the same rule: it has no screen. It is
-# config/portfolio/cv.yml, imported by `rake cv:import` — redesign_plan.md §12.5.
 class Management::SidebarComponent < ViewComponent::Base
   Model = Struct.new(:key, :label, :path, :total, :hint, keyword_init: true) do
     def current?(key_in_view) = key == key_in_view
@@ -22,13 +13,14 @@ class Management::SidebarComponent < ViewComponent::Base
     'statistics' => :statistics
   }.freeze
 
+  attr_reader :user
+
   def initialize(user:, current: nil)
     @user = user
     @current = current
+
     super()
   end
-
-  attr_reader :user
 
   def current
     @current || ENTRY_FOR_CONTROLLER[helpers.controller_name]
@@ -71,21 +63,21 @@ class Management::SidebarComponent < ViewComponent::Base
 
   # Whether the rail starts shut. Read from the request rather than restored by JavaScript on
   # connect: the admin bundle is deferred, so that would flash the sidebar open on every page
-  # load. See app/javascript/controllers/sidebar_controller.js.
+  # load. See app/javascript/admin/sidebar_controller.js.
   def collapsed?
     helpers.management_sidebar_collapsed?
   end
 
   private
 
-  # One cache entry for all eight numbers, so a page that only needs its own content pays for
+  # One cache entry for all the numbers, so a page that only needs its own content pays for
   # its own content. Written outside the locale key on purpose: they are numbers.
   def counts
     Rails.cache.fetch('management/sidebar/counts', expires_in: COUNTS_TTL) do
-      by_status = Post.group(:status).count
+      by_status = helpers.respond_to?(:post_counts) ? helpers.post_counts : Post.group(:status).count
 
       {
-        posts: Post.count,
+        posts: by_status.values.sum,
         posts_by_status: { active: by_status['active'].to_i, inactive: by_status['inactive'].to_i },
         cases: Case.count,
         own_cases: Case.where(own: true).count,

@@ -1,12 +1,10 @@
 nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@window->nav#outside:capture"
   = link_to helpers.root_path, class: 'rc-nav__brand' do
-    = render GemComponent.new(uid: 'nav')
+    = render GemComponent.new(uid: 'nav', variant: :badge)
     span.rc-nav__wordmark rubyco.in
 
-  / Below 760px the sections and the locale switcher live in a drawer, which is what §10 asks
-  / for — before this the nav simply wrapped onto a second row and ate 85px of every phone
-  / screen. The button is hidden on wide screens by CSS, not by JavaScript, so a narrow window
-  / without JS still gets a menu that is open rather than one that cannot be opened.
+  / Below 760px the sections and the locale switcher live in a drawer. The button is hidden on
+  / wide screens by CSS, not JS, so a narrow window without JS gets an open menu, not a stuck one.
   button.rc-nav__toggle[type="button" data-nav-target="toggle" data-action="nav#toggle"
                         aria-expanded="false" aria-controls="rc-nav-drawer"]
     span.rc-nav__toggle-label= t('work.nav.menu')
@@ -24,7 +22,7 @@ nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@w
       = link_to t('work.nav.cv'), helpers.cv_path, title: t('work.nav.cv_title'),
         class: "rc-nav__cv #{'is-current' if cv_current?}",
         aria: { current: ('page' if cv_current?) }
-      = render 'shared/palette'
+      = render PaletteComponent.new
 
     .rc-nav__locales
       - locales.each do |locale|

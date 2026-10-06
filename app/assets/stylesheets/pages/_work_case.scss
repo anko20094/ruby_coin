@@ -1,4 +1,6 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+@use 'work_prose';
 
 .wk-case__header {
   max-width: var(--case-max);
@@ -89,16 +91,6 @@
   gap: 40px;
   align-items: start;
   margin-top: 26px;
-}
-
-.wk-prose {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  font-family: var(--font-body);
-  font-size: 18px;
-  line-height: 1.65;
-  max-width: 68ch;
 }
 
 .wk-case__panels {
@@ -359,6 +351,30 @@
   .pf-did { margin-top: 13px; }
 }
 
+// The card's one link is the name (or "open CV"); its ::after covers the card, so the whole
+// card is still the target and the focus ring is drawn around the card rather than the word.
+.wk-teammate,
+.wk-solo { position: relative; }
+
+.wk-card-link {
+  color: inherit;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &:focus-visible { outline: none; }
+}
+
+.wk-teammate:has(.wk-card-link:focus-visible),
+.wk-solo:has(.wk-card-link:focus-visible) {
+  outline: 2px solid var(--ruby);
+  outline-offset: 3px;
+}
+
 .wk-teammate__head {
   display: flex;
   align-items: center;
@@ -436,13 +452,152 @@
   white-space: nowrap;
 }
 
-@media (max-width: 620px) {
+@include bp.below(620px) {
   .wk-solo {
     flex-wrap: wrap;
     gap: 14px;
   }
 
   .wk-solo__open { width: 100%; }
+}
+
+// Journal entries on the case's stack: a row of three cards that behave like the journal's
+// own rows on hover — warm paper, a ruby edge, the title in ruby.
+.wk-case__journal {
+  max-width: var(--case-max);
+  margin: 56px auto 0;
+  padding: 0 var(--page-pad);
+}
+
+.wk-entries__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+
+  .rc-track { flex: 1 1 260px; }
+}
+
+.wk-entries__all {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: var(--ruby);
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 3px;
+  }
+}
+
+.wk-entries__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.wk-entry {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 12px 16px;
+  padding: 16px 18px;
+  border: var(--rule-row);
+  border-radius: var(--radius-card);
+  color: inherit;
+  text-decoration: none;
+  // The ruby edge is a shadow, as on the journal rows, so it moves nothing.
+  transition: background 150ms, box-shadow 150ms;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--paper-warm);
+    box-shadow: inset 3px 0 0 var(--ruby);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 2px;
+  }
+}
+
+.wk-entry__thumb {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--paper-warm);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 300ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .wk-entry:hover & img { transform: scale(1.06); }
+}
+
+.wk-entry__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.wk-entry__meta {
+  display: flex;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.wk-entry__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 21px;
+  line-height: 1.2;
+  margin: 0;
+  text-wrap: pretty;
+  transition: color 150ms;
+
+  .wk-entry:hover & { color: var(--ruby); }
+}
+
+// Under both columns, at the foot of the card, so the rows of tags line up across the three.
+.wk-entry__tags {
+  grid-column: 1 / -1;
+  align-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding-top: 10px;
+  border-top: var(--rule-row);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+}
+
+.wk-entry__tag.is-shared { color: var(--ruby); }
+
+@include bp.below(lg) {
+  .wk-entries__row { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-entry,
+  .wk-entry__title,
+  .wk-entry__thumb img { transition: none; }
+
+  .wk-entry:hover .wk-entry__thumb img { transform: none; }
 }
 
 // One line and two links between the last figure and the pager: the page argues for two
@@ -474,7 +629,7 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 700px) {
+@include bp.below(md) {
   .wk-case__cta { padding-top: 32px; margin-top: 40px; }
 
   .wk-case__cta-line { font-size: 24px; }
@@ -482,4 +637,168 @@
 
 @media (prefers-reduced-motion: reduce) {
   .wk-case__skip { transition: none; }
+}
+
+// ≤900px — the columns become one and the headlines scale down.
+@include bp.below(lg) {
+  .wk-case__header,
+  .wk-case__plain,
+  .wk-case__strip,
+  .wk-case__team,
+  .wk-case__cta,
+  .wk-case__pager,
+  .wk-case__band-inner { --page-pad: 22px; }
+
+  .wk-case__header { padding-top: 36px; }
+
+  .wk-case__title,
+  .wk-case__title.is-long { font-size: 40px; }
+
+  .wk-case__tagline { font-size: 21px; }
+
+  .wk-case__columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  .wk-case__heading { font-size: 34px; }
+
+  .wk-case__heading.is-small { font-size: 30px; }
+
+  .wk-cards { grid-template-columns: minmax(0, 1fr); }
+
+  .wk-case__pager-cards { grid-template-columns: minmax(0, 1fr); }
+
+  .wk-pager-card--next { text-align: left; }
+}
+
+// ── the rail: figures and contents beside the two tracks ──────
+// Wide screens only. The tracks and the rail share one grid cell stack: the rail spans both
+// rows and is drawn over them, its inner box sticky, so it holds still for exactly as long as
+// the two tracks last. The tracks give up the room on their right instead of the band losing its
+// full-bleed background.
+$rail-width: 220px;
+$rail-gap: 44px;
+
+.wk-rail { display: none; }
+
+#plain,
+#team,
+#contact { scroll-margin-top: 88px; }
+
+@include bp.above(lg) {
+  .wk-case__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wk-case__plain { grid-area: 1 / 1; }
+
+  .wk-case__band { grid-area: 2 / 1; }
+
+  .wk-case__plain,
+  .wk-case__band-inner { padding-right: calc(var(--page-pad) + #{$rail-width + $rail-gap}); }
+
+  .wk-rail {
+    display: block;
+    grid-area: 1 / 1 / 3 / 2;
+    z-index: 2;
+    // The column is the whole width; only the box in it takes the pointer.
+    pointer-events: none;
+    padding: 48px 0 52px;
+    // The rail's right edge on the case container's.
+    padding-right: max(var(--page-pad), calc((100% - var(--case-max)) / 2 + var(--page-pad)));
+  }
+
+  .wk-rail__inner {
+    position: sticky;
+    top: 96px;
+    width: $rail-width;
+    margin-left: auto;
+    max-height: calc(100dvh - 120px);
+    overflow-y: auto;
+    padding: 16px 16px 14px;
+    background: var(--paper);
+    border: var(--rule-row);
+    border-radius: var(--radius-card);
+    pointer-events: auto;
+  }
+}
+
+// Between lg and xl the text column is too narrow to keep the panels beside it.
+@media (min-width: #{bp.width(lg) + 1px}) and (max-width: #{bp.width(xl)}) {
+  .wk-case__columns { grid-template-columns: minmax(0, 1fr); }
+}
+
+.wk-rail__metrics {
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: var(--rule-row);
+}
+
+.wk-rail__metric {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+
+  & + & { margin-top: 10px; }
+}
+
+.wk-rail__value {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.wk-rail__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  line-height: 1.45;
+  color: var(--ink-quiet);
+}
+
+.wk-rail__heading {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-quiet);
+  margin-bottom: 6px;
+}
+
+.wk-rail__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wk-rail__link {
+  @include controls.hit-row(30px);
+
+  padding-left: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  border-left: 2px solid transparent;
+  transition: color 150ms, border-color 150ms;
+
+  &:hover { color: var(--ruby); }
+
+  &.is-active {
+    color: var(--ink);
+    border-left-color: var(--ruby);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-rail__link { transition: none; }
+}
+
+// Paper has no scroll to pin anything to: the strip at the top already carries the figures.
+@media print {
+  .wk-rail { display: none; }
+
+  .wk-case__plain,
+  .wk-case__band-inner { padding-right: var(--page-pad); }
 }

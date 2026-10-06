@@ -1,6 +1,6 @@
-// /contact — max width 1080px, padding 60px 36px, per handoff §7. The design drew a form
-// beside a channel list; the decision was no form (redesign_plan.md §2), so the channels are
-// the page rather than its sidebar, and they get the room the form would have had.
+@use '../theme/breakpoints' as bp;
+// /contact. There is no form (docs/decisions.md), so the channel list is the page and gets
+// the room a form would have had.
 $contact-max: 1080px;
 
 .ct-page {
@@ -110,7 +110,7 @@ $contact-max: 1080px;
   color: var(--ink-soft);
 }
 
-@media (max-width: 900px) {
+@include bp.below(lg) {
   .ct-page__header {
     flex-direction: column;
     align-items: flex-start;
@@ -121,7 +121,7 @@ $contact-max: 1080px;
   .ct-page__title { font-size: 64px; }
 }
 
-@media (max-width: 560px) {
+@include bp.below(sm) {
   .ct-page { padding: 40px 20px; }
 
   .ct-page__title { font-size: 44px; }

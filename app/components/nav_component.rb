@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# Sticky site nav: logo · sections · CV · ⌘K · locale. Four sections, and the roster is not
-# one of them — /team is reached from /studio, from the foot of every case page and from ⌘K.
 class NavComponent < ViewComponent::Base
   Section = Struct.new(:key, :path, keyword_init: true) do
     def label = I18n.t("work.nav.#{key}")
@@ -21,6 +19,7 @@ class NavComponent < ViewComponent::Base
   # the layout stays dumb.
   def initialize(current: nil)
     @current = current
+
     super()
   end
 

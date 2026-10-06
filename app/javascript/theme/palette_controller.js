@@ -1,8 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // ⌘K / Ctrl+K. Pages, cases and journal entries in one list — the server answers, because the
-// journal's search is a Postgres full-text search and the prototype only filtered in memory
-// for want of a server.
+// journal's search is a Postgres full-text search, not something to redo in memory.
 //
 // Built on <dialog>, which brings the focus trap, the Escape handler and the inert background
 // with it rather than having them reimplemented here and got subtly wrong.

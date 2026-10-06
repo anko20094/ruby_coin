@@ -1,5 +1,5 @@
 - content_for :title, full_title(@query.presence || t('.title'))
-- page_meta description: t('.lede')
+- page_meta description: t('.lede'), canonical_query: listing_query
 
 .jn-index
   header.jn-index__header
@@ -16,8 +16,11 @@
   = form_with url: search_path, method: :get, class: 'jn-search' do |f|
     .jn-search__row
       = f.label :query, t('.field'), class: 'jn-search__label'
-      = f.search_field :query, value: @query, class: 'jn-search__input',
-        placeholder: t('.placeholder'), autofocus: @query.blank?
+      .jn-search__box data-controller="search-clear"
+        = f.search_field :query, value: @query, class: 'jn-search__input',
+          placeholder: t('.placeholder'), autofocus: @query.blank?,
+          data: { search_clear_target: 'input', action: 'input->search-clear#sync' }
+        = render 'journal/search_clear'
       = f.submit t('.submit'), class: 'rc-button rc-button--primary'
 
     fieldset.jn-search__fields
@@ -30,24 +33,5 @@
 
   - if @query.blank?
     p.jn-empty= t('.prompt')
-  - elsif @pagy.count.positive?
-    .rc-eyebrow.jn-search__count= t('.found', count: @pagy.count)
-    .jn-entries
-      - @results.each_with_index do |post, index|
-        = render JournalEntryComponent.new(post:, first: index.zero?)
-
-    - if @pagy.pages > 1
-      nav.jn-pager aria-label=t('.title')
-        - if @pagy.previous
-          = link_to search_path(query: @query, search_in: @field, page: @pagy.previous),
-            class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') } do
-            span aria-hidden="true" ←
-        span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"
-        - if @pagy.next
-          = link_to search_path(query: @query, search_in: @field, page: @pagy.next),
-            class: 'jn-pager__step', aria: { label: t('journal.index.pager.next') } do
-            span aria-hidden="true" →
   - else
-    p.jn-empty= t('.none', query: @query)
-    p.jn-search__fallback
-      = link_to t('journal.post.all_entries'), journal_path, class: 'hover-link'
+    = render 'journal/search_results'

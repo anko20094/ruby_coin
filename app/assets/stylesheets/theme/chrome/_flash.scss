@@ -1,0 +1,34 @@
+@use '../controls';
+@use '../flash';
+
+// The flash region and the skip link. Neither existed on the redesign: a redirect that
+// carried a message arrived silent, and the first Tab on every page landed inside the nav
+// with no way past it.
+.rc-skip {
+  @include controls.hit-row(38px);
+
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  transition: top 120ms;
+
+  &:focus-visible { top: 12px; }
+}
+
+.rc-flash {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+
+  &:empty { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-skip { transition: none; }
+}

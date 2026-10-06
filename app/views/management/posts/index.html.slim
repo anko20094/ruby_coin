@@ -40,7 +40,7 @@
           th
       tbody
         - @posts.each do |post|
-          - title = post.title.presence || post.post_translations.map(&:title).compact_blank.first || post.slug
+          - title = post.title.presence || post.translations.map(&:title).compact_blank.first || post.slug
           tr
             td.mg-cell--mono= post.entry_label
             td= mg_status_pill(post.status)

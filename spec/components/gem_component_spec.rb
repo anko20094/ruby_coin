@@ -37,6 +37,16 @@ describe GemComponent, type: :component do
     end
   end
 
+  describe 'the badge' do
+    it 'is driven by the controller but carries no glow' do
+      render_inline(described_class.new(uid: 'spec', variant: :badge, tone: 2))
+
+      expect(page).to have_css('[data-controller="ruby"][data-ruby-variant-value="badge"][data-ruby-tone-value="2"]')
+      expect(page).to have_css('[data-ruby-target="star"]')
+      expect(page).to have_no_css('filter')
+    end
+  end
+
   describe 'the interactive cuts' do
     it 'hand the controller everything it drives' do
       render_inline(described_class.new(uid: 'spec', variant: :hero, size: 400))
@@ -65,6 +75,44 @@ describe GemComponent, type: :component do
       render_inline(described_class.new(uid: 'spec', variant: :hero, size: 400))
 
       expect(page.find('svg')[:style]).to eq('width: 400px; max-width: 100%; height: auto; aspect-ratio: 1')
+    end
+  end
+
+  describe 'a tone' do
+    def stops(tone)
+      render_inline(described_class.new(uid: 'spec', tone:))
+      page.all('#rc-gem-f5-spec stop').pluck(:'stop-color')
+    end
+
+    it 'leaves the brand ruby exactly as it was at tone zero' do
+      expect(stops(0)).to eq(['oklch(75.1% 0.290 14.3)', 'oklch(63.6% 0.251 15.3)', 'oklch(49.5% 0.202 16.7)'])
+    end
+
+    # Hue, lightness and chroma move together but only a little: every shade is still a ruby.
+    it 'shifts the stone to another shade of the same ruby' do
+      expect(stops(1)).to eq(['oklch(77.1% 0.290 2.3)', 'oklch(65.6% 0.251 3.3)', 'oklch(51.5% 0.202 4.7)'])
+    end
+
+    it 'keeps every shade within a narrow band of the brand hue' do
+      described_class::TONES.size.times do |tone|
+        hues = stops(tone).map { |stop| stop[/ ([\d.]+)\)\z/, 1].to_f }
+
+        expect(hues).to all(satisfy { |hue| hue <= 30 || hue >= 350 })
+      end
+    end
+
+    it 'takes any integer round the table, so an id or a position will do' do
+      expect(stops(described_class::TONES.size + 1)).to eq(stops(1))
+    end
+
+    it 'hands the interactive cut its tone, and only when it is not the default' do
+      render_inline(described_class.new(uid: 'spec', variant: :hero, tone: 2))
+      expect(page).to have_css('[data-ruby-tone-value="2"]')
+      expect(page).to have_no_css('polygon[fill="oklch(58% 0.22 18)"]')
+
+      render_inline(described_class.new(uid: 'spec', variant: :hero))
+      expect(page).to have_no_css('[data-ruby-tone-value]')
+      expect(page).to have_css('polygon[fill="oklch(58% 0.22 18)"][data-ruby-target="glow"]')
     end
   end
 

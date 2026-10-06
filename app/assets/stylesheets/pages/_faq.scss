@@ -1,3 +1,4 @@
+@use '../theme/breakpoints' as bp;
 // /faq — the reading measure, same as an article, because that is what it is: prose answers.
 // The old page was a Bootstrap accordion with every panel forced open, so nothing is lost by
 // dropping the accordion entirely.
@@ -56,7 +57,7 @@ $faq-max: 760px;
   }
 }
 
-@media (max-width: 560px) {
+@include bp.below(sm) {
   .fq-page { padding: 40px 20px; }
 
   .fq-page__title { font-size: 38px; }

@@ -3,7 +3,7 @@
 .au-page
   h1.au-page__title= t('labels.edit_account')
 
-  = render 'devise/shared/errors', resource: resource
+  = render ErrorsComponent.new(object: resource, tone: :site)
 
   = form_for(resource, as: resource_name, url: registration_path(resource_name),
              html: { method: :put, class: 'au-form' }) do |f|
@@ -18,15 +18,15 @@
     .au-field
       = f.label :password, class: 'au-label'
       .au-hint= t('.leave_blank')
-      = f.password_field :password, autocomplete: 'new-password', class: 'au-input'
+      = render 'devise/shared/password_input', f: f, field: :password, autocomplete: 'new-password'
 
     .au-field
       = f.label :password_confirmation, class: 'au-label'
-      = f.password_field :password_confirmation, autocomplete: 'new-password', class: 'au-input'
+      = render 'devise/shared/password_input', f: f, field: :password_confirmation, autocomplete: 'new-password'
 
     .au-field
       = f.label :current_password, class: 'au-label'
       .au-hint= t('.confirm_notice')
-      = f.password_field :current_password, autocomplete: 'current-password', class: 'au-input'
+      = render 'devise/shared/password_input', f: f, field: :current_password, autocomplete: 'current-password'
 
     = f.submit t('buttons.update'), class: 'rc-button rc-button--primary'

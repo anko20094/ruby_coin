@@ -1,0 +1,82 @@
+@use '../controls';
+@use '../breakpoints' as bp;
+
+// The site footer.
+.rc-footer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 32px;
+  align-items: flex-end;
+  margin-top: 60px;
+  padding: 48px var(--page-pad) 32px;
+  border-top: 1px solid color-mix(in oklab, var(--ink-mute) 33%, transparent);
+}
+
+.rc-footer__brand {
+  @include controls.hit-row(44px);
+
+  gap: 10px;
+  margin-bottom: 12px;
+
+  .rc-gem {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.rc-footer__wordmark {
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.rc-footer__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  line-height: 1.8;
+}
+
+.rc-footer__sections {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 36px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+
+  a {
+    @include controls.hit-row(32px);
+
+    // One of these is two characters wide.
+    min-width: 32px;
+    justify-content: center;
+  }
+}
+
+.rc-footer__contacts {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-align: right;
+  line-height: 1.8;
+
+  // A column of one-line links: vertical room is free here and each of them is a target.
+  a { @include controls.hit-row(32px); }
+}
+
+// The footer collapses where the nav turns into a drawer.
+@include bp.below(nav) {
+  .rc-footer {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 36px 22px 28px;
+  }
+
+  .rc-footer__sections {
+    justify-content: flex-start;
+    gap: 18px;
+  }
+
+  .rc-footer__contacts { text-align: left; }
+}

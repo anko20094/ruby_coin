@@ -1,4 +1,5 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
 // The sign-in and password screens.
 //
@@ -67,39 +68,74 @@
     outline: 2px solid var(--ruby);
     outline-offset: 3px;
   }
+
+  // Chrome paints autofilled fields light blue; keep them on the page's paper like the rest.
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--ink);
+    caret-color: var(--ink);
+    box-shadow: 0 0 0 1000px var(--paper) inset;
+    transition: background-color 600000s 0s;
+  }
 }
 
+// The reveal button lives inside the field, so the field's underline and focus ring take it in.
 .au-input-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  position: relative;
+  width: 100%;
 }
+
+.au-input--with-reveal { padding-right: 44px; }
 
 .au-reveal {
-  flex: none;
-  min-width: 44px;
-  min-height: 44px;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   background: none;
   border: 0;
   cursor: pointer;
   color: var(--ink-quiet);
-  font-size: 15px;
 
-  &:hover { color: var(--ruby); }
+  &:hover,
+  &.is-active { color: var(--ruby); }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: -4px;
+    border-radius: var(--radius-chip-sm);
+  }
 }
 
-.au-row {
-  // The way to the password reset is the only link on this screen; it was eighteen pixels
-  // tall.
-  .hover-link { @include controls.hit-row(32px); }
+.au-reveal__icon { display: block; }
+.au-reveal__icon--hide { display: none; }
+.au-reveal.is-active .au-reveal__icon--show { display: none; }
+.au-reveal.is-active .au-reveal__icon--hide { display: block; }
 
+.au-actions {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.au-actions__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   font-size: 14px;
+
+  .au-check { min-height: 36px; }
+  .hover-link { @include controls.hit-row(32px); }
 }
 
 .au-check {
@@ -130,7 +166,7 @@
   font-size: 12px;
 }
 
-@media (max-width: 560px) {
+@include bp.below(sm) {
   .au-page { padding: 48px 20px 80px; }
 
   .au-page__title { font-size: 38px; }

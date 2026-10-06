@@ -1,7 +1,10 @@
-/ The quote card (handoff §9a). Select a passage, press Q — or Й, where Q sits on a Ukrainian
-/ keyboard — and read it as a card. The site demonstrating case 05, which renders exactly
-/ these for 430k Telegram users.
-.rc-quote[data-controller="quote-card"]
+/ The quote card. Select a passage, press Q — or Й, where Q sits on a Ukrainian keyboard — and
+/ read it as a card: the kind of card the ImageMaker case renders. The card can be saved as a
+/ PNG, drawn in the browser, or copied as an image where the clipboard takes one.
+.rc-quote[data-controller="quote-card"
+          data-quote-card-copied-value=t('global.quote.copied')
+          data-quote-card-saved-value=t('global.quote.saved')
+          data-quote-card-failed-value=t('global.quote.failed')]
   button.rc-quote__hint[type="button" data-quote-card-target="hint" hidden=true tabindex="-1" aria-hidden="true"]
     kbd Q
     = " #{t('global.quote.hint')}"
@@ -9,6 +12,12 @@
   dialog.rc-quote__card[data-quote-card-target="card" data-action="click->quote-card#close"
                         aria-label=t('global.quote.label')]
     blockquote.rc-quote__text[data-quote-card-target="quote"]
-    .rc-quote__mark
+    .rc-quote__mark[data-quote-card-target="mark"]
       = render GemComponent.new(uid: 'quote')
       span rubyco.in
+    .rc-quote__actions
+      button.rc-quote__action[type="button" data-action="quote-card#download"]
+        = t('global.quote.download')
+      button.rc-quote__action[type="button" data-quote-card-target="copy" data-action="quote-card#copyImage" hidden=true]
+        = t('global.quote.copy')
+      span.rc-quote__status[role="status" data-quote-card-target="status"]

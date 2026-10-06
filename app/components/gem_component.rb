@@ -1,25 +1,7 @@
 # frozen_string_literal: true
 
-# The one piece of brand: a faceted ruby.
-#
-# Geometry is a pointed-top hexagon — outer radius 46, table radius 22 — cut
-# into six kite crown facets. Each facet's fill is computed from how close its
-# centroid sits to a virtual light, which is what makes the stone read as a
-# stone rather than a red polygon.
-#
-# Three variants, from the design system:
-#
-#   :logo    static, light fixed upper-left. Nav and footer, 26–28px.
-#   :hero    light follows the cursor, scroll drives rotation. 400px.
-#   :anchor  scroll rotation only, light fixed. 90px, beside section headers.
-#
-# The server always paints a finished gem, so it is correct with JavaScript
-# disabled and under prefers-reduced-motion. For :hero and :anchor the Stimulus
-# controller then recomputes the same values live — the shading maths exists
-# twice on purpose, here and in theme/ruby_controller.js. Change one, change
-# both.
 class GemComponent < ViewComponent::Base
-  VARIANTS = %i[logo hero anchor].freeze
+  VARIANTS = %i[logo badge hero anchor].freeze
 
   CENTRE = 50.0
   OUTER_RADIUS = 46.0
@@ -28,24 +10,47 @@ class GemComponent < ViewComponent::Base
 
   # Where the light sits at rest. The logo's is a touch further round than the
   # interactive cuts', which is how the prototype had it.
-  LIGHTS = { logo: [30.0, 18.0], hero: [28.0, 18.0], anchor: [28.0, 18.0] }.freeze
+  LIGHTS = { logo: [30.0, 18.0], badge: [30.0, 18.0], hero: [28.0, 18.0], anchor: [28.0, 18.0] }.freeze
+
+  # Shades of the one stone, as offsets on the brand ruby: hue (degrees), lightness (points)
+  # and a chroma factor. Small on purpose — a case or a post gets its own stone, and all of them
+  # still have to read as rubies. ruby_controller.js carries the same table.
+  TONES = [
+    [0, 0, 1.0],     # the brand ruby
+    [-12, 2, 1.0],   # raspberry
+    [9, -3, 0.95],   # garnet
+    [-5, -6, 1.05],  # pigeon's blood
+    [-22, 4, 0.9],   # rose
+    [5, 4, 0.85]     # spinel
+  ].freeze
 
   Facet = Struct.new(:index, :points, :centroid, :brightness, keyword_init: true)
 
-  def initialize(uid:, variant: :logo, size: nil)
+  attr_reader :uid, :variant, :size, :tone
+
+  # tone: any integer — a position, an id — taken round the table, so a caller can hand over
+  # whatever it has and get the same shade for the same thing every time.
+  def initialize(uid:, variant: :logo, size: nil, tone: 0)
     raise ArgumentError, "variant must be one of #{VARIANTS.join(', ')}" unless VARIANTS.include?(variant.to_sym)
 
     @uid = uid
     @variant = variant.to_sym
     @size = size
+    @tone = tone.to_i % TONES.size
+
     super()
   end
 
-  attr_reader :uid, :variant, :size
-
   def interactive? = variant != :logo
-  def glow? = interactive?
+  def glow? = %i[hero anchor].include?(variant)
   def light = LIGHTS.fetch(variant)
+
+  def glow_colour
+    return 'oklch(58% 0.22 18)' if tone.zero?
+
+    hue_shift, lightness_shift, chroma_factor = TONES.fetch(tone)
+    format_oklch(58 + lightness_shift, 0.22 * chroma_factor, 18 + hue_shift)
+  end
 
   # The size is a ceiling, not a fixed width: a 400px hero gem inside a one-column grid used to
   # pin that column's min-content at 400px, and the home page came out 436px wide on a 375px
@@ -142,10 +147,15 @@ class GemComponent < ViewComponent::Base
 
   # Deep blood in shadow, bright fire in the light, hue drifting warmer as it darkens.
   def shade(brightness)
-    lightness = 14 + (brightness * 64)
-    chroma = 0.08 + (brightness * 0.22)
-    hue = 14 + ((1 - brightness) * 6)
-    format('oklch(%.1f%% %.3f %.1f)', lightness, chroma, hue)
+    hue_shift, lightness_shift, chroma_factor = TONES.fetch(tone)
+    lightness = 14 + (brightness * 64) + lightness_shift
+    chroma = (0.08 + (brightness * 0.22)) * chroma_factor
+    hue = 14 + ((1 - brightness) * 6) + hue_shift
+    format_oklch(lightness, chroma, hue)
+  end
+
+  def format_oklch(lightness, chroma, hue)
+    format('oklch(%.1f%% %.3f %.1f)', lightness, chroma, hue % 360)
   end
 
   def inset(points, centroid, factor)

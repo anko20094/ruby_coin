@@ -1,3 +1,5 @@
+@use '../theme/breakpoints' as bp;
+
 // /work — the projects, and nothing else. The CV that used to share this page is /cv now.
 .wk-index {
   max-width: var(--case-max);
@@ -7,37 +9,103 @@
 
 .wk-index .rc-header__title { font-size: clamp(44px, 7.6vw, 84px); }
 
-// Every card the same size: no featured treatment, because the order is already the judgement.
-.wk-projects {
-  display: grid;
-  // min() so the track cannot be wider than the screen it is on — a bare 340px column is
-  // horizontal scroll on a 320px phone.
-  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
-  gap: 16px;
-  margin-top: 34px;
+// Expand all / collapse all. Hidden until the controller has collapsed anything.
+.wk-deck__bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+
+  &[hidden] { display: none; }
 }
 
+.wk-deck__all {
+  min-height: 32px;
+  padding: 0 4px;
+  background: none;
+  border: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
+
+  &:hover { color: var(--ruby); }
+
+  @media (pointer: coarse) { min-height: 44px; }
+}
+
+// Every card the same size: no featured treatment, because the order is already the judgement.
+// The column count is spelled out rather than auto-fit, so the closing tile knows how much of
+// the last row it has to fill.
+.wk-projects {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 34px;
+
+  .wk-deck__bar:not([hidden]) + & { margin-top: 10px; }
+}
+
+@include bp.above(740px) {
+  .wk-projects { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@include bp.above(1120px) {
+  .wk-projects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+// Each card takes four rows of the deck as a subgrid — sector, title, details, foot — so the
+// cards in a row share one height and line their parts up: a wrapped title or a two-line sector
+// moves the whole row, not one card.
 .wk-project {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  position: relative;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0;
   padding: 20px 22px 18px;
   border: var(--rule-row);
   border-radius: var(--radius-card);
+
+  // The title's link covers the card, so the ring goes round the whole of it.
+  &:has(.wk-project__link:focus-visible),
+  &.is-keyed {
+    outline: 2px solid var(--ruby);
+    outline-offset: 2px;
+  }
+
+  // The card J/K is on (list_nav_controller).
+  &.is-keyed { background: var(--paper-warm); }
+
+  // J/K scroll a card into view clear of the sticky nav.
+  scroll-margin: 96px 0 24px;
 }
 
-// Wraps as a row: the longest sector line plus both flags does not fit a card, and without
-// this the sector's second line ran underneath the chips with its interpunct leading.
+.wk-project__link {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &:focus-visible { outline: none; }
+}
+
+.wk-project__head { margin-top: 12px; }
+
+// The flags keep to the right of the sector, which wraps in its own column instead: a badge
+// never pushes a line of its own into one card and not its neighbours.
 .wk-project__meta {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 12px;
 }
-
-.wk-project__sector { flex: 1 1 auto; }
 
 .wk-project__sector {
+  line-height: 1.6;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 1.2px;
@@ -45,12 +113,15 @@
   color: var(--ink-quiet);
 }
 
+// A span of years breaks as a whole, never at its dash.
+.wk-project__year { white-space: nowrap; }
+
 .wk-project__flags {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  flex: none;
-  margin-left: auto;
+
+  &:empty { display: none; }
 }
 
 .wk-project__own {
@@ -73,7 +144,145 @@
   white-space: nowrap;
 }
 
-.wk-project__head { min-width: 0; }
+.wk-project__head {
+  align-self: start;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+// Above the stretched link, so it toggles rather than opening the case.
+.wk-project__toggle {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-top: 4px;
+  padding: 0;
+  background: var(--paper);
+  border: 1px solid color-mix(in oklab, var(--ink-mute) 60%, transparent);
+  border-radius: 50%;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: border-color 150ms, color 150ms;
+
+  &:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 2px;
+  }
+
+  &[hidden] { display: none; }
+
+  @media (pointer: coarse) {
+    width: 44px;
+    height: 44px;
+    margin: -2px -6px 0 0;
+  }
+}
+
+// A chevron drawn from two borders: down when there is more to see, up when it is showing.
+.wk-project__chevron {
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 250ms cubic-bezier(0.2, 0.7, 0.3, 1), margin 250ms;
+
+  [aria-expanded='true'] > & {
+    margin-top: 4px;
+    transform: rotate(225deg);
+  }
+}
+
+// The open/closed height runs on a 1fr/0fr grid row, which animates to the content's real
+// height without measuring it. Only once the controller has settled (.is-ready), so the
+// first collapse on load is not an animation.
+.wk-project__details {
+  display: grid;
+  grid-template-rows: 1fr;
+
+  .is-ready & {
+    transition: grid-template-rows 320ms cubic-bezier(0.2, 0.7, 0.3, 1), opacity 240ms, visibility 0s;
+  }
+
+  .wk-project.is-collapsed & {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.wk-project__details-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wk-project__stack { margin-top: 12px; }
+
+// One card opened on its own, on a screen with more than one column: the details hang off the
+// card's bottom edge over the row below, so the neighbours keep their height and nothing
+// leaves a gap. "Expand all" (.is-flow) puts them back in the card, in flow.
+@include bp.above(740px) {
+  .wk-deck.is-enhanced:not(.is-flow) {
+    .wk-project:not(.is-collapsed) {
+      z-index: 3;
+      background: var(--paper);
+      border-bottom-color: transparent;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+
+      &:hover,
+      &.is-keyed { background: var(--paper-warm); }
+    }
+
+    .wk-project__details {
+      position: absolute;
+      top: 100%;
+      left: -1px;
+      right: -1px;
+      background: inherit;
+      border: var(--rule-row);
+      border-top: 0;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+      box-shadow: 0 18px 28px -18px color-mix(in oklab, var(--ink) 30%, transparent);
+    }
+
+    // Hidden once folded, after the fold has run, so the empty panel takes no clicks.
+    .wk-project.is-collapsed .wk-project__details {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      &.is-ready .wk-project.is-collapsed .wk-project__details {
+        transition: grid-template-rows 320ms cubic-bezier(0.2, 0.7, 0.3, 1), opacity 240ms, visibility 0s 320ms;
+      }
+    }
+
+    .wk-project__details-inner { padding: 0 22px; }
+
+    // The rule the foot draws above itself, drawn again where the details start.
+    .wk-project__tagline {
+      margin-top: 0;
+      padding-top: 12px;
+      border-top: var(--rule-row);
+    }
+
+    .wk-project__stack { margin-bottom: 18px; }
+  }
+}
 
 .wk-project__title {
   font-family: var(--font-display);
@@ -89,7 +298,7 @@
   font-size: 14.5px;
   color: var(--ink-soft);
   line-height: 1.5;
-  margin-top: 8px;
+  margin: 10px 0 0;
   text-wrap: pretty;
 }
 
@@ -104,7 +313,7 @@
 }
 
 .wk-project__foot {
-  margin-top: auto;
+  margin-top: 14px;
   padding-top: 12px;
   border-top: var(--rule-row);
   display: flex;
@@ -146,4 +355,18 @@
   font-size: 10px;
   color: var(--ink-quiet);
   white-space: nowrap;
+}
+
+@include bp.below(lg) {
+  .wk-index {
+    --page-pad: 22px;
+    padding-top: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-project__details,
+  .is-ready .wk-project__details,
+  .wk-project__chevron,
+  .wk-project__toggle { transition: none; }
 }

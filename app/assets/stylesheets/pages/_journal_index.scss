@@ -1,8 +1,8 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
-// /journal — the entry list. Max width 1100px, padding 60px 36px, per handoff §5.
-// The maxima live here rather than in theme/_tokens.scss, which stays byte-identical to
-// the bundle's tokens.css.
+// /journal — the entry list. The page maximum lives here, next to the page it shapes,
+// rather than in theme/_tokens.scss.
 $journal-max: 1100px;
 
 .jn-index {
@@ -44,41 +44,185 @@ $journal-max: 1100px;
   flex: none;
 }
 
+// The filter: a row of tags and a row of orders, each under a label in a fixed column so the
+// two lines of controls start at the same edge. Stacked on a phone.
 .jn-filter {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin: 28px 0 12px;
+  display: grid;
+  gap: 12px;
+  margin: 28px 0 20px;
 }
 
+.jn-filter__group {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: start;
+  column-gap: 16px;
+}
+
+// Level with the first line of chips, whose hit row is 32px tall.
 .jn-filter__label {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--ink-soft);
-  letter-spacing: 1px;
+  line-height: 32px;
+  color: var(--ink-quiet);
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  margin-right: 6px;
-
-  // The second label starts a second control group on the same row.
-  &--order { margin-left: 12px; }
 }
 
-// One row per entry: number · date · title · byline over tags.
+.jn-filter__body .rc-chips { gap: 6px 6px; }
+
+// How many entries a tag chip would leave: after the tag, lighter, and the chip's own colour
+// once it is on.
+.jn-filter__count {
+  // The chip is a flex row, which drops the space between the tag and its number.
+  margin-left: 6px;
+  color: var(--ink-quiet);
+  font-variant-numeric: tabular-nums;
+
+  .is-active > & { color: inherit; opacity: 0.7; }
+}
+
+// Two chips on read as "both", and the note says so — quietly, under the chips.
+.jn-filter__note {
+  margin: 8px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+}
+
+// The three orders as one control: one is always on, so they sit in a single frame.
+.jn-sort {
+  display: inline-flex;
+  justify-self: start;
+  border: 1px solid color-mix(in oklab, var(--ink-mute) 70%, transparent);
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+}
+
+.jn-sort__option {
+  @include controls.hit-row(32px);
+
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 150ms, color 150ms;
+
+  & + & { border-left: 1px solid color-mix(in oklab, var(--ink-mute) 70%, transparent); }
+
+  &:hover { color: var(--ruby); }
+
+  &.is-active {
+    color: var(--ruby);
+    background: color-mix(in oklab, var(--ruby) 9%, var(--paper));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: -2px;
+  }
+}
+
+@include bp.below(sm) {
+  .jn-filter__group {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2px;
+  }
+
+  .jn-filter__label { line-height: 24px; }
+}
+
+// One row per entry: thumbnail · number · date · title · byline over tags.
 .jn-entry {
   display: grid;
-  grid-template-columns: 90px 120px 1fr 180px;
-  grid-template-areas: 'number date title meta';
-  align-items: baseline;
+  grid-template-columns: 56px 70px 100px minmax(0, 1fr) 180px;
+  grid-template-areas: 'thumb number date title meta';
+  align-items: center;
   gap: 18px;
-  padding: 18px 12px;
+  padding: 12px 12px;
   border-bottom: var(--rule-entry);
-  transition: background 150ms;
+  // The ruby edge on hover is a shadow, so it takes no room and moves nothing.
+  transition: background 150ms, box-shadow 150ms;
 
   // The list opens on the strongest of the three hairlines.
   &--first { border-top: var(--rule-strong); }
 
-  &:hover { background: var(--paper-warm); }
+  &:hover,
+  &:focus-visible,
+  &.is-keyed {
+    background: var(--paper-warm);
+    box-shadow: inset 3px 0 0 var(--ruby);
+  }
+
+  // J/K scroll a row into view: clear of the sticky nav and the year heading under it.
+  scroll-margin: 150px 0 24px;
+
+  &:focus-visible { outline-offset: -2px; }
+}
+
+// A year of entries under its own heading, when the list is in date order. The heading sticks
+// under the nav while its year scrolls past, and leaves with the last row of it.
+.jn-year {
+  // An anchor (#year-2026) lands below the sticky nav rather than under it.
+  scroll-margin-top: 73px;
+
+  // The heading's rule opens the year, so the first row does not draw a second one.
+  .jn-entry--first { border-top: 0; }
+}
+
+.jn-year__heading {
+  position: sticky;
+  // The nav's height: it is sticky too, and the heading has to stop just under it.
+  top: 73px;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 28px 0 0;
+  padding: 14px 0 8px;
+  background: var(--paper);
+  border-bottom: var(--rule-strong);
+  font-weight: 400;
+
+  .jn-year:first-child & { margin-top: 0; }
+}
+
+.jn-year__number {
+  font-family: var(--font-display);
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.jn-year__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+// The cover, small, or the post's own stone when it has none.
+.jn-entry__thumb {
+  grid-area: thumb;
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--paper-warm);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 300ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .jn-entry:hover & img { transform: scale(1.06); }
 }
 
 .jn-entry__number {
@@ -104,12 +248,27 @@ $journal-max: 1100px;
   margin: 0;
 }
 
+.jn-entry__name {
+  transition: color 150ms;
+
+  .jn-entry:hover & { color: var(--ruby); }
+}
+
+// Filled, so it reads at a glance down a list of hairlines; still mono and small.
 .jn-entry__badge {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ruby);
-  letter-spacing: 1px;
+  display: inline-block;
+  vertical-align: 0.35em;
   margin-left: 10px;
+  padding: 2px 6px 1px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1.4;
+  color: var(--paper);
+  background: var(--ruby);
+  border-radius: var(--radius-chip-sm);
+  white-space: nowrap;
 }
 
 .jn-entry__meta {
@@ -122,6 +281,88 @@ $journal-max: 1100px;
 }
 
 .jn-entry__tags { color: var(--ink-soft); }
+
+// The preview card a row opens on hover or keyboard focus (entry_preview_controller picks the
+// side). Out of the flow, so nothing moves; pointer-events off, so it never takes a click meant
+// for the row under it; past the title column's start, so the row's own text stays in view.
+.jn-entry { position: relative; }
+
+.jn-preview {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 292px;
+  z-index: 5;
+  display: flex;
+  gap: 14px;
+  width: 380px;
+  padding: 12px;
+  background: var(--paper);
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  box-shadow: 0 14px 34px -14px color-mix(in oklab, var(--ink) 35%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  // Leaving is immediate; arriving waits (below), so sweeping the pointer down the list does
+  // not flash a card per row.
+  transition: opacity 120ms, transform 120ms, visibility 0s 120ms;
+
+  &[data-place='above'] {
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform: translateY(4px);
+  }
+
+  .jn-entry:hover &,
+  .jn-entry:focus-visible & {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 150ms 350ms, transform 150ms 350ms, visibility 0s 350ms;
+  }
+
+  // Touch has no hover, and a narrow row has no room beside its title.
+  @media (hover: none) { display: none; }
+
+  @include bp.below(lg) { display: none; }
+}
+
+.jn-preview__thumb {
+  flex: none;
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--paper-warm);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.jn-preview__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.jn-preview__lead {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.jn-preview__meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+}
 
 .jn-empty {
   padding: 36px;
@@ -180,8 +421,16 @@ $journal-max: 1100px;
   color: var(--ink-soft);
 }
 
-.jn-search__input {
+// The field and its clear button, as one underline.
+.jn-search__box {
+  position: relative;
+  display: flex;
   flex: 1 1 320px;
+  min-width: 0;
+}
+
+.jn-search__input {
+  flex: 1 1 auto;
   min-width: 0;
   font-family: var(--font-body);
   font-size: 18px;
@@ -192,6 +441,9 @@ $journal-max: 1100px;
   background: none;
   border: 0;
   border-bottom: 1px solid var(--ink-mute);
+  border-radius: 0;
+  appearance: none;
+  transition: border-color 150ms, box-shadow 150ms;
 
   @media (pointer: coarse) {
     min-height: 44px;
@@ -199,15 +451,65 @@ $journal-max: 1100px;
 
   &::placeholder { color: var(--ink-quiet); }
 
-  &:focus {
+  // A text field is focus-visible whenever it has focus, so a box round it would be on every
+  // time the reader clicks in. The underline turns ruby and thickens instead.
+  &:focus,
+  &:focus-visible {
     outline: none;
     border-bottom-color: var(--ruby);
+    box-shadow: 0 1px 0 var(--ruby);
   }
+
+  &::-webkit-search-decoration { appearance: none; }
+
+  // Our own clear button stands in for the browser's once search-clear is running.
+  .is-clearable > & {
+    padding-right: 34px;
+
+    &::-webkit-search-cancel-button {
+      appearance: none;
+      display: none;
+    }
+  }
+}
+
+.jn-search__clear {
+  @include controls.hit-square(32px);
+
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-quiet);
+  cursor: pointer;
+  transition: color 150ms;
+
+  &:hover { color: var(--ruby); }
 
   &:focus-visible {
     outline: 2px solid var(--ruby);
-    outline-offset: 3px;
+    outline-offset: -2px;
   }
+
+  &[hidden] { display: none; }
+}
+
+// What live search found, small and to the right of the field.
+.jn-search__hint {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-quiet);
+  white-space: nowrap;
+
+  &:empty { display: none; }
 }
 
 .jn-search__fields {
@@ -258,20 +560,106 @@ $journal-max: 1100px;
   .hover-link { @include controls.hit-row(32px); }
 }
 
-@media (max-width: 560px) {
+@include bp.below(sm) {
   .jn-search__input { font-size: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .jn-entry,
+  .jn-entry__name,
+  .jn-entry__thumb img,
+  .jn-sort__option,
+  .jn-search__input,
+  .jn-search__clear,
   .jn-pager__step { transition: none; }
+
+  .jn-entry:hover .jn-entry__thumb img { transform: none; }
+
+  // Still after the delay, but it appears rather than slides.
+  .jn-preview,
+  .jn-entry:hover .jn-preview,
+  .jn-entry:focus-visible .jn-preview {
+    transform: none;
+    transition-property: visibility;
+  }
 }
 
-// The index's own search row: one line, above the tag filter.
+// The index's own search row: one line, above the tag filter. Live search answers as the
+// reader types, so once it runs the submit button goes; without script it is the way in.
 .jn-index__search {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 12px 16px;
   margin-bottom: 18px;
   flex-wrap: wrap;
+
+  &.is-live .jn-search__submit { display: none; }
+}
+
+// The label takes the filter's label column, so the field starts where the chips do.
+@include bp.above(sm) {
+  .jn-index__search .jn-search__label { flex: 0 0 96px; }
+}
+
+// Narrow screens. The four-column entry row cannot survive below ~900px, and the display
+// sizes have to come down before the 375px floor.
+@include bp.below(lg) {
+  .jn-index__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .jn-index__title { font-size: 60px; }
+
+  .jn-index__anchor { order: -1; }
+
+  // The thumbnail down the left; number and title on the first line, date and byline under.
+  .jn-entry {
+    grid-template-columns: 56px 70px minmax(0, 1fr);
+    grid-template-areas:
+      'thumb number title'
+      'thumb date   meta';
+    row-gap: 6px;
+  }
+
+  .jn-entry__thumb { align-self: start; }
+
+  .jn-entry__meta { text-align: right; }
+}
+
+@include bp.below(nav) {
+  // The nav is a 57px top bar here.
+  .jn-year { scroll-margin-top: 57px; }
+
+  .jn-year__heading { top: 57px; }
+}
+
+@include bp.below(sm) {
+  .jn-index { padding: 40px 20px; }
+
+  .jn-year__number { font-size: 34px; }
+
+  .jn-index__title { font-size: 44px; }
+
+  .jn-index__lede { font-size: 16px; }
+
+  .jn-entry {
+    grid-template-columns: 48px auto minmax(0, 1fr);
+    grid-template-areas:
+      'thumb number date'
+      'thumb title  title'
+      'thumb meta   meta';
+    column-gap: 14px;
+    row-gap: 4px;
+    padding: 14px 4px;
+  }
+
+  .jn-entry__thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .jn-entry__title { font-size: 22px; }
+
+  .jn-entry__meta { text-align: left; }
 }

@@ -15,7 +15,7 @@ describe NavComponent, type: :component do
   it "carries the redesign's four sections" do
     render_in(:en)
 
-    expect(page.all('.rc-nav__link').map { |link| link.text.split.first }).to eq(%w[journal work studio contact])
+    expect(page.all('.rc-nav__link').map { |link| link.text.split.first }).to eq(%w[journal projects studio contact])
   end
 
   # Every section is a link now: /studio waited on real team data, and the roster arrived.
@@ -46,7 +46,7 @@ describe NavComponent, type: :component do
     render_in(:uk)
 
     expect(page.all('.rc-nav__link').map { |link| link.text.split.first })
-      .to eq(%w[журнал роботи студія контакти])
+      .to eq(%w[журнал проєкти студія контакти])
   end
 
   # The highlight is wayfinding; aria-current="page" is a claim about the address. On /team the
@@ -65,7 +65,7 @@ describe NavComponent, type: :component do
   it 'announces it on the page itself' do
     render_in(:en, current: :work)
 
-    expect(page.find("a[aria-current='page']").text).to eq('work')
+    expect(page.find("a[aria-current='page']").text).to eq('projects')
   end
 
   it 'marks the current section' do

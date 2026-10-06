@@ -8,14 +8,14 @@ require 'rails_helper'
 # guarding: the whole reason the editor was rebuilt is that its toolbar looked too small.
 describe 'the self-hosted TinyMCE build' do # rubocop:disable RSpec/DescribeClass
   # rubocop:disable Rails/FilePath -- the autocorrect duplicates segments of paths this long
-  let(:controller_source) { Rails.root.join('app/javascript/controllers/tinymce_controller.js').read }
+  let(:profiles_source) { Rails.root.join('app/javascript/admin/tinymce/profiles.js').read }
   let(:copy_script) { Rails.root.join('bin/copy_tinymce.mjs').read }
   let(:packaged_plugins) { Rails.root.join('node_modules/tinymce/plugins') }
   # rubocop:enable Rails/FilePath
 
   # Both profiles: the post editor's array, and the case editor's space-separated string.
   def plugins_the_editor_asks_for
-    listed = controller_source.scan(/plugins:\s*(\[.*?\]|"[^"]*")/m).flatten
+    listed = profiles_source.scan(/plugins:\s*(\[.*?\]|"[^"]*")/m).flatten
 
     listed.flat_map { |chunk| chunk.gsub(/["\[\],]/, ' ').split }.uniq
   end
@@ -31,6 +31,13 @@ describe 'the self-hosted TinyMCE build' do # rubocop:disable RSpec/DescribeClas
                        "bin/copy_tinymce.mjs does not copy: #{missing.join(', ')}"
   end
 
+  # Its dialog runs an inline <script> in a srcdoc iframe, which the CSP refuses; the editor
+  # screen's own preview pane is the preview.
+  it 'leaves out the preview plugin' do
+    expect(plugins_the_editor_asks_for).not_to include('preview')
+    expect(plugins_the_copy_script_brings).not_to include('preview')
+  end
+
   it 'names only plugins that exist in the package' do
     skip 'node_modules is not installed' unless packaged_plugins.directory?
 
@@ -41,7 +48,7 @@ describe 'the self-hosted TinyMCE build' do # rubocop:disable RSpec/DescribeClas
   end
 
   it 'offers the image button only the types the upload endpoint stores' do
-    offered = controller_source[/images_file_types:\s*"([^"]*)"/, 1].split(',')
+    offered = profiles_source[/images_file_types:\s*"([^"]*)"/, 1].split(',')
     stored = Management::EditorImagesController::FORMATS.values
 
     # jpeg and jpg are one format under two extensions.

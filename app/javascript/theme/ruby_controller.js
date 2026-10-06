@@ -4,37 +4,69 @@ import { Controller } from "@hotwired/stimulus";
 // server-side; this recomputes the same shading as the light moves.
 //
 // The maths below is a port of the same functions in app/components/gem_component.rb
-// (shade, brightness, inset). Change one, change both.
+// (shade, brightness, inset, TONES). Change one, change both.
 //
-// :hero   — light follows the cursor, scroll rotates the crown, the stone tilts.
+// :hero   — light follows the cursor, scroll rotates the crown, the stone tilts. A horizontal
+//           drag turns it (vertical stays the page's scroll), a click or tap without a drag
+//           moves it to the next shade, and seven quick ones set off the easter egg.
 // :anchor — scroll rotates it, the light stays put. Nothing changes between scrolls, so it
 //           repaints on scroll and runs no frame loop of its own.
+// :badge  — the small stones (the logo, case cards, covers): scroll rotates them, and while the
+//           pointer is over the thing they belong to the light follows it and the crown turns a
+//           little. The frame loop runs only for that and stops once the stone has settled.
 const LIGHT_RADIUS = 55; // just past the girdle, so the highlight sits on the rim
 const SMOOTHING = 0.1;
 const IDLE_AFTER_MS = 1500;
 const IDLE_DRIFT = 0.06;
-const SCROLL_FACTOR = { hero: 0.045, anchor: 0.1 };
+const SCROLL_FACTOR = { hero: 0.045, anchor: 0.1, badge: 0.1 };
+const HOVER_SPIN = 3.5; // degrees per frame on entering, decaying with the drag's coast
 const STOP_OFFSETS = [0.18, 0, -0.22];
+const REST_LIGHT = [28, 18];
+
+// [hue shift, lightness shift, chroma factor] — GemComponent::TONES.
+export const TONES = [
+  [0, 0, 1.0],
+  [-12, 2, 1.0],
+  [9, -3, 0.95],
+  [-5, -6, 1.05],
+  [-22, 4, 0.9],
+  [5, 4, 0.85]
+];
+
+// A drag only becomes one past this many pixels, and only if it is more sideways than up or
+// down: anything else is a tap, or the page being scrolled.
+const DRAG_THRESHOLD = 6;
+const DRAG_FACTOR = 0.6; // degrees per pixel
+const SPIN_DECAY = 0.94;
+const EGG_CLICKS = 7;
+const EGG_WINDOW_MS = 2500;
 
 export default class extends Controller {
-  static targets = ["facet", "facetGradient", "tableGradient", "specular", "star", "crown"];
-  static values = { variant: String };
+  static targets = ["facet", "facetGradient", "tableGradient", "specular", "star", "crown", "glow"];
+  static values = { variant: String, tone: Number };
 
   connect() {
-    this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (this.reducedMotion.matches) return; // the static paint is the whole design here
-
     this.centroids = this.facetTargets.map((facet) => centroidOf(facet));
     this.pointsOf = this.facetTargets.map((facet) => pointsOf(facet));
 
-    this.light = [28, 18];
-    this.targetLight = [28, 18];
+    this.tone = this.toneValue % TONES.length;
+    this.light = [...REST_LIGHT];
+    this.targetLight = [...REST_LIGHT];
     this.tilt = [0, 0];
     this.targetTilt = [0, 0];
     this.scrollRotation = 0;
     this.idleRotation = 0;
+    this.dragRotation = 0;
+    this.spin = 0;
+    this.clicks = [];
     this.lastMoved = performance.now();
     this.visible = true;
+
+    // Under reduced motion the static paint is the whole design: a click may still change the
+    // shade, which is a repaint and not a movement, but nothing turns or drifts.
+    this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (this.variantValue === "hero") this.listenToHandle();
+    if (this.reducedMotion.matches) return;
 
     this.onScroll = () => {
       this.scrollRotation = (window.scrollY || 0) * SCROLL_FACTOR[this.variantValue];
@@ -46,6 +78,7 @@ export default class extends Controller {
       this.onPointerMove = (event) => this.aimLight(event);
       window.addEventListener("pointermove", this.onPointerMove);
     }
+    if (this.variantValue === "badge") this.listenToHost();
 
     // A gem scrolled past has no business holding a frame loop open.
     this.observer = new IntersectionObserver(([entry]) => {
@@ -59,7 +92,38 @@ export default class extends Controller {
   }
 
   get looping() {
-    return this.variantValue === "hero";
+    return this.variantValue === "hero" || this.hovered || this.settling;
+  }
+
+  // The card, link or row the stone stands for: hovering any of it wakes the stone.
+  listenToHost() {
+    this.host = this.element.closest("[data-ruby-host], a") || this.element;
+    this.onHostEnter = (event) => {
+      if (event.pointerType === "touch") return;
+      this.hovered = true;
+      this.spin = HOVER_SPIN;
+      this.aimLight(event);
+      if (this.frame) cancelAnimationFrame(this.frame);
+      this.tick();
+    };
+    this.onHostMove = (event) => {
+      if (this.hovered) this.aimLight(event);
+    };
+    this.onHostLeave = () => {
+      this.hovered = false;
+      this.targetLight = [...REST_LIGHT];
+    };
+    this.host.addEventListener("pointerenter", this.onHostEnter);
+    this.host.addEventListener("pointermove", this.onHostMove);
+    this.host.addEventListener("pointerleave", this.onHostLeave);
+  }
+
+  // Still drifting back to rest after the pointer left: the loop keeps going until it has.
+  get settling() {
+    if (this.variantValue !== "badge") return false;
+
+    const [x, y] = this.light;
+    return Math.abs(this.spin) > 0.01 || Math.hypot(x - REST_LIGHT[0], y - REST_LIGHT[1]) > 0.3;
   }
 
   resume() {
@@ -67,16 +131,111 @@ export default class extends Controller {
     else this.paintSoon();
   }
 
-  paintSoon() {
-    if (this.frame || !this.visible) return;
+  // force: a reduced-motion repaint, where nothing else is running and nothing is observed.
+  paintSoon(force = false) {
+    if (this.frame || (!this.visible && !force)) return;
 
     this.frame = requestAnimationFrame(() => {
       this.frame = null;
-      this.paint(this.scrollRotation);
+      this.paint(this.scrollRotation + this.dragRotation);
     });
   }
 
+  // The hero sits inside a button (the view marks it data-ruby-handle), so a keyboard reader
+  // can change the shade too: Enter and Space arrive as the same click.
+  listenToHandle() {
+    this.handle = this.element.closest("[data-ruby-handle]") || this.element;
+    this.onPointerDown = (event) => this.startDrag(event);
+    this.onDragMove = (event) => this.drag(event);
+    this.onDragEnd = (event) => this.endDrag(event);
+    this.onClick = (event) => this.press(event);
+
+    this.handle.addEventListener("pointerdown", this.onPointerDown);
+    this.handle.addEventListener("pointermove", this.onDragMove);
+    this.handle.addEventListener("pointerup", this.onDragEnd);
+    this.handle.addEventListener("pointercancel", this.onDragEnd);
+    this.handle.addEventListener("click", this.onClick);
+  }
+
+  startDrag(event) {
+    if (event.button !== 0 || this.reducedMotion.matches) return;
+
+    this.pointer = { id: event.pointerId, startX: event.clientX, startY: event.clientY, lastX: event.clientX, dragging: false };
+  }
+
+  drag(event) {
+    const pointer = this.pointer;
+    if (!pointer || pointer.id !== event.pointerId) return;
+
+    if (!pointer.dragging) {
+      const dx = event.clientX - pointer.startX;
+      const dy = event.clientY - pointer.startY;
+      if (Math.abs(dx) < DRAG_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return;
+
+      pointer.dragging = true;
+      this.handle.setPointerCapture?.(event.pointerId);
+      this.element.classList.add("is-dragging");
+    }
+
+    const step = (event.clientX - pointer.lastX) * DRAG_FACTOR;
+    pointer.lastX = event.clientX;
+    this.dragRotation += step;
+    this.spin = step;
+    this.lastMoved = performance.now();
+  }
+
+  endDrag(event) {
+    const pointer = this.pointer;
+    if (!pointer || pointer.id !== event.pointerId) return;
+
+    // A drag ends in a click on the same element; that one is not a tap.
+    this.swallowClick = pointer.dragging && event.type === "pointerup";
+    this.pointer = null;
+    this.element.classList.remove("is-dragging");
+    if (event.type === "pointercancel") this.spin = 0;
+  }
+
+  press(event) {
+    if (this.swallowClick) {
+      this.swallowClick = false;
+      event.preventDefault();
+      return;
+    }
+
+    this.nextTone();
+    this.countClick();
+  }
+
+  nextTone() {
+    this.tone = (this.tone + 1) % TONES.length;
+    if (this.hasGlowTarget) this.glowTarget.setAttribute("fill", glowColour(this.tone));
+    if (!this.looping || this.reducedMotion.matches) this.paintSoon(true);
+  }
+
+  // Seven quick presses and the stone comes apart; the easter-egg controller does the rest.
+  countClick() {
+    const now = performance.now();
+    this.clicks = this.clicks.filter((time) => now - time < EGG_WINDOW_MS);
+    this.clicks.push(now);
+    if (this.clicks.length < EGG_CLICKS) return;
+
+    this.clicks = [];
+    window.dispatchEvent(new CustomEvent("rubycoin:shatter", { detail: { gem: this.element } }));
+  }
+
   disconnect() {
+    if (this.host) {
+      this.host.removeEventListener("pointerenter", this.onHostEnter);
+      this.host.removeEventListener("pointermove", this.onHostMove);
+      this.host.removeEventListener("pointerleave", this.onHostLeave);
+    }
+    if (this.handle) {
+      this.handle.removeEventListener("pointerdown", this.onPointerDown);
+      this.handle.removeEventListener("pointermove", this.onDragMove);
+      this.handle.removeEventListener("pointerup", this.onDragEnd);
+      this.handle.removeEventListener("pointercancel", this.onDragEnd);
+      this.handle.removeEventListener("click", this.onClick);
+    }
     window.removeEventListener("scroll", this.onScroll);
     if (this.onPointerMove) window.removeEventListener("pointermove", this.onPointerMove);
     if (this.observer) this.observer.disconnect();
@@ -119,7 +278,17 @@ export default class extends Controller {
       this.idleRotation += IDLE_DRIFT;
     }
 
-    this.paint(this.scrollRotation + this.idleRotation);
+    // Let go of a drag and the stone coasts to a stop rather than halting under the finger.
+    if (!this.pointer?.dragging && Math.abs(this.spin) > 0.01) {
+      this.dragRotation += this.spin;
+      this.spin *= SPIN_DECAY;
+    }
+
+    this.paint(this.scrollRotation + this.idleRotation + this.dragRotation);
+    if (!this.looping) {
+      this.frame = null;
+      return;
+    }
     this.frame = requestAnimationFrame(() => this.tick());
   }
 
@@ -129,6 +298,7 @@ export default class extends Controller {
 
     this.centroids.forEach((centroid, index) => {
       const brightness = brightnessAt(centroid, rotation, lightX, lightY);
+      const tone = this.tone;
       if (brightness > brightest.brightness) brightest = { brightness, index };
 
       const gradient = this.facetGradientTargets[index];
@@ -137,14 +307,14 @@ export default class extends Controller {
       gradient.setAttribute("y1", 50 + y * 30);
       gradient.setAttribute("x2", 50 - x * 30);
       gradient.setAttribute("y2", 50 - y * 30);
-      paintStops(gradient, brightness);
+      paintStops(gradient, brightness, tone);
     });
 
     const tableBrightness = brightnessAt([50, 50], rotation, lightX, lightY);
     const tableStops = this.tableGradientTarget.children;
-    tableStops[0].setAttribute("stop-color", shade(Math.min(1, tableBrightness + 0.25)));
-    tableStops[1].setAttribute("stop-color", shade(tableBrightness * 0.85 + 0.1));
-    tableStops[2].setAttribute("stop-color", shade(Math.max(0, tableBrightness - 0.2)));
+    tableStops[0].setAttribute("stop-color", shade(Math.min(1, tableBrightness + 0.25), this.tone));
+    tableStops[1].setAttribute("stop-color", shade(tableBrightness * 0.85 + 0.1, this.tone));
+    tableStops[2].setAttribute("stop-color", shade(Math.max(0, tableBrightness - 0.2), this.tone));
 
     if (this.hasSpecularTarget) {
       const lit = brightest.brightness >= 0.5;
@@ -171,11 +341,17 @@ export default class extends Controller {
 }
 
 // Deep blood in shadow, bright fire in the light, hue drifting warmer as it darkens.
-function shade(brightness) {
-  const lightness = 14 + brightness * 64;
-  const chroma = 0.08 + brightness * 0.22;
-  const hue = 14 + (1 - brightness) * 6;
+function shade(brightness, tone = 0) {
+  const [hueShift, lightnessShift, chromaFactor] = TONES[tone];
+  const lightness = 14 + brightness * 64 + lightnessShift;
+  const chroma = (0.08 + brightness * 0.22) * chromaFactor;
+  const hue = (14 + (1 - brightness) * 6 + hueShift + 360) % 360;
   return `oklch(${lightness.toFixed(1)}% ${chroma.toFixed(3)} ${hue.toFixed(1)})`;
+}
+
+function glowColour(tone) {
+  const [hueShift, lightnessShift, chromaFactor] = TONES[tone];
+  return `oklch(${58 + lightnessShift}% ${(0.22 * chromaFactor).toFixed(3)} ${(18 + hueShift + 360) % 360})`;
 }
 
 // Falls off over 70 units, then squared — that is what hardens the split
@@ -189,10 +365,10 @@ function brightnessAt(centroid, rotation, lightX, lightY) {
   return (1 - Math.min(1, Math.hypot(x - lightX, y - lightY) / 70)) ** 2;
 }
 
-function paintStops(gradient, brightness) {
+function paintStops(gradient, brightness, tone) {
   Array.from(gradient.children).forEach((stop, index) => {
     const shifted = brightness + STOP_OFFSETS[index];
-    stop.setAttribute("stop-color", shade(Math.min(1, Math.max(0, shifted))));
+    stop.setAttribute("stop-color", shade(Math.min(1, Math.max(0, shifted)), tone));
   });
 }
 

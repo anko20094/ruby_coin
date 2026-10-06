@@ -1,16 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="floating-ruby"
-//
-// Shows a small ruby once the hero has scrolled away, and scrolls back to it on click. Under
-// prefers-reduced-motion the button still works — it just appears without the fade and jumps
-// instead of gliding.
-//
-// Two conditions, not one, and the observed element is the hero SECTION rather than the gem
-// inside it: in one column the gem starts below the fold, so a gem-based observer fires on
-// first paint and the reader lands on a back-to-top button pointing where they already are.
-// The scroll gate is the belt to those braces — on a viewport short enough to hide the whole
-// hero, the observer alone is not enough.
 export default class extends Controller {
   static values = {
     section: { type: String, default: ".hm-hero" },

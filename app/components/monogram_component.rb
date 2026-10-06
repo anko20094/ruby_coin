@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-# A face in a frame: a photograph where there is one, initials where there is not. One crop,
-# one treatment, everywhere a person appears — the frame, the ring and the radius are the same
-# either way, so a photograph arriving moves nothing in the layout. A machine on the roster gets
-# a ruby CI flag across the bottom: the reader is told what it is without a footnote.
 class MonogramComponent < ViewComponent::Base
   RINGS = %i[ink mute paper].freeze
 
@@ -15,6 +11,8 @@ class MonogramComponent < ViewComponent::Base
   # one thing this design must not do. The component decides it rather than a container query:
   # an element cannot query its own container.
   COMPACT_BELOW = 40
+
+  attr_reader :initials, :size, :ring, :photo
 
   def self.of(person, **)
     new(initials: person.short, seed: person.id, machine: person.machine?, photo: person.photo, **)
@@ -29,10 +27,9 @@ class MonogramComponent < ViewComponent::Base
     @machine = machine
     @ring = ring
     @photo = photo
+
     super()
   end
-
-  attr_reader :initials, :size, :ring, :photo
 
   def photo? = photo.present?
 
@@ -53,12 +50,22 @@ class MonogramComponent < ViewComponent::Base
   end
 
   # Beside each 560px photograph sit <name>-120.<ext> and <name>-280.<ext>, so a 26px stone does
-  # not fetch the file a 280px one needs.
-  def photo_responsive
-    smaller = PHOTO_WIDTHS.filter_map do |width|
-      path = photo.sub(/(?=\.\w+\z)/, "-#{width}")
-      [path, "#{width}w"] if Rails.application.assets.load_path.find(path)
+  # not fetch the file a 280px one needs. Which copies exist is looked up once per photograph per
+  # process: a team page draws the same faces dozens of times.
+  SMALLER_COPIES = Concurrent::Map.new
+
+  def self.smaller_copies(photo)
+    SMALLER_COPIES.compute_if_absent(photo) do
+      copies = PHOTO_WIDTHS.filter_map do |width|
+        path = photo.sub(/(?=\.\w+\z)/, "-#{width}")
+        [path, "#{width}w"] if Rails.application.assets.load_path.find(path)
+      end
+      copies.freeze
     end
+  end
+
+  def photo_responsive
+    smaller = self.class.smaller_copies(photo)
     return {} if smaller.empty?
 
     { srcset: smaller.to_h.merge(photo => "#{PHOTO_ORIGINAL_WIDTH}w"), sizes: "#{size}px" }

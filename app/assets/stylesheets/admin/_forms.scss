@@ -1,0 +1,303 @@
+@use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+@use 'a11y';
+
+// The admin's one field system: .mg-field wraps a .mg-label and a .mg-input. Buttons are
+// .mg-btn (admin/_shell.scss); a glyph-only control is .mg-icon-btn.
+.mg-field {
+  margin-bottom: 16px;
+}
+
+.mg-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.mg-input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  font-size: 14px;
+  color: var(--ink);
+
+  &:focus { border-color: var(--ink); }
+}
+
+.mg-input--title {
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.mg-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 4px 0 8px;
+}
+
+.mg-check {
+  @include controls.hit-row(32px);
+
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--ruby);
+  }
+}
+
+// A control whose whole content is one glyph: edit, delete, save, cancel.
+.mg-shell .mg-icon-btn {
+  @include controls.hit-square(32px, 44px);
+
+  padding: 0;
+  color: var(--ink-soft);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-chip);
+  transition: color 150ms, border-color 150ms, background 150ms;
+
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--ruby);
+    background: var(--paper);
+  }
+
+  &--danger { color: var(--ruby); }
+  &--ok { color: var(--mg-ok); }
+}
+
+// button_to wraps its button in a form; in a row of icons the form must not break the line.
+.mg-tag-row__actions form,
+.mg-actions form { display: contents; }
+
+.mg-icon { flex: none; }
+
+// A form screen that is not the post editor: the fields, then a bar with the actions that
+// follows you down — the case form is four thousand pixels tall and has no autosave.
+.mg-form__body {
+  max-width: 1380px;
+}
+
+.mg-form__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 28px -22px -22px;
+  padding: 16px 22px;
+  background: var(--paper);
+  border-top: 1px solid var(--mg-ink-faint);
+  box-shadow: 0 -8px 20px color-mix(in oklab, var(--ink) 5%, transparent);
+}
+
+// A section of an admin form — the frame of the CV, its contact rows, one structured list.
+// Quiet, because the content is what should be loud.
+.mg-section {
+  margin-top: 30px;
+
+  &:first-child { margin-top: 0; }
+
+  &__title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--mg-ink-faint);
+  }
+
+  &__hint {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ink-quiet);
+    text-transform: none;
+  }
+
+  &__count {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ruby);
+  }
+}
+
+// A structured field: the rows, the inputs inside them, and the three controls that make the
+// list a list. Shared by the case form and the CV — see app/views/management/shared/.
+.mg-structure {
+  margin-top: 22px;
+}
+
+.mg-structure__rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.mg-structure__add {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
+  margin-top: 10px;
+  padding: 0 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px dashed var(--ink-mute);
+  border-radius: var(--radius-chip);
+
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--ruby);
+    border-style: solid;
+  }
+}
+
+.mg-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+
+  &__name { @include a11y.visually-hidden; }
+
+  // A grid, not one flex line: a career entry is thirteen fields across two languages.
+  // auto-fit, so a row of two fields does not leave two thirds of the pane blank.
+  &__inputs {
+    flex: 1 1 230px;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+    gap: 10px 12px;
+  }
+
+  // Across, not down: three 32px boxes stacked would add a hundred pixels to every row.
+  &__controls {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  &__control {
+    @include controls.hit-square(32px, 44px);
+
+    line-height: 1;
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: var(--paper);
+    border: 1px solid var(--mg-ink-faint);
+    border-radius: var(--radius-chip);
+    cursor: pointer;
+
+    &:hover:not(:disabled) { border-color: var(--ruby); color: var(--ruby); }
+    &:disabled { opacity: 0.3; cursor: default; }
+    &.is-remove:hover { background: var(--ruby); color: var(--paper); }
+  }
+}
+
+// A list of items — a stack group, a career entry's case slugs — earns two columns.
+.mg-cell--list {
+  grid-column: span 2;
+}
+
+.mg-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+  gap: 10px 14px;
+}
+
+.mg-cell {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+
+  &__label {
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  // One line of a CV does not need a 40px box.
+  .mg-input {
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  // Nested so it beats the rule above: dashed means "click and this becomes an editor".
+  .mg-tinymce-idle {
+    border-style: dashed;
+
+    &:hover { border-color: var(--ruby); }
+  }
+}
+
+// The tag picker (Tom Select) dressed as an .mg-input.
+.mg-shell .ts-wrapper.mg-input {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.mg-shell .ts-control {
+  min-height: 40px;
+  padding: 5px 8px;
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  font-size: 14px;
+  color: var(--ink);
+  box-shadow: none;
+
+  .item {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    border-radius: var(--radius-chip);
+  }
+}
+
+.mg-shell .ts-wrapper.focus .ts-control {
+  border-color: var(--ink);
+  @include controls.focus-ring(1px);
+}
+
+.mg-shell .ts-dropdown {
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  color: var(--ink);
+
+  .option {
+    padding: 8px 12px;
+    font-size: 13px;
+
+    &.active { background: var(--paper-warm); color: var(--ink); }
+  }
+}
+
+@include bp.below(md) {
+  .mg-form__actions .mg-btn { flex: 1; text-align: center; }
+}

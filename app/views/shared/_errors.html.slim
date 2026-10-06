@@ -1,6 +1,0 @@
-= turbo_frame_tag 'error_message' do
-  - if object&.errors&.any?
-    div class="alert alert-danger" role="alert"
-      ul.mb-0
-        - object.errors.full_messages.each do |msg|
-          li = msg

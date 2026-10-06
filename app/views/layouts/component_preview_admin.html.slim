@@ -1,0 +1,14 @@
+/ Lookbook layout for /management components: the admin stylesheet and bundle, inside the
+/ same .mg-shell the admin layout draws, so its scoped resets apply.
+doctype html
+html lang=I18n.locale
+  head
+    meta charset="utf-8"
+    meta[name="viewport" content="width=device-width,initial-scale=1"]
+    - theme_preloaded_faces.each do |face|
+      link rel="preload" href=asset_path("#{face}.woff2") as="font" type="font/woff2" crossorigin=""
+    = stylesheet_link_tag 'admin', media: 'all'
+    = javascript_include_tag 'admin', defer: true
+  body
+    .mg-shell
+      = yield

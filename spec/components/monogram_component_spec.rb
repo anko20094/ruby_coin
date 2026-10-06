@@ -3,6 +3,9 @@
 require 'rails_helper'
 
 describe MonogramComponent, type: :component do
+  # The lookup of smaller copies is memoised per process; each example starts from the disk.
+  before { described_class::SMALLER_COPIES.clear }
+
   it 'draws the initials, and is decoration as far as a screen reader is concerned' do
     render_inline(described_class.new(initials: 'DS', size: 88))
 
@@ -90,10 +93,10 @@ describe MonogramComponent, type: :component do
       expect(photo[:src]).to match(%r{/assets/people/danyil-\h+\.jpg})
     end
 
-    it 'finds the smaller copies of a photograph that is a PNG' do
+    it "finds the smaller copies of the machine's photograph too" do
       render_inline(described_class.of(Team.person!('claude'), size: 26))
 
-      expect(page.find('.rc-monogram__photo')[:srcset]).to match(%r{people/claude-120-\h+\.png 120w})
+      expect(page.find('.rc-monogram__photo')[:srcset]).to match(%r{people/claude-120-\h+\.jpg 120w})
     end
 
     it 'ships every roster photograph in every width the component asks for' do

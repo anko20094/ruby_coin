@@ -1,7 +1,7 @@
 footer.rc-footer
   .rc-footer__identity
     = link_to helpers.root_path, class: 'rc-footer__brand' do
-      = render GemComponent.new(uid: 'footer')
+      = render GemComponent.new(uid: 'footer', variant: :badge)
       span.rc-footer__wordmark rubyco.in
     .rc-footer__meta
       = "© #{Time.current.year} #{profile.name}"

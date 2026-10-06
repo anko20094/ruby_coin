@@ -1,6 +1,7 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
-// The front page. Max width 1320px, per handoff §4.
+// The front page.
 $home-max: 1320px;
 
 .hm-page {
@@ -13,10 +14,17 @@ $home-max: 1320px;
 .hm-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  align-items: center;
-  gap: 48px;
+  align-items: start;
+  gap: 0 48px;
   padding: 64px var(--page-pad) 80px;
 }
+
+// The gem lives inside the copy so a phone can float it beside the headline. Here the copy
+// steps aside and its children fill the left column one row each, with the gem spanning them
+// on the right — the two-column hero it has always been.
+.hm-hero__copy { display: contents; }
+
+.hm-hero__copy > * { grid-column: 1; }
 
 .hm-hero__eyebrow {
   display: flex;
@@ -82,15 +90,40 @@ $home-max: 1320px;
   margin-top: 14px;
 }
 
-.hm-hero__gem {
+.hm-hero__copy > .hm-hero__gem {
+  grid-column: 2;
+  grid-row: 1 / span 5;
+  align-self: center;
   justify-self: center;
   text-align: center;
   min-width: 0;
 }
 
+// A button so the shade can be changed from the keyboard too; it draws nothing of its own.
+// pan-y: a vertical swipe still scrolls the page, only a sideways one turns the stone.
+.hm-hero__stone {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 4px;
+  }
+
+  &:has(.is-dragging) { cursor: grabbing; }
+}
+
 // Sized here rather than passed to the component: the gem yields the column instead of
 // starving the text track, and in one column it shrinks rather than grows.
 .hm-hero__gem .rc-gem {
+  display: block;
   width: clamp(240px, 28vw, 400px);
   height: auto;
   aspect-ratio: 1;
@@ -100,9 +133,16 @@ $home-max: 1320px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 1px;
+  line-height: 1.6;
   color: var(--ink-quiet);
-  margin-top: 12px;
+  max-width: 36ch;
+  margin: 12px auto 0;
+  text-wrap: balance;
+
+  // Under reduced motion the gem stands still, so the hint would be false.
+  @media (prefers-reduced-motion: reduce) { display: none; }
 }
+
 
 // Latest entry.
 .hm-latest { padding: 0 var(--page-pad); }
@@ -252,23 +292,33 @@ $home-max: 1320px;
   }
 }
 
-.hm-card__cover {
-  height: 130px;
-  border-radius: var(--radius-card);
-  background: var(--paper-warm);
+// The stone in the case's own shade, and the figure the case leads with — where an empty box
+// with the case's number used to stand.
+.hm-card__lead {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: var(--rule-row);
+
+  .rc-gem {
+    width: 64px;
+    height: 64px;
+  }
 }
 
-// The case mark as a large ruby glyph behind the card's head.
-.hm-card__glyph {
-  font-family: var(--font-display);
-  font-size: 72px;
-  color: var(--ruby);
-  opacity: 0.16;
-  line-height: 1;
+.hm-card__metric-value {
+  font-size: 30px;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.hm-card__metric-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--ink-quiet);
+  margin-top: 4px;
 }
 
 .hm-card__title {
@@ -278,13 +328,6 @@ $home-max: 1320px;
   line-height: 1.2;
   text-wrap: balance;
   margin: 12px 0 0;
-}
-
-.hm-card__mark {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 16px;
-  color: var(--ruby);
 }
 
 .hm-card__meta {
@@ -301,7 +344,7 @@ $home-max: 1320px;
 }
 
 // The floating ruby: appears once the hero one has gone, and goes back to it. The overshoot in
-// the transform curve is deliberate (§4).
+// the transform curve is deliberate.
 .hm-top {
   position: fixed;
   right: 24px;
@@ -340,7 +383,7 @@ $home-max: 1320px;
 // One column. Two things matter here and both were got wrong once: the headline comes first,
 // and the gem gets smaller rather than larger — together they had pushed the h1 off a short
 // viewport, so the page opened on a gem and nothing else.
-@media (max-width: 1000px) {
+@include bp.below(1000px) {
   .hm-hero {
     grid-template-columns: minmax(0, 1fr);
     gap: 28px;
@@ -349,9 +392,21 @@ $home-max: 1320px;
 
   .hero-br { display: inline; }
 
-  .hm-hero__gem { justify-self: start; }
+  // One column, and the gem floats beside the headline at a fraction of its size, so the first
+  // screen is the headline and the buttons rather than the stone.
+  .hm-hero { display: block; }
 
-  .hm-hero__gem .rc-gem { width: clamp(150px, 30vw, 220px); }
+  .hm-hero__copy > .hm-hero__gem {
+    float: right;
+    width: clamp(64px, 18vw, 140px);
+    margin: 16px 0 8px 14px;
+  }
+
+  .hm-hero__gem .rc-gem { width: 100%; }
+
+  .hm-hero__caption { display: none; }
+
+  .hm-hero__actions { clear: both; }
 
   .hm-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -359,7 +414,7 @@ $home-max: 1320px;
   }
 }
 
-@media (max-width: 700px) {
+@include bp.below(md) {
   .hm-hero__lede { font-size: 17px; }
 
   .hm-latest__entry { grid-template-columns: 1fr; }

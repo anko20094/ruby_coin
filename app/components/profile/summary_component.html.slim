@@ -1,0 +1,3 @@
+section.pf-block.pf-block--summary
+  = render TrackTagComponent.new(label: t('profile.summary'), tone: :ruby, heading: :h2)
+  p.pf-summary= rich(cv.summary)

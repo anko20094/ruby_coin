@@ -1,7 +1,6 @@
 - content_for :title, full_title(@post.title)
-/ The handoff asks journal posts to unfurl with their own cover; only where there is none
-/ does the site card stand in.
-- page_meta description: @post.subtitle, image: (@post.photo.presence && @post.photo.medium.url), type: 'article', published_at: @post.created_at, updated_at: @post.updated_at
+/ A post unfurls with its own cover; only where there is none does the site card stand in.
+- page_meta description: @post.subtitle, image: (@post.photo.presence && @post.photo.medium.url), type: 'article', published_at: @post.created_at, updated_at: @post.updated_at, locales: @post.translated_locales
 
 = render 'shared/reading_progress'
 
@@ -14,12 +13,21 @@ article.jn-post
       = " · #{@post.entry_label}"
     = " · #{@post.created_at.strftime('%Y·%m·%d')}"
 
-  h1.jn-post__title= @post.title
+  h1.jn-post__title style=view_transition_style('post-title', @post.id)
+    = @post.title
   .jn-post__byline= journal_byline(@post)
+  / Only where the tags point at one or two projects; see Cases::Topics.
+  - if @topic_cases.any?
+    .jn-post__project
+      = "#{t('journal.post.project', count: @topic_cases.size)} · "
+      = safe_join(@topic_cases.map { |kase| link_to rich(kase.title, links: false), work_case_path(slug: kase.slug), class: 'hover-link' }, ', ')
 
   - if @post.photo.present?
+    / The first image on the page, so it is fetched first; the sizes are the version's, and
+    / the CSS crops it, so they only reserve the box.
     .jn-post__cover
-      = image_tag @post.photo.medium.url, alt: '', loading: 'lazy'
+      = image_tag @post.photo.medium.url, alt: '', loading: 'eager', fetchpriority: 'high',
+        width: PhotoUploader::MEDIUM.first, height: PhotoUploader::MEDIUM.last
 
   .jn-body
     p.jn-body__lede= @post.subtitle
@@ -31,19 +39,23 @@ article.jn-post
     nav.jn-steps aria-label=t('journal.post.series')
       - if @previous_entry
         = link_to post_path(@previous_entry), class: 'jn-step hover-row' do
-          .jn-step__eyebrow
-            span aria-hidden="true" ←
-            = " #{t('journal.post.previous')} #{@previous_entry.entry_label}"
-          .jn-step__title= @previous_entry.title
-      - else
-        span
+          .jn-step__thumb
+            = render PostCoverComponent.new(post: @previous_entry, uid: 'step-previous')
+          .jn-step__text
+            .jn-step__eyebrow
+              span aria-hidden="true" ←
+              = " #{t('journal.post.previous')} #{@previous_entry.entry_label}"
+            .jn-step__title= @previous_entry.title
 
       - if @next_entry
         = link_to post_path(@next_entry), class: 'jn-step jn-step--next hover-row' do
-          .jn-step__eyebrow
-            = "#{t('journal.post.next')} #{@next_entry.entry_label} "
-            span aria-hidden="true" →
-          .jn-step__title= @next_entry.title
+          .jn-step__thumb
+            = render PostCoverComponent.new(post: @next_entry, uid: 'step-next')
+          .jn-step__text
+            .jn-step__eyebrow
+              = "#{t('journal.post.next')} #{@next_entry.entry_label} "
+              span aria-hidden="true" →
+            .jn-step__title= @next_entry.title
 
   footer.jn-post__footer
     = link_to journal_path, class: 'jn-post__back' do
@@ -60,8 +72,7 @@ article.jn-post
             / The slot is always drawn: CarrierWave reports a cover as absent when its file is
             / missing, and one card without one should not shift the row.
             .jn-related__cover
-              - if post.photo.present?
-                = image_tag post.photo.small.url, alt: '', loading: 'lazy'
+              = render PostCoverComponent.new(post:, uid: "related-#{post.id}")
             .jn-related__date= post.created_at.strftime('%Y·%m·%d')
             h3.jn-related__title= post.title
             .jn-related__tags= post.tags.first(3).map { |tag| "##{tag.title}" }.join(' ')

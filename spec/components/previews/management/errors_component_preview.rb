@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+module Management
+  class ErrorsComponentPreview < ViewComponent::Preview
+    layout 'component_preview_admin'
+
+    # @label Admin
+    def admin
+      render(::ErrorsComponent.new(object: ::ErrorsComponentPreview.invalid_user, tone: :admin))
+    end
+  end
+end

@@ -1,7 +1,7 @@
 - content_for :title, full_title(t('journal.index.title'))
-- page_meta description: t('journal.index.lede')
+- page_meta description: t('journal.index.meta_description'), canonical_query: listing_query(tags: @active_tags)
 
-.jn-index
+.jn-index data-controller="list-nav" data-list-nav-item-value=".jn-entry"
   header.jn-index__header
     .jn-index__intro
       .rc-eyebrow
@@ -14,45 +14,82 @@
     .jn-index__anchor
       = render GemComponent.new(uid: 'journal-anchor', variant: :anchor, size: 90)
 
-  = form_with url: search_path, method: :get, class: 'jn-index__search' do |f|
+  = form_with url: search_path, method: :get, class: 'jn-index__search',
+              data: { controller: 'live-search', live_search_results_value: 'journal-live' } do |f|
     = f.label :query, t('journal.search.field'), class: 'jn-search__label'
-    = f.search_field :query, class: 'jn-search__input', placeholder: t('journal.search.placeholder')
-    = f.submit t('journal.search.submit'), class: 'rc-button'
+    .jn-search__box data-controller="search-clear"
+      = f.search_field :query, class: 'jn-search__input', placeholder: t('journal.search.placeholder'),
+        data: { list_nav_target: 'search', search_clear_target: 'input', action: 'input->search-clear#sync' }
+      = render 'journal/search_clear'
+    / What live search found, said aloud and shown small beside the field.
+    p.jn-search__hint[aria-live="polite" data-live-search-target="status"]
+    = f.submit t('journal.search.submit'), class: 'rc-button jn-search__submit'
 
+  / Two labelled rows: the tags, any number of them on at once, and the order, one of three.
   nav.jn-filter aria-label=t('journal.index.filter')
-    span.jn-filter__label= "#{t('journal.index.filter')} ·"
-    .rc-chips
-      = link_to t('journal.index.all'), journal_path(order: @order), **journal_chip_attributes(active: @active_tag.nil?)
-      - @tags.each do |tag|
-        = link_to "##{tag.title}", journal_path(tag_id: tag.id, order: @order),
-          **journal_chip_attributes(active: @active_tag == tag)
+    .jn-filter__group
+      span.jn-filter__label#jn-filter-tags= t('journal.index.filter')
+      .jn-filter__body
+        .rc-chips role="group" aria-labelledby="jn-filter-tags"
+          = link_to t('journal.index.all'), journal_path(order: @order), **journal_chip_attributes(active: @active_tags.empty?)
+          / Each chip switches its tag on or off and keeps the others, so two chips narrow the list
+          / to the entries carrying both.
+          - @tags.each do |tag|
+            = link_to journal_path(tag_id: journal_tag_toggle(@active_tags, tag), order: @order),
+              **journal_chip_attributes(active: @active_tags.include?(tag)) do
+              = "##{tag.title}"
+              = ' '
+              span.jn-filter__count= tag.readable_count
+        - if @active_tags.many?
+          p.jn-filter__note= t('journal.index.all_tags')
 
-    span.jn-filter__label.jn-filter__label--order= "#{t('journal.index.order.label')} ·"
-    .rc-chips
-      - Post::ORDER_TYPES.each do |order|
-        = link_to t("journal.index.order.#{order}"), journal_path(order:, tag_id: @active_tag&.id),
-          **journal_chip_attributes(active: @order == order)
+    .jn-filter__group
+      span.jn-filter__label#jn-filter-order= t('journal.index.order.label')
+      .jn-sort role="group" aria-labelledby="jn-filter-order"
+        - Post::ORDER_TYPES.each do |order|
+          = link_to t("journal.index.order.#{order}"), journal_path(order:, tag_id: journal_tags_param(@active_tags)),
+            class: ['jn-sort__option', ('is-active' if @order == order)], aria: { current: ('true' if @order == order) }
 
+  / Live search draws its results here and takes the list below out while it does; without
+  / script the form above submits to /search as it always has.
+  #journal-live hidden=true
   - if @posts.any?
-    .jn-entries
-      - @posts.each_with_index do |post, index|
-        = render JournalEntryComponent.new(post:, first: index.zero?)
+    = render 'shared/list_keys'
+    - if @year_counts
+      / A year that runs over two pages is headed again on the second, with the whole year's
+      / count: the heading says where the reader is, not what this page happens to hold.
+      .jn-entries
+        - @posts.group_by { |post| post.created_at.year }.each do |year, posts|
+          section.jn-year id="year-#{year}" aria-labelledby="year-#{year}-heading"
+            h2.jn-year__heading id="year-#{year}-heading"
+              span.jn-year__number= year
+              span.jn-year__count= " · #{t('journal.index.entries', count: @year_counts.fetch(year, posts.size))}"
+            - posts.each_with_index do |post, index|
+              = render JournalEntryComponent.new(post:, first: index.zero?, heading: :h3)
+    - else
+      .jn-entries
+        - @posts.each_with_index do |post, index|
+          = render JournalEntryComponent.new(post:, first: index.zero?)
 
     - if @pagy.pages > 1
       nav.jn-pager aria-label=t('journal.index.title')
         - if @pagy.previous
-          = link_to journal_path(page: @pagy.previous, order: @order, tag_id: @active_tag&.id),
+          = link_to journal_path(page: @pagy.previous, order: @order, tag_id: journal_tags_param(@active_tags)),
             class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') } do
             span aria-hidden="true" ←
         span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"
         - if @pagy.next
-          = link_to journal_path(page: @pagy.next, order: @order, tag_id: @active_tag&.id),
+          = link_to journal_path(page: @pagy.next, order: @order, tag_id: journal_tags_param(@active_tags)),
             class: 'jn-pager__step', aria: { label: t('journal.index.pager.next') } do
             span aria-hidden="true" →
   - else
     p.jn-empty
-      - if @active_tag
-        = t('journal.index.empty', tag: @active_tag.title)
+      - if @active_tags.one?
+        = t('journal.index.empty', tag: @active_tags.first.title)
+        = ' '
+        = link_to t('journal.index.all'), journal_path(order: @order), class: 'hover-link'
+      - elsif @active_tags.many?
+        = t('journal.index.empty_many', tags: @active_tags.map { |tag| "##{tag.title}" }.join(' + '))
         = ' '
         = link_to t('journal.index.all'), journal_path(order: @order), class: 'hover-link'
       - else

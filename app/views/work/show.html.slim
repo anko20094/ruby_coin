@@ -13,7 +13,7 @@ article.wk-case data-controller="track-jump"
         span aria-hidden="true" ←
         = " #{t('work.case.back')}"
       = " · #{@case.mark} / #{format('%02d', @total)} · #{@case.sector.upcase} · #{@case.year}"
-    h1.wk-case__title class=('is-long' if title.length > 14)
+    h1.wk-case__title class=('is-long' if title.length > 14) style=view_transition_style('case-title', @case.slug)
       = rich(@case.title)
       = ' '
       span.wk-case__title-mark= @case.mark
@@ -30,67 +30,112 @@ article.wk-case data-controller="track-jump"
 
   section.wk-case__strip
     .wk-metrics
-      / Each figure is a button that copies "2.14M — users across 2,488 chats". Recruiters
-      / retype these into notes and messages by hand; this is the cheapest thing on the page
-      / and the one most likely to be used.
+      / Each figure is a button that copies "<value> — <label>": recruiters retype these into
+      / notes and messages by hand.
       - @case.metrics.each do |metric|
         / The accessible name says what pressing it does; the figure itself is the visible label.
         button.wk-metric[type="button" data-controller="copy" data-action="copy#copy"
                          data-copy-text-value="#{plain(metric[:value])} — #{plain(metric[:label])}"
                          data-copy-done-value=t('work.case.copied')
                          aria-label="#{t('work.case.copy')}: #{plain(metric[:value])} — #{plain(metric[:label])}"]
-          .wk-metric__value.num= rich(metric[:value], links: false)
+          .wk-metric__value.num data-controller="count-up"= rich(metric[:value], links: false)
           .wk-metric__label= rich(metric[:label], links: false)
           span.wk-metric__flash[aria-live="polite" data-copy-target="flash"]
 
-  section.wk-case__plain
-    = render TrackTagComponent.new(label: t('work.case.plain'), tone: :ruby)
-    h2.wk-case__heading= rich(@case.plain_heading)
-    .wk-case__columns
-      .wk-prose
-        - @case.plain_body.each do |paragraph|
-          p= rich(paragraph)
-      aside.wk-case__panels
-        .wk-panel.wk-panel--mine
-          h3.wk-panel__label.is-ruby= t('work.case.mine')
-          ul.wk-mine
-            - @case.mine.each do |item|
-              li.wk-mine__item= rich(item)
-        .wk-panel.wk-panel--facts
-          h3.wk-panel__label= t('work.case.facts')
-          div= "#{t('work.case.status')} · #{@case.status}"
-          .wk-panel__label= t('work.case.stack')
-          .rc-chips
-            - @case.stack.each do |item|
-              span.rc-chip.rc-chip--sm= item
+  / The two tracks, in one frame so the rail beside them can stick for as long as they last.
+  .wk-case__body
+    section#plain.wk-case__plain
+      = render TrackTagComponent.new(label: t('work.case.plain'), tone: :ruby)
+      h2.wk-case__heading= rich(@case.plain_heading)
+      .wk-case__columns
+        .wk-prose
+          - @case.plain_body.each do |paragraph|
+            p= rich(paragraph)
+        aside.wk-case__panels
+          .wk-panel.wk-panel--mine
+            h3.wk-panel__label.is-ruby= t('work.case.mine')
+            ul.wk-mine
+              - @case.mine.each do |item|
+                li.wk-mine__item= rich(item)
+          .wk-panel.wk-panel--facts
+            h3.wk-panel__label= t('work.case.facts')
+            div= "#{t('work.case.status')} · #{@case.status}"
+            .wk-panel__label= t('work.case.stack')
+            .rc-chips
+              - @case.stack.each do |item|
+                span.rc-chip.rc-chip--sm= item
 
-  section#engineers.wk-case__band tabindex="-1"
-    .wk-case__band-inner
-      = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
-      h2.wk-case__heading.is-small= rich(@case.engineering_heading)
-      p.wk-case__sub= rich(@case.engineering_sub)
-      .wk-cards
-        - @case.engineering_items.each do |item|
-          .wk-card
-            h3.wk-card__title= rich(item[:title])
-            .wk-card__body= rich(item[:body])
-      .wk-quality
-        - @case.quality.each do |metric|
-          .wk-quality__cell
-            .wk-quality__value.num= rich(metric[:value])
-            .wk-quality__label= rich(metric[:label])
-      .wk-case__scope= rich(@case.scope_note)
+    section#engineers.wk-case__band tabindex="-1"
+      .wk-case__band-inner
+        = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
+        h2.wk-case__heading.is-small= rich(@case.engineering_heading)
+        p.wk-case__sub= rich(@case.engineering_sub)
+        .wk-cards
+          - @case.engineering_items.each do |item|
+            .wk-card
+              h3.wk-card__title= rich(item[:title])
+              .wk-card__body= rich(item[:body])
+        .wk-quality
+          - @case.quality.each do |metric|
+            .wk-quality__cell
+              .wk-quality__value.num data-controller="count-up"= rich(metric[:value])
+              .wk-quality__label= rich(metric[:label])
+        .wk-case__scope= rich(@case.scope_note)
+
+    / Wide screens only: the figures and the way round the page, pinned beside the two tracks
+    / (case_rail_controller). The figures are a quiet copy of the strip above and stay hidden
+    / until the strip has scrolled away, so the same numbers are never on screen twice; no
+    / count-up here, the strip already did that.
+    aside.wk-rail[aria-label=t('work.case.rail.label') data-controller="case-rail"]
+      .wk-rail__inner
+        dl.wk-rail__metrics[hidden=true aria-hidden="true" data-case-rail-target="metrics"]
+          - @case.metrics.each do |metric|
+            .wk-rail__metric
+              dt.wk-rail__label= rich(metric[:label], links: false)
+              dd.wk-rail__value.num= rich(metric[:value], links: false)
+        nav.wk-rail__toc aria-label=t('work.case.rail.contents')
+          .wk-rail__heading= t('work.case.rail.contents')
+          ol.wk-rail__list
+            - case_sections(team: @team.any?).each do |anchor, label|
+              li
+                a.wk-rail__link href="##{anchor}" data-case-rail-target="link"= label
 
   - if @team.any?
-    = render 'work/team', team: @team, slug: @case.slug
+    = render CaseTeamComponent.new(team: @team, slug: @case.slug)
+
+  / Journal entries whose tags name this case's stack (Cases::Topics). Drawn only when there is
+  / one: a heading over nothing would promise a connection that is not there. The tags that made
+  / the match are in ruby, and the one most of them share leads on to the rest of the journal.
+  - if @topic_posts.any?
+    section.wk-case__journal.wk-entries
+      .wk-entries__head
+        = render TrackTagComponent.new(label: t('work.case.journal'), tone: :soft, heading: :h2)
+        - if @lead_tag
+          = link_to journal_path(tag_id: @lead_tag.id), class: 'wk-entries__all' do
+            = "#{t('work.case.journal_all', tag: @lead_tag.title)} "
+            span aria-hidden="true" →
+      .wk-entries__row
+        - @topic_posts.each do |post|
+          - shared = @shared_tags.fetch(post.id, [])
+          = link_to post_path(post), class: 'wk-entry' do
+            span.wk-entry__thumb
+              = render PostCoverComponent.new(post:, uid: "case-entry-#{post.id}")
+            span.wk-entry__body
+              span.wk-entry__meta
+                span= post.entry_label
+                span= post.created_at.strftime('%Y·%m·%d')
+              h3.wk-entry__title= post.title
+            span.wk-entry__tags
+              - (shared | post.tags).first(4).each do |tag|
+                span class=(shared.include?(tag) ? 'wk-entry__tag is-shared' : 'wk-entry__tag') = "##{tag.title}"
 
   / The page whose job is to convince someone ended at "here is the next case". A reader who
   / has just read 2,000 words of evidence should not have to go looking for the way to say so.
-  section.wk-case__cta
+  section#contact.wk-case__cta
     p.wk-case__cta-line= t('work.case.cta')
     .wk-case__cta-links
       = link_to t('work.case.cta_contact'), contact_path, class: 'rc-button rc-button--primary'
-      - email = CVProfile.current.contact_rows.find { |key, _, _| key == 'email' }
+      - email = Team.owner_cv.contact_rows.find { |key, _, _| key == 'email' }
       - if email
         = link_to email[1], email[2], class: 'rc-button'
 
