@@ -1,7 +1,15 @@
 name: CI
 
+# Every pull request, and master after a merge. A push to a branch with an open PR is covered by
+# the pull_request run, so branches are not built twice.
 on:
   push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint:
@@ -29,7 +37,6 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    needs: lint
     services:
       postgres:
         image: postgres:14.10
@@ -54,10 +61,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      # Node 22 is the active LTS; sass needs 20.19 or newer.
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'yarn'
 
       - name: Setup Ruby
@@ -66,6 +74,10 @@ jobs:
           ruby-version: 3.4.9
           bundler-cache: true
 
+      # The uploader and seed specs skip themselves without ImageMagick; CI should run them.
+      - name: Ensure ImageMagick
+        run: command -v magick || command -v convert || (sudo apt-get update && sudo apt-get install -y imagemagick)
+
       - name: Install JS dependencies
         run: yarn install
 
@@ -73,10 +85,46 @@ jobs:
         run: bundle exec rails assets:precompile
 
       - name: Set up Database
-        run: |
-          bundle exec rails db:create
-          bundle exec rails db:schema:load
-          bundle exec rails db:migrate
+        run: bundle exec rails db:create db:schema:load
 
       - name: Run RSpec tests
         run: bundle exec rspec
+
+  migrations:
+    name: Migrations reproduce schema.rb
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14.10
+        env:
+          POSTGRES_USER: dev
+          POSTGRES_PASSWORD: dev
+          POSTGRES_DB: ruby_coin_test
+        ports:
+          - 5432:5432
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://dev:dev@localhost:5432/ruby_coin_test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.9
+          bundler-cache: true
+
+      - name: Migrate an empty database
+        run: bundle exec rails db:drop db:create db:migrate
+
+      - name: Compare with the committed schema
+        run: git diff --exit-code db/schema.rb

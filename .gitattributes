@@ -1,7 +1,19 @@
 # See https://git-scm.com/docs/gitattributes for more about git attribute files.
 
-# Mark the database schema as having been generated.
-db/schema.rb linguist-generated
+# Generated: the schema by db:migrate, the share cards by `rake og:cards`.
+db/schema.rb linguist-generated=true
+public/og/*.png linguist-generated=true
+public/og/cards.json linguist-generated=true
 
-# Mark any vendored files as having been vendored.
+# Vendored: the pinned Yarn release (yarnPath in .yarnrc.yml) is not ours to diff.
 vendor/* linguist-vendored
+.yarn/releases/** linguist-vendored=true -diff
+
+# Binary, never normalised or diffed as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff2 binary
+*.woff binary
