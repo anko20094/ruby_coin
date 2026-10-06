@@ -8,18 +8,41 @@
 // with a different Telegram handle, a different copyright holder and a dead YouTube link.
 // One layout now, one identity, one set of type.
 .au-page {
+  display: grid;
+  place-items: center;
+  padding: calc(var(--nav-clear) + 48px) var(--page-pad) clamp(80px, 10vw, 140px);
+}
+
+.au-page__glow {
+  --glow-y: -200px;
+  --glow-h: 1000px;
+}
+
+.au-page__rings {
+  left: 50%;
+  top: 46%;
+  width: 1000px;
+  height: 1000px;
+  max-width: 220vw;
+  transform: translate(-50%, -50%);
+}
+
+// A sheet of paper on the scene.
+.au-card {
+  width: 100%;
   max-width: 480px;
-  margin: 0 auto;
-  padding: 80px var(--page-pad) 120px;
+  padding: clamp(28px, 4vw, 44px);
+  border-radius: 24px;
+  box-shadow: 0 40px 90px -30px oklch(0% 0 0 / 0.75), 0 0 0 1px oklch(58% 0.22 18 / 0.18);
 }
 
 .au-page__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 52px;
-  line-height: 1.06;
+  font-size: clamp(38px, 4vw, 52px);
+  line-height: 1.04;
   letter-spacing: -0.03em;
-  margin: 0 0 32px;
+  margin: 0 0 30px;
 }
 
 .au-form {
@@ -37,10 +60,8 @@
 }
 
 .au-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--ink-soft);
 }
 
@@ -51,22 +72,24 @@
 
 .au-input {
   width: 100%;
+  min-height: 50px;
+  padding: 0 16px;
   font-family: var(--font-body);
   font-size: 17px;
-  padding: 9px 2px;
   color: var(--ink);
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--ink-mute);
+  background: var(--paper);
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  border-radius: 14px;
+  transition: border-color 150ms, box-shadow 150ms;
 
-  &:focus {
-    outline: none;
-    border-bottom-color: var(--ruby);
-  }
+  &:hover { border-color: color-mix(in oklab, var(--ink) 32%, transparent); }
 
+  // A field is focus-visible whenever it has focus: its own edge turns ruby with a soft ring.
+  &:focus,
   &:focus-visible {
-    outline: 2px solid var(--ruby);
-    outline-offset: 3px;
+    outline: none;
+    border-color: var(--ruby);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ruby) 22%, transparent);
   }
 
   // Chrome paints autofilled fields light blue; keep them on the page's paper like the rest.
@@ -86,12 +109,12 @@
   width: 100%;
 }
 
-.au-input--with-reveal { padding-right: 44px; }
+.au-input--with-reveal { padding-right: 52px; }
 
 .au-reveal {
   position: absolute;
   top: 50%;
-  right: 0;
+  right: 3px;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
@@ -110,7 +133,7 @@
   &:focus-visible {
     outline: 2px solid var(--ruby);
     outline-offset: -4px;
-    border-radius: var(--radius-chip-sm);
+    border-radius: 10px;
   }
 }
 
@@ -153,7 +176,7 @@
   padding: 12px 16px;
   border: 1px solid var(--ruby);
   border-left-width: 3px;
-  border-radius: var(--radius-chip);
+  border-radius: 12px;
   background: var(--ruby-mute);
   font-size: 15px;
 
@@ -161,13 +184,16 @@
 }
 
 .au-aside {
-  margin-top: 28px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  margin-top: 26px;
+  font-size: 15px;
+
+  a { color: var(--ruby); }
 }
 
 @include bp.below(sm) {
-  .au-page { padding: 48px 20px 80px; }
+  .au-page { padding-inline: 12px; }
+}
 
-  .au-page__title { font-size: 38px; }
+@media (prefers-reduced-motion: reduce) {
+  .au-input { transition: none; }
 }

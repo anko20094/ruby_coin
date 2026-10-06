@@ -7,8 +7,8 @@ import { Controller } from "@hotwired/stimulus"
 // moves into the drawer on open and back to the button on close, and the page behind does not
 // scroll while it is open.
 
-// $nav-drawer-at in theme/_chrome.scss.
-const DRAWER = "(max-width: 760px)"
+// `nav` in theme/_breakpoints.scss.
+const DRAWER = "(max-width: 920px)"
 
 export default class extends Controller {
   static targets = ["toggle", "drawer"]

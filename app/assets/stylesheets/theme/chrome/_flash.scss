@@ -1,5 +1,7 @@
 @use '../controls';
 @use '../flash';
+@use '../surfaces';
+@use '../breakpoints' as bp;
 
 // The flash region and the skip link. Neither existed on the redesign: a redirect that
 // carried a message arrived silent, and the first Tab on every page landed inside the nav
@@ -11,22 +13,88 @@
   left: 12px;
   top: -60px;
   z-index: 100;
-  padding: 10px 16px;
-  background: var(--ink);
-  color: var(--paper);
-  border-radius: var(--radius-button);
+  padding: 10px 18px;
+  background: var(--ruby-fire);
+  color: #fff;
+  border-radius: var(--radius-pill);
   font-size: 14px;
+  font-weight: 500;
   transition: top 120ms;
 
-  &:focus-visible { top: 12px; }
+  &:focus-visible {
+    top: 12px;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
 }
 
+// Messages stack in the top-right corner under the nav pill, their right edge on the pill's, on
+// the scene's colours so they read over a dark head and a light band alike — and arrive without
+// pushing the page down. On a phone they take the width under the nav. Only the site's: the
+// admin places its own (.mg-flash).
 .rc-flash {
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 0 var(--page-pad);
+  @include surfaces.scene;
+
+  position: fixed;
+  z-index: 45;
+  // The nav pill is 58px tall at 14px from the top, and 1120px wide at most.
+  top: 84px;
+  right: max(16px, calc((100% - 1120px) / 2));
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: min(380px, calc(100% - 32px));
+  color: var(--ink);
 
   &:empty { display: none; }
+
+  .rc-flash__item {
+    margin: 0;
+    border-color: var(--surface-line);
+    border-radius: 16px;
+    box-shadow: 0 18px 44px -16px oklch(0% 0 0 / 0.6);
+    animation: rc-flash-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1);
+
+    &.is-leaving { transform: translateX(24px); }
+  }
+
+  .rc-flash__item--notice { border-left-color: var(--ink-soft); }
+
+  // The narrower nav pill: 10px in from each side, 54px tall at 10px from the top.
+  @include bp.below(nav) {
+    top: 74px;
+    right: 10px;
+  }
+
+  @include bp.below(sm) {
+    left: 10px;
+    width: auto;
+
+    .rc-flash__item {
+      animation-name: rc-flash-drop;
+
+      &.is-leaving { transform: translateY(-8px); }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rc-flash__item { animation: none; }
+  }
+}
+
+@keyframes rc-flash-in {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+
+@keyframes rc-flash-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

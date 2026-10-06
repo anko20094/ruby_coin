@@ -14,7 +14,7 @@ class GemComponent < ViewComponent::Base
 
   # Shades of the one stone, as offsets on the brand ruby: hue (degrees), lightness (points)
   # and a chroma factor. Small on purpose — a case or a post gets its own stone, and all of them
-  # still have to read as rubies. ruby_controller.js carries the same table.
+  # still have to read as rubies. ruby_controller.js reads them from the markup (#ruby_data).
   TONES = [
     [0, 0, 1.0],     # the brand ruby
     [-12, 2, 1.0],   # raspberry
@@ -45,11 +45,19 @@ class GemComponent < ViewComponent::Base
   def glow? = %i[hero anchor].include?(variant)
   def light = LIGHTS.fetch(variant)
 
-  def glow_colour
-    return 'oklch(58% 0.22 18)' if tone.zero?
+  def glow_colour = glow_colour_of(tone)
 
-    hue_shift, lightness_shift, chroma_factor = TONES.fetch(tone)
-    format_oklch(58 + lightness_shift, 0.22 * chroma_factor, 18 + hue_shift)
+  # What ruby_controller paints with, so the shades live in TONES alone. The hero changes shade
+  # on a click and gets the whole table with each shade's glow; every other cut keeps its own
+  # shade, handed over as a table of one.
+  def ruby_data
+    return {} unless interactive?
+    return { 'ruby-tones-value' => [TONES.fetch(tone)].to_json } unless variant == :hero
+
+    {
+      'ruby-tones-value' => TONES.to_json, 'ruby-tone-value' => (tone if tone.positive?),
+      'ruby-glows-value' => TONES.each_index.map { |index| glow_colour_of(index) }.to_json
+    }.compact
   end
 
   # The size is a ceiling, not a fixed width: a 400px hero gem inside a one-column grid used to
@@ -143,6 +151,13 @@ class GemComponent < ViewComponent::Base
   def brightness_at(centroid)
     distance = Math.hypot(centroid[0] - light[0], centroid[1] - light[1])
     (1 - [1, distance / 70.0].min)**2
+  end
+
+  def glow_colour_of(index)
+    return 'oklch(58% 0.22 18)' if index.zero?
+
+    hue_shift, lightness_shift, chroma_factor = TONES.fetch(index)
+    format_oklch(58 + lightness_shift, 0.22 * chroma_factor, 18 + hue_shift)
   end
 
   # Deep blood in shadow, bright fire in the light, hue drifting warmer as it darkens.

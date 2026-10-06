@@ -41,7 +41,7 @@ describe GemComponent, type: :component do
     it 'is driven by the controller but carries no glow' do
       render_inline(described_class.new(uid: 'spec', variant: :badge, tone: 2))
 
-      expect(page).to have_css('[data-controller="ruby"][data-ruby-variant-value="badge"][data-ruby-tone-value="2"]')
+      expect(page).to have_css('[data-controller="ruby"][data-ruby-variant-value="badge"]')
       expect(page).to have_css('[data-ruby-target="star"]')
       expect(page).to have_no_css('filter')
     end
@@ -113,6 +113,26 @@ describe GemComponent, type: :component do
       render_inline(described_class.new(uid: 'spec', variant: :hero))
       expect(page).to have_no_css('[data-ruby-tone-value]')
       expect(page).to have_css('polygon[fill="oklch(58% 0.22 18)"][data-ruby-target="glow"]')
+    end
+
+    # The controller has no table of its own: what it paints with is what TONES says.
+    it 'hands the hero the whole table and a glow per shade, so a click can move it on' do
+      render_inline(described_class.new(uid: 'spec', variant: :hero))
+      svg = page.find('svg')
+
+      expect(JSON.parse(svg['data-ruby-tones-value'])).to eq(described_class::TONES)
+      expect(JSON.parse(svg['data-ruby-glows-value']))
+        .to eq(described_class::TONES.each_index.map { |tone| described_class.new(uid: 'x', tone:).glow_colour })
+    end
+
+    it 'hands every other interactive cut its own shade alone, and the static logo nothing' do
+      render_inline(described_class.new(uid: 'spec', variant: :badge, tone: 3))
+      svg = page.find('svg')
+      expect(JSON.parse(svg['data-ruby-tones-value'])).to eq([described_class::TONES[3]])
+      expect(svg['data-ruby-glows-value']).to be_nil
+
+      render_inline(described_class.new(uid: 'spec', tone: 3))
+      expect(page).to have_no_css('[data-ruby-tones-value]')
     end
   end
 

@@ -18,5 +18,5 @@
       .cv-row__metric
         - headline = kase.headline_metric
         - if headline.present?
-          .cv-row__metric-value.num= rich(headline[:value], links: false)
+          .cv-row__metric-value.rc-figure= figure(headline[:value])
           .cv-row__metric-label= rich(headline[:label], links: false)

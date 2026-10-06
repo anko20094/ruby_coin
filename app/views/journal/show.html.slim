@@ -4,75 +4,84 @@
 
 = render 'shared/reading_progress'
 
-article.jn-post
-  .jn-post__breadcrumb
-    = link_to journal_path, class: 'jn-post__back' do
-      span aria-hidden="true" ←
-      = " #{t('journal.post.back')}"
-    - if @post.entry_label.present?
-      = " · #{@post.entry_label}"
-    = " · #{@post.created_at.strftime('%Y·%m·%d')}"
+article.jn-post.jn-post--page
+  header.jn-post__head.rc-scene
+    .rc-glow.jn-post__glow
+    .rc-wrap.rc-wrap--read
+      p.rc-eyebrow.jn-post__breadcrumb
+        = link_to journal_path, class: 'rc-eyebrow__link jn-post__back' do
+          span aria-hidden="true" ←
+          = t('journal.post.back')
+        span= [@post.entry_label.presence, @post.created_at.strftime('%Y·%m·%d')].compact.join(' · ')
 
-  h1.jn-post__title style=view_transition_style('post-title', @post.id)
-    = @post.title
-  .jn-post__byline= journal_byline(@post)
-  / Only where the tags point at one or two projects; see Cases::Topics.
-  - if @topic_cases.any?
-    .jn-post__project
-      = "#{t('journal.post.project', count: @topic_cases.size)} · "
-      = safe_join(@topic_cases.map { |kase| link_to rich(kase.title, links: false), work_case_path(slug: kase.slug), class: 'hover-link' }, ', ')
+      h1.jn-post__title style=view_transition_style('post-title', @post.id)
+        = @post.title
+      .jn-post__byline= journal_byline(@post)
+      / Only where the tags point at one or two projects; see Cases::Topics.
+      - if @topic_cases.any?
+        .jn-post__project
+          = "#{t('journal.post.project', count: @topic_cases.size)} · "
+          = safe_join(@topic_cases.map { |kase| link_to rich(kase.title, links: false), work_case_path(slug: kase.slug), class: 'hover-link' }, ', ')
 
-  - if @post.photo.present?
-    / The first image on the page, so it is fetched first; the sizes are the version's, and
-    / the CSS crops it, so they only reserve the box.
-    .jn-post__cover
-      = image_tag @post.photo.medium.url, alt: '', loading: 'eager', fetchpriority: 'high',
-        width: PhotoUploader::MEDIUM.first, height: PhotoUploader::MEDIUM.last
+  / The long read stays on paper, at the measure, in the prose styles the editor shares.
+  .jn-post__paper.rc-band
+    .rc-wrap.rc-wrap--read
+      - if @post.photo.present?
+        / The first image on the page, so it is fetched first; the sizes are the version's, and
+        / the CSS crops it, so they only reserve the box.
+        .jn-post__cover
+          = image_tag @post.photo.medium.url, alt: '', loading: 'eager', fetchpriority: 'high',
+            width: PhotoUploader::MEDIUM.first, height: PhotoUploader::MEDIUM.last
 
-  .jn-body
-    p.jn-body__lede= @post.subtitle
-    = journal_body(@post)
+      .jn-body
+        p.jn-body__lede= @post.subtitle
+        = journal_body(@post)
 
-  / The entries either side, by series number. The journal is a numbered series and had no way
-  / to read it as one: every entry's only exits were back to the index and a tag-similarity row.
-  - if @previous_entry || @next_entry
-    nav.jn-steps aria-label=t('journal.post.series')
-      - if @previous_entry
-        = link_to post_path(@previous_entry), class: 'jn-step hover-row' do
-          .jn-step__thumb
-            = render PostCoverComponent.new(post: @previous_entry, uid: 'step-previous')
-          .jn-step__text
-            .jn-step__eyebrow
-              span aria-hidden="true" ←
-              = " #{t('journal.post.previous')} #{@previous_entry.entry_label}"
-            .jn-step__title= @previous_entry.title
+      footer.jn-post__footer
+        = link_to journal_path, class: 'jn-post__back' do
+          span aria-hidden="true" ←
+          = " #{t('journal.post.all_entries')}"
+        span.jn-post__number= @post.entry_label
 
-      - if @next_entry
-        = link_to post_path(@next_entry), class: 'jn-step jn-step--next hover-row' do
-          .jn-step__thumb
-            = render PostCoverComponent.new(post: @next_entry, uid: 'step-next')
-          .jn-step__text
-            .jn-step__eyebrow
-              = "#{t('journal.post.next')} #{@next_entry.entry_label} "
-              span aria-hidden="true" →
-            .jn-step__title= @next_entry.title
+  / The way on: the entries either side, then the ones like it.
+  - if @previous_entry || @next_entry || @related.any?
+    .jn-post__after.rc-scene
+      .rc-wrap.jn-post__after-inner
+        / The entries either side, by series number. The journal is a numbered series and had no
+        / way to read it as one: every entry's only exits were back to the index and a
+        / tag-similarity row.
+        - if @previous_entry || @next_entry
+          nav.jn-steps aria-label=t('journal.post.series')
+            - if @previous_entry
+              = link_to post_path(@previous_entry), class: 'jn-step rc-panel', data: { glow_follow: '' } do
+                .jn-step__thumb
+                  = render PostCoverComponent.new(post: @previous_entry, uid: 'step-previous')
+                .jn-step__text
+                  .jn-step__eyebrow
+                    span aria-hidden="true" ←
+                    = " #{t('journal.post.previous')} #{@previous_entry.entry_label}"
+                  .jn-step__title= @previous_entry.title
 
-  footer.jn-post__footer
-    = link_to journal_path, class: 'jn-post__back' do
-      span aria-hidden="true" ←
-      = " #{t('journal.post.all_entries')}"
-    span.jn-post__number= @post.entry_label
+            - if @next_entry
+              = link_to post_path(@next_entry), class: 'jn-step jn-step--next rc-panel', data: { glow_follow: '' } do
+                .jn-step__thumb
+                  = render PostCoverComponent.new(post: @next_entry, uid: 'step-next')
+                .jn-step__text
+                  .jn-step__eyebrow
+                    = "#{t('journal.post.next')} #{@next_entry.entry_label} "
+                    span aria-hidden="true" →
+                  .jn-step__title= @next_entry.title
 
-  - if @related.any?
-    section.jn-related
-      = render TrackTagComponent.new(label: t('journal.post.related'), tone: :soft, heading: :h2)
-      .jn-related__row
-        - @related.each do |post|
-          = link_to post_path(post), class: 'jn-related__card' do
-            / The slot is always drawn: CarrierWave reports a cover as absent when its file is
-            / missing, and one card without one should not shift the row.
-            .jn-related__cover
-              = render PostCoverComponent.new(post:, uid: "related-#{post.id}")
-            .jn-related__date= post.created_at.strftime('%Y·%m·%d')
-            h3.jn-related__title= post.title
-            .jn-related__tags= post.tags.first(3).map { |tag| "##{tag.title}" }.join(' ')
+        - if @related.any?
+          section.jn-related
+            = render TrackTagComponent.new(label: t('journal.post.related'), tone: :soft, heading: :h2)
+            .jn-related__row
+              - @related.each do |post|
+                = link_to post_path(post), class: 'jn-related__card', data: { reveal: '' } do
+                  / The slot is always drawn: CarrierWave reports a cover as absent when its file is
+                  / missing, and one card without one should not shift the row.
+                  .jn-related__cover
+                    = render PostCoverComponent.new(post:, uid: "related-#{post.id}")
+                  .jn-related__date= post.created_at.strftime('%Y·%m·%d')
+                  h3.jn-related__title= post.title
+                  .jn-related__tags= post.tags.first(3).map { |tag| "##{tag.title}" }.join(' ')

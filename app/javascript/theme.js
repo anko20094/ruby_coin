@@ -21,7 +21,10 @@ import LiveSearchController from "./theme/live_search_controller";
 import SearchClearController from "./theme/search_clear_controller";
 import GemEggController from "./theme/gem_egg_controller";
 import ListNavController from "./theme/list_nav_controller";
+import JournalFilterController from "./theme/journal_filter_controller";
 import "./theme/view_transitions";
+import "./theme/reveal";
+import "./theme/glow_follow";
 
 // Which modifier the palette hint names: ⌘ on Apple platforms, Ctrl everywhere else.
 const platform = navigator.userAgentData?.platform || navigator.platform || "";
@@ -48,3 +51,4 @@ application.register("live-search", LiveSearchController);
 application.register("search-clear", SearchClearController);
 application.register("gem-egg", GemEggController);
 application.register("list-nav", ListNavController);
+application.register("journal-filter", JournalFilterController);

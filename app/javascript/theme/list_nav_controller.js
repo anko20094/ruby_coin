@@ -22,11 +22,15 @@ export default class extends Controller {
   connect() {
     this.onKey = (event) => this.key(event)
     window.addEventListener("keydown", this.onKey)
-    this.hintTargets.forEach((hint) => { hint.hidden = false })
   }
 
   disconnect() {
     window.removeEventListener("keydown", this.onKey)
+  }
+
+  // The journal's filter swaps the hint in with the list, drawn hidden like the first one.
+  hintTargetConnected(hint) {
+    hint.hidden = false
   }
 
   key(event) {
@@ -42,10 +46,15 @@ export default class extends Controller {
       this.search()
     } else if (event.key === "Escape" && this.current) {
       this.release()
-    } else if (event.key === "Enter" && this.current && !this.element.contains(document.activeElement)) {
-      // Focus went elsewhere (a click on the page) but the row is still marked: open that one.
+    } else if (event.key === "Enter" && this.current && this.unfocused) {
+      // A click on blank page dropped focus to the body, but the row is still marked: open that
+      // one. Focus on anything else — a link, a button, the row itself — keeps its own Enter.
       event.preventDefault()
       this.linkIn(this.current)?.click()
+    } else if (event.key === "Tab" && this.current) {
+      // Tabbing on moves focus off the mark, so the mark goes too.
+      this.current.classList.remove("is-keyed")
+      this.current = null
     }
   }
 
@@ -90,6 +99,10 @@ export default class extends Controller {
 
   linkIn(item) {
     return item.matches("a[href]") ? item : item.querySelector("a[href]")
+  }
+
+  get unfocused() {
+    return !document.activeElement || document.activeElement === document.body
   }
 
   get items() {

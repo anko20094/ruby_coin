@@ -27,20 +27,23 @@ class Cases::Topics
   # Each word of an item, and each "·"-separated part of it squashed, so "Active Record" and
   # "pg_search · Mobility" both reach the keys a tag would be written as.
   def keys_for(kase)
-    Array(kase.stack).flat_map { |item| item_keys(item) }.to_set - shared_by_all
+    @keys_for ||= {}.compare_by_identity
+    @keys_for[kase] ||= Array(kase.stack).flat_map { |item| item_keys(item) }.to_set - shared_by_all
   end
 
-  # The readable entries whose tags name this case's stack, most overlapping first.
+  # The readable entries whose tags name this case's stack, most overlapping first — exactly
+  # those whose own page would point back here (#cases_for), so an entry shared too widely to be
+  # about one project is listed under none of them.
   def posts_for(kase, locale: I18n.locale)
     tag_ids = tags_matching(keys_for(kase)).map(&:id)
     return Post.none if tag_ids.empty?
 
-    overlap = Post.joins(:tags).where(tags: { id: tag_ids }).group('posts.id')
-                  .select('posts.id AS post_id, COUNT(*) AS tag_count')
-    Post.active.translated_in(locale)
-        .joins("INNER JOIN (#{overlap.to_sql}) overlap ON overlap.post_id = posts.id")
-        .reorder(Arel.sql('overlap.tag_count DESC, posts.created_at DESC'))
-        .limit(POSTS_PER_CASE)
+    candidates = Post.active.translated_in(locale).where(id: Post.joins(:tags).where(tags: { id: tag_ids }).select(:id))
+                     .includes(:tags)
+    ids = candidates.select { |post| cases_for(post).include?(kase) }
+                    .sort_by { |post| [-shared_tags(post, kase).size, -post.created_at.to_f] }
+                    .first(POSTS_PER_CASE).map(&:id)
+    ids.empty? ? Post.none : Post.where(id: ids).in_order_of(:id, ids)
   end
 
   # The tags of this entry that tied it to the case.

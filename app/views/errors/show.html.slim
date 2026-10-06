@@ -2,18 +2,22 @@
 - content_for :title, full_title(t("error_pages.#{key}.title"))
 - page_meta description: t("error_pages.#{key}.lede")
 
-.er-page
-  .er-code.num= error_status
-  h1.er-title= t("error_pages.#{key}.title")
-  p.er-lede= t("error_pages.#{key}.lede")
+.er-page.rc-scene
+  .rc-glow.er-page__glow
+  = render HexRingsComponent.new(css: 'er-page__rings')
+  .rc-wrap.er-page__inner
+    = render GemComponent.new(uid: 'error', variant: :anchor, size: 120)
+    .er-code= error_status
+    h1.er-title= t("error_pages.#{key}.title")
+    p.er-lede= t("error_pages.#{key}.lede")
 
-  .er-actions
-    = link_to t('error_pages.actions.work'), work_path, class: 'rc-button rc-button--primary'
-    = link_to t('error_pages.actions.journal'), journal_path, class: 'rc-button'
+    .er-actions
+      = link_to t('error_pages.actions.work'), work_path, class: 'rc-button rc-button--primary'
+      = link_to t('error_pages.actions.journal'), journal_path, class: 'rc-button'
 
-  .er-hint
-    span.er-hint__keys
-      kbd.rc-key-cmd ⌘
-      kbd.rc-key-ctrl Ctrl
-      kbd K
-    = " #{t('error_pages.hint')}"
+    .er-hint
+      span.er-hint__keys
+        kbd.rc-key-cmd ⌘
+        kbd.rc-key-ctrl Ctrl
+        kbd K
+      = " #{t('error_pages.hint')}"

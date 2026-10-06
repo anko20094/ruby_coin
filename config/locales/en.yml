@@ -29,24 +29,41 @@ en:
       meta_description: "RubyCoin is a Rails studio: we build Ruby on Rails products and run them for years. Telegram platforms, proptech and AI services, figures from production."
       tagline: Rails products, built and run for years
       eyebrow: RubyCoin · Rails studio · Kyiv
+      hero_pill: "Rails studio · Kyiv · since %{year}"
       headline_lead: We build Rails products,
       headline_join: then
       headline_mark: run them for years
       lede_1: "%{count} of them are in this portfolio: Telegram products with more than 2.8M users, and a US proptech platform with eight years of history."
       lede_2: Every figure on every project page is checked against production rather than memory, including the outage that lasted eleven hours.
-      work_with_us: work with us
-      see_work: see the projects
-      stats: "%{products} · people on the team: %{people} · shipping since %{year}"
-      gem_hint: SCROLL OR DRAG AND IT TURNS · CLICK FOR ANOTHER SHADE
+      work_with_us: Work with us
+      see_work: See the projects
+      gem_hint: Scroll or drag and it turns. Click for another shade.
       gem_button: The ruby — press for another shade
-      latest: latest entry
-      read_full: keep reading
-      recent_work: recent projects
-      all_work: all projects
-      crew: the team today
-      crew_note: "%{people} on the team · %{humans}"
+      figures:
+        products:
+          one: product in the portfolio
+          other: products in the portfolio
+        people:
+          one: person on the team
+          other: people on the team
+        year: the portfolio’s first project
+        entries:
+          one: entry in the journal
+          other: entries in the journal
+      journal_lead: From the
+      journal_mark: journal
+      all_entries: "All %{entries}"
+      new_entry: New entry
+      read_full: Keep reading
+      work_lead: Recent
+      work_mark: projects
+      all_work: "All %{projects}"
+      read_case: Read the case
+      crew_quote: Every project page names the people who worked on it, and what each of them did.
+      crew_note: "%{people} on the team — %{humans}."
+      crew_all: The whole team
       to_top: Back to the top
-      top: TOP
+      top: Top
   faq:
     who_am_i:
       question1: Who are you and what services do you provide?
@@ -463,56 +480,57 @@ en:
 
   work:
     nav:
-      journal: journal
-      work: projects
-      studio: studio
-      contact: contact
-      menu: menu
+      journal: Journal
+      work: Projects
+      studio: Studio
+      contact: Get in touch
+      menu: Menu
       cv: CV
       cv_title: Curriculum vitae
     footer:
-      journal: journal
-      feed: rss
-      work: all projects
-      team: the team
-      cv: cv
-      contact: contact
+      journal: Journal
+      feed: RSS
+      work: All projects
+      team: The team
+      cv: CV
+      contact: Contact
+      cta_lead: Let’s work
+      cta_mark: together.
     index:
       meta_description: "RubyCoin projects: Telegram platforms, proptech services and AI bots on Rails — what was built, who worked on it, and the figures from production."
-      eyebrow: projects
       title: Projects
       lede: In the order we would put them in front of you. Ordered by hand, not by date — and it changes when the work does.
-      own: OWN
-      you_are_here: YOU ARE HERE
+      own: own
+      you_are_here: you are here
       solo: solo
       toggle: "Description and stack: %{title}"
-      expand_all: expand all
-      collapse_all: collapse all
+      expand_all: Expand all
+      collapse_all: Collapse all
     case:
-      back: PROJECTS
-      plain: in plain words
-      mine: what was mine
-      engineering: for engineers
-      facts: facts
+      back: Projects
+      plain: In plain words
+      mine: What was mine
+      engineering: For engineers
+      facts: Facts
       status: status
-      stack: stack
-      pager: MORE PROJECTS
-      previous: PREVIOUS
-      next: NEXT
-      skip: skip to the engineering
+      stack: Stack
+      pager: More projects
+      previous: Previous
+      next: Next
+      skip: Skip to the engineering
       copied: copied
       rail:
         label: figures and contents
-        contents: contents
-        contact: talk it through
+        contents: Contents
+        contact: Talk it through
       copy: Copy
       cta: Read to the end and want to talk it over?
       cta_contact: Get in touch
-      team: who worked on it
+      team: Who worked on it
       team_solo: Solo — the whole stack
-      open_cv: open CV
-      journal: entries on this topic
-      journal_all: 'every entry tagged #%{tag}'
+      open_cv: Open CV
+      journal: Entries on this topic
+      journal_all: 'Every entry tagged #%{tag}'
 
   # The labels /cv and /team/:person share, because they render the same document.
   profile:
@@ -538,7 +556,6 @@ en:
   cv:
     show:
       meta_description: "CV of a Senior Ruby on Rails engineer: commercial services, own products, stack and projects — figures checked against production, git and trackers."
-      eyebrow: cv
       title: Curriculum vitae
       lede: Commercial services and products of my own. Every figure checked against production, git and trackers — not memory.
       projects: the projects
@@ -554,23 +571,21 @@ en:
       title: Who is here
       lede: Every project page names the people who worked on it and what each of them did — this is the same list from the other direction.
     show:
-      back: TEAM
+      back: Team
       on_case: "on"
 
   studio:
     show:
       meta_description: "RubyCoin is a small Rails studio. The people behind the projects in the portfolio, their CVs, and those who worked with us before."
-      eyebrow: studio
       title: The studio
       lede: A small Rails studio. The team below are the people behind these projects — open a card to see their CV and the projects they worked on. Others worked with us too; they are named at the end.
       cv_link: cv & projects
-      alumni: former members
+      alumni: Former members
       alumni_note: Worked with us and moved on.
 
   contact:
     show:
       meta_description: "Contact RubyCoin about a project, an idea, a question or just Rails. Pick whichever channel suits you — we read every message."
-      eyebrow: contact
       title: Contact
       lede: A project, an idea, a question, or you just want to talk Rails. Pick a channel — we read all of them.
 
@@ -592,10 +607,12 @@ en:
   journal:
     index:
       meta_description: "The RubyCoin journal: notes from building Rails products — stories from projects, code snippets and the things that almost broke us."
-      eyebrow: journal
       entries:
         one: "%{count} entry"
         other: "%{count} entries"
+      shown:
+        one: "%{count} entry in the list"
+        other: "%{count} entries in the list"
       title: Journal
       lede: "Notes from the work: stories from projects, snippets, things that almost broke us. Updated when there is something to say."
       filter: filter
@@ -614,7 +631,6 @@ en:
         previous: previous page
         next: next page
     search:
-      eyebrow: search
       title: Search
       lede: Everything in the journal, by title or by body.
       field: query
@@ -636,13 +652,13 @@ en:
         note: note
         warn: careful
     post:
-      back: journal
-      all_entries: all entries
+      back: Journal
+      all_entries: All entries
       related: related
       project:
         one: project
         other: projects
       series: the series
-      previous: previous
-      next: next
+      previous: Previous
+      next: Next
     minutes: "%{count} min"

@@ -2,4 +2,4 @@
   = image_tag photo_url, alt: '', loading:, width:, height:
 - else
   span.rc-cover-gem
-    = render GemComponent.new(uid: "cover-#{uid}", variant: :badge, tone:)
+    = render GemComponent.new(uid: "cover-#{uid}", variant: gem_variant, tone:)

@@ -33,6 +33,15 @@ RSpec.describe LocalisedJson do
       expect(I18n.with_locale(:uk) { cv.contact_rows }).to eq([%w[пошта пишіть mailto:a@b.c]])
     end
 
+    it 'finds one channel by its English key, in the language being read' do
+      email = [pair('email', 'пошта'), pair('write', 'пишіть'), 'mailto:a@b.c']
+      cv = described_class.new('contact' => [%w[github me https://github.com/me], email])
+
+      expect(I18n.with_locale(:uk) { cv.contact(:email) }).to eq(%w[пишіть mailto:a@b.c])
+      expect(cv.contact('github')).to eq(%w[me https://github.com/me])
+      expect(cv.contact(:phone)).to be_nil
+    end
+
     it 'prints a language pair among the items of a stack group, and lets a bare name through' do
       group = { 'label' => 'Skills', 'items' => ['Rails', pair('merge rights', 'право злиття')] }
       cv = described_class.new('stacks' => [group])

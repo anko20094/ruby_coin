@@ -17,7 +17,7 @@ export default class extends Controller {
   static values = { message: String, still: String };
 
   connect() {
-    this.progress = 0;
+    this.recent = [];
     this.onKey = (event) => this.listen(event);
     this.onShatter = (event) => this.shatter(event.detail?.gem);
     window.addEventListener("keydown", this.onKey);
@@ -33,14 +33,11 @@ export default class extends Controller {
   listen(event) {
     if (event.metaKey || event.ctrlKey || event.altKey || typing(event.target)) return;
 
-    if (event.code === KONAMI[this.progress]) {
-      this.progress += 1;
-    } else {
-      this.progress = event.code === KONAMI[0] ? 1 : 0;
-    }
-    if (this.progress < KONAMI.length) return;
+    // The last ten keys against the code, so a stray extra ↑ before the code still counts.
+    this.recent = [...this.recent, event.code].slice(-KONAMI.length);
+    if (this.recent.join() !== KONAMI.join()) return;
 
-    this.progress = 0;
+    this.recent = [];
     this.shatter(null);
   }
 

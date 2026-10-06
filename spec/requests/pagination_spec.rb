@@ -23,7 +23,7 @@ describe 'the pagers', type: :request do
       get journal_path(locale: 'en')
 
       expect(response).to be_successful
-      expect(pager_hrefs('nav.jn-pager')).to eq([journal_path(locale: 'en', order: 'new', page: 2)])
+      expect(pager_hrefs('nav.jn-pager')).to eq([journal_path(locale: 'en', order: 'new', page: 2, anchor: 'entries')])
     end
 
     it 'offers both neighbours on a page in the middle' do
@@ -31,7 +31,10 @@ describe 'the pagers', type: :request do
 
       expect(response).to be_successful
       expect(pager_hrefs('nav.jn-pager')).to eq(
-        [journal_path(locale: 'en', order: 'new', page: 1), journal_path(locale: 'en', order: 'new', page: 3)]
+        [
+          journal_path(locale: 'en', order: 'new', page: 1, anchor: 'entries'),
+          journal_path(locale: 'en', order: 'new', page: 3, anchor: 'entries')
+        ]
       )
     end
 
@@ -39,7 +42,7 @@ describe 'the pagers', type: :request do
       get journal_path(locale: 'en', page: 3)
 
       expect(response).to be_successful
-      expect(pager_hrefs('nav.jn-pager')).to eq([journal_path(locale: 'en', order: 'new', page: 2)])
+      expect(pager_hrefs('nav.jn-pager')).to eq([journal_path(locale: 'en', order: 'new', page: 2, anchor: 'entries')])
     end
 
     it 'pages the best ordering and a tag filter too' do
@@ -49,7 +52,8 @@ describe 'the pagers', type: :request do
       get journal_path(locale: 'en', order: 'best', tag_id: tag.id, page: 2)
 
       expect(response).to be_successful
-      expect(pager_hrefs('nav.jn-pager')).to include(journal_path(locale: 'en', order: 'best', tag_id: tag.id, page: 3))
+      expect(pager_hrefs('nav.jn-pager'))
+        .to include(journal_path(locale: 'en', order: 'best', tag_id: tag.id, page: 3, anchor: 'entries'))
     end
 
     it 'sends a page past the end to the last one' do

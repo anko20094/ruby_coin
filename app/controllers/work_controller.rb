@@ -18,6 +18,8 @@ class WorkController < ApplicationController
     @case = cases.find { |kase| kase.slug == slug } or raise ActiveRecord::RecordNotFound
     @previous_case, @next_case = @case.neighbours(cases)
     @total = cases.size
+    # The stone keeps the shade its card has on /work and the home page.
+    @tone = cases.index(@case)
     @team = Team.for_case(@case.slug)
     topics = Cases::Topics.new(cases)
     @topic_posts = topics.posts_for(@case).includes(:tags, :translations).to_a

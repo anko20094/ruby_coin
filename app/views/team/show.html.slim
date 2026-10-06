@@ -8,89 +8,93 @@
             description: plain(@person.blurb), links: @person.public_links }
 
 .tm-person
-  .tm-person__crumb
-    = link_to team_path, class: 'hover-link' do
-      span aria-hidden="true" ←
-      = " #{t('team.show.back')}"
-    - if context_case
-      = ' · '
-      = link_to plain(context_case.title).upcase, work_case_path(slug: context_case.slug), class: 'hover-link'
+  header.tm-person__head.rc-scene
+    .rc-glow.tm-person__glow
+    .rc-wrap
+      p.rc-eyebrow.tm-person__crumb
+        = link_to team_path, class: 'rc-eyebrow__link' do
+          span aria-hidden="true" ←
+          = t('team.show.back')
+        - if context_case
+          = link_to plain(context_case.title), work_case_path(slug: context_case.slug), class: 'rc-eyebrow__link'
 
-  h1.tm-person__name
-    = @person.name
-    = ' '
-    span.tm-person__mark ·
-  .tm-person__role
-    = @person.role
-    - if cv&.years.present?
-      = " · #{cv.years}"
+      h1.tm-person__name
+        = @person.name
+        = ' '
+        span.rc-mark ·
+      .tm-person__role
+        = @person.role
+        - if cv&.years.present?
+          = " · #{cv.years}"
 
-  .split-grid
-    .split-main
-      - if @person.placeholder?
-        / A placeholder that stops announcing itself is a lie with good typography.
-        .pf-placeholder= t('profile.placeholder')
+  section.rc-band.tm-person__band
+    .rc-wrap
+      .split-grid
+        .split-main
+          - if @person.placeholder?
+            / A placeholder that stops announcing itself is a lie with good typography.
+            .pf-placeholder= t('profile.placeholder')
 
-      / The project the reader arrived through, pinned above the CV: they came asking what
-      / this person did on it, and the answer must not need scrolling.
-      - if @context
-        section.tm-context
-          .tm-context__head
-            h2.tm-context__on= "#{t('team.show.on_case')} #{plain(context_case.title)}"
-            = link_to work_case_path(slug: context_case.slug), class: 'tm-context__link hover-link' do
-              = "#{t('profile.open_case')} "
-              span aria-hidden="true" →
-          .tm-context__meta
-            = [@context.role, @context.period].compact_blank.join(' · ')
-            - if @context.solo?
-              = " · #{t('profile.solo_project')}"
-          = render Profile::DidComponent.new(lines: @context.did)
+          / The project the reader arrived through, pinned above the CV: they came asking what
+          / this person did on it, and the answer must not need scrolling.
+          - if @context
+            section.tm-context.rc-panel
+              .tm-context__head
+                h2.tm-context__on= "#{t('team.show.on_case')} #{plain(context_case.title)}"
+                = link_to work_case_path(slug: context_case.slug), class: 'tm-context__link hover-link' do
+                  = "#{t('profile.open_case')} "
+                  span aria-hidden="true" →
+              .tm-context__meta
+                = [@context.role, @context.period].compact_blank.join(' · ')
+                - if @context.solo?
+                  = " · #{t('profile.solo_project')}"
+              = render Profile::DidComponent.new(lines: @context.did)
 
-      - if cv
-        = render Profile::SummaryComponent.new(profile: cv)
-        = render Profile::CareerComponent.new(profile: cv)
-        = render Profile::StackComponent.new(profile: cv)
-      - else
-        = render Profile::PendingComponent.new
+          - if cv
+            = render Profile::SummaryComponent.new(profile: cv)
+            = render Profile::CareerComponent.new(profile: cv)
+            = render Profile::StackComponent.new(profile: cv)
+          - else
+            = render Profile::PendingComponent.new
 
-      section.pf-block.pf-block--worked
-        = render TrackTagComponent.new(label: "#{t('profile.worked_on')} · #{@contributions.size}",
-                                       tone: :soft, heading: :h2)
-        .tm-worked
-          - @contributions.each do |contribution|
-            - kase = @cases_by_slug[contribution.slug]
-            - here = contribution == @context
-            = link_to work_case_path(slug: kase.slug), id: "c-#{kase.slug}",
-              class: "worked-row hover-row #{'is-here' if here}" do
-              .tm-worked__body
-                h3.tm-worked__title= rich(kase.title, links: false)
-                .tm-worked__did= rich(contribution.did.first)
-              .tm-worked__meta
-                = contribution.role
-                br
-                span.tm-worked__period= contribution.period
+          section.pf-block.pf-block--worked
+            = render TrackTagComponent.new(label: "#{t('profile.worked_on')} · #{@contributions.size}",
+                                           tone: :soft, heading: :h2)
+            .tm-worked
+              - @contributions.each do |contribution|
+                - kase = @cases_by_slug[contribution.slug]
+                - here = contribution == @context
+                = link_to work_case_path(slug: kase.slug), id: "c-#{kase.slug}",
+                  class: "worked-row hover-row #{'is-here' if here}" do
+                  .tm-worked__body
+                    h3.tm-worked__title= rich(kase.title, links: false)
+                    .tm-worked__did= rich(contribution.did.first)
+                  .tm-worked__meta
+                    = contribution.role
+                    br
+                    span.tm-worked__period= contribution.period
 
-      - if @person.not_work.any?
-        section.pf-block.pf-block--notwork
-          = render TrackTagComponent.new(label: t('profile.not_work'), tone: :soft, heading: :h2)
-          .tm-notwork
-            - @person.not_work.each do |item|
-              .tm-notwork__item
-                .tm-notwork__icon aria-hidden="true"= item[:icon]
-                .tm-notwork__label= item[:label]
-                - if item[:detail].present?
-                  .tm-notwork__detail= item[:detail]
+          - if @person.not_work.any?
+            section.pf-block.pf-block--notwork
+              = render TrackTagComponent.new(label: t('profile.not_work'), tone: :soft, heading: :h2)
+              .tm-notwork
+                - @person.not_work.each do |item|
+                  .tm-notwork__item
+                    .tm-notwork__icon aria-hidden="true"= item[:icon]
+                    .tm-notwork__label= item[:label]
+                    - if item[:detail].present?
+                      .tm-notwork__detail= item[:detail]
 
-    aside.split-aside
-      = render MonogramComponent.of(@person, size: 280, ring: :mute)
-      - if cv
-        = render Profile::ContactPanelComponent.new(profile: cv)
-      - else
-        / Dashed em-dashes rather than an absent panel: the shape of the page is the same
-        / whether or not anyone has written the CV yet.
-        .pf-contact.pf-contact--empty
-          - %i[contact location education].each do |key|
-            .pf-contact__row
-              span.pf-contact__key= t("profile.#{key}")
-              span —
-      .pf-updated= "#{t('profile.updated')} · #{cv ? @person.updated : '—'}"
+        aside.split-aside
+          = render MonogramComponent.of(@person, size: 280, ring: :mute)
+          - if cv
+            = render Profile::ContactPanelComponent.new(profile: cv)
+          - else
+            / Dashed em-dashes rather than an absent panel: the shape of the page is the same
+            / whether or not anyone has written the CV yet.
+            .pf-contact.pf-contact--empty
+              - %i[contact location education].each do |key|
+                .pf-contact__row
+                  span.pf-contact__key= t("profile.#{key}")
+                  span —
+          .pf-updated= "#{t('profile.updated')} · #{cv ? @person.updated : '—'}"

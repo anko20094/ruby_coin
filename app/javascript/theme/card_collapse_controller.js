@@ -38,6 +38,11 @@ export default class extends Controller {
     this.wide.removeEventListener("change", this.onWideChange);
     clearTimeout(this.leaveTimer);
     this.element.classList.remove("is-ready", "is-enhanced", "is-flow");
+
+    // Back to the server's drawing: every card open, the toggles and the bar hidden.
+    this.cardTargets.forEach((card) => this.set(card, true));
+    this.toggleTargets.forEach((toggle) => (toggle.hidden = true));
+    if (this.hasBarTarget) this.barTarget.hidden = true;
   }
 
   toggle(event) {

@@ -29,7 +29,7 @@ describe 'the FAQ', type: :request do
     get faq_path(locale: 'en')
 
     nav = response.body[%r{rc-nav__sections.*?</div>}m]
-    expect(nav.scan('rc-nav__link').size).to eq(4)
+    expect(nav.scan('rc-nav__link').size).to eq(3)
     expect(nav).not_to include('faq')
   end
 end

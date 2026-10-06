@@ -2,19 +2,16 @@
 - page_meta description: t('titles.faq_description')
 
 .fq-page
-  header.fq-page__header
-    .rc-eyebrow= "/#{t('titles.faq')}"
-    h1.fq-page__title
-      = t('titles.faq_title')
-      = ' '
-      span.fq-page__mark ·
+  = render PageHeadComponent.new(title: t('titles.faq_title'), uid: 'faq-anchor')
 
-  - @entries.each do |entry|
-    section.fq-entry
-      h2.fq-entry__question= entry[:question]
-      .fq-entry__answer
-        - entry[:answers].each do |answer|
-          - if answer[:markup]
-            p== answer[:text]
-          - else
-            p= answer[:text]
+  section.rc-band.fq-page__band
+    .rc-wrap
+      - @entries.each do |entry|
+        section.fq-entry
+          h2.fq-entry__question= entry[:question]
+          .fq-entry__answer
+            - entry[:answers].each do |answer|
+              - if answer[:markup]
+                p== answer[:text]
+              - else
+                p= answer[:text]

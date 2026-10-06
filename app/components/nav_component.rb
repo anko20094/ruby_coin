@@ -31,9 +31,16 @@ class NavComponent < ViewComponent::Base
     [
       Section.new(key: :journal, path: helpers.journal_path),
       Section.new(key: :work, path: helpers.work_path),
-      Section.new(key: :studio, path: helpers.studio_path),
-      Section.new(key: :contact, path: helpers.contact_path)
+      Section.new(key: :studio, path: helpers.studio_path)
     ]
+  end
+
+  def contact
+    Section.new(key: :contact, path: helpers.contact_path)
+  end
+
+  def nav_link_class(section)
+    "rc-nav__link #{'is-current' if current?(section)}".strip
   end
 
   def current?(section)

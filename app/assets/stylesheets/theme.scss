@@ -1,14 +1,17 @@
 // The public site's stylesheet entry — built to app/assets/builds/theme.css. The admin has
 // its own entry (admin.scss), which imports the same theme/tokens.
 //
-// theme/  — the design system: tokens, faces, reset, shared components, chrome, and the
-//            profile blocks /cv and /team/:person both render.
+// theme/  — the design system: tokens, faces, reset, the two surfaces (paper bands and ink
+//            scenes, theme/_scene.scss), shared components, chrome, and the profile blocks /cv
+//            and /team/:person both render.
 // pages/  — one file per screen, prefixed wk- (work), jn- (journal), tm- (team), and so on.
 
 @use 'theme/tokens';
 @use 'theme/utilities';
 @use 'theme/fonts';
 @use 'theme/base';
+@use 'theme/scene';
+@use 'theme/page_head';
 @use 'theme/components';
 @use 'theme/profile';
 @use 'theme/chrome';
@@ -21,6 +24,7 @@
 
 @use 'pages/journal_index';
 @use 'pages/journal_post';
+@use 'pages/journal_post_page';
 
 @use 'pages/work_index';
 @use 'pages/work_case';

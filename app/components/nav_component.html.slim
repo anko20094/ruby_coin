@@ -3,8 +3,9 @@ nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@w
     = render GemComponent.new(uid: 'nav', variant: :badge)
     span.rc-nav__wordmark rubyco.in
 
-  / Below 760px the sections and the locale switcher live in a drawer. The button is hidden on
-  / wide screens by CSS, not JS, so a narrow window without JS gets an open menu, not a stuck one.
+  / Below the nav breakpoint the sections and the locale switcher live in a drawer. The button is
+  / hidden on wide screens by CSS, not JS, so a narrow window without JS gets an open menu, not a
+  / stuck one.
   button.rc-nav__toggle[type="button" data-nav-target="toggle" data-action="nav#toggle"
                         aria-expanded="false" aria-controls="rc-nav-drawer"]
     span.rc-nav__toggle-label= t('work.nav.menu')
@@ -15,7 +16,7 @@ nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@w
   #rc-nav-drawer.rc-nav__drawer data-nav-target="drawer"
     .rc-nav__sections
       - sections.each do |section|
-        = link_to section.label, section.path, class: "rc-nav__link #{'is-current' if current?(section)}",
+        = link_to section.label, section.path, class: nav_link_class(section),
           aria: { current: ('page' if current_page?(section)) }
 
     .rc-nav__tools
@@ -24,9 +25,13 @@ nav.rc-nav data-controller="nav" data-action="keydown@window->nav#escape click@w
         aria: { current: ('page' if cv_current?) }
       = render PaletteComponent.new
 
-    .rc-nav__locales
-      - locales.each do |locale|
-        = link_to locale.upcase, locale_path(locale),
-          class: "rc-nav__locale #{'is-current' if current_locale?(locale)}",
-          lang: locale, hreflang: locale,
-          aria: { current: ('true' if current_locale?(locale)) }
+      .rc-nav__locales
+        - locales.each do |locale|
+          = link_to locale.upcase, locale_path(locale),
+            class: "rc-nav__locale #{'is-current' if current_locale?(locale)}",
+            lang: locale, hreflang: locale,
+            aria: { current: ('true' if current_locale?(locale)) }
+
+    / The fourth section is the one the site exists to lead to, so it is drawn as the pill's call.
+    = link_to contact.label, contact.path, class: "#{nav_link_class(contact)} rc-nav__cta",
+      aria: { current: ('page' if current_page?(contact)) }

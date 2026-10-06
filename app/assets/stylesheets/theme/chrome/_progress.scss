@@ -5,7 +5,8 @@
   inset: 0 0 auto 0;
   height: 2px;
   z-index: 60;
-  background: var(--ruby);
+  background: var(--ruby-fire);
+  box-shadow: 0 0 12px oklch(58% 0.22 18 / 0.7);
   transform: scaleX(0);
   transform-origin: 0 50%;
   transition: transform 0.08s linear;

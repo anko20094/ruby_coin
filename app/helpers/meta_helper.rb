@@ -79,8 +79,8 @@ module MetaHelper
   # Nor is a combination of tags: there are as many of them as there are subsets, each a thin
   # slice of the single-tag lists, so they all name the unfiltered journal as their original
   # rather than each competing to be indexed.
-  def listing_query(tag: nil, tags: nil)
-    tags = Array(tags || tag)
+  def listing_query(tags: nil)
+    tags = Array(tags)
     return {} if tags.many?
 
     page = request.query_parameters['page'].to_s.to_i

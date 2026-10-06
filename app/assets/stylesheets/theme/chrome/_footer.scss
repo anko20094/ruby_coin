@@ -1,26 +1,77 @@
 @use '../controls';
 @use '../breakpoints' as bp;
 
-// The site footer.
+// The site footer: the closing call on a ruby glow, then the places to go.
 .rc-footer {
+  padding: clamp(88px, 11vw, 168px) 0 36px;
+  border-top: 1px solid var(--surface-line);
+}
+
+.rc-footer__glow {
+  --glow-y: auto;
+  --glow-w: 1200px;
+  --glow-h: 800px;
+
+  top: auto;
+  bottom: -400px;
+  opacity: 0.85;
+}
+
+.rc-footer__cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .rc-gem { margin-bottom: 28px; }
+}
+
+.rc-footer__title {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 10vw, 160px);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.rc-footer__mail {
+  margin-top: 36px;
+  font-size: 17px;
+  word-break: break-word;
+}
+
+.rc-footer__bottom {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 32px;
-  align-items: flex-end;
-  margin-top: 60px;
-  padding: 48px var(--page-pad) 32px;
-  border-top: 1px solid color-mix(in oklab, var(--ink-mute) 33%, transparent);
+  gap: 24px 40px;
+  align-items: end;
+  margin-top: clamp(80px, 10vw, 140px);
+  padding-top: 24px;
+  border-top: 1px solid var(--surface-line);
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+// Without the call (on /contact, which is the call), the footer is just its last row.
+.rc-footer--quiet {
+  padding-top: 40px;
+
+  .rc-footer__bottom {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
 }
 
 .rc-footer__brand {
   @include controls.hit-row(44px);
 
   gap: 10px;
-  margin-bottom: 12px;
+  color: var(--ink);
 
   .rc-gem {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -30,53 +81,45 @@
 }
 
 .rc-footer__meta {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-  line-height: 1.8;
+  margin-top: 6px;
+  line-height: 1.6;
 }
 
 .rc-footer__sections {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0 36px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--ink-soft);
+  gap: 0 24px;
 
   a {
-    @include controls.hit-row(32px);
+    @include controls.hit-row(32px, 44px);
 
     // One of these is two characters wide.
-    min-width: 32px;
+    min-width: 28px;
     justify-content: center;
   }
 }
 
 .rc-footer__contacts {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-  text-align: right;
-  line-height: 1.8;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 
-  // A column of one-line links: vertical room is free here and each of them is a target.
-  a { @include controls.hit-row(32px); }
+  a { @include controls.hit-row(30px, 44px); }
 }
 
-// The footer collapses where the nav turns into a drawer.
-@include bp.below(nav) {
-  .rc-footer {
+.rc-footer a.hover-link:hover { color: var(--ink); }
+
+@include bp.below(lg) {
+  .rc-footer__bottom {
     grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
-    padding: 36px 22px 28px;
+    gap: 20px;
   }
 
   .rc-footer__sections {
     justify-content: flex-start;
-    gap: 18px;
+    gap: 0 18px;
   }
 
-  .rc-footer__contacts { text-align: left; }
+  .rc-footer__contacts { align-items: flex-start; }
 }

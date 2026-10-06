@@ -2,50 +2,43 @@
 - page_meta description: t('studio.show.meta_description')
 
 .st-page
-  header.rc-header
-    .rc-header__intro
-      .rc-eyebrow= "/#{t('studio.show.eyebrow')}"
-      h1.rc-header__title
-        = t('studio.show.title')
-        = ' '
-        span.rc-header__mark ·
-      p.rc-header__lede= t('studio.show.lede')
-    .rc-header__anchor
-      = render GemComponent.new(uid: 'studio-anchor', variant: :anchor, size: 90)
+  = render PageHeadComponent.new(title: t('studio.show.title'), uid: 'studio-anchor', lede: t('studio.show.lede'))
 
-  / The same roster as /team at a lower density — one file, two pages, so a new person is one
-  / entry rather than three edits.
-  .st-crew
-    - @people.each do |person|
-      = link_to person_path(person), class: 'st-card' do
-        = render MonogramComponent.of(person, size: 88, ring: :mute)
-        .st-card__body
-          h2.st-card__name= person.name
-          .st-card__meta
-            span.st-card__role= person.role
-            / The same chip the roster card carries. This page introduces the six as "who is
-            / here today", so a record with invented dates has to say so here too.
-            - if person.placeholder?
-              span.tm-card__chip.is-placeholder= t('profile.placeholder_chip')
-            - elsif person.draft?
-              span.tm-card__chip= t('profile.draft')
-          p.st-card__blurb= rich(person.blurb)
-          .st-card__link
-            = "#{t('studio.show.cv_link')} "
-            span aria-hidden="true" →
+  section.rc-band.st-page__band
+    .rc-wrap.rc-wrap--narrow
+      / The same roster as /team at a lower density — one file, two pages, so a new person is one
+      / entry rather than three edits.
+      .st-crew
+        - @people.each do |person|
+          = link_to person_path(person), class: 'st-card', data: { reveal: '' } do
+            = render MonogramComponent.of(person, size: 88, ring: :mute)
+            .st-card__body
+              h2.st-card__name= person.name
+              .st-card__meta
+                span.st-card__role= person.role
+                / The same chip the roster card carries. This page introduces the six as "who is
+                / here today", so a record with invented dates has to say so here too.
+                - if person.placeholder?
+                  span.tm-card__chip.is-placeholder= t('profile.placeholder_chip')
+                - elsif person.draft?
+                  span.tm-card__chip= t('profile.draft')
+              p.st-card__blurb= rich(person.blurb)
+              .st-card__link
+                = "#{t('studio.show.cv_link')} "
+                span aria-hidden="true" →
 
-  / Alumni: named, and off the crew. Most are names and nothing else — nobody here can keep a
-  / CV of theirs honest — so they print as a pill with nowhere to go. One who is still credited
-  / on a project has something behind the name, and #page? is what tells the two apart.
-  - if @alumni.any?
-    section.st-alumni
-      h2.st-alumni__title
-        = t('studio.show.alumni')
-        span.st-alumni__count= @alumni.size
-      p.st-alumni__note= t('studio.show.alumni_note')
-      ul.st-alumni__list
-        - @alumni.each do |person|
-          - if person.page?
-            li= link_to person.name, person_path(person), class: 'st-alumni__pill is-open'
-          - else
-            li.st-alumni__pill= person.name
+      / Alumni: named, and off the crew. Most are names and nothing else — nobody here can keep a
+      / CV of theirs honest — so they print as a pill with nowhere to go. One who is still credited
+      / on a project has something behind the name, and #page? is what tells the two apart.
+      - if @alumni.any?
+        section.st-alumni
+          h2.st-alumni__title
+            = t('studio.show.alumni')
+            span.st-alumni__count= @alumni.size
+          p.st-alumni__note= t('studio.show.alumni_note')
+          ul.st-alumni__list
+            - @alumni.each do |person|
+              - if person.page?
+                li= link_to person.name, person_path(person), class: 'st-alumni__pill is-open'
+              - else
+                li.st-alumni__pill= person.name

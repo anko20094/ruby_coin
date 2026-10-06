@@ -1,108 +1,62 @@
 @use '../theme/controls';
 @use '../theme/breakpoints' as bp;
 
-// The front page.
-$home-max: 1320px;
+// The front page: a dark hero scene with the stone, then the journal on paper, the portfolio on
+// ink, the crew on paper, and the footer's call.
 
-.hm-page {
-  max-width: $home-max;
-  margin: 0 auto;
-}
-
-// Both tracks carry minmax(0, …): the gem is drawn at an explicit pixel width, so a rigid
-// right-hand track gives itself a min-content floor and the headline column collapses under it.
+// ── hero ──────────────────────────────────────────────────────────────────────
 .hm-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  align-items: start;
-  gap: 0 48px;
-  padding: 64px var(--page-pad) 80px;
+  --gem: clamp(150px, 20vw, 270px);
+  --hero-top: calc(var(--nav-clear) + 24px);
+
+  padding: var(--hero-top) 0 0;
 }
 
-// The gem lives inside the copy so a phone can float it beside the headline. Here the copy
-// steps aside and its children fill the left column one row each, with the gem spanning them
-// on the right — the two-column hero it has always been.
-.hm-hero__copy { display: contents; }
+.hm-hero__glow {
+  --glow-y: -160px;
+  --glow-h: 1000px;
+}
 
-.hm-hero__copy > * { grid-column: 1; }
+// Centred on the stone.
+.hm-hero__rings {
+  left: 50%;
+  top: calc(var(--hero-top) + var(--gem) / 2);
+  width: calc(var(--gem) * 3.3);
+  height: calc(var(--gem) * 3.3);
+  transform: translate(-50%, -50%);
+}
 
-.hm-hero__eyebrow {
+.hm-hero__copy {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-
-.hm-hero__rule {
-  width: 24px;
-  height: 1px;
-  background: var(--ink-mute);
-}
-
-.hm-hero__title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  // Fluid, and no hard <br>: a literal 96px shatters this headline into one-word lines the
-  // moment the column narrows.
-  font-size: clamp(40px, 6.4vw, 96px);
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-  text-wrap: balance;
-  margin: 14px 0 0;
-}
-
-// The authored break. Above 1000px it ends the line without adding a row; below it becomes an
-// ordinary space and the headline is free to re-wrap. It holds a space so the two halves never
-// run together when it goes inline.
-.hero-br {
-  display: block;
-  height: 0;
-}
-
-.hm-hero__mark {
-  color: var(--ruby);
-  font-style: italic;
-}
-
-.hm-hero__lede {
-  font-size: 20px;
-  line-height: 1.5;
-  color: var(--ink-soft);
-  max-width: 560px;
-  margin: 22px 0 0;
-  text-wrap: pretty;
-}
-
-.hm-hero__actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 28px;
-}
-
-.hm-hero__note {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-quiet);
-  margin-top: 14px;
-}
-
-.hm-hero__copy > .hm-hero__gem {
-  grid-column: 2;
-  grid-row: 1 / span 5;
-  align-self: center;
-  justify-self: center;
   text-align: center;
-  min-width: 0;
+}
+
+.hm-hero__gem {
+  position: relative;
+  margin-bottom: 30px;
+
+  // The stone's light on the ground under it: a gradient, so it costs nothing per frame.
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 0;
+    width: calc(var(--gem) * 1.6);
+    height: calc(var(--gem) * 1.4);
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, oklch(55% 0.21 18 / 0.5), oklch(45% 0.18 18 / 0.18) 55%, transparent);
+    pointer-events: none;
+  }
 }
 
 // A button so the shade can be changed from the keyboard too; it draws nothing of its own.
 // pan-y: a vertical swipe still scrolls the page, only a sideways one turns the stone.
 .hm-hero__stone {
   display: block;
+  margin: 0 auto;
   padding: 0;
   border: 0;
   background: none;
@@ -114,58 +68,157 @@ $home-max: 1320px;
 
   &:focus-visible {
     outline: 2px solid var(--ruby);
-    outline-offset: 4px;
+    outline-offset: 6px;
   }
 
   &:has(.is-dragging) { cursor: grabbing; }
-}
 
-// Sized here rather than passed to the component: the gem yields the column instead of
-// starving the text track, and in one column it shrinks rather than grows.
-.hm-hero__gem .rc-gem {
-  display: block;
-  width: clamp(240px, 28vw, 400px);
-  height: auto;
-  aspect-ratio: 1;
+  .rc-gem {
+    display: block;
+    width: var(--gem);
+    height: auto;
+    aspect-ratio: 1;
+  }
 }
 
 .hm-hero__caption {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1px;
-  line-height: 1.6;
+  margin-top: 14px;
+  font-size: 13px;
   color: var(--ink-quiet);
-  max-width: 36ch;
-  margin: 12px auto 0;
-  text-wrap: balance;
 
   // Under reduced motion the gem stands still, so the hint would be false.
   @media (prefers-reduced-motion: reduce) { display: none; }
 }
 
-
-// Latest entry.
-.hm-latest { padding: 0 var(--page-pad); }
-
-.hm-latest__entry {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 36px;
-  align-items: center;
-  padding: 36px 0;
-  margin-top: 12px;
-  border-top: var(--rule-strong);
-  border-bottom: var(--rule-row);
-  transition: background 150ms;
-
-  &:hover { background: var(--paper-warm); }
+.hm-hero__title {
+  margin: 26px 0 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-hero);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
-.hm-latest__cover {
-  height: 300px;
-  border-radius: var(--radius-card);
+// The authored break: a line end on a wide screen, an ordinary space on a narrow one.
+.hero-br {
+  display: block;
+  height: 0;
+}
+
+.hm-hero__lede {
+  max-width: 36em;
+  margin-top: 26px;
+  font-size: var(--fs-lede);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  text-wrap: balance;
+}
+
+.hm-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 38px;
+}
+
+// The counted figures along the foot of the scene.
+.hm-figures {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: clamp(56px, 7vw, 96px) 0 0;
+  padding-bottom: clamp(56px, 6vw, 88px);
+  border-top: 1px solid var(--surface-line);
+}
+
+.hm-figure {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  padding: 26px 24px 0 0;
+
+  + .hm-figure {
+    padding-left: 24px;
+    border-left: 1px solid var(--surface-line);
+  }
+}
+
+.hm-figure__value {
+  margin: 0;
+  font-size: clamp(42px, 4.6vw, 66px);
+}
+
+.hm-figure__label {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink-quiet);
+}
+
+// ── journal ───────────────────────────────────────────────────────────────────
+.hm-journal__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 48px);
+  align-items: start;
+}
+
+.hm-lead {
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+  padding: clamp(26px, 3vw, 42px);
+  transition: transform 300ms ease;
+
+  &:hover { transform: translateY(-3px); }
+
+  &:focus-visible {
+    outline: 2px solid oklch(45% 0.18 18);
+    outline-offset: 3px;
+  }
+}
+
+.hm-lead__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+.hm-lead__new {
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--ruby-fire);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.hm-lead__meta { margin-left: auto; }
+
+.hm-lead__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title cover'
+    'tags  cover'
+    'more  more';
+  gap: 0 24px;
+  margin-top: auto;
+  padding-top: 40px;
+}
+
+.hm-lead__cover {
+  grid-area: cover;
+  align-self: start;
+  width: clamp(88px, 10vw, 136px);
+  aspect-ratio: 1;
+  border-radius: 18px;
   overflow: hidden;
-  background: var(--paper-warm);
+  box-shadow: 0 0 0 1px var(--surface-line);
 
   img {
     width: 100%;
@@ -174,177 +227,328 @@ $home-max: 1320px;
   }
 }
 
-.hm-latest__meta {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-}
-
-.hm-latest__title {
+.hm-lead__title {
+  grid-area: title;
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 56px;
-  line-height: 1;
+  font-size: clamp(34px, 3.6vw, 54px);
+  line-height: 1.02;
   letter-spacing: -0.02em;
-  margin: 10px 0 16px;
   text-wrap: balance;
 }
 
-.hm-latest__more,
-.hm-more {
-  @include controls.hit-row(32px);
+.hm-lead__tags {
+  grid-area: tags;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+}
 
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+.hm-lead__tag {
+  padding: 4px 12px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
   color: var(--ink-soft);
-  margin-top: 16px;
-
-  &:hover { color: var(--ruby); }
 }
 
-// Recent work, and the crew beside it.
-.hm-grid {
+.hm-lead__more {
+  grid-area: more;
+  margin-top: 26px;
+  font-weight: 500;
+  color: var(--ruby);
+}
+
+.hm-journal__list {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--surface-line);
+}
+
+.hm-entry {
+  display: block;
+  padding: 24px 0;
+  border-top: 1px solid var(--surface-line);
+  transition: padding 200ms;
+
+  &:hover { padding-left: 8px; }
+
+  &:hover .hm-entry__title { color: var(--ruby); }
+}
+
+.hm-entry__date {
+  font-size: 14px;
+  color: var(--ink-quiet);
+  font-variant-numeric: tabular-nums;
+}
+
+.hm-entry__title {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.2;
+  text-wrap: pretty;
+  transition: color 200ms;
+}
+
+// ── work ──────────────────────────────────────────────────────────────────────
+.hm-work__glow {
+  --glow-y: -300px;
+  --glow-h: 600px;
+
+  opacity: 0.45;
+}
+
+.hm-cases {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 36px;
+  gap: 20px;
+}
+
+.hm-case {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 40px;
+  padding: clamp(28px, 3.4vw, 52px);
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 3px;
+  }
+}
+
+.hm-case__lead {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+
+  .rc-gem {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+.hm-case__figure {
+  font-size: clamp(80px, 10.5vw, 160px);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.rc-figure__unit {
+  font-size: 0.4em;
+  letter-spacing: -0.01em;
+}
+
+.hm-case__caption {
+  max-width: 28ch;
+  margin-top: 18px;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.hm-case__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hm-case__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+.hm-case__own {
+  padding: 1px 10px;
+  border: 1px solid oklch(58% 0.22 18 / 0.6);
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.hm-case__title {
+  margin: 14px 0 16px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 3.4vw, 50px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.hm-case__tagline {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.hm-case__stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+
+  span {
+    padding: 5px 11px;
+    border-radius: 8px;
+    background: color-mix(in oklab, var(--ink) 7%, transparent);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+}
+
+.hm-case__go {
+  margin-top: 26px;
+  font-weight: 500;
+
+  span {
+    display: inline-block;
+    transition: transform 200ms;
+  }
+
+  .hm-case:hover & span { transform: translateX(4px); }
+}
+
+.hm-minis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.hm-mini {
+  display: block;
+  padding: 26px 24px;
+  border-radius: 18px;
+  background: var(--scene-raised);
+  box-shadow: 0 0 0 1px var(--surface-line);
+  transition: transform 250ms, box-shadow 250ms;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 0 1px oklch(58% 0.22 18 / 0.45), 0 20px 50px -20px oklch(58% 0.22 18 / 0.5);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 3px;
+  }
+}
+
+.hm-mini__figure { font-size: 42px; }
+
+.hm-mini__caption {
+  min-height: 2.8em;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-quiet);
+}
+
+.hm-mini__title {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--surface-line);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.hm-mini__meta {
+  margin-top: 4px;
+  font-size: 13.5px;
+  color: var(--ink-quiet);
+}
+
+// ── crew ──────────────────────────────────────────────────────────────────────
+.hm-crew__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(40px, 6vw, 96px);
   align-items: start;
-  margin-top: 56px;
-  padding: 0 var(--page-pad);
 }
 
-.hm-work { min-width: 0; }
+.hm-crew__quote {
+  max-width: 24ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(30px, 3.6vw, 52px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 
-.hm-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
-  gap: 18px;
-  margin-top: 12px;
+  &::before {
+    content: '“';
+    display: block;
+    height: 44px;
+    font: 400 120px/0.6 var(--font-display);
+    color: var(--ruby);
+  }
 }
 
-// The third surface showing the roster, and it reads the same file as /studio and /team.
-.hm-crew { min-width: 0; }
+.hm-crew__note {
+  margin-top: 28px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.hm-crew__all {
+  font-weight: 500;
+  color: var(--ruby);
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; text-underline-offset: 3px; }
+}
 
 .hm-crew__list {
-  margin-top: 12px;
-  border: var(--rule-strong);
-  border-radius: var(--radius-card);
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
 }
 
 .hm-crew__row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 14px;
+  padding: 12px;
+  border-radius: 16px;
 
-  // The list clips to its rounded corners, which would cut a ring drawn outside the link.
-  &:focus-visible { outline-offset: -2px; }
-
-  + .hm-crew__row {
-    border-top: 1px solid color-mix(in oklab, var(--ink-mute) 20%, transparent);
+  // Faces, not tiles: the stones go round here.
+  .rc-monogram {
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--surface-line);
+    border: 0;
   }
 }
 
 .hm-crew__who {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
 .hm-crew__name {
   font-family: var(--font-display);
-  font-size: 18px;
-  line-height: 1.1;
+  font-size: 21px;
+  line-height: 1.2;
 }
 
 .hm-crew__role {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-soft);
-  margin-top: 2px;
-}
-
-.hm-crew__arrow {
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--ink-quiet);
 }
 
-.hm-crew__note {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-quiet);
-  margin-top: 8px;
-}
-
-.hm-card {
-  display: block;
-  padding: 16px;
-  border: 1px solid color-mix(in oklab, var(--ink-mute) 53%, transparent);
-  border-radius: var(--radius-button);
-  transition: transform 200ms cubic-bezier(0.2, 0.7, 0.3, 1), border-color 200ms;
-
-  &:hover {
-    transform: translateY(-2px);
-    border-color: var(--ink);
-  }
-}
-
-// The stone in the case's own shade, and the figure the case leads with — where an empty box
-// with the case's number used to stand.
-.hm-card__lead {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-bottom: 14px;
-  border-bottom: var(--rule-row);
-
-  .rc-gem {
-    width: 64px;
-    height: 64px;
-  }
-}
-
-.hm-card__metric-value {
-  font-size: 30px;
-  line-height: 1.05;
-  color: var(--ink);
-}
-
-.hm-card__metric-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1.45;
-  color: var(--ink-quiet);
-  margin-top: 4px;
-}
-
-.hm-card__title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 28px;
-  line-height: 1.2;
-  text-wrap: balance;
-  margin: 12px 0 0;
-}
-
-.hm-card__meta {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-soft);
-  margin-top: 4px;
-}
-
-.hm-card__tagline {
-  font-size: 13.5px;
-  color: var(--ink-soft);
-  margin-top: 8px;
-}
-
-// The floating ruby: appears once the hero one has gone, and goes back to it. The overshoot in
-// the transform curve is deliberate.
+// ── back to the top ───────────────────────────────────────────────────────────
+// Appears once the hero's stone has gone, and goes back to it. The overshoot is deliberate.
 .hm-top {
   position: fixed;
   right: 24px;
@@ -353,13 +557,16 @@ $home-max: 1320px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  background: none;
-  border: 0;
+  gap: 6px;
+  padding: 10px 10px 8px;
+  background: color-mix(in oklab, var(--scene) 78%, transparent);
+  border: 1px solid color-mix(in oklab, var(--on-scene) 10%, transparent);
+  border-radius: 20px;
+  color: var(--on-scene-soft);
+  cursor: pointer;
   opacity: 0;
   transform: translateY(12px);
-  // Not reachable while it is not there: at opacity 0 it was still in the tab order, so a
-  // keyboard reader could land on a button nobody can see.
+  // Not reachable while it is not there.
   visibility: hidden;
   transition: opacity 0.35s, transform 0.45s cubic-bezier(0.2, 1.6, 0.3, 1), visibility 0s linear 0.35s;
 
@@ -371,66 +578,136 @@ $home-max: 1320px;
   }
 
   &[hidden] { display: none; }
-}
 
-.hm-top__label {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 1px;
-  color: var(--ink-soft);
-}
-
-// One column. Two things matter here and both were got wrong once: the headline comes first,
-// and the gem gets smaller rather than larger — together they had pushed the h1 off a short
-// viewport, so the page opened on a gem and nothing else.
-@include bp.below(1000px) {
-  .hm-hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
-    padding: 44px var(--page-pad) 56px;
+  &:focus-visible {
+    outline: 2px solid var(--ruby-glow);
+    outline-offset: 2px;
   }
+}
 
+.hm-top__label { font-size: 12px; }
+
+// ── narrower ──────────────────────────────────────────────────────────────────
+@include bp.below(lg) {
   .hero-br { display: inline; }
 
-  // One column, and the gem floats beside the headline at a fraction of its size, so the first
-  // screen is the headline and the buttons rather than the stone.
-  .hm-hero { display: block; }
+  .hm-hero__title .rc-mark { display: block; }
 
-  .hm-hero__copy > .hm-hero__gem {
-    float: right;
-    width: clamp(64px, 18vw, 140px);
-    margin: 16px 0 8px 14px;
+  .hm-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .hm-figure:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
   }
 
-  .hm-hero__gem .rc-gem { width: 100%; }
+  .hm-figure:nth-child(n + 3) {
+    margin-top: 24px;
+    border-top: 1px solid var(--surface-line);
+  }
 
-  .hm-hero__caption { display: none; }
+  .hm-journal__grid,
+  .hm-crew__grid { grid-template-columns: minmax(0, 1fr); }
 
-  .hm-hero__actions { clear: both; }
-
-  .hm-grid {
+  .hm-case {
     grid-template-columns: minmax(0, 1fr);
-    gap: 32px;
+    gap: 24px;
   }
+
+  .hm-minis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@include bp.below(md) {
-  .hm-hero__lede { font-size: 17px; }
+@include bp.below(sm) {
+  .hm-hero__actions .rc-button { padding-inline: 20px; }
 
-  .hm-latest__entry { grid-template-columns: 1fr; }
+  .hm-figure { padding: 22px 12px 0 0; }
 
-  .hm-latest__cover { height: 220px; }
+  .hm-figure + .hm-figure { padding-left: 16px; }
 
-  .hm-latest__title { font-size: 34px; }
+  .hm-figure:nth-child(3) { padding-left: 0; }
 
-  .hm-top { right: 14px; bottom: 14px; }
+  .hm-figure__value { font-size: 44px; }
+
+  .hm-lead { min-height: 0; }
+
+  .hm-lead__body {
+    grid-template-areas:
+      'cover cover'
+      'title title'
+      'tags  tags'
+      'more  more';
+    padding-top: 28px;
+  }
+
+  .hm-lead__cover {
+    width: 88px;
+    margin-bottom: 22px;
+  }
+
+  .hm-case {
+    padding: 26px 22px;
+    border-radius: 20px;
+  }
+
+  .hm-case__figure { font-size: 84px; }
+
+  .hm-case__lead .rc-gem { display: none; }
+
+  .hm-minis {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .hm-mini {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 16px;
+    padding: 20px;
+  }
+
+  .hm-mini__figure {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 34px;
+    text-align: right;
+  }
+
+  .hm-mini__caption { display: none; }
+
+  .hm-mini__title {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .hm-mini__meta {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .hm-crew__list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .hm-crew__row { padding: 10px 0; }
+
+  .hm-top {
+    right: 14px;
+    bottom: 14px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hm-card,
-  .hm-latest__entry,
-  .rc-button,
+  .hm-lead,
+  .hm-entry,
+  .hm-entry__title,
+  .hm-case__go span,
+  .hm-mini,
   .hm-top { transition: none; }
 
-  .hm-card:hover { transform: none; }
+  .hm-lead:hover,
+  .hm-mini:hover { transform: none; }
 }

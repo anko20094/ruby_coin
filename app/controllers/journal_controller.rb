@@ -22,13 +22,12 @@ class JournalController < ApplicationController
 
   def index
     readable = Post.active.translated_in(I18n.locale)
-    # Each chip carries how many entries it would leave, counted over what this language can
-    # read — the same rule the list itself follows.
-    @tags = Tag.joins(:posts).where(posts: { id: readable.select(:id) })
-               .group('tags.id').order(:title).select('tags.*, COUNT(*) AS readable_count')
+    # Every tag this language can read has a chip, whatever else is on.
+    @tags = Tag.where(id: Tag.joins(:posts).where(posts: { id: readable.select(:id) }).select(:id)).order(:title)
     # Looked up in Tag, not in @tags: a tag whose posts are all hidden has no chip but a
     # bookmarked link to it should say "no entries", not silently list everything.
     @active_tags = Tag.where(id: requested_tag_ids).order(:title).to_a
+    @tag_counts = tag_counts(readable)
     @order = Post::ORDER_TYPES.include?(params[:order]) ? params[:order] : 'new'
     @entries_count = readable.count
 
@@ -37,6 +36,9 @@ class JournalController < ApplicationController
     # A date order reads as a timeline, so it gets year headings; "best" is a ranking, and a
     # year between two places in it would mean nothing.
     @year_counts = year_counts if GROUPED_ORDERS.include?(@order)
+    # A chip, an order or a page picked with script on asks for the filter and the list alone
+    # and swaps them in, so the reader is not thrown back to the top of the page.
+    render partial: 'listing' if params[:partial].present?
   end
 
   def show
@@ -79,6 +81,14 @@ class JournalController < ApplicationController
   end
 
   private
+
+  # How many of the entries listed now carry each tag. The filter is AND, so for a chip that is
+  # off this is what switching it on leaves; for one that is on, it is the list itself. Distinct,
+  # because nothing stops posts_tags holding the same pair twice.
+  def tag_counts(readable)
+    listed = @active_tags.any? ? readable.where(id: carrying_every_active_tag) : readable
+    Tag.joins(:posts).where(posts: { id: listed.select(:id) }).group('tags.id').distinct.count('posts.id')
+  end
 
   def filtered_posts
     posts = ORDERS.fetch(@order) { ORDERS['new'] }.call.translated_in(I18n.locale)

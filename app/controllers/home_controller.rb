@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class HomeController < ApplicationController
+  # The three cases drawn as full panels; the rest of the portfolio follows as small tiles.
   RECENT_CASES = 3
+  # Entries listed beside the latest one.
+  MORE_ENTRIES = 3
 
   # The old front page was the article stream, so its pagination and tag filter lived on these
   # query strings (page, tag_ids, order). They are gone for good now that / is the home page —
@@ -14,14 +17,17 @@ class HomeController < ApplicationController
   def index
     readable = Post.translated_in(I18n.locale).includes(:tags, :user, :translations)
     @latest = readable.main.first || readable.active.ordered.first
+    @more_posts = readable.active.ordered.where.not(id: @latest).limit(MORE_ENTRIES).to_a
+    @entries_count = readable.active.count
     # Seven rows: one load answers the cards, the count and the year.
     cases = Case.ordered.to_a
     @cases = cases.first(RECENT_CASES)
+    @other_cases = cases.drop(RECENT_CASES)
     @people = Team.crew
     @projects_count = cases.size
     @first_year = Case.first_year(cases)
 
-    cache_publicly(cases, @latest, @latest&.tags, @latest&.user)
+    cache_publicly(cases, @latest, @latest&.tags, @latest&.user, @more_posts, @entries_count)
   end
 
   private

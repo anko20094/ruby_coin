@@ -4,7 +4,8 @@ import { Controller } from "@hotwired/stimulus";
 // server-side; this recomputes the same shading as the light moves.
 //
 // The maths below is a port of the same functions in app/components/gem_component.rb
-// (shade, brightness, inset, TONES). Change one, change both.
+// (shade, brightness, inset). Change one, change both. The shades themselves are not ported:
+// the component hands them over (tones, and the hero's glows) from GemComponent::TONES.
 //
 // :hero   — light follows the cursor, scroll rotates the crown, the stone tilts. A horizontal
 //           drag turns it (vertical stays the page's scroll), a click or tap without a drag
@@ -23,16 +24,6 @@ const HOVER_SPIN = 3.5; // degrees per frame on entering, decaying with the drag
 const STOP_OFFSETS = [0.18, 0, -0.22];
 const REST_LIGHT = [28, 18];
 
-// [hue shift, lightness shift, chroma factor] — GemComponent::TONES.
-export const TONES = [
-  [0, 0, 1.0],
-  [-12, 2, 1.0],
-  [9, -3, 0.95],
-  [-5, -6, 1.05],
-  [-22, 4, 0.9],
-  [5, 4, 0.85]
-];
-
 // A drag only becomes one past this many pixels, and only if it is more sideways than up or
 // down: anything else is a tap, or the page being scrolled.
 const DRAG_THRESHOLD = 6;
@@ -43,13 +34,15 @@ const EGG_WINDOW_MS = 2500;
 
 export default class extends Controller {
   static targets = ["facet", "facetGradient", "tableGradient", "specular", "star", "crown", "glow"];
-  static values = { variant: String, tone: Number };
+  // tones: [hue shift, lightness shift, chroma factor] rows; glows: the hero's glow per row.
+  static values = { variant: String, tone: Number, tones: Array, glows: Array };
 
   connect() {
     this.centroids = this.facetTargets.map((facet) => centroidOf(facet));
     this.pointsOf = this.facetTargets.map((facet) => pointsOf(facet));
 
-    this.tone = this.toneValue % TONES.length;
+    this.tones = this.tonesValue.length ? this.tonesValue : [[0, 0, 1]];
+    this.tone = this.toneValue % this.tones.length;
     this.light = [...REST_LIGHT];
     this.targetLight = [...REST_LIGHT];
     this.tilt = [0, 0];
@@ -158,6 +151,9 @@ export default class extends Controller {
   }
 
   startDrag(event) {
+    // A touch drag past the browser's tap slop ends in no click, so a flag left from it must not
+    // eat this press.
+    this.swallowClick = false;
     if (event.button !== 0 || this.reducedMotion.matches) return;
 
     this.pointer = { id: event.pointerId, startX: event.clientX, startY: event.clientY, lastX: event.clientX, dragging: false };
@@ -196,8 +192,9 @@ export default class extends Controller {
   }
 
   press(event) {
-    if (this.swallowClick) {
-      this.swallowClick = false;
+    const swallow = this.swallowClick && event.detail > 0; // detail 0: Enter or Space, never a drag
+    this.swallowClick = false;
+    if (swallow) {
       event.preventDefault();
       return;
     }
@@ -207,8 +204,9 @@ export default class extends Controller {
   }
 
   nextTone() {
-    this.tone = (this.tone + 1) % TONES.length;
-    if (this.hasGlowTarget) this.glowTarget.setAttribute("fill", glowColour(this.tone));
+    this.tone = (this.tone + 1) % this.tones.length;
+    const glow = this.glowsValue[this.tone];
+    if (this.hasGlowTarget && glow) this.glowTarget.setAttribute("fill", glow);
     if (!this.looping || this.reducedMotion.matches) this.paintSoon(true);
   }
 
@@ -294,11 +292,11 @@ export default class extends Controller {
 
   paint(rotation) {
     const [lightX, lightY] = this.light;
+    const tone = this.tones[this.tone];
     let brightest = { brightness: -1 };
 
     this.centroids.forEach((centroid, index) => {
       const brightness = brightnessAt(centroid, rotation, lightX, lightY);
-      const tone = this.tone;
       if (brightness > brightest.brightness) brightest = { brightness, index };
 
       const gradient = this.facetGradientTargets[index];
@@ -312,9 +310,9 @@ export default class extends Controller {
 
     const tableBrightness = brightnessAt([50, 50], rotation, lightX, lightY);
     const tableStops = this.tableGradientTarget.children;
-    tableStops[0].setAttribute("stop-color", shade(Math.min(1, tableBrightness + 0.25), this.tone));
-    tableStops[1].setAttribute("stop-color", shade(tableBrightness * 0.85 + 0.1, this.tone));
-    tableStops[2].setAttribute("stop-color", shade(Math.max(0, tableBrightness - 0.2), this.tone));
+    tableStops[0].setAttribute("stop-color", shade(Math.min(1, tableBrightness + 0.25), tone));
+    tableStops[1].setAttribute("stop-color", shade(tableBrightness * 0.85 + 0.1, tone));
+    tableStops[2].setAttribute("stop-color", shade(Math.max(0, tableBrightness - 0.2), tone));
 
     if (this.hasSpecularTarget) {
       const lit = brightest.brightness >= 0.5;
@@ -341,17 +339,11 @@ export default class extends Controller {
 }
 
 // Deep blood in shadow, bright fire in the light, hue drifting warmer as it darkens.
-function shade(brightness, tone = 0) {
-  const [hueShift, lightnessShift, chromaFactor] = TONES[tone];
+function shade(brightness, [hueShift, lightnessShift, chromaFactor]) {
   const lightness = 14 + brightness * 64 + lightnessShift;
   const chroma = (0.08 + brightness * 0.22) * chromaFactor;
   const hue = (14 + (1 - brightness) * 6 + hueShift + 360) % 360;
   return `oklch(${lightness.toFixed(1)}% ${chroma.toFixed(3)} ${hue.toFixed(1)})`;
-}
-
-function glowColour(tone) {
-  const [hueShift, lightnessShift, chromaFactor] = TONES[tone];
-  return `oklch(${58 + lightnessShift}% ${(0.22 * chromaFactor).toFixed(3)} ${(18 + hueShift + 360) % 360})`;
 }
 
 // Falls off over 70 units, then squared — that is what hardens the split

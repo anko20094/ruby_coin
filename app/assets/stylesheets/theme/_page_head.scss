@@ -1,0 +1,83 @@
+@use 'breakpoints' as bp;
+
+// PageHeadComponent: the dark scene a section page opens on. The title takes the left, the anchor
+// gem sits in its rings on the right, lit from above.
+.rc-pagehead {
+  padding: calc(var(--nav-clear) + clamp(28px, 4.4vw, 64px)) 0 clamp(56px, 6.4vw, 96px);
+}
+
+.rc-pagehead__glow {
+  --glow-x: 80%;
+  --glow-y: -320px;
+  --glow-w: 1100px;
+  --glow-h: 900px;
+}
+
+.rc-pagehead__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px 56px;
+}
+
+.rc-pagehead__intro { min-width: 0; }
+
+.rc-pagehead__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-title);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  margin: 0;
+  text-wrap: balance;
+
+  .rc-eyebrow + & { margin-top: 26px; }
+}
+
+.rc-pagehead__lede {
+  max-width: 38em;
+  margin-top: 24px;
+  font-size: var(--fs-lede);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.rc-pagehead__extra { margin-top: 32px; }
+
+.rc-pagehead__gem {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 240px;
+  aspect-ratio: 1;
+
+  // The stone's own light on the ground under it.
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 12%;
+    background: radial-gradient(closest-side, oklch(55% 0.21 18 / 0.45), transparent);
+    pointer-events: none;
+  }
+
+  .rc-gem { position: relative; }
+}
+
+.rc-pagehead__rings {
+  inset: -60%;
+  width: 220%;
+  height: 220%;
+}
+
+@include bp.below(lg) {
+  .rc-pagehead__inner { grid-template-columns: minmax(0, 1fr); }
+
+  // The stone goes first and small: on a phone the title is the page head, not the gem.
+  // The gem's inline width is a ceiling (max-width: 100%), so the box is what shrinks it.
+  .rc-pagehead__gem {
+    order: -1;
+    width: 76px;
+  }
+}

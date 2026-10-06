@@ -1,4 +1,3 @@
-@use '../theme/controls';
 @use '../theme/breakpoints' as bp;
 
 // Also answer to a size container (the admin's mobile preview), not only the viewport.
@@ -11,23 +10,6 @@ $post-max: 760px;
   max-width: $post-max;
   margin: 0 auto;
   padding: 60px var(--page-pad);
-}
-
-.jn-post__breadcrumb,
-.jn-post__footer {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.jn-post__back {
-  @include controls.hit-row(32px);
-
-  transition: color 180ms;
-
-  &:hover { color: var(--ruby); }
 }
 
 .jn-post__title {
@@ -44,19 +26,6 @@ $post-max: 760px;
   font-size: 12px;
   color: var(--ink-soft);
   margin-bottom: 18px;
-}
-
-// The project an entry is about, under the byline (Cases::Topics). Mono and small: a pointer,
-// not a second headline.
-.jn-post__project {
-  margin: -10px 0 18px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--ink-quiet);
-
-  a { color: var(--ruby); }
 }
 
 .jn-post__cover img {
@@ -389,150 +358,14 @@ $post-max: 760px;
   border-radius: var(--radius-card);
 }
 
-.jn-post__footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 48px;
-  padding: 24px 0;
-  border-top: var(--rule-row);
-}
-
-.jn-related {
-  margin-top: 48px;
-}
-
-.jn-related__row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: start;
-  gap: 18px;
-  margin-top: 18px;
-}
-
-.jn-related__card {
-  display: block;
-  transition: transform 200ms cubic-bezier(0.2, 0.7, 0.3, 1);
-
-  &:hover { transform: translateY(-2px); }
-}
-
-// The slot holds its own shape, so a cover that fails to load leaves a quiet rectangle
-// instead of collapsing the card and shifting the ones beside it.
-.jn-related__cover {
-  aspect-ratio: 16 / 9;
-  background: var(--paper-warm);
-  border-radius: var(--radius-card);
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.jn-related__date,
-.jn-related__tags {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-soft);
-}
-
-.jn-related__title {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 1.2;
-  margin: 6px 0 4px;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .jn-post__back,
-  .jn-embed__facade,
-  .jn-related__card { transition: none; }
-
-  .jn-related__card:hover { transform: none; }
-}
-
-// The entries either side, each a card of its own. Same shape as the case pager, because it is
-// the same idea. The first and the last entry have one neighbour: it keeps its own half — the
-// next on the right, the previous on the left — and nothing fills the other.
-.jn-steps {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 56px;
-}
-
-.jn-step {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  border: var(--rule-row);
-  border-radius: var(--radius-card);
-
-  &--next {
-    grid-column: 2;
-    flex-direction: row-reverse;
-    text-align: right;
-  }
-}
-
-// The neighbour's cover, or its stone when it has none — never an empty grey square.
-.jn-step__thumb {
-  flex: none;
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  background: var(--paper-warm);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.jn-step__text { min-width: 0; }
-
-.jn-step__eyebrow {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-
-.jn-step__title {
-  margin-top: 6px;
-  font-family: var(--font-display);
-  font-size: 22px;
-  line-height: 1.2;
-}
-
-@include bp.below(sm) {
-  .jn-steps { grid-template-columns: 1fr; }
-
-  .jn-step--next {
-    grid-column: auto;
-    flex-direction: row;
-    text-align: left;
-  }
-
-  .jn-step__thumb {
-    width: 56px;
-    height: 56px;
-  }
+  .jn-embed__facade { transition: none; }
 }
 
 // Narrow screens. admin.scss sets $narrow-container so the editor's mobile preview, a 390px
 // container on a wide screen, gets these rules as well.
 @include bp.below(lg, $container: $narrow-container) {
   .jn-post__title { font-size: 44px; }
-
-  .jn-related__row { grid-template-columns: repeat(2, 1fr); }
 }
 
 @include bp.below(sm, $container: $narrow-container) {
@@ -548,6 +381,4 @@ $post-max: 760px;
 
   .jn-body h2,
   .jn-body h3 { font-size: 26px; }
-
-  .jn-related__row { grid-template-columns: 1fr; }
 }

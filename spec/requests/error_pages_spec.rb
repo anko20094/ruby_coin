@@ -151,6 +151,15 @@ describe 'error pages', type: :request do
       expect(response.media_type).to eq('text/html')
       expect(response.body.b).to eq(Rails.public_path.join('500.html').binread)
     end
+
+    # Its styles are inline; under the site's policy they would be blocked and the page unstyled.
+    it 'serves the static page without the content security policy' do
+      allow(Team).to receive(:owner_cv).and_raise(ActiveRecord::ConnectionNotEstablished)
+
+      get '/en/journal'
+
+      expect(response.headers['Content-Security-Policy']).to be_nil
+    end
   end
 
   describe 'a query string that url_for would read as routing' do

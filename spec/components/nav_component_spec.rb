@@ -15,7 +15,15 @@ describe NavComponent, type: :component do
   it "carries the redesign's four sections" do
     render_in(:en)
 
-    expect(page.all('.rc-nav__link').map { |link| link.text.split.first }).to eq(%w[journal projects studio contact])
+    expect(page.all('.rc-nav__link').map(&:text)).to eq(['Journal', 'Projects', 'Studio', 'Get in touch'])
+  end
+
+  # The fourth section is the one the site leads to, so the pill draws it as its call.
+  it 'draws the contact section as the call, after the tools' do
+    render_in(:en)
+
+    expect(page).to have_css("a.rc-nav__link.rc-nav__cta[href='/en/contact']", text: 'Get in touch')
+    expect(page).to have_no_css('.rc-nav__sections .rc-nav__cta')
   end
 
   # Every section is a link now: /studio waited on real team data, and the roster arrived.
@@ -31,7 +39,7 @@ describe NavComponent, type: :component do
   it 'keeps the studio marked while the reader is in the roster' do
     render_in(:en, current: :studio)
 
-    expect(page.find('.rc-nav__link.is-current').text).to eq('studio')
+    expect(page.find('.rc-nav__link.is-current').text).to eq('Studio')
   end
 
   # One person's page on a site that is a studio's, and the thing a recruiter arrives for.
@@ -45,8 +53,7 @@ describe NavComponent, type: :component do
   it 'translates the sections' do
     render_in(:uk)
 
-    expect(page.all('.rc-nav__link').map { |link| link.text.split.first })
-      .to eq(%w[журнал проєкти студія контакти])
+    expect(page.all('.rc-nav__link').map(&:text)).to eq(%w[Журнал Проєкти Студія Зв’язатися])
   end
 
   # The highlight is wayfinding; aria-current="page" is a claim about the address. On /team the
@@ -58,20 +65,20 @@ describe NavComponent, type: :component do
       end
     end
 
-    expect(page.find('.rc-nav__link.is-current').text).to eq('studio')
+    expect(page.find('.rc-nav__link.is-current').text).to eq('Studio')
     expect(page).to have_no_css('.rc-nav__link[aria-current]')
   end
 
   it 'announces it on the page itself' do
     render_in(:en, current: :work)
 
-    expect(page.find("a[aria-current='page']").text).to eq('projects')
+    expect(page.find("a[aria-current='page']").text).to eq('Projects')
   end
 
   it 'marks the current section' do
     render_in(:en, current: :journal)
 
-    expect(page.find('.rc-nav__link.is-current').text).to eq('journal')
+    expect(page.find('.rc-nav__link.is-current').text).to eq('Journal')
   end
 
   it 'marks nothing when the section is unknown' do

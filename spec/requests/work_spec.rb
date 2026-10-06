@@ -10,7 +10,7 @@ describe 'the work pages', type: :request do
       get work_path(locale: 'uk')
 
       expect(response).to have_http_status(:ok)
-      expect(response.body.scan('class="wk-project hover-row"').size).to eq(7)
+      expect(response.parsed_body.css('article.wk-project.rc-panel').size).to eq(7)
     end
 
     it 'lets J/K walk the cards, with a hint drawn hidden until the script is there' do
@@ -68,7 +68,7 @@ describe 'the work pages', type: :request do
     it 'renders the Ukrainian copy under the uk locale' do
       get work_path(locale: 'uk')
 
-      expect(response.body).to include('Проєкти', 'ВЛАСНИЙ')
+      expect(response.body).to include('Проєкти', 'власний')
     end
 
     # Collapsing is the controller's job: without script every card is open and no toggle shows.
@@ -82,6 +82,12 @@ describe 'the work pages', type: :request do
         expect(cards.css('.wk-project.is-collapsed')).to be_empty
         expect(cards.css('.wk-project__toggle')).to all(satisfy { |toggle| toggle.key?('hidden') })
         expect(response.parsed_body.at_css('.wk-deck__bar').key?('hidden')).to be(true)
+      end
+
+      # The title's stretched link lies over the gem, so the card is what the pointer reaches.
+      it 'makes each card the host its badge gem wakes on' do
+        expect(cards).to all(satisfy { |card| card.key?('data-ruby-host') })
+        expect(cards.map { |card| card.at_css('svg[data-ruby-variant-value="badge"]') }).to all(be_present)
       end
 
       it 'points each toggle at the part it folds, and says open' do
@@ -127,8 +133,8 @@ describe 'the work pages', type: :request do
       it 'labels the expand-all control in both directions' do
         all = response.parsed_body.at_css('.wk-deck__all')
 
-        expect(all['data-expand-label']).to eq('expand all')
-        expect(all['data-collapse-label']).to eq('collapse all')
+        expect(all['data-expand-label']).to eq('Expand all')
+        expect(all['data-collapse-label']).to eq('Collapse all')
       end
     end
   end
@@ -162,7 +168,7 @@ describe 'the work pages', type: :request do
       get work_case_path(locale: 'en', slug: 'rubycoin')
 
       block = response.parsed_body.at_css('section.wk-case__journal')
-      expect(block.text).to include('entries on this topic')
+      expect(block.text).to include('Entries on this topic')
       expect(block.css('a.wk-entry').pluck('href')).to eq([post_path(entry, locale: 'en')])
     end
 
@@ -174,7 +180,7 @@ describe 'the work pages', type: :request do
       expect(block.css('.wk-entry__tag:not(.is-shared)').map(&:text)).to eq(['#rails'])
 
       all = block.at_css('a.wk-entries__all')
-      expect(all.text).to include('every entry tagged #hotwire')
+      expect(all.text).to include('Every entry tagged #hotwire')
       expect(all['href']).to eq(journal_path(locale: 'en', tag_id: Tag.find_by(title: 'hotwire').id))
     end
 
@@ -210,7 +216,7 @@ describe 'the work pages', type: :request do
     it 'lists the sections, each an anchor the page has' do
       links = rail.css('a.wk-rail__link')
 
-      expect(links.map(&:text)).to eq(['in plain words', 'for engineers', 'who worked on it', 'talk it through'])
+      expect(links.map(&:text)).to eq(['In plain words', 'For engineers', 'Who worked on it', 'Talk it through'])
       links.each { |link| expect(response.parsed_body.at_css(link['href'])).to be_present }
     end
 
@@ -237,7 +243,7 @@ describe 'the work pages', type: :request do
       get work_case_path(slug: 'intelligence', locale: 'en')
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('in plain words', 'for engineers')
+      expect(response.body).to include('In plain words', 'For engineers')
     end
 
     it 'renders the scope note' do

@@ -168,6 +168,17 @@ export default class extends Controller {
     context.fillStyle = colour(context, card.backgroundColor, FALLBACK.paper)
     context.fillRect(0, 0, EXPORT_WIDTH, height)
 
+    // The card is lit from its top-right corner by a CSS gradient, which a canvas cannot read
+    // back; the same light is drawn again in the same place.
+    if (card.backgroundImage !== "none") {
+      const radius = 600 * ratio
+      const light = context.createRadialGradient(EXPORT_WIDTH * 0.9, -0.1 * height, 0, EXPORT_WIDTH * 0.9, -0.1 * height, radius)
+      light.addColorStop(0, "rgba(150, 18, 58, 0.3)")
+      light.addColorStop(0.65, "rgba(150, 18, 58, 0)")
+      context.fillStyle = light
+      context.fillRect(0, 0, EXPORT_WIDTH, height)
+    }
+
     context.font = quoteFont
     if ("letterSpacing" in context) context.letterSpacing = quoteTracking
     context.fillStyle = colour(context, quote.color, FALLBACK.ruby)

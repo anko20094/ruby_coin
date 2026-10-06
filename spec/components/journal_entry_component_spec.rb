@@ -43,6 +43,17 @@ RSpec.describe JournalEntryComponent, type: :component do
       expect(card).to have_css('.jn-preview__thumb', visible: :all)
     end
 
+    # The row already has a live stone; a second one in the hidden card would only add listeners.
+    it 'draws a coverless entry’s stone in the card as the static cut' do
+      post_record.update_columns(photo: nil)
+
+      render_inline(described_class.new(post: post_record.reload))
+
+      expect(page).to have_css('.jn-entry__thumb svg.rc-gem--badge[data-controller="ruby"]')
+      expect(page).to have_css('.jn-preview__thumb svg.rc-gem--logo', visible: :all)
+      expect(page).to have_no_css('.jn-preview [data-controller="ruby"]', visible: :all)
+    end
+
     it 'cuts a long lead at a word' do
       post_record.update!(subtitle: "#{'word ' * 60}end")
 

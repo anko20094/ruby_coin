@@ -12,7 +12,7 @@ describe FooterComponent, type: :component do
     end
 
     expect(page.all('.rc-footer__sections a').map(&:text)).to eq(
-      ['journal', 'rss', 'all projects', 'the team', 'cv', 'faq', 'contact']
+      ['Journal', 'RSS', 'All projects', 'The team', 'CV', 'FAQ', 'Contact']
     )
     expect(page).to have_css("a[href='/en/team']")
     expect(page).to have_css("a[href='/en/cv']")
@@ -51,5 +51,25 @@ describe FooterComponent, type: :component do
 
     expect(page).to have_text('Україна · віддалено')
     expect(page).to have_text('Даниїл Шкоропад')
+  end
+
+  it 'closes on the call, with the owner’s address as its button' do
+    I18n.with_locale(:en) do
+      with_request_url('/en/work') { render_inline(described_class.new) }
+    end
+
+    expect(page).to have_css('footer.rc-footer.rc-scene .rc-footer__title', text: 'Let’s work together.')
+    expect(page).to have_css("a.rc-footer__mail[href='mailto:anko20094@gmail.com']", text: 'anko20094@gmail.com')
+  end
+
+  # /contact is the call already.
+  it 'leaves the call out when asked to be quiet' do
+    I18n.with_locale(:en) do
+      with_request_url('/en/contact') { render_inline(described_class.new(cta: false)) }
+    end
+
+    expect(page).to have_css('footer.rc-footer--quiet')
+    expect(page).to have_no_css('.rc-footer__cta')
+    expect(page).to have_css('.rc-footer__sections a', text: 'Journal')
   end
 end

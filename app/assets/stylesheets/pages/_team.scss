@@ -4,29 +4,28 @@
 // /team — the roster — and /team/:person, the one canonical page per person. What the person
 // page shares with /cv lives in theme/_profile.scss; this is the roster and the blocks that
 // only a person page has.
-.tm-index,
-.tm-person {
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 56px var(--page-pad) 20px;
-}
-
-.tm-index { max-width: var(--case-max); }
+.tm-index__band,
+.tm-person__band { padding: clamp(48px, 5vw, 72px) 0 clamp(72px, 8vw, 112px); }
 
 .tm-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
   gap: 16px;
-  margin-top: 34px;
 }
 
 .tm-card {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  border: var(--rule-row);
-  border-radius: var(--radius-card);
-  padding: 18px 20px;
+  gap: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-panel);
+  transition: transform 250ms, border-color 250ms, background 150ms;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--ruby) 40%, transparent);
+  }
 }
 
 .tm-card__body { min-width: 0; }
@@ -34,11 +33,11 @@
 // The name keeps its own line: it wraps at this width, and a chip on the same baseline
 // collides with the second line of it.
 .tm-card__name {
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 27px;
-  line-height: 1.16;
-  margin: 0;
+  font-size: 29px;
+  line-height: 1.12;
 }
 
 .tm-card__meta {
@@ -49,25 +48,21 @@
   margin-top: 5px;
 }
 
-// No nowrap: "cofounder · product & clients" crossed the card's border on a 360px phone and ran
-// off the screen at 320. The chip beside it keeps its own.
+// No nowrap: "cofounder · product & clients" crossed the card's border on a 360px phone.
 .tm-card__role {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--ink-soft);
   min-width: 0;
+  font-size: 14px;
+  color: var(--ink-quiet);
 }
 
 // Dashed means unfinished — the same line the pending-CV panel and the placeholder banner
 // draw. Ruby when the content itself is invented, quiet when it is merely old.
 .tm-card__chip {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 1px;
+  padding: 1px 9px;
+  font-size: 12px;
   color: var(--ink-quiet);
   border: 1px dashed var(--ink-mute);
-  border-radius: var(--radius-chip-sm);
-  padding: 1px 5px;
+  border-radius: var(--radius-pill);
   white-space: nowrap;
 
   &.is-placeholder {
@@ -77,61 +72,50 @@
 }
 
 .tm-card__blurb {
-  font-family: var(--font-body);
-  font-size: 14px;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.55;
   color: var(--ink-soft);
-  line-height: 1.5;
-  margin-top: 10px;
   text-wrap: pretty;
 }
 
 .tm-card__count {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-quiet);
-  margin-top: 11px;
+  margin-top: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ruby);
 }
 
 // ── one person ─────────────────────────────────────────────
-// The two ways back out of a person page, at eleven pixels tall before this.
-.tm-person__crumb {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-  letter-spacing: 1px;
+.tm-person__head { padding: calc(var(--nav-clear) + clamp(24px, 4vw, 56px)) 0 clamp(56px, 6vw, 88px); }
 
-  .hover-link { @include controls.hit-row(32px); }
+.tm-person__glow {
+  --glow-x: 75%;
+  --glow-y: -340px;
+  --glow-h: 860px;
 }
+
+.tm-person__crumb { gap: 4px 14px; }
 
 .tm-person__name {
+  margin: 26px 0 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(38px, 6.4vw, 72px);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
-  margin: 10px 0 0;
-}
-
-.tm-person__mark {
-  color: var(--ruby);
-  font-style: italic;
+  font-size: clamp(48px, 7.4vw, 104px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
 }
 
 .tm-person__role {
-  font-family: var(--font-mono);
-  font-size: 12px;
+  margin-top: 18px;
+  font-size: var(--fs-lede);
   color: var(--ink-soft);
-  margin-top: 10px;
 }
 
-// The project the reader arrived through. First on the page, above the CV, because that is
-// the question they came with.
-.tm-context {
-  border: var(--rule-strong);
-  border-top: 2px solid var(--ruby);
-  border-radius: var(--radius-card);
-  padding: 18px 20px 20px;
-}
+// The project the reader arrived through: first on the page, above the CV, because that is the
+// question they came with — a dark panel, so it reads as the answer.
+.tm-context { padding: 24px 26px 26px; }
 
 .tm-context__head {
   display: flex;
@@ -142,63 +126,63 @@
 }
 
 .tm-context__on {
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: 10px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  color: var(--ruby);
   margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ruby);
+
+  &::first-letter { text-transform: uppercase; }
 }
 
 .tm-context__link {
   @include controls.hit-row(32px);
 
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--ruby);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
   white-space: nowrap;
 }
 
 .tm-context__meta {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
-  margin-top: 8px;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-quiet);
 }
 
-.tm-context .pf-did { margin-top: 13px; }
+.tm-context .pf-did {
+  margin-top: 16px;
+
+  .pf-did__item { color: var(--ink-soft); }
+}
 
 // ── worked on ──────────────────────────────────────────────
 .tm-worked {
-  margin-top: 16px;
-  border-top: var(--rule-strong);
+  margin-top: 18px;
+  border-top: 1px solid var(--ink);
 }
 
 .tm-worked__body { min-width: 0; }
 
 .tm-worked__title {
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 25px;
+  font-size: 27px;
   line-height: 1.2;
-  margin: 0;
 }
 
 .tm-worked__did {
-  font-family: var(--font-body);
-  font-size: 13.5px;
-  color: var(--ink-soft);
-  line-height: 1.5;
   margin-top: 4px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
 }
 
 .tm-worked__meta {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 13.5px;
+  line-height: 1.6;
   color: var(--ink-soft);
   text-align: right;
-  line-height: 1.7;
 }
 
 .tm-worked__period { color: var(--ink-quiet); }
@@ -212,35 +196,29 @@
 // home page, and they are why it reads as a person rather than a résumé section.
 .tm-notwork {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100px, 100%), 1fr));
-  gap: 16px;
-  margin-top: 16px;
-  padding-top: 20px;
-  border-top: var(--rule-strong);
+  grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr));
+  gap: 18px;
+  margin-top: 18px;
+  padding-top: 22px;
+  border-top: 1px solid var(--ink);
 }
 
 .tm-notwork__icon {
-  font-size: 22px;
+  margin-bottom: 6px;
+  font-size: 24px;
   line-height: 1;
-  margin-bottom: 4px;
 }
 
 .tm-notwork__label {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.1;
 }
 
 .tm-notwork__detail {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--ink-soft);
   margin-top: 4px;
-}
-
-@include bp.below(lg) {
-  .tm-index,
-  .tm-person { padding-top: 36px; }
+  font-size: 13px;
+  color: var(--ink-quiet);
 }
 
 // On a phone the monogram beside the text left the name a 114px column to wrap 27px display
@@ -253,5 +231,11 @@
 
   // Not --monogram-size: the component sets that inline, and an inline custom property
   // beats a rule. `width` is what reads it, so `width` is what overrides it.
-  .tm-card .rc-monogram { width: 56px; }
+  .tm-card .rc-monogram { width: 60px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-card { transition: none; }
+
+  .tm-card:hover { transform: none; }
 }

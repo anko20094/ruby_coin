@@ -34,6 +34,8 @@ class ErrorsController < ApplicationController
     render :show, status: status, formats: :html
   rescue StandardError => e
     Rails.error.report(e, handled: true)
+    # The static page carries its own <style>, which the site's style-src-elem 'self' would block.
+    request.content_security_policy = nil
     send_file Rails.public_path.join('500.html'), status: :internal_server_error, type: 'text/html',
                                                   disposition: 'inline'
   end

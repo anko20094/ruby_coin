@@ -1,0 +1,367 @@
+@use 'surfaces';
+@use 'controls';
+@use 'breakpoints' as bp;
+
+// The public site's composition: full-bleed bands of paper and scenes of ink, a ruby glow where
+// the eye should go, and a type scale with real jumps in it. Admin and the editor never load
+// this file, so nothing here reaches them.
+
+:root {
+  --scene: #{surfaces.$scene};
+  --scene-raised: #{surfaces.$scene-raised};
+  --scene-raised-2: #{surfaces.$scene-raised-2};
+  --on-scene: #{surfaces.$on-scene};
+  --on-scene-soft: #{surfaces.$on-scene-soft};
+  --on-scene-quiet: #{surfaces.$on-scene-quiet};
+  --ruby-glow: #{surfaces.$ruby-glow};
+  // A filled ruby that carries white text at 5.3:1 (--ruby-bright manages 4.3).
+  --ruby-fire: oklch(55% 0.21 18);
+  --glow-strong: oklch(45% 0.18 18 / 0.55);
+  --glow-soft: oklch(45% 0.18 18 / 0.22);
+
+  // Paper grain: 220px of fractal noise, tiled. Drawn once by the browser and cached.
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .1 0 0 0 0 .08 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  // The scale. Few sizes, far apart: a page reads by its jumps.
+  --fs-hero: clamp(48px, 6.8vw, 100px);
+  --fs-title: clamp(48px, 7.2vw, 108px);
+  --fs-section: clamp(38px, 5.2vw, 76px);
+  --fs-heading: clamp(28px, 2.8vw, 40px);
+  --fs-lede: clamp(17px, 1.45vw, 21px);
+
+  --wrap-max: 1280px;
+  --radius-panel: 22px;
+  --radius-pill: 999px;
+
+  // How far below the top a scroll target lands: clear of the floating nav pill.
+  --nav-clear: 96px;
+
+  @include bp.below(nav) { --nav-clear: 84px; }
+}
+
+body.rc-site {
+  background: var(--scene);
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+// The whole page sits on paper unless a band says otherwise — so a page that has not been
+// composed into bands still reads as it did.
+.rc-main {
+  @include surfaces.paper;
+
+  display: block;
+  background: var(--paper);
+}
+
+.rc-wrap {
+  width: 100%;
+  max-width: var(--wrap-max);
+  margin-inline: auto;
+  padding-inline: var(--page-pad);
+
+  // Narrower content keeps the page's left edge, so it lines up under the head's title.
+  &--narrow > * { max-width: 1080px; }
+  &--read { max-width: calc(760px + 2 * var(--page-pad)); }
+}
+
+@include bp.below(lg) {
+  :root { --page-pad: 22px; }
+}
+
+@include bp.below(sm) {
+  :root { --page-pad: 18px; }
+}
+
+// ── surfaces ──────────────────────────────────────────────────────────────────
+
+.rc-band {
+  @include surfaces.paper;
+
+  position: relative;
+  isolation: isolate;
+  background: var(--paper);
+  color: var(--ink);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--grain);
+    opacity: 0.14;
+    pointer-events: none;
+  }
+
+  &--warm { background: var(--paper-warm); }
+}
+
+.rc-scene {
+  @include surfaces.scene;
+
+  position: relative;
+  isolation: isolate;
+  // clip, not hidden: the glows stay inside the band, and a sticky child still sticks.
+  overflow: clip;
+  background: var(--paper);
+  color: var(--ink);
+
+  ::selection {
+    background: var(--ruby-fire);
+    color: #fff;
+  }
+}
+
+// The glow a scene is lit by. Placed with --glow-x/--glow-y; a radial gradient, not a blur.
+.rc-glow {
+  position: absolute;
+  z-index: -1;
+  left: var(--glow-x, 50%);
+  top: var(--glow-y, -120px);
+  width: var(--glow-w, 1200px);
+  height: var(--glow-h, 1000px);
+  max-width: 220vw;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, var(--glow-strong), var(--glow-soft) 45%, transparent 75%);
+  pointer-events: none;
+
+  &--quiet { opacity: 0.5; }
+}
+
+// Concentric hexagons behind a gem: the stone's own outline, echoed outwards.
+.rc-rings {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+
+  polygon {
+    fill: none;
+    stroke: var(--on-scene);
+    stroke-opacity: 0.07;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+// A dark panel on either surface. The light under the pointer follows it: --mx/--my are set on
+// pointermove (theme/glow_follow.js), and --panel-glow is the stone's own shade.
+.rc-panel {
+  @include surfaces.scene;
+
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--radius-panel);
+  background: linear-gradient(180deg, var(--scene-raised), oklch(17.5% 0.01 28));
+  color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--on-scene) 9%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--on-scene) 6%, transparent);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(520px circle at var(--mx, 85%) var(--my, 0%),
+                                color-mix(in oklab, var(--panel-glow, var(--ruby-fire)) 24%, transparent), transparent 62%);
+    opacity: 0.75;
+    transition: opacity 300ms;
+    pointer-events: none;
+  }
+
+  &:hover::before { opacity: 1; }
+}
+
+// ── type ──────────────────────────────────────────────────────────────────────
+
+// The pill a page head opens with: a ruby badge, then the line.
+.rc-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  max-width: 100%;
+  padding: 6px 14px;
+  border: 1px solid var(--surface-line);
+  // Round at one line, and still a soft box when a phone wraps it onto two.
+  border-radius: 22px;
+  background: color-mix(in oklab, var(--ink) 4%, transparent);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+
+  &:has(.rc-eyebrow__badge) { padding-left: 6px; }
+}
+
+.rc-eyebrow__badge {
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--ruby-fire);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.rc-eyebrow__link {
+  @include controls.hit-row(24px, 32px);
+
+  gap: 6px;
+  color: var(--ink);
+  transition: color 150ms;
+
+  &:hover { color: var(--ruby); }
+}
+
+// Italic ruby inside a display line; on a scene it is a gradient of the stone's own light.
+.rc-mark {
+  font-style: italic;
+  color: var(--ruby);
+
+  .rc-scene & {
+    background: linear-gradient(100deg, oklch(70% 0.19 18), oklch(64% 0.23 12) 60%, oklch(76% 0.14 30));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    padding-right: 0.06em;
+  }
+}
+
+// A section's heading row: the big line on the left, the way onwards on the right.
+.rc-sechead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-bottom: clamp(36px, 4.6vw, 60px);
+}
+
+.rc-sechead__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-section);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.rc-sechead__lede {
+  max-width: 40ch;
+  margin-top: 14px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.rc-more {
+  @include controls.hit-row(32px, 44px);
+
+  gap: 8px;
+  flex: none;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ruby);
+
+  .rc-scene & { color: var(--ink); }
+
+  span { transition: transform 200ms; }
+
+  &:hover span { transform: translateX(4px); }
+}
+
+@include bp.below(md) {
+  .rc-sechead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.rc-section { padding-block: clamp(72px, 9vw, 136px); }
+
+// A figure: display face, lining and tabular so a counter does not jitter as it counts.
+.rc-figure {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+
+  &--glow,
+  .rc-scene &.is-lit {
+    color: var(--ruby-glow);
+    text-shadow: 0 0 28px oklch(58% 0.22 18 / 0.55);
+  }
+}
+
+// ── buttons ───────────────────────────────────────────────────────────────────
+
+.rc-button {
+  @include controls.hit-row(44px);
+
+  justify-content: center;
+  gap: 10px;
+  max-width: 100%;
+  white-space: normal;
+  padding: 11px 24px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink);
+  background: none;
+  border: 1px solid color-mix(in oklab, var(--ink) 24%, transparent);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform 200ms, box-shadow 200ms, background 200ms, border-color 200ms, color 200ms;
+
+  &:hover {
+    background: color-mix(in oklab, var(--ink) 7%, transparent);
+    border-color: color-mix(in oklab, var(--ink) 40%, transparent);
+  }
+
+  &:active { transform: translateY(1px); }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 3px;
+  }
+
+  &--primary {
+    color: #fff;
+    background: var(--ruby-fire);
+    border-color: transparent;
+    box-shadow: 0 0 0 1px oklch(70% 0.2 18 / 0.45) inset, 0 10px 36px -12px oklch(58% 0.22 18 / 0.8);
+
+    &:hover {
+      background: var(--ruby-fire);
+      border-color: transparent;
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px oklch(75% 0.2 18 / 0.6) inset, 0 14px 46px -10px oklch(58% 0.22 18 / 0.95);
+    }
+  }
+}
+
+// ── reveal ────────────────────────────────────────────────────────────────────
+
+// Once, on the way in (theme/reveal.js). Without script, or under reduced motion, the class on
+// <html> never appears and everything is simply there.
+.js-reveal [data-reveal]:not(.is-in) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.js-reveal [data-reveal]:not(.is-settled) {
+  transition: opacity 280ms ease-out, transform 280ms ease-out;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-panel::before,
+  .rc-more span,
+  .rc-button { transition: none; }
+}

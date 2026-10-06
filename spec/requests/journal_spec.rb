@@ -88,11 +88,32 @@ describe 'the journal', type: :request do
         expect(counts).to include('#rails' => '2', '#design' => '2')
       end
 
+      it 'counts within what the tags already on leave, since the filter narrows' do
+        create(:post, status: 'active', tags: [create(:tag, title: 'ops')], title: 'An entry under ops only')
+
+        get journal_path(locale: 'en', tag_id: tag.id)
+
+        counts = response.parsed_body.css('.jn-filter a').to_h do |chip|
+          [chip.children.first.text.strip, chip.at_css('.jn-filter__count')&.text]
+        end
+        expect(counts).to include('#rails' => '2', '#design' => '1', '#ops' => '0')
+      end
+
+      it 'counts an entry once when the join table holds its tag twice' do
+        Post.connection.execute("INSERT INTO posts_tags (post_id, tag_id) VALUES (#{both.id}, #{design.id})")
+
+        get journal_path(locale: 'en')
+
+        chip = response.parsed_body.css('.jn-filter a').find { |link| link.text.start_with?('#design') }
+        expect(chip.at_css('.jn-filter__count').text).to eq('2')
+      end
+
       it 'switches a tag on from a chip and keeps the one already on' do
         get journal_path(locale: 'en', tag_id: tag.id)
 
         chip = response.parsed_body.css('.jn-filter a').find { |link| link.text.start_with?('#design') }
-        expect(chip['href']).to eq(journal_path(locale: 'en', tag_id: [tag.id, design.id].sort, order: 'new'))
+        expect(chip['href'])
+          .to eq(journal_path(locale: 'en', tag_id: [tag.id, design.id].sort, order: 'new', anchor: 'entries'))
       end
 
       it 'switches a tag off from its own chip, back to the single-tag address' do
@@ -100,7 +121,7 @@ describe 'the journal', type: :request do
 
         chip = response.parsed_body.css('.jn-filter a').find { |link| link.text.start_with?('#design') }
         expect(chip['aria-current']).to eq('true')
-        expect(chip['href']).to eq(journal_path(locale: 'en', tag_id: tag.id, order: 'new'))
+        expect(chip['href']).to eq(journal_path(locale: 'en', tag_id: tag.id, order: 'new', anchor: 'entries'))
       end
 
       it 'draws the tags and the order as two labelled groups, the order one of three' do
@@ -158,6 +179,44 @@ describe 'the journal', type: :request do
     end
   end
 
+  describe 'GET /journal?partial=1, the fragment the filter swaps in' do
+    let(:design) { create(:tag, title: 'design') }
+    let!(:other) { create(:post, status: 'active', tags: [design], title: 'An entry under another tag') }
+
+    it 'answers with the filter and the filtered list alone, without the page round them' do
+      get journal_path(locale: 'en', tag_id: tag.id, partial: 1)
+
+      expect(response).to be_successful
+      expect(response.body).not_to include('<html', 'jn-search__input', 'rc-nav')
+      fragment = Nokogiri::HTML5.fragment(response.body)
+      expect(fragment.at_css('nav.jn-filter[data-journal-filter-target="filter"]')).to be_present
+      expect(fragment.at_css(".rc-chip.is-active[data-journal-filter-key='tag-#{tag.id}']")).to be_present
+      list = fragment.at_css('.jn-listing__list[data-journal-filter-target="list"]')
+      expect(list['data-summary']).to eq('1 entry in the list')
+      expect(list.css('.jn-entry__name').map(&:text)).to eq([post_record.title])
+      expect(response.body).not_to include(other.title)
+    end
+
+    it 'carries the order and says so when nothing is left' do
+      get journal_path(locale: 'en', tag_id: create(:tag, title: 'empty').id, order: 'best', partial: 1)
+
+      fragment = Nokogiri::HTML5.fragment(response.body)
+      expect(fragment.at_css('.jn-sort__option.is-active')['data-journal-filter-key']).to eq('order-best')
+      expect(fragment.at_css('.jn-listing__list .jn-empty')).to be_present
+    end
+  end
+
+  describe 'the filter links' do
+    it 'land on the list, not the top of the page, when they reload it' do
+      get journal_path(locale: 'en')
+
+      hrefs = response.parsed_body.css('a[data-journal-filter-key]').pluck('href')
+      expect(hrefs).not_to be_empty
+      expect(hrefs).to all(end_with('#entries'))
+      expect(response.parsed_body.at_css('#entries[data-controller="journal-filter"]')).to be_present
+    end
+  end
+
   describe 'GET /journal, grouped by year' do
     before do
       post_record.update_columns(created_at: Time.zone.local(2026, 3, 1))
@@ -185,12 +244,19 @@ describe 'the journal', type: :request do
     end
 
     it 'counts the whole year, not the page, when a year runs over two pages' do
+      create(:post, status: 'active', title: 'A second entry that year', created_at: Time.zone.local(2026, 2, 1))
       stub_const('JournalController::PER_PAGE', 1)
 
       get journal_path(locale: 'en', page: 1)
+      first_page = response.parsed_body
+      get journal_path(locale: 'en', page: 2)
+      second_page = response.parsed_body
 
-      expect(response.parsed_body.at_css('.jn-year__count').text).to include('1 entry')
-      expect(response.parsed_body.css('.jn-year').size).to eq(1)
+      [first_page, second_page].each do |page|
+        expect(page.at_css('.jn-year__number').text).to eq('2026')
+        expect(page.at_css('.jn-year__count').text).to include('2 entries')
+        expect(page.css('.jn-entry').size).to eq(1)
+      end
     end
 
     it 'does not group a ranking' do
@@ -380,10 +446,10 @@ describe 'the journal', type: :request do
       opening, latest = Post.active.order(:entry_number).to_a.values_at(0, -1)
 
       get post_path(locale: 'en', id: opening.slug)
-      expect(response.parsed_body.css('.jn-steps > *').pluck('class')).to eq(['jn-step jn-step--next hover-row'])
+      expect(response.parsed_body.css('.jn-steps > *').pluck('class')).to eq(['jn-step jn-step--next rc-panel'])
 
       get post_path(locale: 'en', id: latest.slug)
-      expect(response.parsed_body.css('.jn-steps > *').pluck('class')).to eq(['jn-step hover-row'])
+      expect(response.parsed_body.css('.jn-steps > *').pluck('class')).to eq(['jn-step rc-panel'])
     end
 
     it 'shows the neighbour’s cover beside it, or its stone when it has none' do
@@ -521,7 +587,7 @@ describe 'the journal', type: :request do
         expect(form['data-live-search-results-value']).to eq('journal-live')
         expect(form.at_css('[aria-live="polite"][data-live-search-target="status"]')).to be_present
         expect(form.at_css('input.jn-search__submit[type="submit"]')).to be_present
-        expect(response.parsed_body.at_css('#journal-live[hidden] + .rc-keys, #journal-live[hidden] ~ .jn-entries'))
+        expect(response.parsed_body.at_css('#journal-live[hidden] + .jn-listing__list .jn-entries'))
           .to be_present
       end
     end

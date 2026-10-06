@@ -1,123 +1,175 @@
 @use '../controls';
+@use '../surfaces';
 @use '../breakpoints' as bp;
 
-// The site nav: the desktop row, and below bp `nav` the top bar and its drawer.
+// The site nav: a glass pill floating over the page. Wide, it carries the sections, the tools and
+// the call; below bp `nav` it keeps the brand and a menu button, and the rest opens as a panel.
 .rc-nav {
-  position: sticky;
-  top: 0;
+  @include surfaces.scene;
+
+  position: fixed;
   z-index: 50;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  max-width: 1120px;
+  margin-inline: auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 14px var(--page-pad);
+  gap: 16px;
+  height: 58px;
+  padding: 0 9px 0 18px;
+  border-radius: var(--radius-pill);
+  color: var(--ink);
   font-family: var(--font-body);
-  background: color-mix(in oklab, var(--paper) 93%, transparent);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid color-mix(in oklab, var(--ink-mute) 20%, transparent);
+
+  // The glass is a layer of its own. On the nav itself a backdrop-filter would make the pill the
+  // containing block of every fixed descendant, and the mobile panel would open inside 58px.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    // Dense enough that the soft text keeps 4.5:1 over a paper band scrolling underneath.
+    background: color-mix(in oklab, var(--scene) 84%, transparent);
+    border: 1px solid var(--surface-line);
+    box-shadow: 0 8px 32px -12px oklch(0% 0 0 / 0.5);
+    backdrop-filter: blur(14px) saturate(1.3);
+  }
 }
 
 .rc-nav__brand {
   @include controls.hit-row(44px);
 
+  flex: none;
   gap: 10px;
 
   .rc-gem {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
   }
 }
 
 .rc-nav__wordmark {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 23px;
   line-height: 1;
+}
+
+.rc-nav__drawer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
 }
 
 .rc-nav__sections {
   display: flex;
-  gap: 26px;
-  font-size: 14px;
+  gap: 28px;
+  margin-inline: auto;
+  font-size: 15px;
 }
 
 .rc-nav__link {
-  // Height only. The sections sit in a 26px-gapped row, so growing them sideways would either
-  // change the spacing the design sets or let one link take a click aimed at the next.
+  // Height only: the sections sit in a gapped row, and growing them sideways would let one link
+  // take a click aimed at the next.
   @include controls.hit-row(44px);
 
-  padding-bottom: 2px;
-  border-bottom: 1px solid transparent;
-  transition: color 0.18s, border-color 0.18s;
+  position: relative;
+  color: var(--ink-soft);
+  transition: color 0.18s;
 
-  &:hover { color: var(--ruby); }
+  &:hover,
+  &.is-current { color: var(--ink); }
 
-  &.is-current {
-    color: var(--ruby);
-    border-bottom-color: var(--ruby);
+  // A ruby point under the section the reader is in.
+  &.is-current::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--ruby);
   }
 }
 
-// The CV sits apart from the four sections, as a chip: it is one person's page on a site that
-// is a studio's, and it is the thing a recruiter arrives looking for.
 .rc-nav__tools {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
+// One person's page on a studio's site, and what a recruiter arrives looking for: a chip.
 .rc-nav__cv {
-  @include controls.hit-row(32px);
+  @include controls.hit-row(30px);
 
-  padding: 0 9px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.6px;
+  padding: 0 11px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--ink-soft);
-  border: 1px solid var(--ink-mute);
-  border-radius: var(--radius-chip);
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-pill);
   transition: color 0.18s, border-color 0.18s;
 
   &:hover,
   &.is-current {
-    color: var(--ruby);
-    border-color: var(--ruby);
+    color: var(--ink);
+    border-color: color-mix(in oklab, var(--ruby) 70%, transparent);
   }
 }
 
 .rc-nav__locales {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  padding: 2px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .rc-nav__locale {
   // Two glyphs, so this one is a box rather than a line.
-  @include controls.hit-square(34px, 44px);
+  @include controls.hit-square(30px, 44px);
 
-  padding: 4px 8px;
-  border-radius: var(--radius-chip);
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
   color: var(--ink-soft);
   transition: color 0.18s, background 0.18s;
 
-  &:hover { color: var(--ruby); }
+  &:hover { color: var(--ink); }
 
   &.is-current {
-    background: var(--ink);
-    color: var(--paper);
+    background: color-mix(in oklab, var(--ink) 14%, transparent);
+    color: var(--ink);
   }
 }
 
-// ── The mobile nav ────────────────────────────────────────────────────────────
-//
-// A top bar with a hamburger and a drawer from the right, so the nav does not wrap and eat a
-// phone screen. One element, two arrangements: on a wide screen the drawer is the right half
-// of the nav row, below the breakpoint the panel that slides in — nothing depends on JS.
-.rc-nav__drawer {
-  display: flex;
-  align-items: center;
-  gap: 26px;
+.rc-nav__cta {
+  flex: none;
+  padding: 0 18px;
+  min-height: 40px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--scene);
+  background: var(--on-scene);
+  border-radius: var(--radius-pill);
+  transition: background 0.2s, color 0.2s;
+
+  &:hover,
+  &.is-current {
+    color: var(--scene);
+    background: oklch(94% 0.04 18);
+  }
+
+  &.is-current::after { display: none; }
+
+  &:focus-visible { outline-offset: 2px; }
 }
 
 .rc-nav__toggle {
@@ -125,25 +177,30 @@
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  padding: 8px 4px 8px 12px;
+  margin-left: auto;
+  padding: 0 12px 0 14px;
   background: none;
   border: 0;
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 0;
+  }
 }
 
 .rc-nav__burger {
   display: block;
-  width: 22px;
+  width: 20px;
 
   span {
     display: block;
-    height: 1px;
-    background: var(--ink);
+    height: 1.5px;
+    background: currentColor;
     transition: transform 180ms, opacity 180ms;
 
     + span { margin-top: 6px; }
@@ -152,136 +209,154 @@
 
 @include bp.below(nav) {
   .rc-nav {
-    padding: 6px 20px;
-    gap: 12px;
-
-    // No blur here, and the background is opaque instead. A backdrop-filter makes its element
-    // the containing block for every fixed-position descendant, so the drawer's `inset: 0 0 0
-    // auto` was resolving against the 57px nav bar rather than the viewport: the menu opened as
-    // a 293×116 box with 476px of content inside it, and not one of its seven links could be
-    // tapped. The blur is a desktop nicety; below this width the drawer covers the screen.
-    backdrop-filter: none;
-    background: var(--paper);
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    height: 54px;
+    padding: 0 6px 0 16px;
   }
 
-  // A logo is a link like any other: 26px of ruby was the smallest tap target on the page.
-  .rc-nav__brand { min-height: 44px; }
-
-  .rc-nav__wordmark { font-size: 19px; }
+  .rc-nav__wordmark { font-size: 21px; }
 
   .rc-nav__toggle {
     display: inline-flex;
-    // Above the open drawer: the burger turns into an X, and the X has to be the thing you
-    // press to close. The drawer was painting over it, so the only way out was a tap outside.
+    // Above the open panel: the burger turns into an X, and the X is what closes it.
     position: relative;
     z-index: 1;
   }
 
+  // A panel under the pill rather than a drawer from the side: the pill stays the one object.
   .rc-nav__drawer {
     position: fixed;
-    inset: 0 0 0 auto;
-    width: min(78vw, 320px);
-    padding: 84px 28px 32px;
-    background: var(--paper);
-    border-left: 1px solid color-mix(in oklab, var(--ink-mute) 30%, transparent);
-    box-shadow: -18px 0 40px color-mix(in oklab, var(--ink) 8%, transparent);
-    transform: translateX(100%);
-    // Hidden, not merely moved: the shadow of an off-canvas panel bleeds back onto the page,
-    // and its links stay in the tab order where nobody can see what has focus.
-    //
-    // visibility flips instantly on open and only after the slide on close. Transitioning it
-    // over the same 220ms meant the drawer was still computed-hidden when the controller tried
-    // to move focus into it, so the first Tab landed back at the top of the page.
-    visibility: hidden;
-    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.3, 1), visibility 0s linear 220ms;
-    display: flex;
+    top: 72px;
+    left: 10px;
+    right: 10px;
+    max-height: calc(100dvh - 84px);
     flex-direction: column;
-    gap: 28px;
+    align-items: stretch;
+    gap: 22px;
+    padding: 18px 20px 20px;
     overflow-y: auto;
     overscroll-behavior: contain;
+    background: var(--scene-raised);
+    border: 1px solid var(--surface-line);
+    border-radius: var(--radius-panel);
+    box-shadow: 0 24px 60px -20px oklch(0% 0 0 / 0.7);
+    opacity: 0;
+    transform: translateY(-8px);
+    // Hidden, not merely faded: its links must leave the tab order. visibility flips at once on
+    // open and only after the fade on close, so focus can move in as soon as it opens.
+    visibility: hidden;
+    transition: opacity 200ms, transform 220ms cubic-bezier(0.2, 0.7, 0.3, 1), visibility 0s linear 220ms;
   }
 
   .rc-nav.is-open .rc-nav__drawer {
+    opacity: 1;
     transform: none;
     visibility: visible;
-    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.3, 1), visibility 0s;
+    transition: opacity 200ms, transform 220ms cubic-bezier(0.2, 0.7, 0.3, 1), visibility 0s;
   }
 
-  .rc-nav.is-open .rc-nav__burger span:first-child { transform: translateY(3px) rotate(45deg); }
-  .rc-nav.is-open .rc-nav__burger span:last-child { transform: translateY(-4px) rotate(-45deg); }
+  .rc-nav.is-open .rc-nav__burger span:first-child { transform: translateY(3.75px) rotate(45deg); }
+  .rc-nav.is-open .rc-nav__burger span:last-child { transform: translateY(-3.75px) rotate(-45deg); }
 
   .rc-nav__sections {
     flex-direction: column;
-    gap: 4px;
-    font-size: 22px;
+    gap: 0;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 30px;
   }
 
-  // 44px minimum, which none of these met before.
   .rc-nav__link {
-    display: block;
-    padding: 11px 0;
-    min-height: 44px;
+    display: flex;
+    min-height: 52px;
+    color: var(--ink);
+
+    + .rc-nav__link { border-top: var(--rule-row); }
+
+    &.is-current { color: var(--ruby); }
+
+    &.is-current::after {
+      left: auto;
+      right: 4px;
+      bottom: 50%;
+      width: 6px;
+      height: 6px;
+      margin: 0 0 -3px;
+    }
   }
 
   .rc-nav__tools {
-    width: 100%;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .rc-nav__cv {
     min-height: 44px;
-    font-size: 13px;
-    padding: 0 14px;
+    padding: 0 16px;
+    font-size: 14px;
   }
 
-  .rc-nav__locales { gap: 8px; }
+  .rc-nav__locales { margin-left: auto; }
 
-  .rc-nav__locale {
-    min-width: 48px;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
+  // Restated after the panel's link rule, which would otherwise paint it in the scene's ink.
+  .rc-nav__cta,
+  .rc-nav__cta.is-current {
     justify-content: center;
-    border: 1px solid color-mix(in oklab, var(--ink-mute) 45%, transparent);
-    font-size: 13px;
+    min-height: 50px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--scene);
   }
 
-  // The page behind a full-height drawer must not scroll under it.
+  // The page behind the open panel must not scroll under it.
   body.is-nav-open { overflow: hidden; }
 }
 
-// Nothing can open the drawer when scripting is off, so there it stays in the page, under the
-// brand, instead of off-canvas behind a button that does nothing.
+// Nothing can open the panel when scripting is off, so there it stays in the pill, which grows to
+// hold it.
 @media (max-width: bp.width(nav)) and (scripting: none) {
-  .rc-nav { flex-wrap: wrap; }
+  // In the flow, above the page: a pill that has grown into a panel.
+  .rc-nav {
+    position: relative;
+    inset: auto;
+    height: auto;
+    margin: 10px;
+    flex-wrap: wrap;
+    padding: 6px 16px 14px;
+    border-radius: var(--radius-panel);
+  }
 
   .rc-nav__toggle { display: none; }
 
   .rc-nav__drawer {
     position: static;
+    flex: 1 1 100%;
     width: 100%;
-    padding: 0 0 8px;
+    max-height: none;
+    padding: 0;
     background: none;
     border: 0;
     box-shadow: none;
+    opacity: 1;
     transform: none;
     visibility: visible;
-    flex-flow: row wrap;
-    gap: 0 20px;
-    overflow: visible;
   }
 
   .rc-nav__sections {
     flex-flow: row wrap;
     gap: 0 20px;
-    font-size: 15px;
+    font-size: 22px;
   }
 
-  .rc-nav__tools { width: auto; }
+  .rc-nav__link + .rc-nav__link { border-top: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rc-nav__drawer,
+  .rc-nav__link,
   .rc-nav__cv,
+  .rc-nav__cta,
   .rc-nav__burger span { transition: none; }
 }

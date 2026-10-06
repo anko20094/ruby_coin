@@ -3,6 +3,8 @@
 
 // ── The command palette ───────────────────────────────────────────────────────
 //
+// It lives in the nav, so it takes the nav's scene colours: a dark sheet over the page.
+//
 // Built on <dialog>, so the focus trap, the Escape handler and the inert background come from
 // the platform rather than from three hundred lines of JavaScript that gets one of them wrong.
 .rc-palette { display: contents; }
@@ -12,27 +14,27 @@
 }
 
 .rc-palette__open {
-  @include controls.hit-row(32px);
+  @include controls.hit-square(34px, 44px);
 
   gap: 10px;
   padding: 0 4px;
   background: none;
   border: 0;
+  border-radius: var(--radius-pill);
   color: var(--ink-soft);
   cursor: pointer;
+  transition: color 0.18s, background 0.18s;
 }
 
-.rc-palette__open:hover { color: var(--ruby); }
+.rc-palette__open:hover {
+  color: var(--ink);
+  background: color-mix(in oklab, var(--ink) 9%, transparent);
+}
 
 .rc-palette__icon { display: block; flex: none; }
 
 // The name is for the drawer; beside the other nav items the glass alone says "search".
-.rc-palette__label {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
+.rc-palette__label { font-size: 14px; }
 
 @include bp.above(nav) {
   .rc-palette__label {
@@ -59,16 +61,14 @@
   width: min(620px, 92vw);
   margin-top: 12vh;
   padding: 0;
-  border: 1px solid var(--ink-mute);
-  border-radius: var(--radius-card);
-  background: var(--paper);
+  border: 1px solid var(--surface-line);
+  border-radius: 20px;
+  background: var(--scene-raised);
   color: var(--ink);
-  box-shadow: 0 24px 60px color-mix(in oklab, var(--ink) 18%, transparent);
+  box-shadow: 0 30px 80px -20px oklch(0% 0 0 / 0.75), 0 0 0 1px oklch(58% 0.22 18 / 0.12);
 
-  &::backdrop {
-    background: color-mix(in oklab, var(--ink) 32%, transparent);
-    backdrop-filter: blur(2px);
-  }
+  // A tint, not a blur: the backdrop covers the whole screen.
+  &::backdrop { background: oklch(10% 0.01 25 / 0.6); }
 }
 
 .rc-palette__field {
@@ -76,7 +76,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  border-bottom: 1px solid color-mix(in oklab, var(--ink-mute) 35%, transparent);
+  border-bottom: 1px solid var(--surface-line);
 }
 
 .rc-palette__glyph {
@@ -122,16 +122,13 @@
   padding: 10px 14px;
   border-radius: var(--radius-chip);
 
-  &[aria-selected='true'] { background: var(--paper-warm); }
+  &[aria-selected='true'] { background: color-mix(in oklab, var(--ink) 9%, transparent); }
 
-  &:hover { background: var(--paper-warm); }
+  &:hover { background: color-mix(in oklab, var(--ink) 6%, transparent); }
 }
 
 .rc-palette__kind {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
+  font-size: 12px;
   color: var(--ruby);
 }
 
@@ -166,11 +163,9 @@
   gap: 18px;
   flex-wrap: wrap;
   padding: 10px 20px;
-  border-top: 1px solid color-mix(in oklab, var(--ink-mute) 35%, transparent);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.8px;
-  color: var(--ink-soft);
+  border-top: 1px solid var(--surface-line);
+  font-size: 12px;
+  color: var(--ink-quiet);
 
   span {
     display: inline-flex;
@@ -180,11 +175,10 @@
 }
 
 @include bp.below(nav) {
-  // In the drawer there is no keyboard to hint at, so the button says what it does.
+  // In the panel there is no keyboard to hint at, so the button says what it does.
   .rc-palette__open {
-    min-height: 44px;
-    width: 100%;
-    justify-content: flex-start;
+    padding: 0 16px 0 12px;
+    border: 1px solid var(--surface-line);
   }
 
   .rc-palette__dialog { margin-top: 6vh; }

@@ -29,13 +29,17 @@ describe 'the home page', type: :request do
 
     # The hero is the studio speaking, and every number in it is counted rather than typed. The
     # headcount is people: the reviewer in CI is on the crew, and it is not one.
-    it 'counts the projects, the people and the year the oldest project started' do
+    it 'counts the projects, the people, the year the oldest project started and the entries' do
       get root_path(locale: 'en')
 
       humans = Team.crew.count { |person| !person.machine? }
+      figures = response.parsed_body.css('.hm-figure').to_h do |figure|
+        [figure.at_css('dt').text, figure.at_css('dd').text]
+      end
 
       expect(humans).to be < Team.crew.size
-      expect(response.body).to include("#{Case.count} products · people on the team: #{humans} · shipping since 2022")
+      expect(figures).to eq('products in the portfolio' => Case.count.to_s, 'people on the team' => humans.to_s,
+                            'the portfolio’s first project' => '2022', 'entry in the journal' => '1')
     end
 
     it 'carries the headline and both halves of the lede' do
@@ -77,10 +81,11 @@ describe 'the home page', type: :request do
       expect(response.body).not_to include('The hidden feature')
     end
 
-    it 'shows the first three cases and nothing more' do
+    it 'draws the first three cases as panels and the rest of the portfolio as tiles' do
       get root_path(locale: 'en')
 
-      expect(response.body.scan('class="hm-card"').size).to eq(HomeController::RECENT_CASES)
+      expect(response.parsed_body.css('a.hm-case').size).to eq(HomeController::RECENT_CASES)
+      expect(response.parsed_body.css('a.hm-mini').size).to eq(Case.count - HomeController::RECENT_CASES)
       expect(response.body).to include(work_case_path(slug: 'intelligence', locale: 'en'))
     end
 
@@ -89,19 +94,19 @@ describe 'the home page', type: :request do
     it 'opens each card on its stone and its headline figure, not on a numbered box' do
       get root_path(locale: 'en')
 
-      cards = response.parsed_body.css('.hm-card')
+      cards = response.parsed_body.css('.hm-case')
       intelligence = Case.find_by!(slug: 'intelligence')
 
-      expect(cards.css('.hm-card__cover, .hm-card__glyph, .hm-card__mark')).to be_empty
-      expect(cards.css('.hm-card__lead svg.rc-gem').size).to eq(HomeController::RECENT_CASES)
-      expect(cards.first.at_css('.hm-card__metric-value[data-controller="count-up"]').text)
+      expect(cards.css('.hm-case__cover, .hm-case__glyph, .hm-case__mark')).to be_empty
+      expect(cards.css('.hm-case__lead svg.rc-gem').size).to eq(HomeController::RECENT_CASES)
+      expect(cards.first.at_css('.hm-case__figure[data-controller="count-up"]').text)
         .to eq(ProseHelper.plain(intelligence.headline_metric[:value]))
     end
 
     it 'gives each card a different shade of the stone' do
       get root_path(locale: 'en')
 
-      shades = response.parsed_body.css('.hm-card').map { |card| card.at_css('stop')['stop-color'] }
+      shades = response.parsed_body.css('.hm-case').map { |card| card.at_css('stop')['stop-color'] }
 
       expect(shades.uniq.size).to eq(HomeController::RECENT_CASES)
     end
@@ -151,7 +156,7 @@ describe 'the home page', type: :request do
 
       humans = Team.crew.count { |person| !person.machine? }
 
-      expect(response.body).to include("#{Team.crew.size} on the team · #{humans} of them human")
+      expect(response.body).to include("#{Team.crew.size} on the team — #{humans} of them human.")
     end
 
     # It used to be one five-column strip here, attributed to the studio as a whole. A studio
@@ -166,7 +171,7 @@ describe 'the home page', type: :request do
       get root_path(locale: 'uk')
 
       expect(response.body).to include(I18n.t('home.index.headline_lead', locale: :uk))
-      expect(response.body).to include("у команді #{Team.crew.size}")
+      expect(response.body).to include("У команді #{Team.crew.size}")
     end
   end
 

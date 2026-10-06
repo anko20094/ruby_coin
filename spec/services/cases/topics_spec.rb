@@ -41,6 +41,22 @@ RSpec.describe Cases::Topics do
     it 'leaves out what the language cannot read' do
       expect(topics.posts_for(site, locale: :uk)).to be_empty
     end
+
+    it 'leaves out an entry another case matches more closely, as the entry itself does' do
+      on_bot = create(:post, status: 'active', title: 'Queues',
+                             tags: [create(:tag, title: 'sidekiq'), on_both.tags.find_by(title: 'postgres')])
+
+      expect(topics.posts_for(bot)).to eq([on_bot])
+      expect(topics.posts_for(site)).not_to include(on_bot)
+    end
+
+    it 'lists an entry under no case when its overlap is shared too widely, as #cases_for does' do
+      wide = described_class.new([site, bot, Case.new(slug: 'third', stack: ['PostgreSQL']), render])
+      only_postgres = create(:post, status: 'active', title: 'Indexes', tags: [on_both.tags.find_by(title: 'postgres')])
+
+      expect(wide.cases_for(only_postgres)).to be_empty
+      expect([site, bot].flat_map { |kase| wide.posts_for(kase).to_a }).not_to include(only_postgres)
+    end
   end
 
   describe '#shared_tags and #lead_tag' do

@@ -3,16 +3,19 @@
 class PostCoverComponent < ViewComponent::Base
   VERSIONS = { small: PhotoUploader::SMALL, medium: PhotoUploader::MEDIUM }.freeze
 
-  private attr_reader :post, :version, :uid, :loading
+  private attr_reader :post, :version, :uid, :loading, :gem_variant
 
   # uid has to be unique on the page: the same post can be the next entry and a related one.
-  def initialize(post:, uid:, version: :small, loading: 'lazy')
+  # gem_variant: :logo for a copy of the cover that should not come alive (a hover preview of a
+  # row that already has a live one).
+  def initialize(post:, uid:, version: :small, loading: 'lazy', gem_variant: :badge)
     raise ArgumentError, "version must be one of #{VERSIONS.keys.join(', ')}" unless VERSIONS.key?(version)
 
     @post = post
     @uid = uid
     @version = version
     @loading = loading
+    @gem_variant = gem_variant
 
     super()
   end

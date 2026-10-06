@@ -31,6 +31,13 @@ class Person::CV
     end
   end
 
+  # [label, href] of the row for one channel, found by its English key whatever language is
+  # being read, so "email" finds the row a Ukrainian reader sees as "пошта".
+  def contact(key)
+    index = Array(@block['contact']).index { |row_key, _, _| pair_of(row_key)['en'] == key.to_s }
+    contact_rows[index].drop(1) if index
+  end
+
   def experience
     Array(@block['experience']).map do |entry|
       {
