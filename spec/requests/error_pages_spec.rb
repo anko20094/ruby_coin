@@ -73,7 +73,6 @@ describe 'error pages', type: :request do
 
   describe 'a miss on a page that has a record behind it' do
     include_context 'when the cases are imported'
-    include_context 'when the cv is imported'
 
     it 'is a 404 on the designed page for a case that does not exist' do
       get '/en/work/nope'
@@ -141,16 +140,25 @@ describe 'error pages', type: :request do
       expect(response.body).to include(I18n.t('error_pages.internal.title', locale: :en))
     end
 
-    # The footer reads the database, and a database that is down is the commonest reason for a
-    # 500 — the layout then fails again while explaining the first failure.
+    # A database that is down is the commonest reason for a 500 — and when the layout fails
+    # again while explaining the first failure, the static page is what is left.
     it 'is the static page when the layout cannot render either' do
-      allow(CVProfile).to receive(:current).and_raise(ActiveRecord::ConnectionNotEstablished)
+      allow(Team).to receive(:owner_cv).and_raise(ActiveRecord::ConnectionNotEstablished)
 
       get '/en/journal'
 
       expect(response).to have_http_status(:internal_server_error)
       expect(response.media_type).to eq('text/html')
       expect(response.body.b).to eq(Rails.public_path.join('500.html').binread)
+    end
+
+    # Its styles are inline; under the site's policy they would be blocked and the page unstyled.
+    it 'serves the static page without the content security policy' do
+      allow(Team).to receive(:owner_cv).and_raise(ActiveRecord::ConnectionNotEstablished)
+
+      get '/en/journal'
+
+      expect(response.headers['Content-Security-Policy']).to be_nil
     end
   end
 

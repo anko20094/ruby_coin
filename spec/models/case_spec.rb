@@ -18,7 +18,7 @@ RSpec.describe Case do
       expect(described_class.new(slug: 'dna', mark: '08', position: 8)).not_to be_valid
     end
 
-    # The handoff's editorial rule: never one language alone.
+    # The editorial rule: never one language alone.
     it 'refuses a scalar written in only one language' do
       described_class::LOCALISED_SCALARS.each { |field| kase.public_send(:"#{field}_en=", 'x') }
 
@@ -59,6 +59,19 @@ RSpec.describe Case do
 
         expect(described_class.slugs.last(2)).to eq(%w[tie-a tie-b])
       end
+    end
+  end
+
+  describe '#headline_metric' do
+    it 'is the first of the metrics, in the reader’s language' do
+      kase = described_class.find_by!(slug: 'intelligence')
+
+      expect(kase.headline_metric).to eq(kase.metrics.first)
+      expect(kase.headline_metric[:value]).to be_present
+    end
+
+    it 'is nil for a case with no metrics yet' do
+      expect(described_class.new.headline_metric).to be_nil
     end
   end
 
@@ -140,8 +153,14 @@ RSpec.describe Case do
     end
 
     it 'is also named by the career in the CV' do
-      CV::Importer.call
-      CVProfile.current.update_columns(experience: [{ 'case_slugs' => ['scratch'] }])
+      allow(Team).to receive(:owner_cv).and_return(Person::CV.new('experience' => [{ 'cases' => ['scratch'] }]))
+
+      expect(scratch.destroy).to be(false)
+    end
+
+    it 'is also named by a career entry in people.yml' do
+      ghost = Person.new('id' => 'ghost', 'cv' => { 'experience' => [{ 'cases' => ['scratch'] }] })
+      allow(Team).to receive(:everyone).and_return(Team.everyone + [ghost])
 
       expect(scratch.destroy).to be(false)
     end
@@ -251,7 +270,7 @@ RSpec.describe Case do
 
   # StructuredJson's form-facing half, exercised here because Case is the model that still has
   # a form. The CV reads structured fields but no longer writes them: it has no screen — it is
-  # config/portfolio/cv.yml, imported by `rake cv:import`.
+  # config/portfolio/cv.yml.
   describe 'the structured rows a form posts' do
     let(:kase) { described_class.ordered.first }
 
@@ -281,6 +300,19 @@ RSpec.describe Case do
       kase.metrics_rows = { '0' => row }
 
       expect(kase.metrics_rows.first.keys).to match_array(%w[value label])
+    end
+  end
+
+  describe '.first_year' do
+    it 'reads a language pair by its values and a bare string as it is' do
+      paired = described_class.new(year: { 'en' => '2019—now', 'uk' => '2019—зараз' })
+      cases = [paired, described_class.new(year: '2017')]
+
+      expect(described_class.first_year(cases)).to eq('2017')
+    end
+
+    it 'answers the same from rows already loaded' do
+      expect(described_class.first_year(described_class.all.to_a)).to eq(described_class.first_year)
     end
   end
 end

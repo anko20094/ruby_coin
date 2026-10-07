@@ -7,7 +7,6 @@ require 'rails_helper'
 # in a link ends the outer one early, so the rest of the card stops being clickable.
 describe 'a link written into a case field', type: :request do
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   let(:link) { '<a href="https://example.com/inside-a-card">linked</a>' }
 

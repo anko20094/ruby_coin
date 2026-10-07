@@ -16,6 +16,11 @@ class JournalEntryComponentPreview < ViewComponent::Preview
     render(JournalEntryComponent.new(post: sample_post(created_at: Time.current), first: true))
   end
 
+  # Under a year heading on the journal, the row's title steps down to an h3.
+  def under_a_year
+    render(JournalEntryComponent.new(post: sample_post, first: true, heading: :h3))
+  end
+
   private
 
   # Previews must not write to the database, so this is an unsaved post with just enough

@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'team:check' do # rubocop:disable RSpec/DescribeClass
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   it 'prints the notes and says the roster is consistent' do
     run = run_task('team:check')
 
     expect(run.aborted?).to be(false)
-    expect(run.stdout).to include('note: 1 placeholder CV', 'roster is consistent')
+    expect(run.stdout).to include('roster is consistent')
+    expect(run.stdout).not_to include('placeholder CV')
   end
 
   it 'prints every problem, counts them and exits non-zero' do

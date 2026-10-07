@@ -30,7 +30,6 @@ RSpec.configure do |config|
   end
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [Rails.root.join('spec', 'fixtures')]
-  config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :request
 
   config.include ActiveSupport::Testing::TimeHelpers
@@ -56,6 +55,13 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+
+  # spec/content checks the YAML under config/portfolio — the claims and the roster — rather than
+  # an endpoint. Some of those checks still render a page to see a link, so they run as request
+  # specs, which is what they were before they moved out of spec/requests.
+  config.define_derived_metadata(file_path: %r{/spec/content/}) do |metadata|
+    metadata[:type] ||= :request
+  end
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!

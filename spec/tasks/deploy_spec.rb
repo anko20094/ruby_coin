@@ -4,12 +4,14 @@ require 'open3'
 require 'rails_helper'
 
 # A dry run prints every task Capistrano would execute, in order, without connecting anywhere.
-RSpec.describe 'cap production deploy' do # rubocop:disable RSpec/DescribeClass
-  let(:dry_run) do
-    output, = Open3.capture2e('bundle', 'exec', 'cap', 'production', 'deploy', '--dry-run', '--trace',
-                              chdir: Rails.root.to_s)
-    output
+RSpec.describe 'cap production deploy', :slow do # rubocop:disable RSpec/DescribeClass
+  # One dry run for the whole file: every example reads the same output, and each run is a
+  # Capistrano boot in a subprocess.
+  runs = Hash.new do |memo, task|
+    memo[task] = Open3.capture2e('bundle', 'exec', 'cap', 'production', task, '--dry-run', '--trace',
+                                 chdir: Rails.root.to_s).first
   end
+  define_method(:dry_run) { runs['deploy'] }
   let(:executed) { dry_run.scan(/^\*\* Execute (\S+)/).flatten }
 
   def position(task) = executed.index(task) || raise(ArgumentError, "#{task} did not run: #{executed.inspect}")
@@ -29,8 +31,9 @@ RSpec.describe 'cap production deploy' do # rubocop:disable RSpec/DescribeClass
     expect(executed.count('deploy:data')).to eq(1)
   end
 
-  it 'runs the pending tasks and then the CV import' do
-    expect(dry_run).to match(/rake after_party:run.*rake cv:import/m)
+  it 'runs the pending tasks, and no CV import: the CV is read from cv.yml' do
+    expect(dry_run).to include('rake after_party:run')
+    expect(dry_run).not_to include('cv:import')
   end
 
   it 'leaves the data tasks out of any run that is not a deploy, such as a rollback' do

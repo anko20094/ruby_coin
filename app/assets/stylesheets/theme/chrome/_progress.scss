@@ -1,0 +1,18 @@
+// The reading-progress bar. Painted with transform rather than width so the
+// browser can keep it off the main thread; the origin is the left edge so it grows rightwards.
+.rc-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: 60;
+  background: var(--ruby-fire);
+  box-shadow: 0 0 12px oklch(58% 0.22 18 / 0.7);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.08s linear;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-progress { transition: none; }
+}

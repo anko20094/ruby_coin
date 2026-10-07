@@ -1,69 +1,48 @@
-@use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
 // /cv — the hiring page. The same document as /team/danyil (theme/_profile.scss holds what
 // they share); what is here is the frame around it and the compact project list.
-.cv-page {
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 56px var(--page-pad) 20px;
-}
+.cv-page__band { padding: clamp(48px, 5vw, 72px) 0 clamp(72px, 8vw, 112px); }
 
 .cv-page__identity {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 12px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  gap: 14px 20px;
+  font-size: var(--fs-lede);
   color: var(--ink-soft);
 }
 
-.cv-page__print {
-  // The only control on the page besides the navigation, and it was a 15px text box.
-  @include controls.hit-row(32px);
-
-  font: inherit;
-  color: var(--ruby);
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--ruby);
-  padding: 0 2px;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover { color: var(--ruby-bright); }
-}
+.cv-page__print { white-space: nowrap; }
 
 .cv-page__lede {
-  font-family: var(--font-body);
-  font-size: 15px;
-  color: var(--ink-soft);
-  line-height: 1.55;
   max-width: 640px;
-  margin: 12px 0 18px;
+  margin: 14px 0 22px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
 }
 
 // ── the compact project list ───────────────────────────────
 // Beside a career the mark reads as an index, which is why it is printed here and nowhere on
 // the /work cards.
-.cv-rows { border-top: var(--rule-strong); }
+.cv-rows { border-top: 1px solid var(--ink); }
 
 .cv-row {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 152px;
+  grid-template-columns: 48px minmax(0, 1fr) 170px;
   gap: 18px;
   align-items: start;
-  padding: 20px 8px;
-  border-bottom: var(--rule-row);
+  padding: 22px 10px;
+  border-bottom: 1px solid var(--surface-line);
 }
 
 .cv-row__mark {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--ruby);
+  padding-top: 6px;
+  font-family: var(--font-display);
   font-style: italic;
-  padding-top: 8px;
+  font-size: 22px;
+  color: var(--ruby);
 }
 
 .cv-row__body { min-width: 0; }
@@ -78,33 +57,29 @@
 .cv-row__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1.24;
   margin: 0;
 }
 
 .cv-row__own {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
+  padding: 1px 10px;
+  font-size: 12.5px;
   color: var(--ruby);
-  letter-spacing: 1px;
-  border: 1px solid color-mix(in oklab, var(--ruby) 27%, transparent);
-  border-radius: var(--radius-chip-sm);
-  padding: 1px 5px;
+  border: 1px solid color-mix(in oklab, var(--ruby) 40%, transparent);
+  border-radius: var(--radius-pill);
   white-space: nowrap;
 }
 
 .cv-row__here {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 12.5px;
   color: var(--ink-soft);
-  letter-spacing: 1px;
   white-space: nowrap;
 }
 
 .cv-row__tagline {
   font-family: var(--font-body);
-  font-size: 14.5px;
+  font-size: 15px;
   color: var(--ink-soft);
   margin-top: 5px;
   line-height: 1.5;
@@ -112,10 +87,9 @@
 }
 
 .cv-row__meta {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 13.5px;
   color: var(--ink-quiet);
-  margin-top: 7px;
+  margin-top: 8px;
 }
 
 .cv-row__metric {
@@ -124,23 +98,21 @@
 }
 
 .cv-row__metric-value {
-  font-size: 21px;
-  line-height: 1.1;
+  font-size: 36px;
+  color: var(--ruby);
+  white-space: nowrap;
 }
 
 .cv-row__metric-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.4;
   color: var(--ink-quiet);
-  margin-top: 5px;
-  line-height: 1.45;
 }
 
-@media (max-width: 900px) {
-  .cv-page { padding: 36px var(--page-pad) 20px; }
-
+@include bp.below(lg) {
   .cv-row {
-    grid-template-columns: 28px minmax(0, 1fr);
+    grid-template-columns: 34px minmax(0, 1fr);
     gap: 14px;
   }
 

@@ -1,11 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// A 2px ruby bar across the top, showing how much of a long read is behind you.
-// Case pages and journal posts only — the handoff asks for it on both, and nowhere else.
-//
-// rAF-throttled: the scroll listener does nothing but ask for a frame, and the frame does the
-// one width write. Under prefers-reduced-motion the bar still tracks the scroll, it just does
-// not ease between values — the bar is information, not decoration.
 export default class extends Controller {
   connect() {
     this.frame = null

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# A CV written in people.yml, with the same face as CVProfile so one set of partials draws
-# both.
 class Person::CV
   include LocalisedJson
 
@@ -15,12 +13,29 @@ class Person::CV
     define_method(field) { |fallback: true| localised(@block[field], fallback: fallback) }
   end
 
+  # cv.yml keeps the name as two keys, because it predates the language pairs.
+  def name(fallback: true)
+    value = @block['nameUk'] ? { 'en' => @block['name'], 'uk' => @block['nameUk'] } : @block['name']
+
+    localised(value, fallback: fallback)
+  end
+
+  # The date the CV's figures were read on: "2026·08·18".
+  def figures_as_of = @block['updated']
+
   # [key, label, href] per row, printed in order. The key and the label may each be a language
   # pair: "email" reads the same in both, "runs in" does not.
   def contact_rows
     Array(@block['contact']).map do |key, label, href|
       [localised(key), localised(label), href]
     end
+  end
+
+  # [label, href] of the row for one channel, found by its English key whatever language is
+  # being read, so "email" finds the row a Ukrainian reader sees as "пошта".
+  def contact(key)
+    index = Array(@block['contact']).index { |row_key, _, _| pair_of(row_key)['en'] == key.to_s }
+    contact_rows[index].drop(1) if index
   end
 
   def experience

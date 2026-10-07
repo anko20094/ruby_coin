@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module I18nExtended
-  AVAILABLE_LOCALES = %w[uk en].freeze
+  # config.i18n.available_locales, the default first: the order the alternates and the language
+  # switcher list them in.
+  AVAILABLE_LOCALES = [I18n.default_locale, *I18n.available_locales].uniq.map(&:to_s).freeze
 
   # `*/*` counts as a page load. Rails reports it as its own format rather than as HTML, and
   # it is what most crawlers and every curl send — the ones whose duplicate copy of the site
@@ -50,7 +52,8 @@ module I18nExtended
 
   # Deliberately small: match the browser's ordered preferences against the two languages this
   # site has, and fall back to the default. Quality values are honoured because a browser set
-  # to "uk, en;q=0.8" means it.
+  # to "uk, en;q=0.8" means it: no q is 1, and q=0 means "not this one" (RFC 9110 §12.4.2), so
+  # that language is dropped rather than ranked. Equal weights keep the order they were sent in.
   def negotiated_locale
     accepted_locales.find { |tag| AVAILABLE_LOCALES.include?(tag) } || I18n.default_locale
   end
@@ -59,9 +62,15 @@ module I18nExtended
     request.headers['Accept-Language'].to_s
            .split(',')
            .map { |part| part.split(';') }
-           .map { |tag, quality| [tag.to_s.strip.downcase.split('-').first, quality.to_s[/[\d.]+/].to_f] }
-           .sort_by { |_, quality| -(quality.zero? ? 1.0 : quality) }
-           .map(&:first)
+           .map { |tag, *params| [tag.to_s.strip.downcase.split('-').first, quality_of(params)] }
+           .select { |_, quality| quality.positive? }
+           .each_with_index.sort_by { |(_, quality), index| [-quality, index] }
+           .map { |(tag, _), _| tag }
+  end
+
+  def quality_of(params)
+    value = params.map(&:strip).find { |param| param.match?(/\Aq\s*=/i) }
+    value.nil? ? 1.0 : value[/=\s*([\d.]+)/, 1].to_f
   end
 
   def default_url_options

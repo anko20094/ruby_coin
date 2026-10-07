@@ -1,0 +1,52 @@
+/ The list, its pager or what to say when there is nothing. data-summary is what journal-filter
+/ reads out once it has swapped a new one in.
+- summary = @posts.any? ? t('journal.index.shown', count: @pagy.count) : nil
+.jn-listing__list data-journal-filter-target="list" data-summary=summary tabindex="-1"
+  - if @posts.any?
+    - if @year_counts
+      / A year that runs over two pages is headed again on the second, with the whole year's
+      / count: the heading says where the reader is, not what this page happens to hold.
+      .jn-entries
+        - @posts.group_by { |post| post.created_at.year }.each do |year, posts|
+          section.jn-year id="year-#{year}" aria-labelledby="year-#{year}-heading"
+            h2.jn-year__heading id="year-#{year}-heading"
+              span.jn-year__number= year
+              / The pill beside the year is the separator a sighted reader sees; this is the one read out.
+              span.rc-visually-hidden= ' · '
+              span.jn-year__count= t('journal.index.entries', count: @year_counts.fetch(year, posts.size))
+            - posts.each_with_index do |post, index|
+              = render JournalEntryComponent.new(post:, first: index.zero?, heading: :h3)
+    - else
+      .jn-entries
+        - @posts.each_with_index do |post, index|
+          = render JournalEntryComponent.new(post:, first: index.zero?)
+
+    - if @pagy.pages > 1
+      nav.jn-pager aria-label=t('journal.index.title')
+        - if @pagy.previous
+          = link_to journal_path(page: @pagy.previous, order: @order, tag_id: journal_tags_param(@active_tags),
+                                 anchor: 'entries'),
+            class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') },
+            data: { journal_filter_key: 'page-previous', journal_filter_scroll: true } do
+            span aria-hidden="true" ←
+        span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"
+        - if @pagy.next
+          = link_to journal_path(page: @pagy.next, order: @order, tag_id: journal_tags_param(@active_tags),
+                                 anchor: 'entries'),
+            class: 'jn-pager__step', aria: { label: t('journal.index.pager.next') },
+            data: { journal_filter_key: 'page-next', journal_filter_scroll: true } do
+            span aria-hidden="true" →
+  - else
+    p.jn-empty
+      - if @active_tags.one?
+        = t('journal.index.empty', tag: @active_tags.first.title)
+        = ' '
+        = link_to t('journal.index.all'), journal_path(order: @order, anchor: 'entries'), class: 'hover-link',
+          data: { journal_filter_key: 'tag-all' }
+      - elsif @active_tags.many?
+        = t('journal.index.empty_many', tags: @active_tags.map { |tag| "##{tag.title}" }.join(' + '))
+        = ' '
+        = link_to t('journal.index.all'), journal_path(order: @order, anchor: 'entries'), class: 'hover-link',
+          data: { journal_filter_key: 'tag-all' }
+      - else
+        = t('journal.index.empty_all')

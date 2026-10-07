@@ -1,59 +1,28 @@
 - content_for :title, full_title(t('journal.index.title'))
-- page_meta description: t('journal.index.lede')
+- page_meta description: t('journal.index.meta_description'), canonical_query: listing_query(tags: @active_tags)
 
-.jn-index
-  header.jn-index__header
-    .jn-index__intro
-      .rc-eyebrow
-        = "/#{t('journal.index.eyebrow')} · #{t('journal.index.entries', count: @entries_count)}"
-      h1.jn-index__title
-        = t('journal.index.title')
-        = ' '
-        span.jn-index__mark ·
-      p.jn-index__lede= t('journal.index.lede')
-    .jn-index__anchor
-      = render GemComponent.new(uid: 'journal-anchor', variant: :anchor, size: 90)
+.jn-index data-controller="list-nav" data-list-nav-item-value=".jn-entry"
+  = render PageHeadComponent.new(title: t('journal.index.title'), uid: 'journal-anchor', lede: t('journal.index.lede'),
+                                 badge: @entries_count, eyebrow: t('home.index.figures.entries', count: @entries_count)) do
+    = form_with url: search_path, method: :get, class: 'jn-index__search',
+                data: { controller: 'live-search', live_search_results_value: 'journal-live' } do |f|
+      = f.label :query, t('journal.search.field'), class: 'jn-search__label'
+      .jn-search__box data-controller="search-clear"
+        = f.search_field :query, class: 'jn-search__input', placeholder: t('journal.search.placeholder'),
+          data: { list_nav_target: 'search', search_clear_target: 'input', action: 'input->search-clear#sync' }
+        = render 'journal/search_clear'
+      / What live search found, said aloud and shown small beside the field.
+      p.jn-search__hint[aria-live="polite" data-live-search-target="status"]
+      = f.submit t('journal.search.submit'), class: 'rc-button jn-search__submit'
 
-  = form_with url: search_path, method: :get, class: 'jn-index__search' do |f|
-    = f.label :query, t('journal.search.field'), class: 'jn-search__label'
-    = f.search_field :query, class: 'jn-search__input', placeholder: t('journal.search.placeholder')
-    = f.submit t('journal.search.submit'), class: 'rc-button'
-
-  nav.jn-filter aria-label=t('journal.index.filter')
-    span.jn-filter__label= "#{t('journal.index.filter')} ·"
-    .rc-chips
-      = link_to t('journal.index.all'), journal_path(order: @order), **journal_chip_attributes(active: @active_tag.nil?)
-      - @tags.each do |tag|
-        = link_to "##{tag.title}", journal_path(tag_id: tag.id, order: @order),
-          **journal_chip_attributes(active: @active_tag == tag)
-
-    span.jn-filter__label.jn-filter__label--order= "#{t('journal.index.order.label')} ·"
-    .rc-chips
-      - Post::ORDER_TYPES.each do |order|
-        = link_to t("journal.index.order.#{order}"), journal_path(order:, tag_id: @active_tag&.id),
-          **journal_chip_attributes(active: @order == order)
-
-  - if @posts.any?
-    .jn-entries
-      - @posts.each_with_index do |post, index|
-        = render JournalEntryComponent.new(post:, first: index.zero?)
-
-    - if @pagy.pages > 1
-      nav.jn-pager aria-label=t('journal.index.title')
-        - if @pagy.previous
-          = link_to journal_path(page: @pagy.previous, order: @order, tag_id: @active_tag&.id),
-            class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') } do
-            span aria-hidden="true" ←
-        span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"
-        - if @pagy.next
-          = link_to journal_path(page: @pagy.next, order: @order, tag_id: @active_tag&.id),
-            class: 'jn-pager__step', aria: { label: t('journal.index.pager.next') } do
-            span aria-hidden="true" →
-  - else
-    p.jn-empty
-      - if @active_tag
-        = t('journal.index.empty', tag: @active_tag.title)
-        = ' '
-        = link_to t('journal.index.all'), journal_path(order: @order), class: 'hover-link'
-      - else
-        = t('journal.index.empty_all')
+  section.rc-band.jn-index__band
+    .rc-wrap.rc-wrap--narrow
+      / The filter and the list, which journal-filter refreshes in place when a chip, an order or
+      / a page is picked. #entries is also where those links land without script.
+      #entries.jn-listing data-controller="journal-filter" data-action="click->journal-filter#follow"
+        = render 'filter'
+        p.rc-visually-hidden[aria-live="polite" data-journal-filter-target="status"]
+        / Live search draws its results here and takes the list below out while it does; without
+        / script the form above submits to /search as it always has.
+        #journal-live hidden=true
+        = render 'entries'

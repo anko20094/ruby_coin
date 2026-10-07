@@ -3,9 +3,6 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "8.0.23",
-    "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.8",
-    "bootstrap5-toggle": "^5.4.1",
     "esbuild": "^0.28.2",
     "sass": "^1.105.1",
     "tinymce": "^8.9.2",
@@ -13,9 +10,9 @@
   },
   "scripts": {
     "build": "node bin/copy_tinymce.mjs && esbuild app/javascript/*.* --bundle --minify --outdir=app/assets/builds --public-path=assets",
-    "build:css": "sass ./app/assets/stylesheets/application.bootstrap.scss:./app/assets/builds/application.css ./app/assets/stylesheets/theme.scss:./app/assets/builds/theme.css ./app/assets/stylesheets/admin.scss:./app/assets/builds/admin.css ./app/assets/stylesheets/editor_content.scss:./app/assets/builds/editor_content.css --style=compressed --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import,if-function,global-builtin,color-functions",
+    "build:css": "node bin/build_css.mjs --style=compressed",
     "build:dev": "node bin/copy_tinymce.mjs && esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=assets",
-    "build:css:dev": "sass ./app/assets/stylesheets/application.bootstrap.scss:./app/assets/builds/application.css ./app/assets/stylesheets/theme.scss:./app/assets/builds/theme.css ./app/assets/stylesheets/admin.scss:./app/assets/builds/admin.css ./app/assets/stylesheets/editor_content.scss:./app/assets/builds/editor_content.css --no-source-map --load-path=node_modules --quiet-deps --silence-deprecation=import,if-function,global-builtin,color-functions",
+    "build:css:dev": "node bin/build_css.mjs",
     "build:tinymce": "node bin/copy_tinymce.mjs"
   },
   "packageManager": "yarn@4.18.0"

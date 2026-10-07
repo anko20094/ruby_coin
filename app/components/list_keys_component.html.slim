@@ -1,0 +1,9 @@
+/ Drawn hidden: the keys only work once list-nav has connected, which unhides it. The CSS
+/ keeps it off touch screens, where there is no keyboard to press them on.
+p.rc-keys[data-list-nav-target="hint" hidden=true]
+  kbd J
+  = ' '
+  kbd K
+  = " — #{t('global.list_keys.navigate')} · "
+  kbd= '/'
+  = " — #{t('global.list_keys.search')}"

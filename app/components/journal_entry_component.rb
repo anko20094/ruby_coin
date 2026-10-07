@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
-# One row of the journal index: number · date · title · byline over tags.
-#
-# The whole row is a single <a>, not a div with a click handler — keyboard, middle-click and
-# "open in new tab" all have to work (handoff §11).
 class JournalEntryComponent < ViewComponent::Base
-  def initialize(post:, first: false)
+  LEAD_LIMIT = 140
+
+  attr_reader :post
+
+  # `heading: :h3` where the rows sit under a heading of their own (the journal's years).
+  def initialize(post:, first: false, heading: :h2)
     @post = post
     @first = first
+    @heading = heading
+
     super()
   end
 
-  attr_reader :post
+  def heading_tag = @heading == :h3 ? :h3 : :h2
 
   def css_classes
     ['jn-entry', ('jn-entry--first' if @first)].compact.join(' ')
@@ -29,5 +32,16 @@ class JournalEntryComponent < ViewComponent::Base
 
   def tag_list
     post.tags.map { |tag| "##{tag.title}" }.join(' ')
+  end
+
+  # The subtitle, which every post has, as one plain line short enough for the preview card.
+  def lead
+    ProseHelper.plain(post.subtitle).squish.truncate(LEAD_LIMIT, separator: ' ')
+  end
+
+  def lead_id = "jn-lead-#{post.id || object_id}"
+
+  def preview_meta
+    [I18n.t('journal.minutes', count: post.reading_minutes), tag_list.presence].compact.join(' · ')
   end
 end

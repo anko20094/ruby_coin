@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# What the admin editor is handed, and what it hands back.
 module EditorHelper
   # The HTML for one Action Text body, ready for TinyMCE.
   #

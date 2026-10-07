@@ -3,16 +3,66 @@
 // footer and a sidebar that ran off the page. There is no PDF to download and this is most of
 // why there does not need to be one.
 @media print {
-  :root {
-    // Print has no oklch and no colour budget: ink on white, and the accent survives as bold.
+  // Print has no oklch and no colour budget: ink on white, and the accent survives as bold.
+  // Every surface is paper on paper — a scene or a dark panel would print as a black slab —
+  // so the tokens are set again on each of them, not only on :root.
+  :root,
+  .rc-main,
+  .rc-scene,
+  .rc-band,
+  .rc-panel,
+  .pf-contact {
     --paper: #fff;
     --paper-warm: #fff;
     --ink: #111;
     --ink-soft: #333;
+    --ink-quiet: #444;
     --ink-mute: #777;
     --ruby: #000;
+    --ruby-glow: #000;
+    --surface-line: #bbb;
+    --rule-strong: 1px solid #111;
+    --rule-row: 1px solid #bbb;
     --page-pad: 0;
+
+    color-scheme: light;
   }
+
+  body.rc-site,
+  .rc-scene,
+  .rc-band,
+  .rc-panel,
+  .pf-contact {
+    background: #fff !important;
+    color: #111;
+    box-shadow: none !important;
+  }
+
+  .rc-band::before,
+  .rc-panel::before { display: none; }
+
+  .rc-mark,
+  .rc-figure {
+    color: #000 !important;
+    text-shadow: none !important;
+    -webkit-text-fill-color: currentColor;
+    background: none !important;
+  }
+
+  .rc-pagehead,
+  .rc-section { padding-block: 0 12pt; }
+
+  .rc-pagehead__inner { display: block; }
+
+  .rc-pagehead__extra { margin-top: 6pt; }
+
+  // The reveal entrance is for a screen being scrolled; on paper everything is simply there.
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .pf-contact { border: 1px solid #111; }
 
   @page {
     margin: 14mm 12mm;
@@ -33,6 +83,9 @@
   .rc-palette,
   .hm-top,
   .rc-gem,
+  .rc-glow,
+  .rc-rings,
+  .rc-pagehead__gem,
   // Initials in a box carry nothing on paper, and they are what stands in for a photograph
   // until six real ones arrive.
   .rc-monogram,
@@ -42,17 +95,19 @@
   .wk-case__pager,
   .jn-steps,
   .jn-related,
+  .wk-entries,
   .jn-filter,
   .jn-pager,
   .jn-index__search,
-  .jn-search { display: none !important; }
+  .jn-search,
+  .wk-case__gem { display: none !important; }
 
   .rc-main { animation: none; }
 
   // The sidebar is sticky on screen. On paper it becomes a block near the top: the two
   // columns are one flow, and the one thing a printed CV must carry on its first page is how
-  // to answer it. The handoff asks for it "after the summary", which two grid children cannot
-  // interleave — first is the closest, and it is where a CV usually puts contacts anyway.
+  // to answer it. Two grid children cannot interleave, so it goes first — where a CV usually
+  // puts contacts anyway.
   .split-grid {
     display: flex;
     flex-direction: column;
@@ -65,8 +120,10 @@
     break-inside: avoid;
   }
 
-  .rc-header__title,
-  .ct-page__title { font-size: 26pt; }
+  .rc-pagehead__title,
+  .tm-person__name { font-size: 26pt; }
+
+  .tm-person__head { padding: 0 0 12pt; }
 
   // A career entry or a project row split across a page break is unreadable.
   .pf-career__entry,

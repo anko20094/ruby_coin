@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# Bits of /management chrome that have to be decided before the page is painted.
 module ManagementHelper
   SIDEBAR_COOKIE = :mg_sidebar
 

@@ -1,0 +1,11 @@
+- region = capture do
+  .rc-flash[aria-live="polite" aria-atomic="true"]
+    - messages.each do |message|
+      .rc-flash__item class="rc-flash__item--#{message.tone}" role=message.role data-controller="dismiss" data-dismiss-after-value=message.lifetime data-action="mouseenter->dismiss#pause mouseleave->dismiss#resume focusin->dismiss#pause focusout->dismiss#resume"
+        span.rc-flash__text= message.text
+        button.rc-flash__close type="button" data-action="dismiss#close" aria-label=t('global.dismiss')
+          span aria-hidden="true" ×
+- if frame_id
+  = helpers.turbo_frame_tag(frame_id) { region }
+- else
+  = region

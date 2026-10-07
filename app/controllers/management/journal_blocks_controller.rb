@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 module Management
-  # Creates the block the slash menu just asked for and hands back what Trix needs to place
-  # it: the signed global id, and the same partial the public page renders so the editor
-  # shows the real thing rather than a placeholder.
   class JournalBlocksController < ApplicationController
     def create
       authorize [:management, JournalBlock]

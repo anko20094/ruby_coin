@@ -1,17 +1,30 @@
-footer.rc-footer
-  .rc-footer__identity
-    = link_to helpers.root_path, class: 'rc-footer__brand' do
-      = render GemComponent.new(uid: 'footer')
-      span.rc-footer__wordmark rubyco.in
-    .rc-footer__meta
-      = "© #{Time.current.year} #{profile.name}"
-      br
-      = profile.location
+footer.rc-footer.rc-scene class=('rc-footer--quiet' unless cta?)
+  .rc-glow.rc-footer__glow
+  - if cta?
+    .rc-wrap.rc-footer__cta data-reveal=""
+      = render GemComponent.new(uid: 'footer-cta', variant: :anchor, size: 84)
+      p.rc-footer__title
+        = "#{t('work.footer.cta_lead')} "
+        span.rc-mark= t('work.footer.cta_mark')
+      - if (mail = email)
+        = link_to mail[0], mail[1], class: 'rc-button rc-button--primary rc-footer__mail'
+      - else
+        = link_to t('work.nav.contact'), helpers.contact_path, class: 'rc-button rc-button--primary rc-footer__mail'
 
-  .rc-footer__sections
-    - links.each do |label, path|
-      = link_to label, path, class: 'hover-link'
+  .rc-wrap.rc-footer__bottom
+    .rc-footer__identity
+      = link_to helpers.root_path, class: 'rc-footer__brand' do
+        = render GemComponent.new(uid: 'footer', variant: :badge)
+        span.rc-footer__wordmark rubyco.in
+      .rc-footer__meta
+        = "© #{Time.current.year} #{profile.name}"
+        br
+        = profile.location
 
-  .rc-footer__contacts
-    - rows = contacts.map { |value, href| link_to(value, href, class: 'hover-link', target: '_blank', rel: 'noreferrer') }
-    = safe_join(rows, tag.br)
+    .rc-footer__sections
+      - links.each do |label, path|
+        = link_to label, path, class: 'hover-link'
+
+    .rc-footer__contacts
+      - contacts.each do |value, href|
+        = link_to value, href, class: 'hover-link', target: '_blank', rel: 'noreferrer'

@@ -23,7 +23,7 @@ RSpec.describe 'db/seeds.rb' do # rubocop:disable RSpec/DescribeClass
     it 'creates nothing else, because the deploy owns the portfolio and the journal is real' do
       seed
 
-      expect([Post.count, Case.count, CVProfile.count, Tag.count]).to eq([0, 0, 0, 0])
+      expect([Post.count, Case.count, Tag.count]).to eq([0, 0, 0])
     end
 
     it 'leaves an existing admin as it is' do
@@ -74,12 +74,12 @@ RSpec.describe 'db/seeds.rb' do # rubocop:disable RSpec/DescribeClass
 
     it 'loads the portfolio and the journal, and is idempotent' do
       seed
-      counts = [Case.count, CVProfile.count, Post.count, User.count]
+      counts = [Case.count, Post.count, User.count]
 
       seed
 
-      expect(counts).to eq([7, 1, JournalController::PER_PAGE + 2, 1])
-      expect([Case.count, CVProfile.count, Post.count, User.count]).to eq(counts)
+      expect(counts).to eq([7, JournalController::PER_PAGE + 2, 1])
+      expect([Case.count, Post.count, User.count]).to eq(counts)
     end
 
     it 'seeds more entries than the journal shows at once, each readable in both languages' do

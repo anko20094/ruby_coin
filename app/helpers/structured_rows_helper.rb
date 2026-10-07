@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-# The admin widget for a StructuredJson field: a list of rows that can be added to, taken
-# from and reordered, drawn the same way wherever one appears.
-#
-# It was CasesHelper, for the case form alone. The CV turned out to be three more of exactly
-# these lists, so it moved here rather than being written twice.
 module StructuredRowsHelper
   # The row index inside the <template> the add button clones. Swapped for a fresh number by
   # structure_rows_controller.js; it has to be something that cannot occur in a real name.

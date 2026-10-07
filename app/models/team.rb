@@ -1,18 +1,8 @@
 # frozen_string_literal: true
 
-# The roster and who did what on which project: config/portfolio/people.yml and team.yml,
-# read as one thing.
-#
-# YAML rather than tables, by decision (handoff §6, TECH-STACK). Six people who change once a
-# quarter are edited through a pull request, where a diff is the right review. A CV belongs
-# to the person and a contribution belongs to the project; keeping them in two files is what
-# stops a person's page and a case page from describing the same work in two sentences.
-#
-# Development re-reads the files on every call so an edit shows on refresh; everywhere else
-# they are parsed once per process.
 module Team
   PATH = Rails.root.join('config', 'portfolio')
-  FILES = %w[people team].freeze
+  FILES = %w[people team cv].freeze
   PHOTOS = Rails.root.join('app', 'assets', 'images', 'people')
 
   class << self
@@ -47,6 +37,11 @@ module Team
 
     # The one whose CV is cv.yml — the person /cv is about.
     def owner = people.find(&:owner?)
+
+    # cv.yml: the CV /cv, the owner's page, the footer and the share cards print.
+    def owner_cv
+      cached(:owner_cv) { Person::CV.new(YAML.load_file(PATH.join('cv.yml')).fetch('cv')) }
+    end
 
     # Every row the file holds for a project, hidden people included. The check task is the
     # caller: to report that a row is parked you first have to be able to see it.

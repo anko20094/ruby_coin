@@ -10,7 +10,7 @@ xml.feed(xmlns: 'http://www.w3.org/2005/Atom', 'xml:lang' => I18n.locale.to_s) d
   xml.link rel: 'self', href: feed_url(format: :atom)
   xml.link rel: 'alternate', type: 'text/html', href: journal_url
   xml.updated @updated_at.iso8601
-  xml.author { xml.name CVProfile.current.name }
+  xml.author { xml.name Team.owner_cv.name }
 
   @posts.each do |post|
     xml.entry do

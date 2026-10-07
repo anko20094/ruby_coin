@@ -1,35 +1,31 @@
 # frozen_string_literal: true
 
-# Copies config/portfolio/cases.yml into the cases table, then reads every field back and
-# compares it with the source.
-#
-# The YAML stays in the repo as the source of truth for the initial load: every figure in it
-# was read from production, git or a tracker, and the handoff forbids retyping any of them. So
-# this is a copy that refuses to claim success. It writes in one transaction and rolls back when
-# the read-back differs, so nothing is committed that was not checked, and it returns the
-# mismatches it found and lets the caller decide how loudly to fail.
-#
-# Rows are matched on slug, which the admin can edit: a renamed case is created again beside
-# the old one, and `strays` names the rows the file does not.
 class Cases::Importer < BaseService
   SOURCE = Rails.root.join('config', 'portfolio', 'cases.yml')
 
-  Result = Struct.new(:imported, :mismatches, :strays, keyword_init: true) do
-    def clean? = mismatches.empty?
+  Result = Struct.new(:imported, :kept, :mismatches, :strays, keyword_init: true) do
+    def ok? = mismatches.empty?
   end
 
-  def initialize(path = SOURCE)
+  def initialize(path = SOURCE, force: false)
     @path = path
+    @force = force
   end
 
   def call
     imported = []
+    kept = []
     mismatches = []
 
     Case.transaction(requires_new: true) do
       entries.each_with_index do |entry, index|
-        attributes = attributes_for(entry, index)
         record = Case.find_or_initialize_by(slug: entry['slug'])
+        if record.persisted? && !@force
+          kept << record.slug
+          next
+        end
+
+        attributes = attributes_for(entry, index)
         record.assign_attributes(attributes)
         record.save!
         record.reload
@@ -42,7 +38,7 @@ class Cases::Importer < BaseService
     end
 
     imported.clear if mismatches.any?
-    Result.new(imported: imported, mismatches: mismatches, strays: Case.where.not(slug: slugs).pluck(:slug))
+    Result.new(imported:, kept:, mismatches:, strays: Case.where.not(slug: slugs).pluck(:slug))
   end
 
   private

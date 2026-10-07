@@ -1,30 +1,30 @@
 - content_for :title, full_title(t('labels.enter_account'))
 - page_meta description: t('labels.enter_account')
 
-.au-page
-  h1.au-page__title= t('labels.enter_account')
+.au-page.rc-scene
+  .rc-glow.au-page__glow
+  = render HexRingsComponent.new(css: 'au-page__rings')
+  / A sheet of paper on the scene: the form stays light, where every field is easiest to read.
+  .au-card.rc-band
+    h1.au-page__title= t('labels.enter_account')
 
-  = render 'devise/shared/errors', resource: resource
+    = render ErrorsComponent.new(object: resource, tone: :site)
 
-  = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: 'au-form' }) do |f|
-    .au-field
-      = f.label :email, class: 'au-label'
-      = f.email_field :email, autofocus: true, autocomplete: 'email', class: 'au-input'
+    = form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: 'au-form' }) do |f|
+      .au-field
+        = f.label :email, class: 'au-label'
+        = f.email_field :email, autofocus: true, autocomplete: 'email', class: 'au-input'
 
-    .au-field[data-controller="password-visibility"]
-      = f.label :password, class: 'au-label'
-      .au-input-row
-        = f.password_field :password, autocomplete: 'current-password', class: 'au-input',
-          data: { password_visibility_target: 'input' }
-        button.au-reveal[type="button" data-action="password-visibility#toggleVisibility"
-                         aria-label=t('labels.show_password')]
-          span aria-hidden="true" ◉
+      .au-field
+        = f.label :password, class: 'au-label'
+        = render 'devise/shared/password_input', f: f, field: :password, autocomplete: 'current-password'
 
-    - if devise_mapping.rememberable?
-      .au-row
-        label.au-check
-          = f.check_box :remember_me
-          span= t('buttons.remember_me')
-        = link_to t('buttons.forgot_password'), new_password_path(resource_name), class: 'hover-link'
-
-    = f.submit t('buttons.sign_in'), class: 'rc-button rc-button--primary'
+      / Remember-me and the reset link stack on the left; the button sits on the same row.
+      .au-actions
+        - if devise_mapping.rememberable?
+          .au-actions__aside
+            label.au-check
+              = f.check_box :remember_me
+              span= t('buttons.remember_me')
+            = link_to t('buttons.forgot_password'), new_password_path(resource_name), class: 'hover-link'
+        = f.submit t('buttons.sign_in'), class: 'rc-button rc-button--primary'

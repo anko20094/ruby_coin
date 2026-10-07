@@ -10,13 +10,13 @@ RSpec.describe Team do
 
   describe '.people' do
     it 'reads the roster in file order, which is display order' do
-      expect(described_class.crew.map(&:id)).to eq(%w[danyil mykhailo oleksii natalia vladyslav claude])
+      expect(described_class.crew.map(&:id)).to eq(%w[danyil mykhailo oleksii oleksandr natalia vladyslav claude])
     end
 
     it 'separates the crew from the people who have left, and loses nobody between them' do
       expect(described_class.people).to match_array(described_class.crew + described_class.alumni)
       expect(described_class.crew & described_class.alumni).to be_empty
-      expect(described_class.alumni.map(&:id)).to include('oleksandr')
+      expect(described_class.alumni.map(&:id)).to include('andrii-mazurok')
     end
   end
 

@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
 module Statistics
-  # Views per post.
-  #
-  # This used to `group(:properties)` — the whole JSONB blob — so a post whose title changed
-  # after some views were recorded appeared twice, once under each title, with the counts
-  # split between them. It groups by the id now, and reads the title from the post rather than
-  # from whatever was stored at view time.
   class PostViewsQuery < BaseQuery
     LIMIT = 50
 
-    def count
+    def call
       counts = Ahoy::Event.where(name: 'Viewed Post')
                           .group(Arel.sql("properties->>'post_id'"))
                           .order(Arel.sql('count_all DESC'))

@@ -1,4 +1,6 @@
 @use 'controls';
+@use 'surfaces';
+@use 'breakpoints' as bp;
 
 // A profile — the document /cv and /team/:person both render. One set of rules, because they
 // are the same CV at two addresses: one aimed at a recruiter, one at a client asking who will
@@ -11,16 +13,15 @@
 .split-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
-  gap: 40px;
+  gap: 48px;
   align-items: start;
-  margin-top: 30px;
 }
 
 .split-main { min-width: 0; }
 
 .split-aside {
   position: sticky;
-  top: 96px;
+  top: var(--nav-clear);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -33,7 +34,7 @@
   //
   // The cap only bites when it has to. Where the column fits there is no scroll container and
   // no scrollbar; where it does not, the overflow is reachable instead of hidden below the fold.
-  max-height: calc(100dvh - 96px - 24px);
+  max-height: calc(100dvh - var(--nav-clear) - 24px);
   overflow-y: auto;
 
   // Given a colour, because an overlay scrollbar that only appears once you already scrolled
@@ -42,7 +43,7 @@
   scrollbar-color: color-mix(in oklab, var(--ink-mute) 70%, transparent) transparent;
 }
 
-@media (max-width: 900px) {
+@include bp.below(lg) {
   .split-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 32px;
@@ -58,16 +59,16 @@
     overflow-y: visible;
   }
 
-  .split-aside .rc-monogram { width: min(200px, 45%); }
+  .split-aside .rc-monogram { width: min(180px, 45%); }
 }
 
 .pf-block {
-  margin-top: 38px;
+  margin-top: 56px;
 
-  &--summary { margin-top: 34px; }
-  &--projects { margin-top: 26px; }
+  &--summary { margin-top: 40px; }
+  &--projects { margin-top: 48px; }
   &--worked,
-  &--notwork { margin-top: 40px; }
+  &--notwork { margin-top: 56px; }
 }
 
 // On /cv the summary opens the column and the grid's own margin is enough; on a person page it
@@ -77,9 +78,9 @@
 .pf-summary {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 25px;
-  line-height: 1.34;
-  margin-top: 14px;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.3;
+  margin-top: 18px;
   max-width: 54ch;
   text-wrap: pretty;
 }
@@ -88,8 +89,8 @@
 .pf-career { margin-top: 16px; }
 
 .pf-career__entry {
-  padding: 16px 0;
-  border-top: var(--rule-entry);
+  padding: 20px 0;
+  border-top: 1px solid var(--surface-line);
 }
 
 .pf-career__head {
@@ -102,7 +103,7 @@
 .pf-career__org {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 24px;
+  font-size: 27px;
   line-height: 1.3;
   min-width: 0;
   margin: 0;
@@ -115,16 +116,14 @@
 }
 
 .pf-career__when {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
+  font-size: 13.5px;
+  color: var(--ink-quiet);
   text-align: right;
   line-height: 1.5;
 }
 
 .pf-career__note {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13.5px;
   color: var(--ink-quiet);
   margin-top: 6px;
 }
@@ -154,12 +153,10 @@
 }
 
 .pf-stack__label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--ink-quiet);
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
 
 .pf-strengths {
@@ -170,35 +167,41 @@
 }
 
 .pf-strengths__item {
-  border-top: var(--rule-strong);
-  padding-top: 9px;
+  border-top: 1px solid var(--ink);
+  padding-top: 10px;
   font-family: var(--font-body);
   font-size: 14.5px;
   line-height: 1.5;
 }
 
 // ── the sidebar panel ──────────────────────────────────────
+// How to answer the CV: a small dark panel, the one thing on the page lit like a scene.
 .pf-contact {
-  border: var(--rule-strong);
-  border-top: 2px solid var(--ruby);
-  border-radius: var(--radius-card);
-  padding: 16px 18px;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  line-height: 1.85;
+  @include surfaces.scene;
+
+  padding: 20px 22px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--scene-raised), oklch(17.5% 0.01 28));
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--on-scene) 6%, transparent);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.7;
 
   // With no CV there is nothing to print here, and a dashed box of em-dashes is the same
   // shape as the filled one — which is the point: the page does not change when it arrives.
   &--empty {
+    @include surfaces.paper;
+
+    background: none;
+    box-shadow: none;
     border: 1px dashed var(--ink-mute);
     color: var(--ink-quiet);
   }
 }
 
 .pf-contact__label {
-  font-size: 10px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--ink-quiet);
   margin-top: 10px;
 
@@ -222,12 +225,13 @@
   @include controls.hit-row(32px);
 
   color: var(--ink);
-  border-bottom: 1px solid var(--ink-mute);
+  transition: color 150ms;
+
+  &:hover { color: var(--ruby); }
 }
 
 .pf-updated {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 13px;
   color: var(--ink-quiet);
   line-height: 1.65;
 }
@@ -236,22 +240,20 @@
 // Dashed, both of them, and the same dashed line the draft chip uses: it means unfinished.
 .pf-placeholder {
   border: 1px dashed var(--ruby);
-  border-radius: var(--radius-card);
+  border-radius: 14px;
   background: var(--ruby-mute);
-  padding: 10px 14px;
-  margin-bottom: 22px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 1px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
   color: var(--ruby);
   line-height: 1.6;
 }
 
 .pf-pending {
   border: 1px dashed var(--ink-mute);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-panel);
   background: var(--paper-warm);
-  padding: 22px 24px;
+  padding: 24px 26px;
   margin-top: 34px;
 }
 
@@ -283,7 +285,7 @@
 
 .pf-did__item {
   position: relative;
-  padding-left: 15px;
+  padding-left: 18px;
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.55;
@@ -310,11 +312,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 190px;
   gap: 18px;
-  padding: 15px 12px;
-  border-bottom: 1px solid color-mix(in oklab, var(--ink-mute) 33%, transparent);
-  // Room for the sticky nav — which is 73px tall, so 70 left the row's top edge and its rule
-  // behind it — plus enough that the row reads as a row rather than as the top of the screen.
-  scroll-margin-top: 88px;
+  padding: 18px 12px;
+  border-bottom: 1px solid var(--surface-line);
+  // Room for the nav pill, so the row reads as a row rather than as the top of the screen.
+  scroll-margin-top: var(--nav-clear);
 
   // The project the reader came from.
   &.is-here {
@@ -325,7 +326,7 @@
 
 // Below this the right-hand meta is crushed rather than aligned, so it left-aligns under the
 // title instead.
-@media (max-width: 620px) {
+@include bp.below(620px) {
   .worked-row {
     grid-template-columns: minmax(0, 1fr);
     gap: 6px;

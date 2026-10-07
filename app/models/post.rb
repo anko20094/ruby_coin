@@ -1,23 +1,16 @@
 # frozen_string_literal: true
 
 class Post < ApplicationRecord
-  require 'i18n'
-
   LIMIT_COUNT = 3
   has_and_belongs_to_many :tags
   belongs_to :user
-  # Mobility's Table backend also defines Post#translations over these same rows (as
-  # Post::Translation). This association is the one the app uses — pg_search's
-  # associated_against, Posts::Translator and posts_helper all name it.
-  has_many :post_translations, dependent: :destroy
-
   extend Mobility
 
-  # Table backend over post_translations. See config/initializers/mobility.rb for what is
-  # switched on and what is not.
+  # Table backend over post_translations, read and written only through Post#translations. See
+  # config/initializers/mobility.rb for what is switched on and what is not.
   translates :title, :subtitle
-  # Mobility's translation class spans the whole table, and every preload would read the legacy
-  # bodies in `description` along with the title.
+  # The legacy bodies are still in post_translations.description (see PostTranslation), and
+  # every preload of the titles would read them along with it.
   Post::Translation.ignored_columns += %w[description]
 
   extend FriendlyId
@@ -32,6 +25,9 @@ class Post < ApplicationRecord
   # The body lives in Action Text, one named rich text per locale. post_translations.description
   # is left in place as a dormant backup of the pre-Action-Text bodies and is no longer read.
   RICH_TEXT_BODIES = { en: :description_en, uk: :description_uk }.freeze
+  # What makes a body more than empty, in Ruby and in Postgres alike: one character that is not
+  # whitespace. Markup counts, so an <img> alone is a body.
+  BODY_CONTENT = /[^[:space:]]/
   # Words per minute for the "N min" label. Compute, never store — it goes stale on edit.
   READING_SPEED = 200
   # How long a post wears the ruby NEW badge on the journal index.
@@ -43,10 +39,10 @@ class Post < ApplicationRecord
   # Searching action_text_rich_texts.body directly would match HTML tag names, so each body
   # is mirrored into a stripped column on posts and the scopes stay off the join.
   pg_search_scope :search_everywhere, against: %i[search_body_en search_body_uk],
-                                      associated_against: { post_translations: [:title] },
+                                      associated_against: { translations: [:title] },
                                       using: { tsearch: { prefix: true, any_word: true } },
                                       order_within_rank: 'posts.created_at DESC'
-  pg_search_scope :search_by_title, associated_against: { post_translations: [:title] },
+  pg_search_scope :search_by_title, associated_against: { translations: [:title] },
                                     using: { tsearch: { prefix: true, any_word: true } },
                                     order_within_rank: 'posts.created_at DESC'
   pg_search_scope :search_by_description, against: %i[search_body_en search_body_uk],
@@ -65,30 +61,19 @@ class Post < ApplicationRecord
   validates :photo, presence: true
   validates :main_post, inclusion: { in: [true, false] }
 
+  # Post.active and Post.inactive are the enum's own scopes and carry no order: a caller that
+  # lists posts says which order it wants, so a search or a count never has to unscope one.
   enum :status, { active: 0, inactive: 1 }
 
   scope :ordered, -> { order(created_at: :desc) }
   # Featured *and* published. Featuring is a display choice, hiding is a publication one, and
-  # the second has to win: a post switched to inactive was still being shown on the home page
-  # because this scope only asked the first question.
+  # the second has to win.
   scope :main, -> { where(main_post: true, status: :active).ordered }
-  scope :active, -> { where(status: :active).ordered }
-  scope :inactive, -> { where(status: :inactive).ordered }
-  # Most read first.
-  #
-  # Two things were wrong with this. It said LEFT JOIN and then filtered on
-  # `ahoy_events.name`, which turns the outer join back into an inner one — so "best" listed
-  # only posts somebody had already opened, and a new entry could not appear there until it
-  # had been read somewhere else first. And it joined every event row to every post before
-  # grouping: 622 ms at 100k events, measured.
-  #
-  # Counting views means reading the view rows, so the sequential scan does not go away. But
-  # aggregating them once and joining the result costs half as much — 314 ms on the same data —
-  # and the LEFT JOIN puts the unread entries at the end of the list instead of hiding them.
+  # Most read first. Views are aggregated once and LEFT JOINed, so unread entries sort last
+  # instead of disappearing (filtering the event name inside the join would make it inner).
   #
   # If the events table ever gets large enough for that to matter, the answer is a stored count
-  # on posts rather than a cleverer query; it is written down in redesign_plan.md rather than
-  # built for traffic the site does not have.
+  # on posts rather than a cleverer query — not built yet for traffic the site does not have.
   scope :best, lambda {
     counts = Ahoy::Event.where(name: 'Viewed Post')
                         .select(Arel.sql("(properties->>'post_id')::bigint AS post_id, COUNT(*) AS views_count"))
@@ -101,12 +86,26 @@ class Post < ApplicationRecord
   }
   scope :oldest, -> { where(status: :active).order(created_at: :asc) }
   # Mobility's fallbacks are off, so a post with no title or body in a language would list there
-  # as a blank row; this is the posts that can be read in it.
+  # as a blank row; this is the posts that can be read in it. The same three conditions as
+  # #translated_in? — title, subtitle, a body with anything in it — so a post is either listed
+  # and openable in a language or neither. The body is the rich text, not its plain-text copy:
+  # an entry that is only a picture has a body and no words.
   scope :translated_in, lambda { |locale|
-    titled = PostTranslation.where(locale: locale.to_s).where.not(title: [nil, '']).where.not(subtitle: [nil, ''])
+    titled = Post::Translation.where(locale: locale.to_s).where.not(title: [nil, '']).where.not(subtitle: [nil, ''])
+    bodied = ActionText::RichText.where(record_type: name, name: rich_text_name(locale).to_s)
+                                 .where('action_text_rich_texts.body ~ ?', BODY_CONTENT.source)
 
-    where(id: titled.select(:post_id)).where.not("search_body_#{locale}" => [nil, ''])
+    where(id: titled.select(:post_id)).where(id: bodied.select(:record_id))
   }
+
+  # How many of these posts each year holds, keyed by the year as the site prints it — the
+  # application's zone, not UTC, so an entry written on the night of 31 December is counted
+  # under the year its date says.
+  def self.count_by_year
+    year = Arel.sql("EXTRACT(YEAR FROM posts.created_at AT TIME ZONE 'UTC' AT TIME ZONE " \
+                    "#{connection.quote(Time.zone.tzinfo.name)})::integer")
+    group(year).count(:id)
+  end
 
   # The entry either side of this one, by the series number the site prints. Nothing linked
   # posts to each other before: the only way out of an entry was back to the index or a
@@ -134,6 +133,8 @@ class Post < ApplicationRecord
   end
 
   # `base`, or the first of base-2, base-3... that nobody holds.
+  def self.rich_text_name(locale) = RICH_TEXT_BODIES[locale.to_sym] || :description_en
+
   def self.unused_slug(base)
     return if base.blank?
 
@@ -177,11 +178,13 @@ class Post < ApplicationRecord
   end
 
   def translated_in?(locale)
-    translation = post_translations.find { |row| row.locale == locale.to_s }
+    translation = translations.find { |row| row.locale == locale.to_s }
     return false if translation.nil? || translation.title.blank? || translation.subtitle.blank?
 
-    # The association reader, not the has_rich_text one: that would build an empty record.
-    public_send(:"rich_text_#{RICH_TEXT_BODIES[locale.to_sym] || :description_en}")&.body.present?
+    # The association reader, not the has_rich_text one: that would build an empty record. The
+    # stored markup, not #to_s, which wraps every body in the Action Text layout.
+    body = public_send(:"rich_text_#{self.class.rich_text_name(locale)}")&.body
+    body.present? && body.to_html.match?(BODY_CONTENT)
   end
 
   # #042 — a stored series number, printed the same way everywhere.

@@ -6,7 +6,6 @@ require 'rails_helper'
 # page down with it. ?controller= and ?action= are what scanners send; ?host= is what a phisher does.
 describe 'the language switcher', type: :request do
   include_context 'when the cases are imported'
-  include_context 'when the cv is imported'
 
   def switcher_hrefs
     response.body.scan(/class="rc-nav__locale[^"]*"[^>]*href="([^"]*)"/).flatten

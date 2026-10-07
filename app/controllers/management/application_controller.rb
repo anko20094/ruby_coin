@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module Management
-  # Every screen under /management is behind the same door, and the door is here rather than
-  # repeated in each controller: a controller that forgets the line is the failure this class
-  # exists to prevent — #translate forgot it, and left an OpenAI endpoint open to the world.
-  #
-  # verify_authorized is the second half of the same guarantee: authentication says who you
-  # are, and this says an action that never asked Pundit is a bug, not a public action.
   class ApplicationController < ApplicationController
     layout 'management/layouts/application'
 
@@ -27,5 +21,13 @@ module Management
       policy.style_src_elem :self, :unsafe_inline
       policy.frame_src :self
     end
+
+    helper_method :post_counts
+
+    private
+
+    # Posts per status, read once per request: the posts list's filter tabs and the sidebar both
+    # print them.
+    def post_counts = @post_counts ||= Post.group(:status).count
   end
 end

@@ -1,11 +1,26 @@
 = link_to post_path(post, locale: I18n.locale), class: css_classes do
-  span.jn-entry__number= post.entry_label
-  span.jn-entry__date= date
-  h2.jn-entry__title
-    = post.title
-    - if post.recent?
-      span.jn-entry__badge= t('journal.index.new_badge')
-  span.jn-entry__meta
-    = byline
-    br
-    span.jn-entry__tags= tag_list
+  span.jn-entry__thumb
+    = render PostCoverComponent.new(post:, uid: "entry-#{post.id}")
+  span.jn-entry__body
+    = content_tag heading_tag, class: 'jn-entry__title', data: { vt_name: helpers.view_transition_name('post-title', post.id) } do
+      span.jn-entry__name= post.title
+      - if post.recent?
+        span.jn-entry__badge= t('journal.index.new_badge')
+    / One quiet line under the title: which entry, when, by whom, how long, about what.
+    span.jn-entry__meta
+      span.jn-entry__number= post.entry_label
+      span.jn-entry__date= date
+      span.jn-entry__byline= byline
+      - if tag_list.present?
+        span.jn-entry__tags= tag_list
+  span.jn-entry__go aria-hidden="true" →
+  / A closer look on a pointer's hover or keyboard focus, drawn with the row so it costs no
+  / request. aria-hidden: it repeats what the row says, except the lead, which entry-preview
+  / gives the row as its description.
+  span.jn-preview[aria-hidden="true" data-controller="entry-preview"]
+    span.jn-preview__thumb
+      = render PostCoverComponent.new(post:, uid: "preview-#{post.id}", gem_variant: :logo)
+    span.jn-preview__body
+      span.jn-preview__lead id=lead_id
+        = lead
+      span.jn-preview__meta= preview_meta

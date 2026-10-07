@@ -1,4 +1,4 @@
-svg.rc-gem class="rc-gem--#{variant}" viewBox="-6 -6 112 112" aria-hidden="true" focusable="false" style=style data-controller=(interactive? ? 'ruby' : nil) data-ruby-variant-value=(interactive? ? variant : nil)
+svg.rc-gem class="rc-gem--#{variant}" viewBox="-6 -6 112 112" aria-hidden="true" focusable="false" style=style data-controller=(interactive? ? 'ruby' : nil) data-ruby-variant-value=(interactive? ? variant : nil) data=ruby_data
   defs
     - if glow?
       filter id="rc-gem-glow-#{uid}" x="-50%" y="-50%" width="200%" height="200%"
@@ -13,7 +13,7 @@ svg.rc-gem class="rc-gem--#{variant}" viewBox="-6 -6 112 112" aria-hidden="true"
           stop offset="#{[0, 60, 100][index]}%" stop-color=colour
 
   - if glow?
-    polygon points=polygon(outer) fill="oklch(58% 0.22 18)" opacity="0.45" filter="url(#rc-gem-glow-#{uid})"
+    polygon points=polygon(outer) fill=glow_colour opacity="0.45" filter="url(#rc-gem-glow-#{uid})" data-ruby-target="glow"
 
   g.rc-gem__crown data-ruby-target="crown"
     - facets.each do |facet|

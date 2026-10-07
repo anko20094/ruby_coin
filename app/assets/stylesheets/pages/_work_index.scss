@@ -1,95 +1,307 @@
+@use '../theme/breakpoints' as bp;
+
 // /work — the projects, and nothing else. The CV that used to share this page is /cv now.
-.wk-index {
-  max-width: var(--case-max);
-  margin: 0 auto;
-  padding: 56px var(--page-pad) 20px;
+// The head is a scene (PageHeadComponent); the deck is dark panels on a paper band.
+.wk-index__band { padding: clamp(40px, 5vw, 72px) 0 clamp(72px, 8vw, 120px); }
+
+// Expand all / collapse all. Hidden until the controller has collapsed anything.
+.wk-deck__bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+
+  &[hidden] { display: none; }
 }
 
-.wk-index .rc-header__title { font-size: clamp(44px, 7.6vw, 84px); }
+.wk-deck__all {
+  min-height: 36px;
+  padding: 0 16px;
+  background: none;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 150ms, border-color 150ms;
+
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--ruby);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 2px;
+  }
+
+  @media (pointer: coarse) { min-height: 44px; }
+}
 
 // Every card the same size: no featured treatment, because the order is already the judgement.
+// The column count is spelled out rather than auto-fit, so the closing tile knows how much of
+// the last row it has to fill.
 .wk-projects {
   display: grid;
-  // min() so the track cannot be wider than the screen it is on — a bare 340px column is
-  // horizontal scroll on a 320px phone.
-  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
-  gap: 16px;
-  margin-top: 34px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+
+  .wk-deck__bar:not([hidden]) + & { margin-top: 16px; }
 }
 
+@include bp.above(740px) {
+  .wk-projects { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@include bp.above(1120px) {
+  .wk-projects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+// Each card takes four rows of the deck as a subgrid — sector, title, details, foot — so the
+// cards in a row share one height and line their parts up: a wrapped title or a two-line sector
+// moves the whole row, not one card.
 .wk-project {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 20px 22px 18px;
-  border: var(--rule-row);
-  border-radius: var(--radius-card);
+  position: relative;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  padding: 24px 26px 22px;
+  // The floating details hang below the card, so the panel must not clip.
+  overflow: visible;
+  transition: transform 250ms, box-shadow 250ms;
+
+  &:hover { transform: translateY(-2px); }
+
+  // The title's link covers the card, so the ring goes round the whole of it — in paper's ruby,
+  // since the ring sits on the band outside the panel.
+  &:has(.wk-project__link:focus-visible),
+  &.is-keyed {
+    outline: 2px solid oklch(45% 0.18 18);
+    outline-offset: 3px;
+  }
+
+  // The card J/K is on (list_nav_controller).
+  &.is-keyed { box-shadow: 0 0 0 1px oklch(58% 0.22 18 / 0.6), 0 20px 50px -20px oklch(58% 0.22 18 / 0.6); }
+
+  // J/K scroll a card into view clear of the nav pill.
+  scroll-margin: var(--nav-clear) 0 24px;
 }
 
-// Wraps as a row: the longest sector line plus both flags does not fit a card, and without
-// this the sector's second line ran underneath the chips with its interpunct leading.
+.wk-project__link {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &:focus-visible { outline: none; }
+}
+
+.wk-project__head { margin-top: 18px; }
+
+// The flags keep to the right of the sector, which wraps in its own column instead: a badge
+// never pushes a line of its own into one card and not its neighbours.
 .wk-project__meta {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-}
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
 
-.wk-project__sector { flex: 1 1 auto; }
+  .rc-gem {
+    width: 34px;
+    height: 34px;
+  }
+}
 
 .wk-project__sector {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  font-size: 13.5px;
+  line-height: 1.4;
   color: var(--ink-quiet);
 }
+
+// A span of years breaks as a whole, never at its dash.
+.wk-project__year { white-space: nowrap; }
 
 .wk-project__flags {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  flex: none;
-  margin-left: auto;
+
+  &:empty { display: none; }
 }
 
 .wk-project__own {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  color: var(--ruby);
-  letter-spacing: 1px;
-  border: 1px solid color-mix(in oklab, var(--ruby) 27%, transparent);
-  border-radius: var(--radius-chip-sm);
-  padding: 1px 5px;
+  padding: 1px 10px;
+  border: 1px solid oklch(58% 0.22 18 / 0.6);
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  color: var(--ink);
   white-space: nowrap;
 }
 
 // The only joke in the layout, and it lands because the reader is on it.
 .wk-project__here {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 1px;
+  font-size: 12.5px;
   color: var(--ink-soft);
   white-space: nowrap;
 }
 
-.wk-project__head { min-width: 0; }
+.wk-project__head {
+  align-self: start;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+// Above the stretched link, so it toggles rather than opening the case.
+.wk-project__toggle {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-top: 4px;
+  padding: 0;
+  background: color-mix(in oklab, var(--ink) 6%, transparent);
+  border: 1px solid var(--surface-line);
+  border-radius: 50%;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: border-color 150ms, color 150ms;
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--ink) 40%, transparent);
+    color: var(--ink);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 2px;
+  }
+
+  &[hidden] { display: none; }
+
+  @media (pointer: coarse) {
+    width: 44px;
+    height: 44px;
+    margin: -2px -6px 0 0;
+  }
+}
+
+// A chevron drawn from two borders: down when there is more to see, up when it is showing.
+.wk-project__chevron {
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 250ms cubic-bezier(0.2, 0.7, 0.3, 1), margin 250ms;
+
+  [aria-expanded='true'] > & {
+    margin-top: 4px;
+    transform: rotate(225deg);
+  }
+}
+
+// The open/closed height runs on a 1fr/0fr grid row, which animates to the content's real
+// height without measuring it. Only once the controller has settled (.is-ready), so the
+// first collapse on load is not an animation.
+.wk-project__details {
+  display: grid;
+  grid-template-rows: 1fr;
+
+  .is-ready & {
+    transition: grid-template-rows 320ms cubic-bezier(0.2, 0.7, 0.3, 1), opacity 240ms, visibility 0s;
+  }
+
+  .wk-project.is-collapsed & {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.wk-project__details-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wk-project__stack { margin-top: 12px; }
+
+// One card opened on its own, on a screen with more than one column: the details hang off the
+// card's bottom edge over the row below, so the neighbours keep their height and nothing
+// leaves a gap. "Expand all" (.is-flow) puts them back in the card, in flow.
+@include bp.above(740px) {
+  .wk-deck.is-enhanced:not(.is-flow) {
+    .wk-project:not(.is-collapsed) {
+      z-index: 3;
+      transform: none;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    // The panel's gradient ends on this colour, so the hanging part reads as the same panel.
+    .wk-project__details {
+      position: absolute;
+      top: calc(100% - 1px);
+      left: 0;
+      right: 0;
+      background: oklch(17.5% 0.01 28);
+      border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--on-scene) 6%, transparent), 0 28px 50px -18px oklch(0% 0 0 / 0.6);
+      clip-path: inset(0 -1px -80px -1px);
+    }
+
+    // Hidden once folded, after the fold has run, so the empty panel takes no clicks.
+    .wk-project.is-collapsed .wk-project__details {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      &.is-ready .wk-project.is-collapsed .wk-project__details {
+        transition: grid-template-rows 320ms cubic-bezier(0.2, 0.7, 0.3, 1), opacity 240ms, visibility 0s 320ms;
+      }
+    }
+
+    .wk-project__details-inner { padding: 0 26px; }
+
+    // The rule the foot draws above itself, drawn again where the details start.
+    .wk-project__tagline {
+      margin-top: 0;
+      padding-top: 14px;
+      border-top: var(--rule-row);
+    }
+
+    .wk-project__stack { margin-bottom: 22px; }
+  }
+}
 
 .wk-project__title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 34px;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  font-size: 36px;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
   margin: 0;
+  text-wrap: balance;
 }
 
 .wk-project__tagline {
   font-family: var(--font-body);
-  font-size: 14.5px;
+  font-size: 15px;
   color: var(--ink-soft);
   line-height: 1.5;
-  margin-top: 8px;
+  margin: 10px 0 0;
   text-wrap: pretty;
 }
 
@@ -97,15 +309,14 @@
 .wk-project__stack .rc-chips { gap: 5px; }
 
 .wk-project__more {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   color: var(--ink-quiet);
   padding: 2px;
 }
 
 .wk-project__foot {
-  margin-top: auto;
-  padding-top: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
   border-top: var(--rule-row);
   display: flex;
   align-items: flex-end;
@@ -116,16 +327,15 @@
 .wk-project__metric { min-width: 0; }
 
 .wk-project__metric-value {
-  font-size: 21px;
-  line-height: 1.1;
+  font-size: 44px;
+  white-space: nowrap;
 }
 
 .wk-project__metric-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 13px;
   color: var(--ink-quiet);
-  margin-top: 4px;
-  line-height: 1.45;
+  margin-top: 6px;
+  line-height: 1.4;
 }
 
 .wk-project__who {
@@ -142,8 +352,18 @@
 }
 
 .wk-project__count {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12.5px;
   color: var(--ink-quiet);
   white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-project__details,
+  .is-ready .wk-project__details,
+  .wk-project__chevron,
+  .wk-project__toggle,
+  .wk-project,
+  .wk-deck__all { transition: none; }
+
+  .wk-project:hover { transform: none; }
 }

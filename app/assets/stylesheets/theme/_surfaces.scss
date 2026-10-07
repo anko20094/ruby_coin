@@ -1,0 +1,57 @@
+// The two surfaces every public page is composed from: paper (light) and scene (dark ink).
+//
+// Components are written once, against the semantic tokens (--ink, --ink-soft, --paper, --ruby,
+// the rules…). A surface sets those tokens for everything inside it, so a chip, a monogram or a
+// hairline drawn for paper comes out right on a scene without a second set of rules.
+//
+// Every value is spelled out rather than taken from :root: a token that refers to another one
+// is resolved where it is declared, so a scene inside a band (or the other way round) would
+// otherwise inherit the outer surface's colours.
+
+// The ink scene's own values, also exposed on :root as --scene-* for the few rules that need a
+// scene colour on paper (a dark panel inside a light band).
+$scene: oklch(14.5% 0.012 25);
+$scene-raised: oklch(20% 0.012 28);
+$scene-raised-2: oklch(23% 0.013 28);
+$on-scene: oklch(96% 0.006 60);
+// 9.9:1 on --scene, 8.4:1 on the raised panel.
+$on-scene-soft: oklch(78% 0.008 40);
+// The quietest text on a scene: 6.3:1 on --scene, 5.4:1 on the raised panel.
+$on-scene-quiet: oklch(66% 0.008 30);
+// Ruby as text on a scene. --ruby (45%) is 2.4:1 there; this is 6.2:1 on --scene, 5.3:1 raised.
+$ruby-glow: oklch(68% 0.2 18);
+
+@mixin paper {
+  --paper: oklch(98% 0.005 60);
+  --paper-warm: oklch(95% 0.012 60);
+  --ink: oklch(18% 0.01 30);
+  --ink-soft: oklch(45% 0.01 30);
+  --ink-mute: oklch(72% 0.008 30);
+  --ink-quiet: oklch(53% 0.008 30);
+  --ruby: oklch(45% 0.18 18);
+  --ruby-mute: oklch(94% 0.04 18);
+  --rule-strong: 1px solid oklch(18% 0.01 30);
+  --rule-row: 1px solid color-mix(in oklab, oklch(72% 0.008 30) 35%, transparent);
+  --rule-entry: 1px dotted oklch(72% 0.008 30);
+  --surface-line: color-mix(in oklab, oklch(18% 0.01 30) 12%, transparent);
+
+  color-scheme: light;
+}
+
+@mixin scene {
+  --paper: #{$scene};
+  --paper-warm: #{$scene-raised};
+  --ink: #{$on-scene};
+  --ink-soft: #{$on-scene-soft};
+  --ink-quiet: #{$on-scene-quiet};
+  // A hairline, never text.
+  --ink-mute: oklch(40% 0.01 30);
+  --ruby: #{$ruby-glow};
+  --ruby-mute: oklch(25% 0.06 18);
+  --rule-strong: 1px solid color-mix(in oklab, #{$on-scene} 28%, transparent);
+  --rule-row: 1px solid color-mix(in oklab, #{$on-scene} 11%, transparent);
+  --rule-entry: 1px dotted color-mix(in oklab, #{$on-scene} 22%, transparent);
+  --surface-line: color-mix(in oklab, #{$on-scene} 10%, transparent);
+
+  color-scheme: dark;
+}

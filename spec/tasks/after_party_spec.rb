@@ -22,7 +22,6 @@ RSpec.describe 'after_party:run' do # rubocop:disable RSpec/DescribeClass
     expect(AfterParty::TaskRecord.pluck(:version)).to match_array(task_files.map { |file| file.basename.to_s[/\A\d+/] })
     expect(legacy.reload.rich_body(:uk).body.to_plain_text).to eq('Українська стаття')
     expect(Case.count).to eq(7)
-    expect(CVProfile.count).to eq(1)
   end
 
   it 'finds nothing to do the second time' do
@@ -45,7 +44,7 @@ RSpec.describe 'after_party:run' do # rubocop:disable RSpec/DescribeClass
       run_task('after_party:run')
 
       expect(AfterParty::TaskRecord.count).to eq(0)
-      expect([Case.count, CVProfile.count, ActionText::RichText.count]).to eq([0, 0, 0])
+      expect([Case.count, ActionText::RichText.count]).to eq([0, 0])
       expect(legacy.reload.search_body_uk).to be_blank
     end
 
@@ -60,9 +59,9 @@ RSpec.describe 'after_party:run' do # rubocop:disable RSpec/DescribeClass
     end
 
     it 'leaves the database untouched even when a task aborts' do
-      allow(Cases::Importer).to receive(:call).and_wrap_original do |original, *args|
-        original.call(*args)
-        Cases::Importer::Result.new(imported: [], mismatches: ['dna.mark: expected 2'], strays: [])
+      allow(Cases::Importer).to receive(:call).and_wrap_original do |original, *args, **kwargs|
+        original.call(*args, **kwargs)
+        Cases::Importer::Result.new(imported: [], kept: [], mismatches: ['dna.mark: expected 2'], strays: [])
       end
 
       run = run_task('after_party:run')

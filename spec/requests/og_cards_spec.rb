@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'rake'
-load Rails.root.join('lib', 'tasks', 'og_cards.rake')
 
 # The cards are PNGs committed beside a digest of the text they were drawn from. A case whose
 # title, tagline or first figure changes after `rake og:cards` unfurls the old one in Telegram
@@ -24,6 +22,10 @@ RSpec.describe OgCards do
     expected = Case.pluck(:slug).product(I18nExtended::AVAILABLE_LOCALES).map { |slug, locale| "#{slug}-#{locale}" }
 
     expect(recorded.keys).to match_array(expected + I18nExtended::AVAILABLE_LOCALES.map { |locale| "site-#{locale}" })
+  end
+
+  it 'hands the page the digests it recorded, for the image URLs' do
+    expect(described_class.recorded).to eq(recorded)
   end
 
   it 'has the image for every card it recorded' do

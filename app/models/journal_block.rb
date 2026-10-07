@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-# A block inside an article body: a highlighted code listing, a callout, or an embed.
-#
-# Stored as a row and referenced from the rich text by signed global id, which is what lets
-# the public page, the admin preview and the mobile view all render it from one partial.
 class JournalBlock < ApplicationRecord
   include ActionText::Attachable
 

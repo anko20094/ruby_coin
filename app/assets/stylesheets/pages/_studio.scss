@@ -1,29 +1,28 @@
 @use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
 // /studio — the same roster as /team at a lower density, and the way into it from the nav.
-.st-page {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 60px var(--page-pad);
-}
+.st-page__band { padding: clamp(48px, 5vw, 72px) 0 clamp(72px, 8vw, 112px); }
 
 .st-crew {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
-  gap: 22px;
-  margin-top: 36px;
+  gap: 20px;
 }
 
 .st-card {
   display: flex;
   align-items: flex-start;
-  gap: 18px;
-  padding: 20px;
-  border: var(--rule-row);
-  border-radius: var(--radius-button);
-  transition: border-color 150ms;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-panel);
+  transition: transform 250ms, border-color 250ms;
 
-  &:hover { border-color: var(--ink); }
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--ruby) 40%, transparent);
+  }
 }
 
 .st-card__body { min-width: 0; }
@@ -31,7 +30,7 @@
 .st-card__name {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 30px;
+  font-size: 32px;
   line-height: 1.1;
   margin: 0;
 }
@@ -45,14 +44,13 @@
 }
 
 .st-card__role {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--ink-soft);
+  font-size: 14px;
+  color: var(--ink-quiet);
 }
 
 .st-card__blurb {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
   color: var(--ink-soft);
   line-height: 1.5;
   margin-top: 10px;
@@ -60,19 +58,14 @@
 }
 
 .st-card__link {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.6px;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--ruby);
-  margin-top: 12px;
-}
-
-@media (max-width: 900px) {
-  .st-page { padding: 36px var(--page-pad); }
 }
 
 // Same reasoning as the roster card: an 88px stone next to a 100px column of prose.
-@media (max-width: 480px) {
+@include bp.below(xs) {
   .st-card {
     flex-direction: column;
     gap: 14px;
@@ -85,35 +78,37 @@
 
 @media (prefers-reduced-motion: reduce) {
   .st-card { transition: none; }
+
+  .st-card:hover { transform: none; }
 }
 
-// Alumni. Dashed, per the handoff: the border says "not a card, nothing to click" before the
+// Alumni. Dashed: the border says "not a card, nothing to click" before the
 // cursor does. A pill is not a control, so it carries no hit target and no hover.
 .st-alumni {
-  margin-top: 56px;
-  padding-top: 28px;
-  border-top: var(--rule-row);
+  margin-top: clamp(56px, 6vw, 88px);
+  padding-top: 32px;
+  border-top: 1px solid var(--surface-line);
 }
 
 .st-alumni__title {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: var(--ink-quiet);
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(30px, 3vw, 40px);
+  line-height: 1.1;
 }
 
 .st-alumni__count {
-  font-size: 10px;
+  font-family: var(--font-body);
+  font-size: 15px;
   color: var(--ruby);
 }
 
 .st-alumni__note {
-  margin-top: 6px;
-  font-size: 13px;
+  margin-top: 8px;
+  font-size: 15px;
   color: var(--ink-quiet);
   text-wrap: pretty;
 }
@@ -128,10 +123,10 @@
 }
 
 .st-alumni__pill {
-  padding: 6px 14px;
+  padding: 6px 16px;
   border: 1px dashed color-mix(in oklab, var(--ink-mute) 55%, transparent);
-  border-radius: 20px;
-  font-size: 13px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
   color: var(--ink-soft);
 }
 

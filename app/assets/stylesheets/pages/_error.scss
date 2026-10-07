@@ -1,37 +1,61 @@
-@use '../theme/controls';
+@use '../theme/breakpoints' as bp;
 
-// The designed error page (handoff §9a). Not a 9-byte "Not Found" from the middleware:
-// the reader is still on the site, so the page looks like the site and offers the two
-// places worth going.
-
+// The designed error page: a scene with the stone, and the two places worth going. Not a
+// 9-byte "Not Found" from the middleware — the reader is still on the site.
 .er-page {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 120px var(--page-pad) 140px;
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding: calc(var(--nav-clear) + 40px) 0 96px;
   text-align: center;
 }
 
+.er-page__glow {
+  --glow-y: -160px;
+  --glow-h: 1000px;
+}
+
+.er-page__rings {
+  left: 50%;
+  top: calc(var(--nav-clear) + 100px);
+  width: 520px;
+  height: 520px;
+  transform: translate(-50%, -50%);
+}
+
+.er-page__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 760px;
+}
+
 .er-code {
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--ruby);
-  margin-bottom: 28px;
+  margin: 28px 0 18px;
+  font-family: var(--font-display);
+  font-size: clamp(64px, 9vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-variant-numeric: lining-nums;
+  color: var(--ruby-glow);
+  text-shadow: 0 0 40px oklch(58% 0.22 18 / 0.55);
 }
 
 .er-title {
+  margin: 0 0 20px;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 76px;
-  line-height: 1.06;
+  font-size: clamp(40px, 5.4vw, 76px);
+  line-height: 1.02;
   letter-spacing: -0.03em;
-  margin: 0 0 20px;
+  text-wrap: balance;
 }
 
 .er-lede {
-  font-size: 18px;
-  color: var(--ink-soft);
-  margin: 0 auto 40px;
   max-width: 520px;
+  margin: 0 auto 40px;
+  font-size: var(--fs-lede);
+  color: var(--ink-soft);
 }
 
 .er-actions {
@@ -43,10 +67,8 @@
 
 .er-hint {
   margin-top: 52px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.6px;
-  color: var(--ink-soft);
+  font-size: 14px;
+  color: var(--ink-quiet);
 }
 
 .er-hint__keys {
@@ -55,20 +77,16 @@
   margin-right: 4px;
 
   kbd {
+    padding: 4px 7px;
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1;
-    padding: 4px 6px;
-    border: 1px solid color-mix(in oklab, var(--ink-mute) 60%, transparent);
-    border-radius: var(--radius-chip-sm);
     color: var(--ink);
+    border: 1px solid var(--surface-line);
+    border-radius: 6px;
   }
 }
 
-@media (max-width: 700px) {
-  .er-page { padding: 72px 20px 96px; }
-
-  .er-title { font-size: 46px; }
-
-  .er-lede { font-size: 16px; }
+@include bp.below(md) {
+  .er-page { padding-bottom: 72px; }
 }

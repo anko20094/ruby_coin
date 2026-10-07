@@ -14,7 +14,7 @@ RSpec.describe Cases::Importer do
   # This is the point of the class: a figure that changed shape on the way into JSONB has to
   # be reported, not shrugged off.
   it 'reports that the stored copy matches the source' do
-    expect(described_class.call).to be_clean
+    expect(described_class.call).to be_ok
   end
 
   it 'is idempotent — running it twice leaves seven cases, not fourteen' do
@@ -23,12 +23,32 @@ RSpec.describe Cases::Importer do
     expect { described_class.call }.not_to change(Case, :count)
   end
 
-  it 'overwrites a field that has drifted from the source' do
+  # The table is the source of truth once a case is in it: the admin edits it there.
+  it 'keeps a case that is already in the table' do
     described_class.call
     dna = Case.find_by!(slug: 'dna')
     dna.update_columns(year: '1999')
 
+    result = described_class.call
+
+    expect(dna.reload.year).to eq('1999')
+    expect(result.imported).to be_empty
+    expect(result.kept.size).to eq(7)
+  end
+
+  it 'creates only the cases the table is missing' do
     described_class.call
+    Case.where(slug: 'leads').delete_all
+
+    expect(described_class.call.imported).to eq(['leads'])
+  end
+
+  it 'overwrites a field that has drifted from the source when forced' do
+    described_class.call
+    dna = Case.find_by!(slug: 'dna')
+    dna.update_columns(year: '1999')
+
+    described_class.call(force: true)
 
     expect(dna.reload.year).not_to eq('1999')
   end
@@ -59,7 +79,7 @@ RSpec.describe Cases::Importer do
 
       result = described_class.new(path).call
 
-      expect(result).not_to be_clean
+      expect(result).not_to be_ok
       expect(result.mismatches).to include(a_string_matching(/dna\.mark: expected 2, stored "2"/))
       expect(result.imported).to be_empty
       expect(Case.count).to eq(0)
@@ -70,7 +90,7 @@ RSpec.describe Cases::Importer do
       before = Case.order(:position).pluck(:slug, :updated_at)
       path = source_with { |cases| cases.second['mark'] = 2 }
 
-      described_class.new(path).call
+      described_class.new(path, force: true).call
 
       expect(Case.order(:position).pluck(:slug, :updated_at).first(3)).to eq(before.first(3))
       expect(Case.find_by!(slug: 'dna').mark).to eq('02')

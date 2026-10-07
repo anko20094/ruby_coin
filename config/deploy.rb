@@ -73,8 +73,10 @@ before 'deploy:assets:precompile', 'deploy:yarn_install'
 # ------------------------------
 # Data tasks, before the new release is live
 # ------------------------------
-# What they write is ignored by the release still serving, and a failure stops the deploy
-# before the symlink moves.
+# They run on the new release while the old one is still serving, and both share the database
+# and public/uploads, so a data task may only add: nothing the old release reads is deleted or
+# renamed here. Clean-ups that remove files (cleanup:legacy_cover_versions) are run by hand once
+# the new release is live. A failing task stops the deploy before the symlink moves.
 before 'deploy:publishing', 'deploy:data'
 
 # ------------------------------

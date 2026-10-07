@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module Search
-  # What ⌘K answers with: the site, in one list.
-  #
-  # The handoff says to back the palette with the existing /search PgSearch action rather than
-  # filtering in memory — the prototype did the latter only because it had no server. So this
-  # is that action's other format, widened to cover the two things the palette also has to
-  # find: the cases, and the pages themselves.
   class Palette < BaseService
     LIMIT = 8
 
@@ -16,12 +10,7 @@ module Search
       def as_json(*) = { kind: kind, label: I18n.t("global.palette.kinds.#{kind}"), title: title, hint: hint, url: url }
     end
 
-    # Case fields are TinyMCE markup. The palette answers in JSON and the browser prints the
-    # result with textContent, so a bolded word would arrive as a literal <b> — and an escaped
-    # ampersand as a literal &amp;, which is what "cofounder · product & clients" did.
-    def self.plain(value)
-      CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(value.to_s)).strip
-    end
+    private attr_reader :query, :routes, :locale
 
     def initialize(query, routes:, locale: I18n.locale)
       @query = query.to_s.strip
@@ -37,7 +26,10 @@ module Search
 
     private
 
-    attr_reader :query, :routes, :locale
+    # Case fields are TinyMCE markup. The palette answers in JSON and the browser prints the
+    # result with textContent, so a bolded word would arrive as a literal <b> — and an escaped
+    # ampersand as a literal &amp;, which is what "cofounder · product & clients" did.
+    def plain(value) = ProseHelper.plain(value)
 
     # Pages first: someone typing "con" almost always wants /contact, not an article that
     # happens to contain the word.
@@ -81,27 +73,27 @@ module Search
     # page — the names are translated, the ids are not.
     def people
       Team.people.select { |person| person.page? && matches_person?(person) }.map do |person|
-        Result.new(kind: 'person', title: self.class.plain(person.name), hint: self.class.plain(person.role),
+        Result.new(kind: 'person', title: plain(person.name), hint: plain(person.role),
                    url: routes.person_path(person, locale: locale))
       end
     end
 
     def matches_person?(person)
       needle = query.downcase
-      [self.class.plain(person.name), self.class.plain(person.role), person.id]
+      [plain(person.name), plain(person.role), person.id]
         .compact.any? { |field| field.downcase.include?(needle) }
     end
 
     def cases
       Case.ordered.select { |kase| matches_case?(kase) }.map do |kase|
-        Result.new(kind: 'case', title: self.class.plain(kase.title), hint: self.class.plain(kase.tagline),
+        Result.new(kind: 'case', title: plain(kase.title), hint: plain(kase.tagline),
                    url: routes.work_case_path(slug: kase.slug, locale: locale))
       end
     end
 
     def matches_case?(kase)
       needle = query.downcase
-      [self.class.plain(kase.title), self.class.plain(kase.tagline), kase.sector, kase.slug]
+      [plain(kase.title), plain(kase.tagline), kase.sector, kase.slug]
         .compact.any? { |field| field.downcase.include?(needle) }
     end
 
