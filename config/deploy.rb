@@ -10,7 +10,9 @@ set :branch,      'master'
 set :user,        'root'
 
 set :deploy_to, "/home/#{fetch(:user)}/apps/#{fetch(:application)}"
-set :ssh_options, { forward_agent: true, user: fetch(:user), keys: %w[~/.ssh/id_rsa.pub] }
+set :ssh_options,  {
+  forward_agent: true, user: fetch(:user), keys: %w[~/.ssh/id_rsa.pub], known_hosts: Net::SSH::KnownHosts
+}
 set :pty,          true
 set :use_sudo,     false
 set :stage,        :production
