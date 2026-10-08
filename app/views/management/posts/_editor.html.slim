@@ -1,0 +1,166 @@
+/ The edit screen: fields and preview, the save state and language tabs above them, the
+/ publication fields below. Wiring: Management::EditorFormHelper#post_editor_form_data.
+/
+/ Field naming is asymmetric and that is not an accident of this screen: the locale being
+/ requested posts post[title], every other locale posts post[title_localizations][xx]. That
+/ shape predates the redesign and Posts::Translator, localization_params and the AI translate
+/ button all read it, so the template bends to it rather than the other way round. Bodies are
+/ already symmetric — post[description_uk] / post[description_en].
+- editing = post.persisted?
+- locales = [I18n.locale] + (I18n.available_locales - [I18n.locale])
+
+= form_with model: [:management, post], data: post_editor_form_data(post) do |f|
+  .mg-editor
+    - if editing
+      = f.hidden_field :lock_version, data: { post_editor_target: 'lockVersion' }
+
+    / A failed Save used to re-render this screen unchanged — no message anywhere, while the
+    / state indicator above still read "no changes". The autosave path reported errors; the
+    / submit path did not.
+    = render ErrorsComponent.new(object: post)
+
+    .mg-editor__bar
+      .mg-tabs
+        - locales.each do |locale|
+          button.mg-tab type="button" data-locale=locale aria-pressed=(locale == I18n.locale ? 'true' : 'false') data-action="editor-layout#pickLocale" data-editor-layout-target="tab"
+            = locale.to_s
+            span.mg-tab__dirty data-locale=locale
+        button.mg-tab type="button" aria-pressed="false" data-action="editor-layout#toggleSideBySide" data-editor-layout-target="sideBySide"
+          = t('.side_by_side')
+
+      / The wording lives here rather than in the controller, so every state stays translated.
+      / Announced: the whole point of an autosave indicator is telling you what happened, and
+      / a sighted reader was the only one it told.
+      / A re-render after a failed submit is not "no changes" — it was the one moment the
+      / indicator was guaranteed to be wrong, and it was the only thing on screen.
+      - failed = post.errors.any?
+      .mg-state[role="status" aria-live="polite" aria-atomic="true"
+        data-post-editor-target="state" data-state=(failed ? 'invalid' : 'clean')
+        data-phrase-clean=t('.state.clean')
+        data-phrase-dirty=t('.state.dirty')
+        data-phrase-saving=t('.state.saving')
+        data-phrase-saved=t('.state.saved', at: '%{at}')
+        data-phrase-invalid=t('.state.invalid', errors: '%{errors}')
+        data-phrase-conflict=t('.state.conflict')
+        data-phrase-failed=t('.state.failed')]
+        span.mg-state__dot
+        - clean_phrase = editing ? t('.state.clean') : t('.state.unsaved')
+        span[data-post-editor-target="stateText"]= failed ? t('.state.invalid', errors: post.errors.full_messages.to_sentence) : clean_phrase
+
+    .mg-conflict[role="alert" hidden=true data-post-editor-target="conflict"]
+      span= t('.conflict')
+      = link_to t('.reload'), edit_management_post_path(post), class: 'mg-conflict__reload', data: { turbo: false } if editing
+
+    .mg-editor__cols data-editor-layout-target="cols"
+      .mg-editor__main
+        - locales.each do |locale|
+          - own = locale == I18n.locale
+          .mg-locale data-locale=locale lang=locale data-editor-layout-target="locale" hidden=(!own)
+            .mg-locale__label= t('.language', name: t(locale))
+
+            / `label_tag nil` renders a <label> with no `for`, so the three main fields of the
+            / editor were unlabelled. Each label now names the id its own input carries.
+            - title_id = own ? 'post_title' : "title_#{locale}"
+            - subtitle_id = own ? 'post_subtitle' : "subtitle_#{locale}"
+
+            .mg-field
+              = label_tag title_id, t('.title'), class: 'mg-label'
+              - if own
+                = f.text_field :title, class: 'mg-input mg-input--title', placeholder: t('.placeholders.title')
+              - else
+                = f.text_field "title_localizations][#{locale}", id: title_id, value: current_data(post, 'title', locale), class: 'mg-input mg-input--title', data: { locale: locale.to_s }, placeholder: t('.placeholders.title')
+
+            .mg-field
+              = label_tag subtitle_id, t('.subtitle'), class: 'mg-label'
+              - if own
+                = f.text_field :subtitle, class: 'mg-input', placeholder: t('.placeholders.subtitle')
+              - else
+                = f.text_field "subtitle_localizations][#{locale}", id: subtitle_id, value: current_data(post, 'subtitle', locale), class: 'mg-input', data: { locale: locale.to_s }, placeholder: t('.placeholders.subtitle')
+
+            / TinyMCE, on a plain textarea. The value is not the raw stored body: journal
+            / blocks are stored as an empty <action-text-attachment> and would be an invisible
+            / gap in a WYSIWYG editor, so editor_html fills each one in. See EditorHelper.
+            - body_field = Post::RICH_TEXT_BODIES.fetch(locale)
+            .mg-field id=(own ? 'basic-description' : 'localized_description')
+              = label_tag "post_#{body_field}", t('.body'), class: 'mg-label'
+              = f.text_area body_field, value: editor_html(post.public_send(:"rich_text_#{body_field}")), class: 'mg-editor__body', data: tinymce_post_data
+
+        .mg-field.mg-translate
+          = button_tag t('.translate'), type: 'button', id: 'translation-button', class: 'mg-btn', data: { aitranslation_target: 'button', action: 'click->aitranslation#fetchData' }
+          span.mg-translate__status[role="status" aria-live="polite" data-aitranslation-target="status"]
+
+      - if editing
+        .mg-editor__preview
+          .mg-preview__head
+            span.mg-label= t('.preview')
+            / Which language this is a preview of. It used to be whatever the admin's own
+            / chrome was in, whichever tab was open — so writing Ukrainian showed an English
+            / preview, and there was no way to tell.
+            span.mg-preview__locale[data-editor-layout-target="previewLocale"]= I18n.locale.to_s
+            button.mg-preview__width.is-current type="button" aria-pressed="true" data-width="desktop" data-action="editor-layout#setWidth" data-editor-layout-target="width"= t('.width.desktop')
+            button.mg-preview__width type="button" aria-pressed="false" data-width="mobile" data-action="editor-layout#setWidth" data-editor-layout-target="width"= t('.width.mobile')
+
+            / The real page, in the language being edited. A new tab, because leaving the
+            / editor mid-write to look at the article is not the thing anybody wants.
+            - locales.each do |locale|
+              = link_to t('.open'), post_path(id: post.slug, locale: locale), class: 'mg-preview__open',
+                target: '_blank', rel: 'noopener',
+                hidden: (locale != I18n.locale),
+                data: { locale: locale, editor_layout_target: 'openLink', turbo: false }
+          .mg-preview data-post-editor-target="preview" data-editor-layout-target="preview" data-width="desktop"
+            = render 'management/posts/preview', post: post, locale: I18n.locale
+
+    / Below the two columns, not beside them.
+    /
+    / These are set-once fields — the slug, the author, the status, the cover — and they were
+    / taking a fixed 300px out of the middle of the screen for the whole time you were writing.
+    / Across the bottom they cost nothing while the body and the preview get half the pane each.
+    .mg-editor__meta
+      .mg-editor__meta-label= t('.meta')
+      .mg-editor__meta-grid
+        .mg-field
+          = f.label :slug, t('.slug'), class: 'mg-label'
+          = f.text_field :slug, class: 'mg-input', placeholder: t('.placeholders.slug')
+
+        .mg-field
+          = f.label :tag_ids, t('.tags'), class: 'mg-label'
+          = f.collection_select :tag_ids, (tags || post.tags), :id, :title, { selected: post.tag_ids },
+            { multiple: true, class: 'mg-input', data: { controller: 'tomselect', tomselect_url_value: api_tags_path, tomselect_phrases_value: t('management.editor.select').to_json } }
+
+        .mg-field
+          = f.label :user_id, t('.author'), class: 'mg-label'
+          = f.collection_select :user_id, users, :id, :nickname, { include_blank: false }, { class: 'mg-input' }
+
+        .mg-field
+          = f.label :status, t('.status'), class: 'mg-label'
+          = f.select :status, Post.statuses.keys.map { |status| [t("management.posts.index.statuses.#{status}"), status] }, {}, { class: 'mg-input' }
+
+        .mg-field
+          = f.label :main_post, t('.main_post'), class: 'mg-label'
+          = f.select :main_post, [[t('buttons.no_text'), false], [t('buttons.yes_text'), true]], {}, { class: 'mg-input' }
+
+        .mg-field
+          = f.label :photo, t('.cover'), class: 'mg-label'
+          = f.file_field :photo, accept: 'image/*', class: 'mg-input'
+
+        / What a link to this post looks like elsewhere: the same three things every unfurl shows.
+        .mg-field
+          .mg-label= t('.og')
+          .mg-og
+            .mg-og__cover
+              - if post.photo.present?
+                = image_tag post.photo.small.url, alt: ''
+            .mg-og__body
+              .mg-og__host rubyco.in
+              .mg-og__title= post.title.presence || t('.untitled')
+              .mg-og__sub= post.subtitle
+
+        - if editing
+          .mg-field
+            .mg-label= t('.created')
+            .mg-cell--mono= post.created_at.strftime('%Y·%m·%d %H:%M')
+
+
+    .mg-editor__actions
+      = f.submit(editing ? t('global.button.save') : t('global.button.create'), class: 'mg-btn mg-btn--primary')
+      = link_to t('global.button.cancel'), management_posts_path, class: 'mg-btn mg-btn--ghost', data: { turbo: false }

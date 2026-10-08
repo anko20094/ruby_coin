@@ -1,0 +1,27 @@
+- content_for :title, full_title(t('team.index.title'))
+- page_meta description: t('team.index.meta_description')
+
+.tm-index
+  - humans = @people.count { |person| !person.machine? }
+  = render PageHeadComponent.new(title: t('team.index.title'), uid: 'team-anchor', lede: t('team.index.lede'),
+                                 badge: @people.size, eyebrow: t('counts.humans', count: humans))
+
+  section.rc-band.tm-index__band
+    .rc-wrap
+      .tm-cards
+        - @people.each do |person|
+          = link_to person_path(person), class: 'tm-card hover-row', data: { reveal: '' } do
+            = render MonogramComponent.of(person, size: 76, ring: :mute)
+            .tm-card__body
+              / The name keeps its own line: it wraps at this width, and a chip on the same
+              / baseline collides with the second line.
+              h2.tm-card__name= person.name
+              .tm-card__meta
+                span.tm-card__role= person.role
+                / Dashed means unfinished, and it is the same signal the pending CV panel uses.
+                - if person.placeholder?
+                  span.tm-card__chip.is-placeholder= t('profile.placeholder_chip')
+                - elsif person.draft?
+                  span.tm-card__chip= t('profile.draft')
+              p.tm-card__blurb= rich(person.blurb)
+              .tm-card__count= t('counts.projects', count: person.contributions(order: @order).size)

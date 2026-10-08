@@ -1,0 +1,133 @@
+@use '../theme/breakpoints' as bp;
+
+// /cv — the hiring page. The same document as /team/danyil (theme/_profile.scss holds what
+// they share); what is here is the frame around it and the compact project list.
+.cv-page__band { padding: clamp(48px, 5vw, 72px) 0 clamp(72px, 8vw, 112px); }
+
+.cv-page__identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  font-size: var(--fs-lede);
+  color: var(--ink-soft);
+}
+
+.cv-page__print { white-space: nowrap; }
+
+.cv-page__lede {
+  max-width: 640px;
+  margin: 14px 0 22px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+// ── the compact project list ───────────────────────────────
+// Beside a career the mark reads as an index, which is why it is printed here and nowhere on
+// the /work cards.
+.cv-rows { border-top: 1px solid var(--ink); }
+
+.cv-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 170px;
+  gap: 18px;
+  align-items: start;
+  padding: 22px 10px;
+  border-bottom: 1px solid var(--surface-line);
+}
+
+.cv-row__mark {
+  padding-top: 6px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--ruby);
+}
+
+.cv-row__body { min-width: 0; }
+
+.cv-row__titles {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.cv-row__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.24;
+  margin: 0;
+}
+
+.cv-row__own {
+  padding: 1px 10px;
+  font-size: 12.5px;
+  color: var(--ruby);
+  border: 1px solid color-mix(in oklab, var(--ruby) 40%, transparent);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.cv-row__here {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.cv-row__tagline {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin-top: 5px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.cv-row__meta {
+  font-size: 13.5px;
+  color: var(--ink-quiet);
+  margin-top: 8px;
+}
+
+.cv-row__metric {
+  min-width: 0;
+  text-align: right;
+}
+
+.cv-row__metric-value {
+  font-size: 36px;
+  color: var(--ruby);
+  white-space: nowrap;
+}
+
+.cv-row__metric-label {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-quiet);
+}
+
+@include bp.below(lg) {
+  .cv-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .cv-row__metric {
+    grid-column: 2;
+    text-align: left;
+    margin-top: 7px;
+  }
+
+  .cv-row__title { font-size: 24px; }
+
+  .pf-career__head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .pf-career__when { text-align: left; }
+}

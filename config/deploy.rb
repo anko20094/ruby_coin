@@ -50,7 +50,9 @@ set :puma_systemctl_user, :system
 # ------------------------------
 append :linked_files, *%w[config/master.key config/database.yml config/credentials.yml.enc .env]
 
-set :linked_dirs, %w[log tmp/pids tmp/cache tmp/sockets vendor/bundle public/uploads public/system node_modules]
+set :linked_dirs, %w[
+  log tmp/pids tmp/cache tmp/sockets vendor/bundle public/uploads public/system node_modules storage
+]
 
 # ------------------------------
 # Yarn install before asset precompile
@@ -67,6 +69,15 @@ namespace :deploy do
 end
 
 before 'deploy:assets:precompile', 'deploy:yarn_install'
+
+# ------------------------------
+# Data tasks, before the new release is live
+# ------------------------------
+# They run on the new release while the old one is still serving, and both share the database
+# and public/uploads, so a data task may only add: nothing the old release reads is deleted or
+# renamed here. Clean-ups that remove files (cleanup:legacy_cover_versions) are run by hand once
+# the new release is live. A failing task stops the deploy before the symlink moves.
+before 'deploy:publishing', 'deploy:data'
 
 # ------------------------------
 # Upload credentials automatically

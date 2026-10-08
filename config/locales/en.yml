@@ -1,95 +1,97 @@
 en:
 
   titles:
-    admin: Admin
     faq: FAQ
-    main: Main
-    search: Search
     edit: Edit
     new: New
     tags: Tags
-    posts: Posts
-    categories: Categories
-    filters: Filters
     faq_title: Frequently Asked Questions
+    faq_description: Frequently asked questions about RubyCoin — who we are, how to join our projects for practice, how to get mentoring and what it costs.
   buttons:
     remember_me: Remember me
     forgot_password: Forgot password?
     sign_in: Sign in
-    sign_up: Sign up
     update: Update
-    delete_account: Delete account
-    have_account: Do you already have an account?
-    back: Back
-    send_reset_password: Send me reset password instructions
+    send_reset_password: Send reset instructions
     create: Create
     yes_text: 'Yes'
     no_text: 'No'
-    apply: Apply
   labels:
-    registration: Registration
     enter_account: Account login
+    show_password: Show password
+    hide_password: Hide password
     edit_account: Edit account
     create_tag: Create tag
   confirmations:
-    action_confirmation: Action confirmation
     delete: Are you sure you want to delete %{item}?
   home:
     index:
-      show_first: Show first
-      new: New
-      best: Best
-      by_tags: By tags
-      by_difficulty: By difficulty level
-      all: All
-      easy: Easy
-      middle: Middle
-      hard: Hard
-      search_by_tag: Search by tags
-      reset_filter:  Reset filter
-      placeholders:
-        tags: Enter tags
-    show:
-      similar_posts: Similar posts
-    search:
-      search: Search
-      no_results: No results
-      interesting: Maybe you'll be interested
-      placeholder: What is a "gem" in Ruby?
-      advanced: Advanced search
-      radio:
-        all: All fields
-        title: Title
-        description: Description
-      results: 'Results:'
+      meta_description: "RubyCoin is a Rails studio: we build Ruby on Rails products and run them for years. Telegram platforms, proptech and AI services, figures from production."
+      tagline: Rails products, built and run for years
+      eyebrow: RubyCoin · Rails studio · Kyiv
+      hero_pill: "Rails studio · Kyiv · since %{year}"
+      headline_lead: We build Rails products,
+      headline_join: then
+      headline_mark: run them for years
+      lede_1: "%{count} of them are in this portfolio: Telegram products with more than 2.8M users, and a US proptech platform with eight years of history."
+      lede_2: Every figure on every project page is checked against production rather than memory, including the outage that lasted eleven hours.
+      work_with_us: Work with us
+      see_work: See the projects
+      gem_hint: Scroll or drag and it turns. Click for another shade.
+      gem_button: The ruby — press for another shade
+      figures:
+        products:
+          one: product in the portfolio
+          other: products in the portfolio
+        people:
+          one: person on the team
+          other: people on the team
+        year: the portfolio’s first project
+        entries:
+          one: entry in the journal
+          other: entries in the journal
+      journal_lead: From the
+      journal_mark: journal
+      all_entries: "All %{entries}"
+      new_entry: New entry
+      read_full: Keep reading
+      work_lead: Recent
+      work_mark: projects
+      all_work: "All %{projects}"
+      read_case: Read the case
+      crew_quote: Every project page names the people who worked on it, and what each of them did.
+      crew_note: "%{people} on the team — %{humans}."
+      crew_all: The whole team
+      to_top: Back to the top
+      top: Top
   faq:
     who_am_i:
       question1: Who are you and what services do you provide?
-      answer1_1: I am a programmer with experience in Ruby and Ruby on Rails.
-      answer1_2: I create Ukrainian-language content, including tutorials and instructions, especially on programming.
-      answer1_3: I also develop websites for practical learning and storing created information.
-      more_info1_html: You can read more about this in the post <a href="https://t.me/rubychatua">Meet the author of the channel</a>
+      answer1_1: We are RubyCoin, a small studio that builds products on Ruby on Rails and runs them for years.
+      answer1_2: We also write learning material in Ukrainian — tutorials and lessons, programming among them.
+      answer1_3: And we build websites for hands-on learning and for keeping that material — this one included.
+      more_info1_html: You can get to know us better in our <a href="https://t.me/rubychatua" target="_blank" rel="noreferrer">Telegram chat</a>.
     services:
       question2: What services do you offer for beginners?
-      answer2_1: For beginners, I offer various educational materials, including programming lessons in Ruby and Ruby on Rails that I create myself or have studied.
-      more_info2: My goal is to help beginners learn the basics of these technologies and gain practical experience.
+      answer2_1: Learning material on Ruby and Ruby on Rails — lessons we write ourselves, and the sources we learned from.
+      more_info2: Our goal is to help beginners learn the basics of these technologies and get practical experience.
     collaboration:
       question3: Can I join your projects for practice?
       answer3_1: Yes.
-      more_info3: If you have enough desire and determination, I will be happy to help.
+      more_info3: If you have the drive and the determination, we will be glad to help.
     consultation:
       question4: Do you provide mentoring or consulting services?
-      answer4_1: Yes, I offer mentoring and consulting services upon prior acquaintance through skype/discord.
-      answer4_2_1_html: I am ready to answer your questions and help you solve programming tasks in Ruby and Ruby on Rails as much as possible in the <a href="https://t.me/rubychatua"> telegram group.</a>
-      more_info4: I also provide the first job in this field upon successful completion of the internship.
+      answer4_1: Yes, we offer mentoring and consulting once we have got acquainted — on Discord.
+      answer4_2_1_html: We answer questions about Ruby and Ruby on Rails and help with tasks as time allows, in our <a href="https://t.me/rubychatua" target="_blank" rel="noreferrer">Telegram group</a>.
+      more_info4: Those who complete the internship successfully are offered a first job in the field.
     communication:
-      question5: How can I contact you for more information or consultation?
-      answer5_1: You can contact me through linkedIn or telegram.
-      more_info5: Links are located in the footer of the website.
+      question5: How can I contact you for more information or a consultation?
+      answer5_1: You can contact us through LinkedIn or Telegram.
+      more_info5: You will find the links at the bottom of the page.
     price:
       question6: Is there a cost for your services?
-      answer6_1: My educational materials are available for free on my website (in the process of filling).
-      more_info6: I provide mentoring services for free, as time permits.
+      answer6_1: Our learning materials on this site are available for free.
+      more_info6: We provide mentoring for free too, as time allows.
 
   datetime: &datetime
     month_names:
@@ -108,7 +110,6 @@ en:
     attributes:
       user:
         email: Email
-        old_password: Old password
         password: Password
         password_confirmation: Password confirmation
         current_password: Current password
@@ -122,10 +123,30 @@ en:
         description: Description
         photo: Photo
         status: Status
+        slug: Slug
       tag:
         title: Title
+      case:
+        slug: Slug
+        metrics: Metrics
+        quality: Quality figures
+        engineering_items: Engineering cards
+        plain_body: Plain-words paragraphs
+        mine: What was mine
+        mark: Mark
+        position: Position
+        title: Title
+        tagline: Tagline
+        role: Role
+        plain_heading: Plain-words heading
+        engineering_heading: Engineering heading
+        engineering_sub: Engineering subheading
+        scope_note: Scope note
+        year: Years
+        sector: Sector
+        status: Status
     models:
-      post: Post
+      post: Entry
     errors:
       models:
         user:
@@ -135,8 +156,8 @@ en:
               taken: is already taken
             password:
               blank: can't be blank
-              too_short: is too short, required minimum %{count} symbols
-              too_long: is too long, required maximum %{count} symbols
+              too_short: must be at least %{count} characters
+              too_long: must be at most %{count} characters
             password_confirmation:
               confirmation: doesn't match
             email:
@@ -157,115 +178,487 @@ en:
             photo:
               blank: can't be blank
               translation_missing: translation missing
-  
+        case:
+          one_language_only: has a row written in one language only
+          attributes:
+            slug:
+              named_elsewhere: is named in team.yml or the CV, so it can be neither changed nor deleted
+
   management:
+    crumbs:
+      posts: Entries
+      cases: Cases
+      tags: Tags
+      statistics: Statistics
+    statistics:
+      index:
+        title: Statistics
+        note: what gets read
+        periods:
+          today: today
+          month: this month
+          year: this year
+          all: all time
+        cases: Cases
+        posts: Journal entries
+        columns:
+          case: Case
+          post: Entry
+          views: Views
+        no_case_views: No case has been opened yet.
+        no_post_views: No entry has been opened yet.
     posts:
       index:
-        title: Post
-        tags: Tags
-      new:
-        title: Create a post
-      edit:
-        title: Edit the post
-      form:
-        title_label: Title
-        subtitle_label: Subtitle
-        photo_label: Main photo
-        description_label: Description
-        status_label: Status active ?
-        tag_label: Tags
+        title: Entries
+        new: ＋ new entry
+        search: search titles and bodies…
+        counted: "%{shown} of %{total}"
+        empty: nothing here yet.
+        delete: delete
+        filters:
+          all: all
+          active: published
+          inactive: hidden
+        statuses:
+          active: published
+          inactive: hidden
+        columns:
+          status: status
+          title: title
+          langs: langs
+          tags: tags
+          author: author
+          updated: updated
+      editor:
+        untitled: untitled
+        meta: publication
+        side_by_side: both
+        language: "%{name}"
+        title: title
+        subtitle: lede
+        body: body
+        slug: slug
+        tags: tags
+        author: author
+        status: status
+        main_post: featured on the home page
+        cover: cover
+        og: how a link to this looks
+        created: created
+        preview: preview
+        width:
+          desktop: desktop
+          mobile: mobile
+        open: open ↗
+        translate: translate the other language
+        translation:
+          translating: "Translating…"
+          done: "Done"
+          error: "Something went wrong, try again"
+          overwrite: "The other language already has text. Replace it with the translation?"
+        conflict: Someone else saved this entry after you opened it. Nothing here has been written.
+        reload: reload theirs
+        state:
+          clean: no changes
+          unsaved: not saved yet
+          dirty: unsaved changes
+          saving: saving…
+          saved: "saved %{at}"
+          invalid: "not saved: %{errors}"
+          conflict: conflict — not saved
+          failed: not saved — check your connection or sign in again
         placeholders:
-          title: Enter title
-          subtitle: Enter subtitle
-          description: Enter description
-          tags: Enter tags
-          select_image: Select image
-        status:
-          label: Status
-          active: Active
-          disabled: Disabled
-        translation_button: Translate
-        main_post: Main post
-        translation_notice: "* if there won't be translation post will not displayed in another language version of site"
+          title: What is this about?
+          subtitle: One sentence saying what the piece is about.
+          slug: how-this-reads-in-a-url
       create:
-        success: Post successfully created
+        success: Entry created
       update:
-        success: Post successfully updated
+        success: Entry updated
+        conflict: Someone else saved this entry while you were saving it. Nothing has been written — your work is still here, and Save will take it now.
       destroy:
-        success: Post successfully deleted
+        success: Entry deleted
+
+    editor:
+      select:
+        remove: "Remove"
+        no_results: "No results"
+      tinymce:
+        inline_code: inline code
+        blocks: Block
+        insert: Insert
+        cancel: Cancel
+        language: language
+        source: code
+        tone: tone
+        tone_note: note
+        tone_warn: warning
+        body: text
+        url: link
+        caption: caption
+        load_error: "The editor could not load. The field below still holds the body and still saves."
+        block_error: The block could not be inserted.
+        upload_error: The image could not be uploaded.
+        paragraph: Paragraph
+        heading2: Heading 2
+        heading3: Heading 3
+        heading4: Heading 4
+        preformatted: Preformatted
+        kinds:
+          code: Code listing…
+          callout: Callout…
+          embed: Embed…
+    editor_images:
+      create:
+        missing: no file
+        type: that file is not an image
+        processing: that image could not be read
+        size: "an image may be at most %{limit} MB"
+
+    cases:
+      index:
+        title: Cases
+        own: own
+        this_site: this site
+        columns:
+          title: title
+          flags: flags
+      form:
+        slug: Slug
+        mark: Mark
+        position: Position
+        year: Years
+        sector: Sector
+        status: Status
+        own: Own project
+        this_site: This very site
+        title: Title
+        tagline: Tagline
+        role: Role
+        plain_heading: Plain-words heading
+        engineering_heading: Engineering heading
+        engineering_sub: Engineering subheading
+        scope_note: Scope note
+        stack: Stack, one per line
+        metrics: Metrics
+        quality: Quality figures
+        engineering_items: Engineering cards
+        plain_body: Plain-words paragraphs
+        mine: What was mine
+      create:
+        success: Case successfully created
+      update:
+        success: Case successfully updated
+        conflict: Someone else saved this case after you opened it. Nothing has been written. Your changes are still here, and Save will replace theirs.
+      destroy:
+        success: Case successfully deleted
+
+
+    sidebar_component:
+      home: back to the entry list
+      where: /management
+      collapse: collapse the sidebar
+      expand: expand the sidebar
+      models: MODELS
+      system: SYSTEM
+      navigation: admin sections
+      post: Entry
+      case: Case
+      tag: Tag
+      statistics: Statistics
+      posts_hint: "%{active} published · %{inactive} hidden"
+      cases_hint: "%{own} own"
+      tags_hint: "%{used} in use"
+      statistics_hint: views · visits
 
     shared:
-      admin_left_panel:
-        admin: Admin
-        posts: Posts
-        tags: Tags
-        statistic: Statistic
-        active-admin: Administrator
-        exit: Exit
-
+      structure_row:
+        add: add a row
+        expected: "the design draws %{count}"
+        move_up: move up
+        move_down: move down
+        remove: remove this row
+        row: row
+        value: figure
+        label: label
+        title: title
+        body: text
     tags:
       index:
-        tags: Exist tags
-        create: Create a tag
+        tags: Existing tags
         placeholders:
           name: Enter name
       form:
-        title_label: Name of the tag
-      edit:
-        title_label: Name of the tag
+        title_label: Tag name
       create:
         success: Tag successfully created
       update:
         success: Tag successfully updated
       destroy:
         success: Tag successfully deleted
-      placeholders:
-        name: Name
-
   en: English
   uk: Ukrainian
 
+  # Every count on the site goes through one of these. English needs two forms and Ukrainian
+  # three, and the naive version prints "2 людей", which is wrong.
+  counts:
+    projects:
+      one: "%{count} project"
+      other: "%{count} projects"
+    products:
+      one: "%{count} product"
+      other: "%{count} products"
+    # Not "people": one of the six on the roster is a machine, and it is credited on four of the
+    # seven projects. The home page counts the humans separately for the same reason.
+    contributors:
+      one: "%{count} contributor"
+      other: "%{count} contributors"
+    humans:
+      one: "%{count} of them human"
+      other: "%{count} of them human"
+
   global:
-    errors:
-      invalid_format: has an invalid format
-    user:
-      roles:
-        basic: Basic
-        moderator: Moderator
-        admin: Admin
+    list_keys:
+      navigate: navigate
+      search: search
     button:
       delete: Delete
       cancel: Cancel
       create: Create
       save: Save
-      edit: Edit
-      show: Show
-      submit: Submit
-    dialog:
-      you_sure: Are you sure?
-    text:
-      omission: ... (continuation)
-  main_btn:
-    read_more: Read more
+      delete_item: Delete %{item}
+      edit_item: Edit %{item}
+    dismiss: Dismiss this message
+    reading_progress: reading progress
+    quote:
+      hint: for a card
+      label: The passage as a card
+      download: download PNG
+      copy: copy image
+      saved: Saved as rubycoin-quote.png
+      copied: Image copied
+      failed: That did not work — please try again
+    egg:
+      toast: You found the easter egg. The stone flew apart at its facets — and set itself back.
+      still: You found the easter egg. The stone stays whole — you asked for less motion.
+    palette:
+      open: Search the site
+      placeholder: pages, projects, entries…
+      empty: Type to search the site.
+      none: Nothing found.
+      all: Search the journal
+      kinds:
+        page: page
+        case: project
+        person: person
+        entry: entry
+      move: move
+      open_result: open
+      close: close
+    skip_to_content: Skip to the content
   nav_item:
-    sign_in: Sign in
     sign_out: Sign out
-    panel: Panel
-    root: Main page
-    faq: FAQ
   application_controller:
-    alert: You are not authorized to perform this action.
-  
-  home_controller:
-    show:
-      errors:
-        not_found: Post not found
+    alert: You are not allowed to do this.
+
+  # The plain-text answer of config/initializers/rack_attack.rb.
+  throttled:
+    one: "Too many requests. Try again in %{count} second."
+    other: "Too many requests. Try again in %{count} seconds."
 
   errors:
     messages:
-      wrong_posts_name: "This name alreadt exists."
+      processing_error: "Cannot resize image."
       carrierwave_processing_error: "Cannot resize image."
       carrierwave_integrity_error: "Not an image."
       carrierwave_download_error: "Couldn't download image."
-      extension_whitelist_error: "You are not allowed to upload %{extension} files, allowed types: %{allowed_types}"
-      extension_blacklist_error: "You are not allowed to upload %{extension} files, prohibited types: %{prohibited_types}"
+      content_type_allowlist_error: "Not an image: %{content_type} files cannot be uploaded."
+      max_size_error: "The file is too large: it must be no more than %{max_size}."
+      min_size_error: "The file is too small: it must be at least %{min_size}."
+      extension_allowlist_error: "You are not allowed to upload %{extension} files, allowed types: %{allowed_types}"
+      extension_denylist_error: "You are not allowed to upload %{extension} files, prohibited types: %{prohibited_types}"
+
+  work:
+    nav:
+      journal: Journal
+      work: Projects
+      studio: Studio
+      contact: Get in touch
+      menu: Menu
+      cv: CV
+      cv_title: Curriculum vitae
+    footer:
+      journal: Journal
+      feed: RSS
+      work: All projects
+      team: The team
+      cv: CV
+      contact: Contact
+      cta_lead: Let’s work
+      cta_mark: together.
+    index:
+      meta_description: "RubyCoin projects: Telegram platforms, proptech services and AI bots on Rails — what was built, who worked on it, and the figures from production."
+      title: Projects
+      lede: In the order we would put them in front of you. Ordered by hand, not by date — and it changes when the work does.
+      own: own
+      you_are_here: you are here
+      solo: solo
+      toggle: "Description and stack: %{title}"
+      expand_all: Expand all
+      collapse_all: Collapse all
+    case:
+      back: Projects
+      plain: In plain words
+      mine: What was mine
+      engineering: For engineers
+      facts: Facts
+      status: status
+      stack: Stack
+      pager: More projects
+      previous: Previous
+      next: Next
+      skip: Skip to the engineering
+      copied: copied
+      rail:
+        label: figures and contents
+        contents: Contents
+        contact: Talk it through
+      copy: Copy
+      cta: Read to the end and want to talk it over?
+      cta_contact: Get in touch
+      team: Who worked on it
+      team_solo: Solo — the whole stack
+      open_cv: Open CV
+      journal: Entries on this topic
+      journal_all: 'Every entry tagged #%{tag}'
+
+  # The labels /cv and /team/:person share, because they render the same document.
+  profile:
+    summary: summary
+    career: career
+    stack: stack
+    contact: contact
+    location: where
+    languages: languages
+    education: education
+    updated: cv updated
+    draft: CV DRAFT
+    placeholder_chip: PLACEHOLDER
+    placeholder: PLACEHOLDER DATA · layout preview only — replace before launch
+    worked_on: worked on
+    not_work: off work
+    open_case: read about the project
+    solo_project: solo project
+    pending:
+      title: This CV is not filled in yet
+      body: The contributions above are written by the project lead and are accurate. The career, stack and education sections are the person's own to write — until they do, this page shows nothing rather than guessing.
+
+  cv:
+    show:
+      meta_description: "CV of a Senior Ruby on Rails engineer: commercial services, own products, stack and projects — figures checked against production, git and trackers."
+      title: Curriculum vitae
+      lede: Commercial services and products of my own. Every figure checked against production, git and trackers — not memory.
+      projects: the projects
+      print: save as pdf
+      pending_body: The CV is still being written.
+      figures: figures
+      both_halves: "Both halves of the same evidence: the career on the left, the work that backs it below."
+
+  team:
+    index:
+      meta_description: "The RubyCoin team: who worked on each of the studio’s projects and what exactly they did, with CVs and links to the projects."
+      eyebrow: team
+      title: Who is here
+      lede: Every project page names the people who worked on it and what each of them did — this is the same list from the other direction.
+    show:
+      back: Team
+      on_case: "on"
+
+  studio:
+    show:
+      meta_description: "RubyCoin is a small Rails studio. The people behind the projects in the portfolio, their CVs, and those who worked with us before."
+      title: The studio
+      lede: A small Rails studio. The team below are the people behind these projects — open a card to see their CV and the projects they worked on. Others worked with us too; they are named at the end.
+      cv_link: cv & projects
+      alumni: Former members
+      alumni_note: Worked with us and moved on.
+
+  contact:
+    show:
+      meta_description: "Contact RubyCoin about a project, an idea, a question or just Rails. Pick whichever channel suits you — we read every message."
+      title: Contact
+      lede: A project, an idea, a question, or you just want to talk Rails. Pick a channel — we read all of them.
+
+  error_pages:
+    not_found:
+      title: This page is not here
+      lede: The address is wrong, or what stood here has moved. Nothing is broken on your side.
+    unacceptable:
+      title: That request could not be accepted
+      lede: Usually a form that sat open too long. Go back and send it again.
+    internal:
+      title: Something broke on our side
+      lede: The error is logged and we will see it. Try again in a minute.
+    actions:
+      work: See the projects
+      journal: Read the journal
+    hint: searches the whole site
+
+  journal:
+    index:
+      meta_description: "The RubyCoin journal: notes from building Rails products — stories from projects, code snippets and the things that almost broke us."
+      entries:
+        one: "%{count} entry"
+        other: "%{count} entries"
+      shown:
+        one: "%{count} entry in the list"
+        other: "%{count} entries in the list"
+      title: Journal
+      lede: "Notes from the work: stories from projects, snippets, things that almost broke us. Updated when there is something to say."
+      filter: filter
+      all: all
+      order:
+        label: show
+        new: newest
+        oldest: oldest
+        best: best
+      empty: "no entries for #%{tag}."
+      empty_all: nothing published yet.
+      empty_many: "no entries carry all of %{tags}."
+      all_tags: entries carrying every selected tag
+      new_badge: NEW
+      pager:
+        previous: previous page
+        next: next page
+    search:
+      title: Search
+      lede: Everything in the journal, by title or by body.
+      field: query
+      placeholder: what are you looking for?
+      submit: Search
+      clear: Clear the search
+      where: look in
+      fields:
+        all: everywhere
+        title: titles
+        description: bodies
+      prompt: Type something and press Search.
+      found:
+        one: "%{count} entry"
+        other: "%{count} entries"
+      none: "Nothing matches “%{query}”."
+    blocks:
+      callout:
+        note: note
+        warn: careful
+    post:
+      back: Journal
+      all_entries: All entries
+      related: related
+      project:
+        one: project
+        other: projects
+      series: the series
+      previous: Previous
+      next: Next
+    minutes: "%{count} min"

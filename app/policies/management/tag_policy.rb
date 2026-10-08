@@ -11,11 +11,9 @@ class Management::TagPolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      if user.present? && (user.admin? || user.moderator?)
-        scope.all
-      else
-        scope.where(status: 'active')
-      end
+      # Tags are editorial metadata, not public content: there is no anonymous tag list, and
+      # no tags.status column to filter one by. This used to ask for that column and raise.
+      user.present? && user.staff_member? ? scope.all : scope.none
     end
   end
 end

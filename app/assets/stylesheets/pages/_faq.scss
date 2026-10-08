@@ -1,0 +1,44 @@
+@use '../theme/breakpoints' as bp;
+
+// /faq — the reading measure, same as an article, because that is what it is: prose answers.
+// The old page was a Bootstrap accordion with every panel forced open, so nothing is lost by
+// dropping the accordion entirely.
+.fq-page__band { padding: clamp(40px, 4vw, 64px) 0 clamp(72px, 8vw, 112px); }
+
+.fq-entry {
+  max-width: 760px;
+  padding: 36px 0;
+  border-top: 1px solid var(--surface-line);
+
+  &:first-child { border-top: 0; }
+}
+
+.fq-entry__question {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(26px, 2.6vw, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.fq-entry__answer {
+  font-size: 17.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+
+  p { margin: 0 0 12px; }
+
+  p:last-child { margin-bottom: 0; }
+
+  a {
+    color: var(--ruby);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+@include bp.below(sm) {
+  .fq-entry { padding: 28px 0; }
+}

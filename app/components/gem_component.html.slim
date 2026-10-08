@@ -1,0 +1,33 @@
+svg.rc-gem class="rc-gem--#{variant}" viewBox="-6 -6 112 112" aria-hidden="true" focusable="false" style=style data-controller=(interactive? ? 'ruby' : nil) data-ruby-variant-value=(interactive? ? variant : nil) data=ruby_data
+  defs
+    - if glow?
+      filter id="rc-gem-glow-#{uid}" x="-50%" y="-50%" width="200%" height="200%"
+        feGaussianBlur stdDeviation="3.2"
+    radialGradient id="rc-gem-table-#{uid}" cx="50%" cy="50%" r="55%" data-ruby-target="tableGradient"
+      - table_stops.each_with_index do |colour, index|
+        stop offset="#{[0, 60, 100][index]}%" stop-color=colour
+    - facets.each do |facet|
+      - line = facet_gradient_line(facet)
+      linearGradient id="rc-gem-f#{facet.index}-#{uid}" gradientUnits="userSpaceOnUse" x1=line[:x1] y1=line[:y1] x2=line[:x2] y2=line[:y2] data-ruby-target="facetGradient"
+        - facet_stops(facet).each_with_index do |colour, index|
+          stop offset="#{[0, 60, 100][index]}%" stop-color=colour
+
+  - if glow?
+    polygon points=polygon(outer) fill=glow_colour opacity="0.45" filter="url(#rc-gem-glow-#{uid})" data-ruby-target="glow"
+
+  g.rc-gem__crown data-ruby-target="crown"
+    - facets.each do |facet|
+      polygon points=polygon(facet.points) fill="url(#rc-gem-f#{facet.index}-#{uid})" data-ruby-target="facet"
+    polygon points=polygon(inner) fill="url(#rc-gem-table-#{uid})"
+    / The shimmer and the crown star only exist while they are actually lit. The
+    / interactive cuts keep an inert placeholder so the controller has something
+    / to drive; the static logo does not carry dead markup.
+    - if (shimmer = specular)
+      polygon points=shimmer[:points] fill="oklch(96% 0.05 30)" opacity=shimmer[:opacity] style="mix-blend-mode:screen" data-ruby-target="specular"
+    - elsif interactive?
+      polygon points="" fill="oklch(96% 0.05 30)" opacity="0" style="mix-blend-mode:screen" data-ruby-target="specular"
+    - if (star = crown)
+      circle cx="50" cy="50" r=star[:radius] fill="oklch(97% 0.06 30)" opacity=star[:opacity] style="mix-blend-mode:screen" data-ruby-target="star"
+    - elsif interactive?
+      circle cx="50" cy="50" r="0" fill="oklch(97% 0.06 30)" opacity="0" style="mix-blend-mode:screen" data-ruby-target="star"
+    polygon points=polygon(outer) fill="none" stroke="currentColor" stroke-width="0.35" stroke-opacity="0.25" stroke-linejoin="miter"

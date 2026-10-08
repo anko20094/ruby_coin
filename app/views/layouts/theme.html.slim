@@ -1,0 +1,38 @@
+doctype html
+html lang=I18n.locale
+  head
+    meta charset="utf-8"
+    = favicon_link_tag asset_path('favicon.ico')
+    title
+      = content_for?(:title) ? yield(:title) : MetaHelper::SITE_NAME
+
+    meta[name="viewport" content="width=device-width,initial-scale=1"]
+    / --scene, for the browser chrome around the page: every page opens and closes on it.
+    meta[name="theme-color" content="#0f0808"]
+    = render 'shared/meta'
+    / No csrf_meta_tags here on purpose. Nothing on the public theme makes a non-GET request —
+    / the only form is the GET search — and the masked token in that tag changes on every
+    / response, which made the ETag change on every response too. Without it, a reader who
+    / comes back to a page they have already read gets a 304 with no body instead of the whole
+    / page again. Rails' form helpers carry their own token in a hidden field, so a form added
+    / here later still works; only a hand-written fetch() would need the tag back.
+    = csp_meta_tag
+    / The four faces are self-hosted (theme/_fonts.scss) — no runtime request to
+    / Google Fonts. Preload only the slices the first paint actually needs.
+    - theme_preloaded_faces.each do |face|
+      link rel="preload" href=asset_path("#{face}.woff2") as="font" type="font/woff2" crossorigin=""
+    = stylesheet_link_tag 'theme', media: 'all'
+    = javascript_include_tag 'theme', defer: true
+
+  body.rc-site
+    a.rc-skip href="#main"= t('global.skip_to_content')
+    = render NavComponent.new
+    = render FlashComponent.new(flash:)
+    main#main.rc-main.page-in tabindex="-1"
+      = yield
+    = render FooterComponent.new(cta: !content_for?(:quiet_footer))
+    = render 'shared/quote_card'
+    / The easter egg's caption. A live region from the start, so the first toast is announced.
+    .rc-egg[data-controller="gem-egg" data-gem-egg-message-value=t('global.egg.toast')
+            data-gem-egg-still-value=t('global.egg.still')]
+      .rc-egg__toast[role="status" data-gem-egg-target="toast"]

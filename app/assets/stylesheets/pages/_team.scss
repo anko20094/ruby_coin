@@ -1,0 +1,241 @@
+@use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+
+// /team — the roster — and /team/:person, the one canonical page per person. What the person
+// page shares with /cv lives in theme/_profile.scss; this is the roster and the blocks that
+// only a person page has.
+.tm-index__band,
+.tm-person__band { padding: clamp(48px, 5vw, 72px) 0 clamp(72px, 8vw, 112px); }
+
+.tm-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  gap: 16px;
+}
+
+.tm-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-panel);
+  transition: transform 250ms, border-color 250ms, background 150ms;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--ruby) 40%, transparent);
+  }
+}
+
+.tm-card__body { min-width: 0; }
+
+// The name keeps its own line: it wraps at this width, and a chip on the same baseline
+// collides with the second line of it.
+.tm-card__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 29px;
+  line-height: 1.12;
+}
+
+.tm-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+
+// No nowrap: "cofounder · product & clients" crossed the card's border on a 360px phone.
+.tm-card__role {
+  min-width: 0;
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+// Dashed means unfinished — the same line the pending-CV panel and the placeholder banner
+// draw. Ruby when the content itself is invented, quiet when it is merely old.
+.tm-card__chip {
+  padding: 1px 9px;
+  font-size: 12px;
+  color: var(--ink-quiet);
+  border: 1px dashed var(--ink-mute);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+
+  &.is-placeholder {
+    color: var(--ruby);
+    border-color: var(--ruby);
+  }
+}
+
+.tm-card__blurb {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.tm-card__count {
+  margin-top: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ruby);
+}
+
+// ── one person ─────────────────────────────────────────────
+.tm-person__head { padding: calc(var(--nav-clear) + clamp(24px, 4vw, 56px)) 0 clamp(56px, 6vw, 88px); }
+
+.tm-person__glow {
+  --glow-x: 75%;
+  --glow-y: -340px;
+  --glow-h: 860px;
+}
+
+.tm-person__crumb { gap: 4px 14px; }
+
+.tm-person__name {
+  margin: 26px 0 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(48px, 7.4vw, 104px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.tm-person__role {
+  margin-top: 18px;
+  font-size: var(--fs-lede);
+  color: var(--ink-soft);
+}
+
+// The project the reader arrived through: first on the page, above the CV, because that is the
+// question they came with — a dark panel, so it reads as the answer.
+.tm-context { padding: 24px 26px 26px; }
+
+.tm-context__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tm-context__on {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ruby);
+
+  &::first-letter { text-transform: uppercase; }
+}
+
+.tm-context__link {
+  @include controls.hit-row(32px);
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.tm-context__meta {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+.tm-context .pf-did {
+  margin-top: 16px;
+
+  .pf-did__item { color: var(--ink-soft); }
+}
+
+// ── worked on ──────────────────────────────────────────────
+.tm-worked {
+  margin-top: 18px;
+  border-top: 1px solid var(--ink);
+}
+
+.tm-worked__body { min-width: 0; }
+
+.tm-worked__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.tm-worked__did {
+  margin-top: 4px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.tm-worked__meta {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.tm-worked__period { color: var(--ink-quiet); }
+
+@include bp.below(620px) {
+  .tm-worked__meta { text-align: left; }
+}
+
+// ── not-work ───────────────────────────────────────────────
+// The one place emoji appear in the design. They came with this block when it lived on the
+// home page, and they are why it reads as a person rather than a résumé section.
+.tm-notwork {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr));
+  gap: 18px;
+  margin-top: 18px;
+  padding-top: 22px;
+  border-top: 1px solid var(--ink);
+}
+
+.tm-notwork__icon {
+  margin-bottom: 6px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.tm-notwork__label {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.tm-notwork__detail {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-quiet);
+}
+
+// On a phone the monogram beside the text left the name a 114px column to wrap 27px display
+// type into. The stone goes above instead, and gives up half its size: the words are the card.
+@include bp.below(xs) {
+  .tm-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  // Not --monogram-size: the component sets that inline, and an inline custom property
+  // beats a rule. `width` is what reads it, so `width` is what overrides it.
+  .tm-card .rc-monogram { width: 60px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-card { transition: none; }
+
+  .tm-card:hover { transform: none; }
+}

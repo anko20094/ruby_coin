@@ -6,7 +6,27 @@ RSpec.describe User do
   subject { build(:user) }
 
   describe 'associations' do
-    it { is_expected.to have_many(:posts).dependent(:delete_all) }
+    it { is_expected.to have_many(:posts).dependent(:destroy) }
+  end
+
+  describe '#destroy' do
+    let!(:user) { create(:user) }
+    let!(:entry) { create(:post, user: user) }
+
+    it 'takes the posts with it, and what hangs off them' do
+      user.destroy
+
+      expect(Post.where(id: entry.id)).to be_empty
+      expect(PostTranslation.where(post_id: entry.id)).to be_empty
+      expect(ActionText::RichText.where(record_type: 'Post', record_id: entry.id)).to be_empty
+    end
+
+    it 'leaves other people posts alone' do
+      other = create(:post)
+
+      expect { user.destroy }.to change(Post, :count).by(-1)
+      expect(Post.exists?(other.id)).to be(true)
+    end
   end
 
   describe 'enums' do

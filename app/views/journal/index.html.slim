@@ -1,0 +1,28 @@
+- content_for :title, full_title(t('journal.index.title'))
+- page_meta description: t('journal.index.meta_description'), canonical_query: listing_query(tags: @active_tags)
+
+.jn-index data-controller="list-nav" data-list-nav-item-value=".jn-entry"
+  = render PageHeadComponent.new(title: t('journal.index.title'), uid: 'journal-anchor', lede: t('journal.index.lede'),
+                                 badge: @entries_count, eyebrow: t('home.index.figures.entries', count: @entries_count)) do
+    = form_with url: search_path, method: :get, class: 'jn-index__search',
+                data: { controller: 'live-search', live_search_results_value: 'journal-live' } do |f|
+      = f.label :query, t('journal.search.field'), class: 'jn-search__label'
+      .jn-search__box data-controller="search-clear"
+        = f.search_field :query, class: 'jn-search__input', placeholder: t('journal.search.placeholder'),
+          data: { list_nav_target: 'search', search_clear_target: 'input', action: 'input->search-clear#sync' }
+        = render 'journal/search_clear'
+      / What live search found, said aloud and shown small beside the field.
+      p.jn-search__hint[aria-live="polite" data-live-search-target="status"]
+      = f.submit t('journal.search.submit'), class: 'rc-button jn-search__submit'
+
+  section.rc-band.jn-index__band
+    .rc-wrap.rc-wrap--narrow
+      / The filter and the list, which journal-filter refreshes in place when a chip, an order or
+      / a page is picked. #entries is also where those links land without script.
+      #entries.jn-listing data-controller="journal-filter" data-action="click->journal-filter#follow"
+        = render 'filter'
+        p.rc-visually-hidden[aria-live="polite" data-journal-filter-target="status"]
+        / Live search draws its results here and takes the list below out while it does; without
+        / script the form above submits to /search as it always has.
+        #journal-live hidden=true
+        = render 'entries'

@@ -1,0 +1,37 @@
+- provide(:title, full_title(t('.title')))
+
+- content_for :topbar do
+  = render 'management/shared/top_bar', crumbs: [t('management.crumbs.cases')],
+    action: link_to(t('buttons.create'), new_management_case_path, class: 'mg-btn mg-btn--primary', data: { turbo: false })
+
+/ The same working list as the posts: the title is the way into the editor, delete is the one
+/ other action on the row.
+.mg-table-scroll
+  table.mg-table.mg-cases
+    thead
+      tr
+        th #
+        th= t('.columns.title')
+        th= t('.columns.flags')
+        th
+    tbody
+      - @cases.each do |kase|
+        - name = plain(kase.title)
+        tr.mg-case-row
+          td.mg-cell--mono.mg-cases__mark= kase.mark
+          td
+            = link_to edit_management_case_path(kase), class: 'mg-title-link', data: { turbo: false } do
+              .mg-title= rich(kase.title)
+              .mg-title__path= "#{kase.slug} · #{kase.year} · #{kase.sector}"
+          td
+            .mg-tags
+              - if kase.own?
+                span.mg-tag= t('.own')
+              - if kase.is_this_site?
+                span.mg-tag= t('.this_site')
+          td.mg-cell--right
+            .mg-actions
+              = button_to t('global.button.delete'), management_case_path(kase), method: :delete,
+                class: 'mg-action mg-action--danger', aria: { label: t('global.button.delete_item', item: name) },
+                form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
+                                confirm_message_value: t('confirmations.delete', item: name) } }

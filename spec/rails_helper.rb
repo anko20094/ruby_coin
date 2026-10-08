@@ -12,7 +12,6 @@ require 'devise'
 require 'factory_bot_rails'
 require 'shoulda/matchers'
 require 'faker'
-require 'database_cleaner'
 require 'pundit/rspec'
 require 'pundit/matchers'
 
@@ -29,13 +28,10 @@ RSpec.configure do |config|
   config.before do
     Rails.application.routes.default_url_options[:locale] = I18n.default_locale
   end
-  config.before(:each, type: :feature) do
-    default_url_options[:locale] = I18n.default_locale
-  end
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [Rails.root.join('spec', 'fixtures')]
-  config.include Devise::Test::ControllerHelpers, type: :controller
-  config.include Devise::Test::IntegrationHelpers, type: :system
+  config.include Devise::Test::IntegrationHelpers, type: :request
+
   config.include ActiveSupport::Testing::TimeHelpers
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -60,10 +56,16 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
 
+  # spec/content checks the YAML under config/portfolio — the claims and the roster — rather than
+  # an endpoint. Some of those checks still render a page to see a link, so they run as request
+  # specs, which is what they were before they moved out of spec/requests.
+  config.define_derived_metadata(file_path: %r{/spec/content/}) do |metadata|
+    metadata[:type] ||= :request
+  end
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
   config.include FactoryBot::Syntax::Methods
-  config.include_context 'when carrierwave cleanup', include_shared: true
 end

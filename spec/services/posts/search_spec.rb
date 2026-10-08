@@ -39,6 +39,26 @@ RSpec.describe Posts::Search do
         }
       }
 
+      describe 'the order of the results' do
+        let(:found) { described_class.call({ query: 'postgres', search_in: 'all' }).to_a }
+
+        it 'puts the closest match first, not the newest' do
+          closest = create(:post, title: 'Postgres', description_uk: '<p>Postgres postgres postgres postgres.</p>',
+                                  created_at: 2.years.ago)
+          passing = create(:post, title: 'Notes', description_uk: '<p>A passing mention of postgres.</p>',
+                                  created_at: 1.day.ago)
+
+          expect(found).to eq([closest, passing])
+        end
+
+        it 'puts the newest first among equal matches' do
+          older = create(:post, title: 'Postgres', description_uk: '<p>Postgres.</p>', created_at: 2.years.ago)
+          newer = create(:post, title: 'Postgres', description_uk: '<p>Postgres.</p>', created_at: 1.day.ago)
+
+          expect(found).to eq([newer, older])
+        end
+      end
+
       search_scopes.each do |scope, params|
         context "when pg_scope is #{scope}" do
           params.each do |query, collection|

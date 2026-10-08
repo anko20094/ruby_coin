@@ -1,0 +1,29 @@
+- content_for :title, full_title(@query.presence || t('.title'))
+- page_meta description: t('.lede'), canonical_query: listing_query
+
+.jn-index
+  = render PageHeadComponent.new(title: t('.title'), uid: 'search-anchor', lede: t('.lede')) do
+    = form_with url: search_path, method: :get, class: 'jn-search' do |f|
+      .jn-search__row
+        = f.label :query, t('.field'), class: 'jn-search__label'
+        .jn-search__box data-controller="search-clear"
+          = f.search_field :query, value: @query, class: 'jn-search__input',
+            placeholder: t('.placeholder'), autofocus: @query.blank?,
+            data: { search_clear_target: 'input', action: 'input->search-clear#sync' }
+          = render 'journal/search_clear'
+        = f.submit t('.submit'), class: 'rc-button rc-button--primary'
+
+      fieldset.jn-search__fields
+        legend.jn-search__label= t('.where')
+        .rc-chips
+          - JournalController::SEARCH_FIELDS.each do |field|
+            .jn-search__field
+              = f.radio_button :search_in, field, checked: @field == field, id: "search_in_#{field}"
+              = f.label :search_in, t(".fields.#{field}"), value: field, for: "search_in_#{field}"
+
+  section.rc-band.jn-index__band
+    .rc-wrap.rc-wrap--narrow
+      - if @query.blank?
+        p.jn-empty= t('.prompt')
+      - else
+        = render 'journal/search_results'

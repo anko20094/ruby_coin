@@ -1,51 +1,39 @@
 # frozen_string_literal: true
 
 class Posts::Translator < BaseService
-  attr_accessor :post, :params
+  FIELDS = %w[title subtitle].freeze
+
+  attr_reader :post, :params
 
   def initialize(post, params)
     @post = post
     @params = params
   end
 
+  # False when a submitted language is blank; the post then carries its own validation errors
+  # and the missing translations together, so the form shows all of them at once.
   def call
-    return false unless localization_valid?(params)
+    missing = assign
+    return true if missing.empty?
 
-    I18n.available_locales.each do |locale|
-      article = post.post_translations.find_or_create_by(locale:)
-
-      update_post(article, locale)
+    post.validate
+    missing.each do |field|
+      message = I18n.t("activerecord.errors.models.post.attributes.#{field}.translation_missing")
+      post.errors.add(field.to_sym, message:)
     end
+    false
   end
 
   private
 
-  def update_post(article, locale)
-    if params.dig('title_localizations', locale).present?
-      article.update!(title: params.dig('title_localizations', locale))
-    end
+  def assign
+    FIELDS.each_with_object([]) do |field, missing|
+      params.fetch("#{field}_localizations") { {} }.each do |locale, value|
+        next unless I18n.available_locales.include?(locale.to_sym)
+        next missing << field if value.blank?
 
-    if params.dig('subtitle_localizations', locale).present?
-      article.update(subtitle: params.dig('subtitle_localizations', locale))
-    end
-
-    return if params.dig('description_localizations', locale).blank?
-
-    article.update(description: params.dig('description_localizations', locale))
-  end
-
-  def localization_valid?(localization_params)
-    localization_params.each do |field, translations|
-      translations.each_value do |value|
-        next if value.present?
-
-        fieldname = field.delete_suffix('_localizations')
-        message = I18n.t("activerecord.errors.models.post.attributes.#{fieldname}.translation_missing")
-
-        @post.errors.add(fieldname.to_sym, message:)
+        post.public_send(:"#{field}_#{locale}=", value)
       end
     end
-
-    @post.errors.blank?
   end
 end

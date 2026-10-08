@@ -1,0 +1,5 @@
+.jn-code
+  - if block.language.present?
+    span.jn-code__lang= block.language
+  pre.jn-code__body
+    code== journal_highlight(block.source, block.language)

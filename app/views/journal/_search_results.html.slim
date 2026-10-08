@@ -1,0 +1,25 @@
+/ What a search found: the whole of /search below its form, and the fragment the journal's live
+/ search swaps in (journal#search with ?partial=1). data-summary is what that one announces.
+- summary = @pagy.count.positive? ? t('journal.search.found', count: @pagy.count) : t('journal.search.none', query: @query)
+.jn-results data-summary=summary
+  - if @pagy.count.positive?
+    .rc-eyebrow.jn-search__count= t('journal.search.found', count: @pagy.count)
+    .jn-entries
+      - @results.each_with_index do |post, index|
+        = render JournalEntryComponent.new(post:, first: index.zero?)
+
+    - if @pagy.pages > 1
+      nav.jn-pager aria-label=t('journal.search.title')
+        - if @pagy.previous
+          = link_to search_path(query: @query, search_in: @field, page: @pagy.previous),
+            class: 'jn-pager__step', aria: { label: t('journal.index.pager.previous') } do
+            span aria-hidden="true" ←
+        span.jn-pager__count= "#{@pagy.page} / #{@pagy.pages}"
+        - if @pagy.next
+          = link_to search_path(query: @query, search_in: @field, page: @pagy.next),
+            class: 'jn-pager__step', aria: { label: t('journal.index.pager.next') } do
+            span aria-hidden="true" →
+  - else
+    p.jn-empty= t('journal.search.none', query: @query)
+    p.jn-search__fallback
+      = link_to t('journal.post.all_entries'), journal_path, class: 'hover-link'

@@ -1,33 +1,78 @@
-- provide(:title, full_title(t("titles.posts")))
-.admin-panel
-  .admin-panel__content
-    .admin-panel__inner
-      = render 'management/shared/admin_left_panel'
-      .admin-panel__right
-        .inner-title
-          h1.admin__title = t('.title')
-          .dropdown = t('.tags')
-        .posts-admin
-          - @posts.each do |post|
-            = turbo_frame_tag post, class: 'post' do
-              - if post.photo.url
-                = image_tag post.photo.url(:thumb), class: 'post-img'
-              - else
-                = image_tag "post-small.png", class: 'post-img'
-              .post__content
-                .post__text
-                  h4.post__title = post.title
-                  p.post__description = post.subtitle
-                .post__actions
-                  .delete
-                    = link_to image_tag("delete-icon.svg"), management_post_path(post),
-                                            data: { turbo_method: :delete, turbo_confirm: t('global.dialog.you_sure') }
-                  .edit
-                    = link_to  image_tag("edit-icon.svg"), edit_management_post_path(post),
-                            data: { turbo: :false }
-        .footer-panel
-          .pagination
-            - if @pagy.pages > 1
-              .pagination__inner
-                == pagy_bootstrap_nav(@pagy)
-          = link_to t('buttons.create'), new_management_post_path, class: 'main-btn', data: { turbo: :false }
+- provide(:title, full_title(t('.title')))
+- filters = { nil => t('.filters.all'), 'active' => t('.filters.active'), 'inactive' => t('.filters.inactive') }
+- keep = { query: params[:query].presence, sort: params[:sort].presence, direction: params[:direction].presence }.compact
+- sort_path = ->(**overrides) { management_posts_path(**keep.except(:sort, :direction), status: params[:status].presence, **overrides) }
+
+- content_for :topbar do
+  = render 'management/shared/top_bar', crumbs: [t('management.crumbs.posts')],
+    note: t('.counted', shown: @posts.size, total: @pagy.count),
+    action: link_to(t('.new'), new_management_post_path, class: 'mg-btn mg-btn--primary', data: { turbo: false })
+
+.mg-rail
+  .mg-filters
+    - filters.each do |value, label|
+      - current = params[:status].presence == value
+      = link_to management_posts_path(**keep, status: value), class: "mg-filter #{'is-current' if current}",
+        aria: { current: ('true' if current) } do
+        = label
+        span.mg-filter__count= value.nil? ? @counts.values.sum : @counts[value].to_i
+
+  = form_with url: management_posts_path, method: :get, class: 'mg-search', data: { turbo: false } do |f|
+    span.mg-search__glyph ⌕
+    = f.hidden_field :status, value: params[:status].presence, id: nil
+    = f.search_field :query, value: params[:query], placeholder: t('.search'), class: 'mg-search__input', id: nil,
+      aria: { label: t('.search') }
+
+- if @posts.any?
+  / The table is a working list with eight columns; on a phone it used to push the whole page
+  / sideways by 273px. It scrolls inside its own box instead, so the page does not.
+  .mg-table-scroll
+    table.mg-table
+      thead
+        tr
+          th[aria-sort=mg_aria_sort('number')]= mg_sort_link('#', 'number', path: sort_path)
+          th[aria-sort=mg_aria_sort('status')]= mg_sort_link(t('.columns.status'), 'status', path: sort_path)
+          th= t('.columns.title')
+          th= t('.columns.langs')
+          th= t('.columns.tags')
+          th= t('.columns.author')
+          th[aria-sort=mg_aria_sort('updated')]= mg_sort_link(t('.columns.updated'), 'updated', path: sort_path)
+          th
+      tbody
+        - @posts.each do |post|
+          - title = post.title.presence || post.translations.map(&:title).compact_blank.first || post.slug
+          tr
+            td.mg-cell--mono= post.entry_label
+            td= mg_status_pill(post.status)
+            / The title is the way in. It was inert — seven hundred pixels of the thing your eye
+            / lands on doing nothing — while the way to the editor was a sixty-pixel button at
+            / the far edge of the row. The separate `edit` button has gone with it.
+            td
+              = link_to edit_management_post_path(post), class: 'mg-title-link', data: { turbo: false } do
+                .mg-title= title
+                .mg-title__path= "/post/#{post.slug}"
+            td= mg_language_pair(post.translated_locales)
+            td
+              .mg-tags
+                - post.tags.first(3).each do |tag|
+                  span.mg-tag= "##{tag.title}"
+                - if post.tags.size > 3
+                  span.mg-tags__more= "+#{post.tags.size - 3}"
+            td.mg-cell--mono= post.user&.nickname
+            td.mg-cell--mono= post.updated_at.strftime('%Y·%m·%d')
+            td.mg-cell--right
+              .mg-actions
+                = button_to t('.delete'), management_post_path(post), method: :delete,
+                  class: 'mg-action mg-action--danger', aria: { label: t('global.button.delete_item', item: title) },
+                  form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
+                                  confirm_message_value: t('confirmations.delete', item: title) } }
+
+  - if @pagy.pages > 1
+    nav.mg-pager
+      - if @pagy.previous
+        = link_to '←', management_posts_path(**keep, status: params[:status].presence, page: @pagy.previous), class: 'mg-pager__step'
+      span= "#{@pagy.page} / #{@pagy.pages}"
+      - if @pagy.next
+        = link_to '→', management_posts_path(**keep, status: params[:status].presence, page: @pagy.next), class: 'mg-pager__step'
+- else
+  .mg-empty= t('.empty')

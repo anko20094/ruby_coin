@@ -1,0 +1,469 @@
+@use '../theme/controls';
+@use 'a11y';
+@use '../theme/breakpoints' as bp;
+
+// Resets scoped to the shell, on top of admin/_base.scss.
+.mg-shell {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button { cursor: pointer; }
+
+  // :where() keeps the reset at the shell's own specificity, so one class can pick a family.
+  :where(button, input, select, textarea) { font-family: inherit; }
+
+  table { margin: 0; }
+
+  // Placeholders at a contrast that can be read: the UA grey is 2:1 on paper.
+  :is(input, textarea)::placeholder {
+    font: inherit;
+    color: var(--ink-quiet);
+    opacity: 1;
+  }
+}
+
+// Flash sits in the pane, under the top bar: a full-width strip per message, in the admin's
+// mono. The messages themselves are FlashComponent's (theme/_flash.scss).
+.mg-flash {
+  .rc-flash__item {
+    align-items: center;
+    margin: 0;
+    border: 0;
+    border-bottom: 1px solid var(--mg-ink-faint);
+    border-radius: 0;
+    padding: 4px 12px 4px 22px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+  }
+
+  .rc-flash__item--notice { background: color-mix(in oklab, var(--mg-ok) 12%, var(--paper)); }
+  .rc-flash__item--alert { color: var(--ruby); }
+}
+
+// Sidebar + content pane.
+.mg-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.mg-sidebar {
+  width: var(--mg-sidebar);
+  transition: width 180ms ease;
+  flex-shrink: 0;
+  background: var(--paper-warm);
+  border-right: 1px solid var(--mg-ink-faint);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.mg-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--mg-ink-faint);
+}
+
+.mg-sidebar__name-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.mg-sidebar__toggle {
+  @include controls.hit-square(32px);
+
+  flex-shrink: 0;
+  line-height: 1;
+  font-size: 13px;
+  color: var(--ink-quiet);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-chip);
+  transition: color 150ms, border-color 150ms, transform 200ms;
+
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--mg-ink-faint);
+  }
+}
+
+// The rail. Everything that is words gets out of the way; the dots, the counts and the ruby
+// stay, so which screen you are on is still readable at 56px.
+.mg-shell.is-sidebar-collapsed {
+  --mg-sidebar: 56px;
+
+  .mg-sidebar__name-block,
+  .mg-sidebar__label,
+  .mg-sidebar__who { display: none; }
+
+  .mg-sidebar__brand,
+  .mg-sidebar__user { padding-inline: 0; justify-content: center; }
+
+  .mg-sidebar__brand { flex-direction: column-reverse; gap: 12px; }
+
+  .mg-sidebar__toggle { transform: rotate(180deg); }
+
+  .mg-sidebar__models { padding-inline: 4px; }
+
+  .mg-model {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+  }
+
+  // The count is the one number worth keeping: it is how you notice a draft you left behind.
+  .mg-model__count {
+    font-size: 9px;
+    margin-left: 3px;
+  }
+}
+
+// Clipped rather than display:none, which would leave each link named by its count alone.
+@include bp.above(lg) {
+  .mg-shell.is-sidebar-collapsed .mg-model__body { @include a11y.visually-hidden; }
+}
+
+.mg-sidebar__wordmark {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.mg-sidebar__where {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  letter-spacing: 1.2px;
+  margin-top: 2px;
+}
+
+.mg-sidebar__models {
+  flex: 1;
+  overflow: auto;
+  padding: 6px 8px;
+}
+
+.mg-sidebar__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  color: var(--ink-quiet);
+  padding: 12px 10px 6px;
+}
+
+.mg-model {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-card);
+  transition: background 120ms, border-color 120ms;
+
+  &:hover { background: var(--paper); }
+
+  &.is-current {
+    background: var(--paper);
+    border-color: var(--ink);
+  }
+}
+
+.mg-model__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink-mute);
+  flex-shrink: 0;
+
+  .mg-model.is-current & { background: var(--ruby); }
+}
+
+.mg-model__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.mg-model__name {
+  font-size: 13.5px;
+  line-height: 1.2;
+
+  .mg-model.is-current & { font-weight: 500; }
+}
+
+.mg-model__hint {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mg-model__count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+
+  .mg-model.is-current & { color: var(--ink); }
+}
+
+.mg-sidebar__user {
+  border-top: 1px solid var(--mg-ink-faint);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mg-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background: radial-gradient(circle at 30% 30%, var(--paper-warm), oklch(88% 0.05 20));
+  border: 1px solid var(--ink-mute);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ruby);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.mg-sidebar__who {
+  flex: 1;
+  min-width: 0;
+}
+
+.mg-sidebar__name {
+  font-size: 12.5px;
+  line-height: 1.2;
+}
+
+.mg-sidebar__role {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.mg-sidebar__out {
+  @include controls.hit-square(32px);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  border-radius: var(--radius-chip);
+
+  &:hover {
+    color: var(--ruby);
+    background: var(--paper);
+  }
+}
+
+// The brand is a link home now — it looked like one and did nothing.
+.mg-sidebar__home {
+  @include controls.hit-row(38px);
+
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-chip);
+  transition: color 150ms;
+
+  &:hover .mg-sidebar__wordmark { color: var(--ruby); }
+}
+
+.mg-pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mg-topbar {
+  height: var(--mg-topbar);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--mg-ink-faint);
+  background: var(--paper);
+}
+
+.mg-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.mg-crumbs__sep { color: var(--ink-quiet); }
+
+.mg-crumbs__here {
+  margin: 0;
+  font: inherit;
+  color: var(--ink);
+}
+
+.mg-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mg-topbar__note {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  letter-spacing: 0.5px;
+}
+
+// Nested under .mg-shell so these beat the `\.mg-shell a { color: inherit }` reset above —
+// without that, a primary button rendered as a link inherits ink on ink and disappears.
+.mg-shell .mg-btn {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--ink);
+  transition: background 120ms, color 120ms;
+
+  &--primary {
+    background: var(--ink);
+    color: var(--paper);
+
+    &:hover {
+      background: var(--ruby);
+      border-color: var(--ruby);
+      color: var(--paper);
+    }
+  }
+
+  &--ghost {
+    border-color: transparent;
+    background: transparent;
+    color: var(--ink-soft);
+
+    &:hover { color: var(--ink); }
+  }
+}
+
+.mg-content {
+  flex: 1;
+  min-width: 0;
+  padding: 22px;
+
+  &:focus { outline: none; }
+}
+
+.mg-skip {
+  @include controls.hit-row(38px);
+
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  transition: top 120ms;
+
+  &:focus-visible { top: 12px; }
+}
+
+// An eight-column working list will not fit a phone and should not try to. It scrolls in its
+// own box so the page around it does not, which is the difference between a table you can read
+// sideways and a site that is 273px too wide.
+.mg-table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@include bp.below(lg) {
+  .mg-shell { flex-direction: column; }
+
+  .mg-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: 0;
+    border-bottom: 1px solid var(--mg-ink-faint);
+  }
+
+  // The sidebar used to take 348px at the top of every screen — half the first viewport, with
+  // its own 220px scroller nested inside. It is a summary here: the models stay, the counts
+  // and hints go, and it stops being taller than the content it introduces.
+  .mg-sidebar__models {
+    max-height: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .mg-model {
+    flex: 1 1 auto;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mg-model__hint { display: none; }
+
+  .mg-sidebar__label { flex: 1 0 100%; }
+
+  .mg-sidebar__where { display: none; }
+
+  .mg-sidebar,
+  .mg-sidebar__brand,
+  .mg-sidebar__user { padding-top: 10px; padding-bottom: 10px; }
+
+  // Below 900px the sidebar is already a horizontal strip, so there is no rail to collapse to
+  // and nothing the toggle could usefully do. It, and the collapsed state, step aside.
+  .mg-sidebar__toggle { display: none; }
+
+  .mg-shell.is-sidebar-collapsed {
+    --mg-sidebar: 100%;
+
+    .mg-sidebar__name-block,
+    .mg-sidebar__label,
+    .mg-sidebar__who { display: revert; }
+
+    .mg-model__hint { display: none; }
+
+    .mg-sidebar__brand { flex-direction: row; }
+
+    .mg-model { justify-content: flex-start; gap: 8px; padding-inline: 10px; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-model,
+  .mg-btn,
+  .mg-skip,
+  .mg-sidebar,
+  .mg-sidebar__toggle { transition: none; }
+}

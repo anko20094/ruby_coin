@@ -6,7 +6,8 @@ FactoryBot.define do
     title { Faker::Book.title }
     sequence(:slug) { |n| "#{Faker::Internet.slug}-#{n}" }
     subtitle { Faker::Lorem.sentence }
-    description { Faker::Lorem.sentence }
+    description_uk { "<p>#{Faker::Lorem.sentence}</p>" }
+    description_en { "<p>#{Faker::Lorem.sentence}</p>" }
     photo do
       Rack::Test::UploadedFile.new(File.open(Rails.root.join('spec', 'fixtures', 'files', 'test_image.png')))
     end

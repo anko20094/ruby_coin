@@ -2,14 +2,12 @@
 
 module Management
   class TagsController < ApplicationController
-    before_action :authenticate_user!
     before_action :authorize_policy
     before_action :set_tag!, only: %i[destroy edit update]
 
     def index
       @tag = Tag.new
-      @tags = policy_scope(Tag).order(created_at: :desc)
-      @pagy, @tags = pagy(@tags, limit: 8)
+      load_tags!
     end
 
     def new
@@ -32,8 +30,14 @@ module Management
         end
       else
         respond_to do |format|
-          format.html { redirect_to management_tags_path, status: :unprocessable_content }
-          format.turbo_stream { flash.now[:alert] = @tag.errors.full_messages.join }
+          # Re-render, don't redirect: 422 is not a redirect status, so the browser stayed on
+          # a bare "You are being redirected" page and the typed title was lost.
+          format.html do
+            load_tags!
+            render :index, status: :unprocessable_content
+          end
+
+          format.turbo_stream { flash.now[:alert] = @tag.errors.full_messages.to_sentence }
         end
       end
     end
@@ -50,8 +54,14 @@ module Management
         end
       else
         respond_to do |format|
-          format.html { redirect_to management_tags_path, status: :unprocessable_content }
-          format.turbo_stream { flash.now[:alert] = @tag.errors.full_messages.join }
+          # Re-render, don't redirect: 422 is not a redirect status, so the browser stayed on
+          # a bare "You are being redirected" page and the typed title was lost.
+          format.html do
+            load_tags!
+            render :index, status: :unprocessable_content
+          end
+
+          format.turbo_stream { flash.now[:alert] = @tag.errors.full_messages.to_sentence }
         end
       end
     end
@@ -70,6 +80,10 @@ module Management
     end
 
     private
+
+    def load_tags!
+      @pagy, @tags = pagy(policy_scope([:management, Tag]).order(created_at: :desc), limit: 8, raise_range_error: true)
+    end
 
     def tag_params
       params.expect(tag: [:title])

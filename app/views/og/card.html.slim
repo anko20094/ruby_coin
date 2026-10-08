@@ -1,0 +1,114 @@
+/ The 1200×630 card a link unfurls into. Rendered by OgCards (app/services/og_cards.rb) through
+/ headless Chrome, once per case per locale, straight to public/og/. Never served at request time.
+/
+/ The faces are inlined as data URIs because the page is opened over file:// with no server
+/ behind it, and the whole point of the card is that it is set in the site's own type.
+doctype html
+html lang=locale
+  head
+    meta charset="utf-8"
+    css:
+      #{fonts}
+
+      :root {
+        --paper: oklch(98% 0.005 60);
+        --paper-warm: oklch(95% 0.012 60);
+        --ink: oklch(18% 0.01 30);
+        --ink-soft: oklch(45% 0.01 30);
+        --ink-mute: oklch(72% 0.008 30);
+        --ruby: oklch(45% 0.18 18);
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        width: 1200px; height: 630px;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Geist', system-ui, sans-serif;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: 64px 72px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 17px; letter-spacing: 3.4px; text-transform: uppercase;
+        color: var(--ink-soft);
+        display: flex; gap: 14px; align-items: center;
+      }
+
+      .eyebrow b { color: var(--ruby); font-weight: 500; }
+
+      .rule { flex: 1; height: 1px; background: color-mix(in oklab, var(--ink-mute) 45%, transparent); }
+
+      .body { display: flex; flex-direction: column; justify-content: center; max-width: 700px; }
+
+      h1 {
+        font-family: 'Display', 'Instrument Serif', Georgia, serif;
+        font-weight: 400;
+        font-size: 86px; line-height: 1.02; letter-spacing: -0.03em;
+      }
+
+      h1.is-long { font-size: 66px; }
+
+      /* Three lines, then stop: a long summary used to run down into the ruby. */
+      .tagline {
+        margin-top: 22px;
+        font-size: 26px; line-height: 1.4; color: var(--ink-soft);
+        max-width: 640px;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .foot {
+        display: flex; align-items: flex-end; justify-content: space-between; gap: 40px;
+        position: relative; z-index: 1;
+      }
+
+      .metric { display: flex; align-items: baseline; gap: 16px; }
+
+      .metric__value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 52px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+      }
+
+      .metric__label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 15px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ink-soft);
+        max-width: 320px; line-height: 1.5;
+      }
+
+      .wordmark {
+        font-family: 'Display', 'Instrument Serif', Georgia, serif;
+        font-size: 30px; color: var(--ink-soft);
+      }
+
+      /* Bleeds off the right edge, behind the text — the stone is the brand, not a subject. */
+      .gem { position: absolute; right: -108px; top: 96px; width: 430px; opacity: 0.92; }
+
+  body
+    .eyebrow
+      - if mark.present?
+        b= mark
+      span= eyebrow
+      .rule
+
+    .body
+      h1 class=('is-long' if title.to_s.length > 26)
+        = title
+      - if tagline.present?
+        p.tagline= tagline
+
+    .foot
+      - if metric
+        .metric
+          .metric__value= metric[:value]
+          .metric__label= metric[:label]
+      - else
+        div
+      .wordmark rubyco.in
+
+    .gem= gem

@@ -1,0 +1,10 @@
+/ Only div, a, span and their class/href survive Action Text's sanitiser on the way out —
+/ measured, not assumed. The facade is therefore plain markup that still works with
+/ JavaScript off, and JournalHelper#activate_embed puts back the data attributes, the link
+/ target and the aria-hidden the sanitiser strips.
+.jn-embed
+  a.jn-embed__facade href=block.url
+    span.jn-embed__play ▶
+    span.jn-embed__host= URI.parse(block.url).host
+  - if block.embed_caption.present?
+    .jn-embed__caption= block.embed_caption

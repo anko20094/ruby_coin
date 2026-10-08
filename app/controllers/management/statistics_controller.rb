@@ -2,19 +2,23 @@
 
 module Management
   class StatisticsController < ApplicationController
-    before_action :authenticate_user!
     before_action :authorize_policy
 
     def index
-      @post_views = Statistics::PostViewsQuery.new.count
-      @daily_views = Statistics::DailyViewsQuery.new.count
-      @monthly_views = Statistics::MonthlyViewsQuery.new.count
-      @yearly_views = Statistics::YearlyViewsQuery.new.count
-      @total_views = Statistics::TotalViewsQuery.new.count
+      @totals = {
+        today: Statistics::ViewsQuery.call(:day),
+        month: Statistics::ViewsQuery.call(:month),
+        year: Statistics::ViewsQuery.call(:year),
+        all: Statistics::ViewsQuery.call
+      }
+      @post_views = Statistics::PostViewsQuery.call
+      @case_views = Statistics::CaseViewsQuery.call
     end
 
+    private
+
     def authorize_policy
-      authorize :statistics
+      authorize [:management, :statistics]
     end
   end
 end

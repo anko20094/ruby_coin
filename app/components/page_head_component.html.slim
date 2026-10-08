@@ -1,0 +1,22 @@
+header.rc-scene.rc-pagehead
+  .rc-glow.rc-pagehead__glow
+  .rc-wrap.rc-pagehead__inner
+    .rc-pagehead__intro
+      - if eyebrow?
+        p.rc-eyebrow
+          - if badge.present?
+            span.rc-eyebrow__badge= badge
+          - if eyebrow.present?
+            span= eyebrow
+      h1.rc-pagehead__title
+        = title
+        - if mark.present?
+          = ' '
+          span.rc-mark= mark
+      - if lede.present?
+        p.rc-pagehead__lede= lede
+      - if content?
+        .rc-pagehead__extra= content
+    .rc-pagehead__gem
+      = render HexRingsComponent.new(css: 'rc-pagehead__rings')
+      = render GemComponent.new(uid:, variant: :anchor, size: 132)

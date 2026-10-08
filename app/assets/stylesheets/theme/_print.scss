@@ -1,0 +1,156 @@
+// /cv is the page a recruiter prints. The normal next step after "this one looks good" is to
+// print it or attach it to an internal email, and Cmd-P produced the sticky nav, the ruby, the
+// footer and a sidebar that ran off the page. There is no PDF to download and this is most of
+// why there does not need to be one.
+@media print {
+  // Print has no oklch and no colour budget: ink on white, and the accent survives as bold.
+  // Every surface is paper on paper — a scene or a dark panel would print as a black slab —
+  // so the tokens are set again on each of them, not only on :root.
+  :root,
+  .rc-main,
+  .rc-scene,
+  .rc-band,
+  .rc-panel,
+  .pf-contact {
+    --paper: #fff;
+    --paper-warm: #fff;
+    --ink: #111;
+    --ink-soft: #333;
+    --ink-quiet: #444;
+    --ink-mute: #777;
+    --ruby: #000;
+    --ruby-glow: #000;
+    --surface-line: #bbb;
+    --rule-strong: 1px solid #111;
+    --rule-row: 1px solid #bbb;
+    --page-pad: 0;
+
+    color-scheme: light;
+  }
+
+  body.rc-site,
+  .rc-scene,
+  .rc-band,
+  .rc-panel,
+  .pf-contact {
+    background: #fff !important;
+    color: #111;
+    box-shadow: none !important;
+  }
+
+  .rc-band::before,
+  .rc-panel::before { display: none; }
+
+  .rc-mark,
+  .rc-figure {
+    color: #000 !important;
+    text-shadow: none !important;
+    -webkit-text-fill-color: currentColor;
+    background: none !important;
+  }
+
+  .rc-pagehead,
+  .rc-section { padding-block: 0 12pt; }
+
+  .rc-pagehead__inner { display: block; }
+
+  .rc-pagehead__extra { margin-top: 6pt; }
+
+  // The reveal entrance is for a screen being scrolled; on paper everything is simply there.
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .pf-contact { border: 1px solid #111; }
+
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  body {
+    background: #fff;
+    color: #111;
+    font-size: 10.5pt;
+  }
+
+  // Chrome, decoration and anything that cannot be followed on paper.
+  .rc-nav,
+  .rc-footer,
+  .rc-progress,
+  .rc-skip,
+  .rc-flash,
+  .rc-palette,
+  .hm-top,
+  .rc-gem,
+  .rc-glow,
+  .rc-rings,
+  .rc-pagehead__gem,
+  // Initials in a box carry nothing on paper, and they are what stands in for a photograph
+  // until six real ones arrive.
+  .rc-monogram,
+  .cv-page__print,
+  .pf-updated__aside,
+  .wk-case__skip,
+  .wk-case__pager,
+  .jn-steps,
+  .jn-related,
+  .wk-entries,
+  .jn-filter,
+  .jn-pager,
+  .jn-index__search,
+  .jn-search,
+  .wk-case__gem { display: none !important; }
+
+  .rc-main { animation: none; }
+
+  // The sidebar is sticky on screen. On paper it becomes a block near the top: the two
+  // columns are one flow, and the one thing a printed CV must carry on its first page is how
+  // to answer it. Two grid children cannot interleave, so it goes first — where a CV usually
+  // puts contacts anyway.
+  .split-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .split-aside {
+    position: static;
+    order: -1;
+    margin: 0 0 14pt;
+    break-inside: avoid;
+  }
+
+  .rc-pagehead__title,
+  .tm-person__name { font-size: 26pt; }
+
+  .tm-person__head { padding: 0 0 12pt; }
+
+  // A career entry or a project row split across a page break is unreadable.
+  .pf-career__entry,
+  .pf-stack__group,
+  .pf-strengths__item,
+  .cv-row,
+  .worked-row,
+  .tm-card,
+  .wk-project,
+  .wk-panel,
+  .wk-card { break-inside: avoid; }
+
+  .pf-block { break-before: auto; }
+
+  // A link the reader cannot click is a link they cannot follow — print where it went. Only
+  // for the contact column: on a project row the ::after becomes another grid cell and the
+  // URL comes out as a one-character-wide column down the page.
+  // An address printed after itself is noise, and that is all a mailto: adds.
+  .pf-contact__value[href^='mailto:']::after { content: none; }
+
+  .pf-contact__value::after {
+    content: ' (' attr(href) ')';
+    font-family: var(--font-mono);
+    font-size: 8pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  a { text-decoration: none; }
+}

@@ -1,0 +1,45 @@
+- content_for :title, full_title(t('cv.show.title'))
+- page_meta description: t('cv.show.meta_description'), image: "/og/site-#{I18n.locale}.png", type: 'profile'
+
+.cv-page
+  = render PageHeadComponent.new(title: t('cv.show.title'), uid: 'cv-anchor') do
+    .cv-page__identity
+      span= [@profile.name, @profile.role, @profile.years].compact_blank.join(' · ')
+      / The page a recruiter prints. There is no PDF to download and this is most of why there
+      / does not need to be one — theme/_print.scss makes the printed page the CV.
+      button.cv-page__print.rc-button[type="button" data-controller="print" data-action="print#now"]
+        = t('cv.show.print')
+
+  section.rc-band.cv-page__band
+    .rc-wrap
+      - written = @profile.present?
+
+      .split-grid
+        .split-main
+          - if written
+            = render Profile::SummaryComponent.new(profile: @profile)
+          - else
+            = render Profile::PendingComponent.new(body: t('cv.show.pending_body'))
+
+          / The projects are the portfolio's, not the CV's, so they are here either way.
+          section.pf-block.pf-block--projects
+            = render TrackTagComponent.new(label: t('cv.show.projects'), tone: :ruby, heading: :h2)
+            p.cv-page__lede= t('cv.show.lede')
+            = render 'cv/project_rows', cases: @cases
+
+          - if written
+            = render Profile::CareerComponent.new(profile: @profile, cases_by_slug: @cases_by_slug)
+            = render Profile::StackComponent.new(profile: @profile)
+
+        aside.split-aside
+          - if @person
+            = render MonogramComponent.of(@person, size: 280, ring: :mute)
+          - if written
+            = render Profile::ContactPanelComponent.new(profile: @profile)
+            .pf-updated
+              = "#{t('cv.show.figures')} · #{@profile.figures_as_of}"
+              / "on the left" is a screen fact. On paper the sidebar is at the top, and the
+              / sentence would be describing a layout the reader is not looking at.
+              span.pf-updated__aside
+                br
+                = t('cv.show.both_halves')

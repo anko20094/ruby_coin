@@ -1,0 +1,5 @@
+div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: center"
+  - tones.times do |tone|
+    figure style="margin: 0; text-align: center; font: 11px ui-monospace, monospace"
+      = render GemComponent.new(uid: "preview-tone-#{tone}", tone:, size:)
+      figcaption= "tone: #{tone}"

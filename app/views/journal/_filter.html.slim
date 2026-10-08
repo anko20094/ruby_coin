@@ -1,0 +1,32 @@
+/ Two labelled rows: the tags, any number of them on at once, and the order, one of three. Every
+/ link lands on #entries, so without script the reloaded page opens at the list, not the top;
+/ with it, journal-filter swaps the list in place and keeps the reader where they were.
+nav.jn-filter aria-label=t('journal.index.filter') data-journal-filter-target="filter"
+  .jn-filter__group
+    span.jn-filter__label#jn-filter-tags= t('journal.index.filter')
+    .jn-filter__body
+      .rc-chips role="group" aria-labelledby="jn-filter-tags"
+        = link_to t('journal.index.all'), journal_path(order: @order, anchor: 'entries'),
+          **journal_chip_attributes(active: @active_tags.empty?), data: { journal_filter_key: 'tag-all' }
+        / Each chip switches its tag on or off and keeps the others, so two chips narrow the list
+        / to the entries carrying both.
+        - @tags.each do |tag|
+          = link_to journal_path(tag_id: journal_tag_toggle(@active_tags, tag), order: @order, anchor: 'entries'),
+            **journal_chip_attributes(active: @active_tags.include?(tag)), data: { journal_filter_key: "tag-#{tag.id}" } do
+            = "##{tag.title}"
+            = ' '
+            span.jn-filter__count= @tag_counts.fetch(tag.id, 0)
+      - if @active_tags.many?
+        p.jn-filter__note= t('journal.index.all_tags')
+
+  .jn-filter__group
+    span.jn-filter__label#jn-filter-order= t('journal.index.order.label')
+    .jn-filter__body.jn-filter__body--row
+      .jn-sort role="group" aria-labelledby="jn-filter-order"
+        - Post::ORDER_TYPES.each do |order|
+          = link_to t("journal.index.order.#{order}"),
+            journal_path(order:, tag_id: journal_tags_param(@active_tags), anchor: 'entries'),
+            class: ['jn-sort__option', ('is-active' if @order == order)], aria: { current: ('true' if @order == order) },
+            data: { journal_filter_key: "order-#{order}" }
+
+  = render ListKeysComponent.new

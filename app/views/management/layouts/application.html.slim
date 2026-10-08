@@ -1,21 +1,25 @@
 doctype html
-html
+html lang=I18n.locale
   head
     = favicon_link_tag asset_path('favicon.ico')
-    meta content=("text/html; charset=UTF-8") http-equiv="Content-Type" /
+    meta charset="utf-8"
     title
-      = content_for?(:title) ? yield(:title) : "RubyCoin"
+      = content_for?(:title) ? yield(:title) : MetaHelper::SITE_NAME
     meta content="width=device-width,initial-scale=1" name="viewport" /
     = csrf_meta_tags
     = csp_meta_tag
-    = stylesheet_link_tag "application", "data-turbo-track": "reload", media: 'all'
-    = tinymce_assets
-    = javascript_include_tag "application", "data-turbo-track": "reload", defer: true
-  - css_classes = [controller_path.gsub('/', '-'), action_name].map { |s| s.gsub('_', '-') }
-  body class=css_classes data-lang="#{I18n.locale}"
-    #flash
-      = render 'shared/flash'
-    = render 'shared/navbar'
-    .sticky-footer
-      = yield
-    = render 'shared/footer'
+    - theme_preloaded_faces.each do |face|
+      link rel="preload" href=asset_path("#{face}.woff2") as="font" type="font/woff2" crossorigin=""
+    = stylesheet_link_tag 'admin', media: 'all'
+    = javascript_include_tag 'admin', defer: true
+  - css_classes = [controller_path.tr('/', '-'), action_name].map { |name| name.tr('_', '-') }
+  body class=css_classes
+    a.mg-skip href="#main"= t('global.skip_to_content')
+    .mg-shell class=('is-sidebar-collapsed' if management_sidebar_collapsed?)
+      = render Management::SidebarComponent.new(user: current_user)
+      .mg-pane
+        = yield(:topbar).presence || render('management/shared/top_bar', crumbs: [t(controller_name, scope: 'management.crumbs', default: controller_name.humanize)])
+        .mg-flash
+          = render FlashComponent.new(flash:, frame_id: 'flash_message')
+        main#main.mg-content tabindex="-1"
+          = yield

@@ -1,29 +1,66 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-describe Management::TagPolicy do
-  subject(:policy) { described_class.new(user, record) }
 
-  describe '#index? #show?' do
-    let(:record) { create(:tag) }
-    let(:actions) { %i[index show] }
+RSpec.describe Management::TagPolicy do
+  subject(:policy) { described_class.new(user, Tag) }
 
-    context 'when user is admin' do
-      let(:role) { :admin }
+  let(:reads) { %i[index show] }
+  let(:writes) { %i[new create edit update destroy] }
 
-      it_behaves_like 'permit actions'
+  context 'when the user is an admin' do
+    let(:user) { build(:user, :admin) }
+
+    it { expect(policy).to permit_actions(reads + writes) }
+  end
+
+  context 'when the user is a moderator' do
+    let(:user) { build(:user, :moderator) }
+
+    it { expect(policy).to permit_actions(reads) }
+    it { expect(policy).to forbid_actions(writes) }
+  end
+
+  context 'when the user is a reader' do
+    let(:user) { build(:user, role: :user) }
+
+    it { expect(policy).to forbid_actions(reads + writes) }
+  end
+
+  context 'when nobody is signed in' do
+    let(:user) { nil }
+
+    it { expect(policy).to forbid_actions(reads + writes) }
+  end
+
+  # Tags are editorial metadata: there is no anonymous tag list.
+  describe 'Scope' do
+    subject(:resolved) { described_class::Scope.new(user, Tag).resolve }
+
+    let!(:tag) { create(:tag) }
+
+    context 'when the user is an admin' do
+      let(:user) { build(:user, :admin) }
+
+      it { is_expected.to contain_exactly(tag) }
     end
 
-    context 'when user is moderator' do
-      let(:role) { :moderator }
+    context 'when the user is a moderator' do
+      let(:user) { build(:user, :moderator) }
 
-      it_behaves_like 'permit actions'
+      it { is_expected.to contain_exactly(tag) }
     end
 
-    context 'when user' do
-      let(:role) { :user }
+    context 'when the user is a reader' do
+      let(:user) { build(:user, role: :user) }
 
-      it_behaves_like 'forbid actions'
+      it { is_expected.to be_empty }
+    end
+
+    context 'when nobody is signed in' do
+      let(:user) { nil }
+
+      it { is_expected.to be_empty }
     end
   end
 end

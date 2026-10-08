@@ -43,6 +43,21 @@ task :seed do
   end
 end
 
+namespace :deploy do
+  desc 'Run the pending data tasks against the new release'
+  task :data do
+    next unless fetch(:deploying)
+
+    on primary :db do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'after_party:run'
+        end
+      end
+    end
+  end
+end
+
 desc 'Run after party'
 task :after_party do
   on primary :db do

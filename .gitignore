@@ -46,3 +46,11 @@
 .DS_Store
 .yarn/install-state.gz
 *.dump
+
+# Self-hosted TinyMCE, copied out of node_modules by bin/copy_tinymce.mjs on every build.
+/public/tinymce
+
+/.claude/settings.local.json
+
+# Claude Code agent worktrees
+/.claude/worktrees/

@@ -1,0 +1,92 @@
+@use '../theme/breakpoints' as bp;
+
+// The designed error page: a scene with the stone, and the two places worth going. Not a
+// 9-byte "Not Found" from the middleware — the reader is still on the site.
+.er-page {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding: calc(var(--nav-clear) + 40px) 0 96px;
+  text-align: center;
+}
+
+.er-page__glow {
+  --glow-y: -160px;
+  --glow-h: 1000px;
+}
+
+.er-page__rings {
+  left: 50%;
+  top: calc(var(--nav-clear) + 100px);
+  width: 520px;
+  height: 520px;
+  transform: translate(-50%, -50%);
+}
+
+.er-page__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 760px;
+}
+
+.er-code {
+  margin: 28px 0 18px;
+  font-family: var(--font-display);
+  font-size: clamp(64px, 9vw, 120px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-variant-numeric: lining-nums;
+  color: var(--ruby-glow);
+  text-shadow: 0 0 40px oklch(58% 0.22 18 / 0.55);
+}
+
+.er-title {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(40px, 5.4vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.er-lede {
+  max-width: 520px;
+  margin: 0 auto 40px;
+  font-size: var(--fs-lede);
+  color: var(--ink-soft);
+}
+
+.er-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.er-hint {
+  margin-top: 52px;
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+.er-hint__keys {
+  display: inline-flex;
+  gap: 4px;
+  margin-right: 4px;
+
+  kbd {
+    padding: 4px 7px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1;
+    color: var(--ink);
+    border: 1px solid var(--surface-line);
+    border-radius: 6px;
+  }
+}
+
+@include bp.below(md) {
+  .er-page { padding-bottom: 72px; }
+}

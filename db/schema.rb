@@ -10,9 +10,47 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2024_02_04_184511) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_01_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "action_text_rich_texts", force: :cascade do |t|
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "ahoy_events", force: :cascade do |t|
     t.string "name"
@@ -57,6 +95,35 @@ ActiveRecord::Schema[8.1].define(version: 2024_02_04_184511) do
     t.index ["visitor_token", "started_at"], name: "index_ahoy_visits_on_visitor_token_and_started_at"
   end
 
+  create_table "cases", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.jsonb "engineering_heading", default: {}, null: false
+    t.jsonb "engineering_items", default: [], null: false
+    t.jsonb "engineering_sub", default: {}, null: false
+    t.boolean "is_this_site", default: false, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.string "mark", null: false
+    t.jsonb "metrics", default: [], null: false
+    t.jsonb "mine", default: [], null: false
+    t.boolean "own", default: false, null: false
+    t.jsonb "plain_body", default: [], null: false
+    t.jsonb "plain_heading", default: {}, null: false
+    t.integer "position", null: false
+    t.jsonb "quality", default: [], null: false
+    t.jsonb "role", default: {}, null: false
+    t.jsonb "scope_note", default: {}, null: false
+    t.jsonb "sector", default: {}, null: false
+    t.string "slug", null: false
+    t.jsonb "stack", default: [], null: false
+    t.jsonb "status", default: {}, null: false
+    t.jsonb "tagline", default: {}, null: false
+    t.jsonb "title", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "year", default: {}, null: false
+    t.index ["position"], name: "index_cases_on_position"
+    t.index ["slug"], name: "index_cases_on_slug", unique: true
+  end
+
   create_table "friendly_id_slugs", force: :cascade do |t|
     t.string "scope"
     t.string "slug", null: false
@@ -67,6 +134,13 @@ ActiveRecord::Schema[8.1].define(version: 2024_02_04_184511) do
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
   end
 
+  create_table "journal_blocks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "post_translations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -75,22 +149,28 @@ ActiveRecord::Schema[8.1].define(version: 2024_02_04_184511) do
     t.string "subtitle"
     t.string "title"
     t.datetime "updated_at", null: false
-    t.index ["locale"], name: "index_post_translations_on_locale"
+    t.index ["post_id", "locale"], name: "index_post_translations_on_post_id_and_locale", unique: true
     t.index ["post_id"], name: "index_post_translations_on_post_id"
   end
 
   create_table "posts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "description"
+    t.integer "entry_number"
+    t.integer "lock_version", default: 0, null: false
     t.boolean "main_post", default: false, null: false
     t.string "photo"
+    t.text "search_body_en"
+    t.text "search_body_uk"
     t.string "slug"
     t.integer "status"
     t.string "subtitle"
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["entry_number"], name: "index_posts_on_entry_number", unique: true
     t.index ["slug"], name: "index_posts_on_slug", unique: true
+    t.index ["status", "created_at"], name: "index_posts_on_status_and_created_at"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
@@ -137,5 +217,7 @@ ActiveRecord::Schema[8.1].define(version: 2024_02_04_184511) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "posts", "users"
 end

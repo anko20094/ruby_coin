@@ -1,0 +1,427 @@
+@use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+
+// The edit screen: three columns — fields · meta · preview — with the save state and the
+// language tabs on a bar above them.
+.mg-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: -22px;
+}
+
+.mg-editor__bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--mg-ink-faint);
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.mg-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.mg-tab {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  color: var(--ink);
+
+  &.is-current {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+// The per-language dirty count: how many fields in that language are unsaved.
+.mg-tab__dirty {
+  font-size: 9.5px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--ruby);
+  color: var(--paper);
+
+  &:empty { display: none; }
+}
+
+.mg-state {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.mg-state__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--ink-mute);
+}
+
+.mg-state[data-state='saving'] .mg-state__dot { background: var(--mg-warn); }
+.mg-state[data-state='saved'] .mg-state__dot { background: var(--mg-ok); }
+.mg-state[data-state='invalid'] .mg-state__dot,
+.mg-state[data-state='conflict'] .mg-state__dot { background: var(--ruby); }
+
+.mg-state[data-state='invalid'],
+.mg-state[data-state='conflict'] { color: var(--ruby); }
+
+// Shown only when another session has saved over this one.
+.mg-conflict {
+  padding: 12px 22px;
+  background: var(--ruby-mute);
+  border-bottom: 1px solid var(--ruby);
+  color: var(--ruby);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mg-conflict__reload {
+  border-bottom: 1px solid var(--ruby);
+}
+
+// ErrorsComponent: what a refused save said, above the form.
+.mg-errors {
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border: 1px solid var(--ruby);
+  border-left-width: 3px;
+  border-radius: var(--radius-chip);
+  background: var(--ruby-mute);
+  color: var(--ruby);
+  font-size: 13px;
+
+  ul { margin: 0; padding-left: 18px; }
+}
+
+// Edge to edge in the editor, like the conflict banner it sits beside.
+.mg-editor > .mg-errors {
+  margin: 0;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  padding: 10px 22px;
+}
+
+// Two columns, not three. The meta fields used to take a fixed 300px out of the middle for
+// the whole time you were writing; they are a strip under the fold now, so the body and the
+// preview — the two things you actually look at together — get half the pane each.
+.mg-editor__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.mg-editor__main,
+.mg-editor__preview {
+  padding: 20px 22px;
+  min-width: 0;
+}
+
+.mg-editor__preview {
+  border-left: 1px solid var(--mg-ink-faint);
+  background: var(--paper-warm);
+  position: sticky;
+  top: var(--mg-topbar);
+}
+
+// The strip. auto-fill rather than a fixed count, so it is four across on a wide screen and
+// one across on a narrow one without a breakpoint for each step in between.
+.mg-editor__meta {
+  border-top: 1px solid var(--mg-ink-faint);
+  padding: 18px 22px 4px;
+}
+
+.mg-editor__meta-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  color: var(--ink-quiet);
+  margin-bottom: 12px;
+}
+
+.mg-editor__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0 22px;
+  align-items: start;
+}
+
+// One group per language. Hidden groups are display:none rather than removed, so their fields
+// still post — switching tabs never loses what is typed in the other language.
+.mg-locale[hidden] { display: none; }
+
+.mg-locale__label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  color: var(--ink-quiet);
+  margin-bottom: 10px;
+}
+
+.mg-editor__cols:not(:has(.mg-editor__preview)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mg-editor__cols.is-side-by-side {
+  .mg-editor__main {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+// TinyMCE. The editor draws its own chrome from the oxide skin under public/tinymce; what is
+// set here is only where it meets the screen around it — the border, the width, and the fact
+// that a toolbar with this many buttons has to wrap rather than push the meta column off.
+.mg-editor .tox-tinymce {
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+}
+
+.mg-editor .tox .tox-editor-header {
+  box-shadow: none;
+  border-bottom: 1px solid var(--mg-ink-faint);
+}
+
+// Before TinyMCE has loaded — and if it never does — the textarea is the editor. It has to
+// look like a field either way rather than like a broken one.
+.mg-editor__body,
+.mg-cell__rich {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  padding: 10px 12px;
+}
+
+.mg-editor__body { min-height: 220px; }
+
+// A case form has sixty-odd fields and boots an editor on the one being used. The cue that a
+// field is about to become one belongs on the field, not in a sentence above the form.
+.mg-tinymce-idle {
+  cursor: text;
+  border-style: dashed;
+
+  &:hover { border-color: var(--ruby); }
+}
+
+.mg-field__error {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--ruby);
+}
+
+// The AI translate button and the line that says how it went.
+.mg-translate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mg-translate__status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+
+  &:empty { display: none; }
+}
+
+.mg-shell .mg-btn[data-state='busy'] { opacity: 0.6; cursor: progress; }
+.mg-shell .mg-btn[data-state='done'] { border-color: var(--mg-ok); }
+.mg-shell .mg-btn[data-state='failed'] { border-color: var(--mg-warn); }
+
+.mg-translate:has([data-state='done']) .mg-translate__status { color: var(--mg-ok); }
+.mg-translate:has([data-state='failed']) .mg-translate__status { color: var(--ruby); }
+
+// The OG card: the same three things a link preview shows anywhere else.
+.mg-og {
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.mg-og__cover {
+  aspect-ratio: 1200 / 630;
+  background: var(--paper-warm);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.mg-og__body { padding: 10px 12px; }
+
+.mg-og__host {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  color: var(--ink-quiet);
+}
+
+.mg-og__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 4px 0 2px;
+}
+
+.mg-og__sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.mg-preview__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mg-preview__width {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 3px 8px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-chip);
+  background: var(--paper);
+
+  &.is-current {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+.mg-preview {
+  transition: opacity 150ms;
+
+  &.is-busy { opacity: 0.45; }
+}
+
+.mg-preview__frame {
+  display: block;
+  background: var(--paper);
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+// The article inside the pane keeps its own measure, just scaled down to fit the column.
+.mg-preview__article {
+  max-width: none;
+  padding: 20px;
+}
+
+// A size container, so the article's narrow rules answer to the frame, not the screen.
+.mg-preview[data-width='mobile'] .mg-preview__frame {
+  max-width: 390px;
+  margin: 0 auto;
+  container-type: inline-size;
+}
+
+// The article's own rules (pages/_journal_post.scss) set every margin that matters, so this
+// adds only what theme/_base.scss would have and the admin bundle does not pull in. A blanket
+// `margin: 0` here would land after those rules and flatten the article's spacing — which is
+// exactly what it did the first time.
+.mg-preview__article {
+  ul { list-style: disc; }
+
+  a { color: var(--ruby); }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+// Sticky, because the editor grows with the article: a long piece put Save three thousand
+// pixels below where you are typing. It stays at the bottom of the DOM — the tab order still
+// ends where the form does — and at the bottom of the screen, where a primary action belongs.
+.mg-editor__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 16px 22px;
+  border-top: 1px solid var(--mg-ink-faint);
+  background: var(--paper);
+  box-shadow: 0 -8px 20px color-mix(in oklab, var(--ink) 5%, transparent);
+}
+
+// This used to stack at 1400px, because a third column had to fit between the editor and the
+// preview. With the meta fields moved out, half a pane is still a readable measure well below
+// that; the preview goes under the editor only when neither would be wide enough to read.
+@include bp.below(xl) {
+  .mg-editor__cols { grid-template-columns: minmax(0, 1fr); }
+
+  .mg-editor__preview {
+    border-left: 0;
+    border-top: 1px solid var(--mg-ink-faint);
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-preview { transition: none; }
+}
+
+// Which language the pane is a preview of, and the way out to the real page in it. Both used
+// to be missing, so an editor writing Ukrainian watched an English preview with no way to tell
+// and no link to the page they were actually changing.
+.mg-preview__locale {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  border-radius: var(--radius-chip);
+  background: var(--ruby-mute);
+  color: var(--ruby);
+}
+
+.mg-preview__open {
+  @include controls.hit-row(32px);
+
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+
+  &:hover { color: var(--ruby); }
+  &[hidden] { display: none; }
+}

@@ -1,29 +1,54 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-describe Management::PostPolicy do
-  subject(:policy) { described_class.new(user, record) }
 
-  describe '#index? #show?' do
-    let(:record) { create(:post) }
-    let(:actions) { %i[index show] }
+# Management::PostsController authorizes [:management, Post] before every action, so each
+# action name below is a method that really runs. Moderators may look but not write: #preview
+# only reads, #autosave and #translate write (translate spends the OpenAI credit).
+RSpec.describe Management::PostPolicy do
+  subject(:policy) { described_class.new(user, Post) }
 
-    context 'when user is admin' do
-      let(:role) { :admin }
+  let(:reads) { %i[index show preview] }
+  let(:writes) { %i[new create edit update destroy autosave translate] }
 
-      it_behaves_like 'permit actions'
-    end
+  it 'is the policy [:management, Post] resolves to' do
+    expect(Pundit::PolicyFinder.new([:management, Post]).policy).to eq(described_class)
+  end
 
-    context 'when user is moderator' do
-      let(:role) { :moderator }
+  it 'is also the policy a namespaced Post instance resolves to' do
+    expect(Pundit::PolicyFinder.new([:management, Post.new]).policy).to eq(described_class)
+  end
 
-      it_behaves_like 'permit actions'
-    end
+  context 'when the user is an admin' do
+    let(:user) { build(:user, :admin) }
 
-    context 'when user' do
-      let(:role) { :user }
+    it { expect(policy).to permit_actions(reads + writes) }
+  end
 
-      it_behaves_like 'forbid actions'
+  context 'when the user is a moderator' do
+    let(:user) { build(:user, :moderator) }
+
+    it { expect(policy).to permit_actions(reads) }
+    it { expect(policy).to forbid_actions(writes) }
+  end
+
+  context 'when the user is a reader' do
+    let(:user) { build(:user, role: :user) }
+
+    it { expect(policy).to forbid_actions(reads + writes) }
+  end
+
+  context 'when nobody is signed in' do
+    let(:user) { nil }
+
+    it { expect(policy).to forbid_actions(reads + writes) }
+  end
+
+  describe Management::PostPolicy::Scope do
+    it 'resolves to every post' do
+      post = create(:post)
+
+      expect(described_class.new(nil, Post).resolve).to include(post)
     end
   end
 end

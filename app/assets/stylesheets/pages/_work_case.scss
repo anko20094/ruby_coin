@@ -1,0 +1,927 @@
+@use '../theme/controls';
+@use '../theme/surfaces';
+@use '../theme/breakpoints' as bp;
+@use 'work_prose';
+
+// /work/:slug — a scene for the hero and its figures, "in plain words" on paper, "for engineers"
+// as a scene of its own, and the team, the journal and the way onwards back on paper.
+
+$rail-width: 230px;
+$rail-gap: 48px;
+
+// Every block shares the case column; the two tracks give up room on the right for the rail.
+@mixin case-column {
+  width: 100%;
+  max-width: var(--case-max);
+  margin-inline: auto;
+  padding-inline: var(--page-pad);
+}
+
+// ── hero ──────────────────────────────────────────────────────────────────────
+.wk-case__header { padding: calc(var(--nav-clear) + clamp(24px, 4vw, 56px)) 0 0; }
+
+.wk-case__glow {
+  --glow-x: 70%;
+  --glow-y: -340px;
+  --glow-w: 1200px;
+  --glow-h: 1000px;
+}
+
+.wk-case__intro,
+.wk-case__strip { max-width: var(--case-max); }
+
+// The case's own stone, in the shade its card has elsewhere, floated to the right of the title.
+.wk-case__intro { position: relative; }
+
+.wk-case__gem {
+  position: absolute;
+  top: 40px;
+  right: var(--page-pad);
+  display: grid;
+  place-items: center;
+  width: 240px;
+  aspect-ratio: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 10%;
+    background: radial-gradient(closest-side, oklch(55% 0.21 18 / 0.45), transparent);
+    pointer-events: none;
+  }
+}
+
+.wk-case__rings {
+  inset: -55%;
+  width: 210%;
+  height: 210%;
+}
+
+@include bp.above(xl) {
+  // The title wraps before it reaches the stone.
+  .wk-case__title,
+  .wk-case__tagline { max-width: calc(100% - 270px); }
+}
+
+@include bp.below(xl) {
+  .wk-case__gem { display: none; }
+}
+
+.wk-case__breadcrumb {
+  gap: 4px 12px;
+
+  > span { font-variant-numeric: tabular-nums; }
+}
+
+.wk-case__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(56px, 9vw, 128px);
+  margin: 26px 0 0;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+
+  // Longer localised titles drop a step so they don't wrap badly.
+  &.is-long { font-size: clamp(44px, 6.4vw, 92px); }
+}
+
+.wk-case__title-mark {
+  font-size: 0.45em;
+  letter-spacing: -0.01em;
+}
+
+.wk-case__tagline {
+  max-width: 820px;
+  margin: 22px 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.3;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.wk-case__role {
+  margin-top: 18px;
+  font-size: 15px;
+  color: var(--ink-quiet);
+}
+
+// "↓ skip to the engineering" — the affordance that makes /work/:slug#engineers a link worth
+// sending.
+.wk-case__skip {
+  @include controls.hit-row(40px, 44px);
+
+  gap: 6px;
+  margin-top: 26px;
+  padding: 0 16px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  transition: border-color 180ms, background 180ms;
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--ruby) 70%, transparent);
+    background: color-mix(in oklab, var(--ink) 5%, transparent);
+  }
+}
+
+// The figures, along the foot of the hero scene.
+.wk-case__strip { padding-block: clamp(48px, 6vw, 80px) clamp(56px, 6vw, 88px); }
+
+.wk-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  border-top: 1px solid var(--surface-line);
+}
+
+.wk-metric {
+  position: relative;
+  min-width: 0;
+  padding: 26px 22px 0 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: default;
+
+  + .wk-metric {
+    padding-left: 22px;
+    border-left: 1px solid var(--surface-line);
+  }
+
+  // The affordance appears only where the controller made it work.
+  &.is-copyable {
+    cursor: pointer;
+
+    &::after {
+      content: '⧉';
+      position: absolute;
+      top: 12px;
+      right: 10px;
+      font-size: 13px;
+      color: var(--ink-quiet);
+      opacity: 0;
+      transition: opacity 150ms;
+    }
+
+    &:hover::after,
+    &:focus-visible::after { opacity: 1; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+
+  &.is-copied .wk-metric__value { text-shadow: 0 0 36px oklch(68% 0.2 18 / 0.9); }
+}
+
+.wk-metric__value {
+  font-size: clamp(44px, 4.4vw, 64px);
+  white-space: nowrap;
+}
+
+.wk-metric__label {
+  margin-top: 12px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--ink-quiet);
+}
+
+.wk-metric__flash {
+  display: block;
+  min-height: 1.4em;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ruby);
+}
+
+// ── track 1: in plain words ───────────────────────────────────────────────────
+.wk-case__plain-inner {
+  @include case-column;
+
+  padding-block: clamp(64px, 7vw, 104px);
+}
+
+.wk-case__heading {
+  max-width: 900px;
+  margin: 18px 0 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(36px, 4.2vw, 60px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+
+  &.is-small { font-size: clamp(32px, 3.6vw, 52px); }
+}
+
+.wk-case__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: 48px;
+  align-items: start;
+  margin-top: 36px;
+}
+
+.wk-case__panels {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// What was mine is the one raised card on the paper: lighter than the band, with a soft lift,
+// so it reads first without turning into a dark block in the middle of the prose.
+.wk-panel {
+  &--mine {
+    padding: 24px 24px 26px;
+    background: oklch(99.6% 0.003 60);
+    border: 1px solid var(--surface-line);
+    border-radius: var(--radius-panel);
+    box-shadow: 0 1px 2px oklch(18% 0.01 30 / 0.04), 0 18px 40px -26px oklch(18% 0.01 30 / 0.3);
+  }
+
+  &--facts {
+    padding: 20px 22px;
+    border: 1px solid var(--surface-line);
+    border-radius: var(--radius-panel);
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+
+    .rc-chips { gap: 6px; }
+  }
+}
+
+.wk-panel__label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-quiet);
+
+  &.is-ruby { color: var(--ruby); }
+}
+
+.wk-panel--facts .wk-panel__label { margin-bottom: 4px; }
+
+.wk-panel--facts div + .wk-panel__label { margin-top: 14px; }
+
+// The markers are short ruby bars, not bullet glyphs — 2px and the brighter ruby, so they still
+// read as ruby on the white card rather than as dark hairlines.
+.wk-mine {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-top: 14px;
+}
+
+.wk-mine__item {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+
+  b,
+  strong { color: var(--ink); }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 10px;
+    height: 2px;
+    margin-top: -0.5px;
+    border-radius: 1px;
+    background: var(--ruby-bright);
+  }
+}
+
+// ── track 2: for engineers ────────────────────────────────────────────────────
+// A scene of its own: the change of surface is the signal that the register changed.
+.wk-case__band {
+  // The band is a scroll target: room above it for the nav pill.
+  scroll-margin-top: 0;
+
+  // It takes focus when the reader jumps to it, so the keyboard carries on from here. It is a
+  // destination, not a control: a ring round half the page would be noise.
+  &:focus { outline: none; }
+}
+
+.wk-case__band-glow {
+  --glow-x: 20%;
+  --glow-y: -420px;
+  --glow-h: 800px;
+
+  opacity: 0.6;
+}
+
+.wk-case__band-inner {
+  @include case-column;
+
+  padding-block: clamp(72px, 8vw, 120px);
+}
+
+.wk-case__sub {
+  max-width: 760px;
+  margin: 16px 0 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.wk-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.wk-card {
+  padding: 24px 24px 26px;
+  border-radius: 18px;
+  background: var(--scene-raised);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--on-scene) 7%, transparent), 0 0 0 1px var(--surface-line);
+}
+
+.wk-card__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--ruby);
+
+  &::first-letter { text-transform: uppercase; }
+}
+
+.wk-card__body {
+  margin-top: 10px;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+
+  b,
+  strong { color: var(--ink); }
+}
+
+.wk-quality {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-top: 40px;
+  border-top: 1px solid var(--surface-line);
+}
+
+.wk-quality__cell {
+  padding: 22px 20px 0 0;
+
+  + .wk-quality__cell {
+    padding-left: 20px;
+    border-left: 1px solid var(--surface-line);
+  }
+}
+
+.wk-quality__value { font-size: 40px; }
+
+.wk-quality__label {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink-quiet);
+}
+
+// Every case ends with an honest statement of limits.
+.wk-case__scope {
+  display: block;
+  max-width: 900px;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--surface-line);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-quiet);
+}
+
+// ── after the tracks ──────────────────────────────────────────────────────────
+.wk-case__after { padding-bottom: clamp(64px, 7vw, 104px); }
+
+// Between the engineering track and the pager: a reader who has just been shown the work asks
+// who did it, and a client asks it first.
+.wk-case__team {
+  @include case-column;
+
+  padding-top: clamp(64px, 7vw, 104px);
+}
+
+.wk-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.wk-teammate {
+  display: block;
+  padding: 20px 22px;
+  border: 1px solid var(--surface-line);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--paper) 70%, transparent);
+
+  .pf-did { margin-top: 14px; }
+}
+
+// The card's one link is the name (or "open CV"); its ::after covers the card, so the whole
+// card is still the target and the focus ring is drawn around the card rather than the word.
+.wk-teammate,
+.wk-solo { position: relative; }
+
+.wk-card-link {
+  color: inherit;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &:focus-visible { outline: none; }
+}
+
+.wk-teammate:has(.wk-card-link:focus-visible),
+.wk-solo:has(.wk-card-link:focus-visible) {
+  outline: 2px solid var(--ruby);
+  outline-offset: 3px;
+}
+
+.wk-teammate__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .rc-monogram { border-radius: 50%; }
+}
+
+.wk-teammate__who { min-width: 0; }
+
+.wk-teammate__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 25px;
+  line-height: 1.1;
+}
+
+.wk-teammate__role {
+  margin-top: 3px;
+  font-size: 13.5px;
+  color: var(--ink-quiet);
+}
+
+// One person did the whole thing. A grid holding a single card reads as an unfinished page;
+// this reads as the claim it is.
+.wk-solo {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  margin-top: 22px;
+  padding: 24px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-panel);
+  background: color-mix(in oklab, var(--paper) 70%, transparent);
+
+  .rc-monogram { border-radius: 50%; }
+}
+
+.wk-solo__body {
+  flex: 1;
+  min-width: 0;
+
+  .pf-did { margin-top: 14px; }
+}
+
+.wk-solo__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.wk-solo__meta {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+// Whose team the other contributors were.
+.wk-solo__outside {
+  max-width: 80ch;
+  margin-top: 12px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-quiet);
+}
+
+.wk-solo__open {
+  flex: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ruby);
+  white-space: nowrap;
+}
+
+@include bp.below(620px) {
+  .wk-solo {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .wk-solo__open { width: 100%; }
+}
+
+// Journal entries on the case's stack: three cards that behave like the journal's own rows.
+.wk-case__journal {
+  @include case-column;
+
+  margin-top: clamp(56px, 6vw, 88px);
+}
+
+.wk-entries__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+
+  .rc-track { flex: 1 1 260px; }
+}
+
+.wk-entries__all {
+  @include controls.hit-row(32px, 44px);
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ruby);
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 3px;
+  }
+}
+
+.wk-entries__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.wk-entry {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 12px 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--surface-line);
+  border-radius: 18px;
+  color: inherit;
+  transition: background 150ms, border-color 150ms, transform 200ms;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--paper-warm);
+    border-color: color-mix(in oklab, var(--ruby) 45%, transparent);
+  }
+
+  &:hover { transform: translateY(-2px); }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 2px;
+  }
+}
+
+.wk-entry__thumb {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--paper-warm);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 300ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .wk-entry:hover & img { transform: scale(1.06); }
+}
+
+.wk-entry__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.wk-entry__meta {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-quiet);
+  font-variant-numeric: tabular-nums;
+}
+
+.wk-entry__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.2;
+  text-wrap: pretty;
+  transition: color 150ms;
+
+  .wk-entry:hover & { color: var(--ruby); }
+}
+
+// Under both columns, at the foot of the card, so the rows of tags line up across the three.
+.wk-entry__tags {
+  grid-column: 1 / -1;
+  align-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding-top: 12px;
+  border-top: var(--rule-row);
+  font-size: 13px;
+  color: var(--ink-quiet);
+}
+
+.wk-entry__tag.is-shared { color: var(--ruby); }
+
+// One line and two links between the last figure and the pager: the page argues for two
+// thousand words and then has to say what to do about it.
+.wk-case__cta {
+  @include case-column;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px 32px;
+  margin-top: clamp(56px, 6vw, 88px);
+  padding-top: clamp(40px, 4vw, 56px);
+  border-top: 1px solid var(--surface-line);
+  scroll-margin-top: var(--nav-clear);
+}
+
+.wk-case__cta-line {
+  max-width: 620px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.wk-case__cta-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+// ── prev / next ───────────────────────────────────────────────────────────────
+.wk-case__pager {
+  @include case-column;
+
+  margin-top: clamp(48px, 5vw, 72px);
+}
+
+.wk-case__pager-label {
+  padding-bottom: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-quiet);
+}
+
+.wk-case__pager-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.wk-pager-card {
+  display: block;
+  padding: 24px 26px;
+  transition: transform 250ms;
+
+  &:hover { transform: translateY(-2px); }
+
+  &--next { text-align: right; }
+
+  &:focus-visible {
+    outline: 2px solid oklch(45% 0.18 18);
+    outline-offset: 3px;
+  }
+}
+
+.wk-pager-card__eyebrow {
+  font-size: 14px;
+  color: var(--ink-quiet);
+}
+
+.wk-pager-card__title {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 2.6vw, 36px);
+  line-height: 1.1;
+}
+
+@include bp.below(lg) {
+  .wk-case__columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .wk-entries__row,
+  .wk-case__pager-cards { grid-template-columns: minmax(0, 1fr); }
+
+  .wk-pager-card--next { text-align: left; }
+
+  .wk-metric:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@include bp.below(sm) {
+  .wk-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .wk-metric { padding-right: 12px; }
+
+  .wk-metric + .wk-metric { padding-left: 14px; }
+
+  .wk-metric:nth-child(odd) { padding-left: 0; }
+
+  .wk-metric:nth-child(n + 3) { margin-top: 8px; }
+
+  .wk-metric__value { font-size: 40px; }
+
+  .wk-quality { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .wk-quality__cell:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .wk-quality__value { font-size: 34px; }
+}
+
+// ── the rail: figures and contents beside the two tracks ──────────────────────
+// Wide screens only. The tracks and the rail share one grid cell stack: the rail spans both
+// rows and is drawn over them, its inner box sticky, so it holds still for exactly as long as
+// the two tracks last. It is a small scene of its own, so it reads over paper and ink alike.
+.wk-rail { display: none; }
+
+#plain,
+#team { scroll-margin-top: 0; }
+
+@include bp.above(lg) {
+  .wk-case__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wk-case__plain { grid-area: 1 / 1; }
+
+  .wk-case__band { grid-area: 2 / 1; }
+
+  .wk-case__plain-inner,
+  .wk-case__band-inner { padding-right: calc(var(--page-pad) + #{$rail-width + $rail-gap}); }
+
+  .wk-rail {
+    display: block;
+    grid-area: 1 / 1 / 3 / 2;
+    z-index: 2;
+    // The column is the whole width; only the box in it takes the pointer.
+    pointer-events: none;
+    padding: clamp(64px, 7vw, 104px) 0 clamp(72px, 8vw, 120px);
+    // The rail's right edge on the case column's.
+    padding-right: max(var(--page-pad), calc((100% - var(--case-max)) / 2 + var(--page-pad)));
+  }
+
+  .wk-rail__inner {
+    @include surfaces.scene;
+
+    position: sticky;
+    top: var(--nav-clear);
+    width: $rail-width;
+    margin-left: auto;
+    max-height: calc(100dvh - var(--nav-clear) - 24px);
+    overflow-y: auto;
+    padding: 18px 18px 14px;
+    color: var(--ink);
+    background: color-mix(in oklab, var(--scene-raised) 92%, transparent);
+    border: 1px solid var(--surface-line);
+    border-radius: 18px;
+    box-shadow: 0 18px 40px -20px oklch(0% 0 0 / 0.55);
+    pointer-events: auto;
+  }
+}
+
+// Between lg and xl the text column is too narrow to keep the panels beside it.
+@media (min-width: #{bp.width(lg) + 1px}) and (max-width: #{bp.width(xl)}) {
+  .wk-case__columns { grid-template-columns: minmax(0, 1fr); }
+}
+
+.wk-rail__metrics {
+  margin: 0 0 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--surface-line);
+}
+
+.wk-rail__metric {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+
+  & + & { margin-top: 12px; }
+}
+
+.wk-rail__value {
+  margin: 0;
+  font-size: 28px;
+  color: var(--ruby);
+}
+
+.wk-rail__label {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-quiet);
+}
+
+.wk-rail__heading {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-quiet);
+}
+
+.wk-rail__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wk-rail__link {
+  @include controls.hit-row(32px);
+
+  padding-left: 12px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  border-left: 2px solid var(--surface-line);
+  transition: color 150ms, border-color 150ms;
+
+  &:hover { color: var(--ink); }
+
+  &.is-active {
+    color: var(--ink);
+    border-left-color: var(--ruby);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-case__skip,
+  .wk-metric.is-copyable::after,
+  .wk-entry,
+  .wk-entry__title,
+  .wk-entry__thumb img,
+  .wk-pager-card,
+  .wk-rail__link { transition: none; }
+
+  .wk-entry:hover,
+  .wk-pager-card:hover { transform: none; }
+
+  .wk-entry:hover .wk-entry__thumb img { transform: none; }
+}
+
+// Paper has no scroll to pin anything to: the strip at the top already carries the figures.
+@media print {
+  .wk-rail { display: none; }
+
+  .wk-case__plain-inner,
+  .wk-case__band-inner { padding-right: var(--page-pad); }
+}

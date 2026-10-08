@@ -1,0 +1,53 @@
+/ The case form: seven translated scalars, a stack list and the structured fields, each a list
+/ of rows. Every text field the /work page renders as markup (ProseHelper#rich) is an editor;
+/ Case::STRUCTURES#count says what the design draws, not how many rows may exist.
+= form_with model: [:management, kase], scope: :case, class: 'mg-form', data: case_form_data(kase) do |f|
+  .mg-form__body
+    = render ErrorsComponent.new(object: kase)
+    = f.hidden_field :lock_version if kase.persisted?
+
+    .mg-cells
+      .mg-field
+        = f.label :slug, t('.slug'), class: 'mg-label'
+        = f.text_field :slug, class: 'mg-input'
+      .mg-field
+        = f.label :mark, t('.mark'), class: 'mg-label'
+        = f.text_field :mark, class: 'mg-input'
+      .mg-field
+        = f.label :position, t('.position'), class: 'mg-label'
+        = f.number_field :position, min: 1, class: 'mg-input'
+
+    .mg-checks
+      label.mg-check
+        = f.check_box :own
+        span= t('.own')
+      label.mg-check
+        = f.check_box :is_this_site
+        span= t('.this_site')
+
+    / One field per language for every translated scalar. Both are required: a case is never
+    / published in one language alone.
+    - Case::LOCALISED_SCALARS.each do |field|
+      .mg-structure
+        .mg-label= t(".#{field}")
+        .mg-cells
+          - I18n.available_locales.each do |locale|
+            .mg-cell
+              label.mg-cell__label[for="case_#{field}_#{locale}"]= "#{t(".#{field}")} · #{t(locale).downcase}"
+              - if Case::PLAIN_SCALARS.include?(field)
+                = f.text_field :"#{field}_#{locale}", class: 'mg-input'
+              - else
+                = f.text_area :"#{field}_#{locale}", rows: 2, class: 'mg-input mg-cell__rich', data: tinymce_data(profile: 'case', lazy: true, lang: locale)
+
+    .mg-structure
+      = f.label :stack_list, t('.stack'), class: 'mg-label'
+      = f.text_area :stack_list, rows: 8, class: 'mg-input'
+
+    / Structured content, drawn by the widget the CV uses too (management/shared/).
+    - Case::STRUCTURES.each do |field, spec|
+      = render 'management/shared/structure_section', record: kase, scope: :case, field: field, spec: spec, label: t(".#{field}")
+
+  .mg-form__actions
+    / "Save", not "Edit". The button writes the form; edit is what you were already doing.
+    = f.submit(kase.new_record? ? t('global.button.create') : t('global.button.save'), class: 'mg-btn mg-btn--primary')
+    = link_to t('global.button.cancel'), management_cases_path, class: 'mg-btn mg-btn--ghost'

@@ -1,0 +1,173 @@
+@use '../breakpoints' as bp;
+@use '../surfaces';
+
+// ── The quote card ────────────────────────────────────────────────────────────
+.rc-quote { display: contents; }
+
+.rc-quote__hint {
+  position: absolute;
+  z-index: 55;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  background: var(--scene);
+  color: var(--on-scene);
+  border: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 24px -10px oklch(0% 0 0 / 0.5);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  pointer-events: none;
+
+  kbd {
+    font: inherit;
+    padding: 1px 4px;
+    border: 1px solid color-mix(in oklab, var(--paper) 45%, transparent);
+    border-radius: 2px;
+  }
+
+  &[hidden] { display: none; }
+}
+
+// The hint names a key, and a selection made by touch has no keyboard to press it on.
+@media (hover: none), (pointer: coarse) {
+  .rc-quote__hint { display: none; }
+}
+
+// A small scene: the passage in the stone's light. The PNG export reads these colours off the
+// live card (quote_card_controller), so what is saved is what is shown.
+.rc-quote__card {
+  @include surfaces.scene;
+
+  width: min(660px, 92vw);
+  padding: 56px 52px 40px;
+  border: 1px solid var(--surface-line);
+  border-radius: var(--radius-panel);
+  background-color: var(--scene-raised);
+  background-image: radial-gradient(600px circle at 90% -10%, oklch(50% 0.2 18 / 0.28), transparent 65%);
+  color: var(--ink);
+  box-shadow: 0 30px 80px -20px oklch(0% 0 0 / 0.7);
+
+  &::backdrop { background: oklch(10% 0.01 25 / 0.6); }
+}
+
+.rc-quote__text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ruby);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+
+  // The passage sets its own size: a sentence gets to be a headline, a paragraph does not.
+  &.is-lg { font-size: 46px; }
+  &.is-md { font-size: 34px; }
+  &.is-sm { font-size: 25px; line-height: 1.34; }
+
+  // Ukrainian quotes with «», English with “”.
+  quotes: '“' '”';
+  &:lang(uk) { quotes: '«' '»'; }
+
+  &::before { content: open-quote; }
+  &::after { content: close-quote; }
+}
+
+.rc-quote__mark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 34px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--ink-soft);
+
+  .rc-gem {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Save or copy the card. Not part of the picture: the PNG is drawn from the quote and the mark.
+.rc-quote__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--surface-line);
+}
+
+.rc-quote__action {
+  min-height: 34px;
+  padding: 0 14px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: none;
+  border: 1px solid color-mix(in oklab, var(--ink) 24%, transparent);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 150ms, color 150ms;
+
+  &:hover { background: color-mix(in oklab, var(--ink) 8%, transparent); }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: 2px;
+  }
+
+  &[hidden] { display: none; }
+
+  @media (pointer: coarse) { min-height: 44px; }
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+.rc-quote__status {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+@include bp.below(sm) {
+  .rc-quote__card { padding: 36px 26px 26px; }
+
+  .rc-quote__text {
+    &.is-lg { font-size: 30px; }
+    &.is-md { font-size: 25px; }
+    &.is-sm { font-size: 19px; }
+  }
+}
+
+// ── The easter egg's caption ─────────────────────────────────────────────────
+.rc-egg__toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 10px 18px;
+  background: var(--scene-raised);
+  color: var(--on-scene);
+  border: 1px solid oklch(58% 0.22 18 / 0.35);
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: center;
+  box-shadow: 0 12px 32px -8px oklch(0% 0 0 / 0.55), 0 0 30px -6px oklch(58% 0.22 18 / 0.45);
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.4s cubic-bezier(0.2, 1.4, 0.3, 1);
+
+  &.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}

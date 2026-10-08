@@ -1,66 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
-  <title>We're sorry, but something went wrong (500)</title>
+  <meta charset="utf-8">
+  <title>rubyco.in — у нас щось зламалося · something broke</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f0808">
   <style>
-  .rails-default-error-page {
-    background-color: #EFEFEF;
-    color: #2E2F30;
-    text-align: center;
-    font-family: arial, sans-serif;
-    margin: 0;
-  }
-
-  .rails-default-error-page div.dialog {
-    width: 95%;
-    max-width: 33em;
-    margin: 4em auto 0;
-  }
-
-  .rails-default-error-page div.dialog > div {
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #BBB;
-    border-top: #B00100 solid 4px;
-    border-top-left-radius: 9px;
-    border-top-right-radius: 9px;
-    background-color: white;
-    padding: 7px 12% 0;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
-
-  .rails-default-error-page h1 {
-    font-size: 100%;
-    color: #730E15;
-    line-height: 1.5em;
-  }
-
-  .rails-default-error-page div.dialog > p {
-    margin: 0 0 1em;
-    padding: 1em;
-    background-color: #F7F7F7;
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #999;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-color: #DADADA;
-    color: #666;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; display: grid; place-items: center; overflow-x: hidden;
+           background: #0f0808 radial-gradient(1100px 900px at 50% -160px, rgba(150, 10, 50, 0.55), rgba(110, 10, 40, 0.2) 45%, transparent 75%) no-repeat;
+           color: #f5f1ee; font: 400 17px/1.6 ui-sans-serif, system-ui, sans-serif; }
+    main { max-width: 34rem; padding: 3rem 1.25rem; text-align: center; }
+    svg { width: 84px; height: 84px; }
+    .code { margin: 1.5rem 0 0; font: 400 clamp(64px, 14vw, 104px)/0.9 Georgia, serif; color: #fb5668;
+            text-shadow: 0 0 40px rgba(222, 28, 70, 0.55); }
+    h1 { font: 400 clamp(34px, 7vw, 48px)/1.05 Georgia, serif; margin: 1rem 0 0.75rem; letter-spacing: -0.02em; }
+    p { color: #bcb6b3; margin: 0 0 1.75rem; }
+    .en { margin-top: 2.25rem; padding-top: 2rem; border-top: 1px solid rgba(245, 241, 238, 0.1); }
+    .en h1 { font-size: 28px; margin-top: 0; }
+    a { display: inline-block; padding: 12px 24px; border-radius: 999px; background: #d01840; color: #fff;
+        font-weight: 500; text-decoration: none; box-shadow: 0 10px 36px -12px rgba(222, 28, 70, 0.8); }
+    a:focus-visible { outline: 2px solid #fb5668; outline-offset: 3px; }
   </style>
 </head>
-
-<body class="rails-default-error-page">
-  <!-- This file lives in public/500.html -->
-  <div class="dialog">
-    <div>
-      <h1>We're sorry, but something went wrong.</h1>
+<body>
+  <main>
+    <svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true">
+      <polygon points="50,4 89.8,27 89.8,73 50,96 10.2,73 10.2,27" fill="#5c0a1f"/>
+      <polygon points="50,4 89.8,27 69,39 50,28" fill="#ff2d6a"/>
+      <polygon points="50,4 50,28 31,39 10.2,27" fill="#c0103f"/>
+      <polygon points="50,28 69,39 69,61 50,72 31,61 31,39" fill="#8c0d2f"/>
+      <polygon points="69,61 89.8,73 50,96 50,72" fill="#2a0410"/>
+    </svg>
+    <div class="code">500</div>
+    <h1>У нас щось зламалося</h1>
+    <p>Помилку записано в лог, ми її побачимо. Спробуйте за хвилину.</p>
+    <a href="/">rubyco.in</a>
+    <div class="en" lang="en">
+      <h1>Something broke on our side</h1>
+      <p>The error is logged and we will see it. Try again in a minute.</p>
     </div>
-    <p>If you are the application owner check the logs for more information.</p>
-  </div>
+  </main>
 </body>
 </html>

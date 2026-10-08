@@ -1,0 +1,79 @@
+- content_for :title, full_title(t('work.index.title'))
+- page_meta description: t('work.index.meta_description'), image: "/og/site-#{I18n.locale}.png"
+
+.wk-index data-controller="list-nav" data-list-nav-item-value=".wk-project"
+  = render PageHeadComponent.new(title: t('work.index.title'), uid: 'work-anchor', lede: t('work.index.lede'),
+                                 badge: @cases.size, eyebrow: t('home.index.figures.products', count: @cases.size))
+
+  section.rc-band.wk-index__band
+    .rc-wrap
+      / Every card is identical: no featured size, no hero treatment, and no case mark — the order
+      / is a judgement kept by hand in the content, and numbering a hand-ordered list turns it into
+      / a leaderboard that ages badly the first time it is reordered.
+      /
+      / Collapsible, but only once card-collapse has connected: without script every card is drawn
+      / open and the toggles stay hidden. The title is the link; it stretches over the card, and the
+      / toggle sits above that. One card opened on its own floats its details over the row below, so
+      / its neighbours keep their height; "expand all" lays every card out open, in flow.
+      = render ListKeysComponent.new
+
+      .wk-deck[data-controller="card-collapse"
+               data-action="click@document->card-collapse#clickOutside keydown.esc@document->card-collapse#escape"]
+        .wk-deck__bar data-card-collapse-target="bar" hidden=true
+          button.wk-deck__all[type="button" data-card-collapse-target="all" data-action="card-collapse#toggleAll"
+                               data-expand-label=t('work.index.expand_all') data-collapse-label=t('work.index.collapse_all')]
+            = t('work.index.expand_all')
+
+        .wk-projects
+          - @cases.each_with_index do |kase, index|
+            - team = @team_by_slug[kase.slug]
+            - details_id = "wk-project-#{kase.slug}-details"
+            - gem = GemComponent.new(uid: "work-#{kase.slug}", variant: :badge, tone: index)
+            article.wk-project.rc-panel[data-card-collapse-target="card" data-glow-follow="" data-reveal="" data-ruby-host=""
+                                        style="--panel-glow: #{gem.glow_colour}"]
+              / The flags hold the right of the sector line, so a badge never adds a line of its own.
+              .wk-project__meta
+                = render gem
+                span.wk-project__sector
+                  = "#{kase.sector} · "
+                  span.wk-project__year= kase.year
+                .wk-project__flags
+                  - if kase.is_this_site?
+                    span.wk-project__here
+                      span aria-hidden="true" ←
+                      = " #{t('work.index.you_are_here')}"
+                  - if kase.own?
+                    span.wk-project__own= t('work.index.own')
+
+              .wk-project__head
+                h2.wk-project__title data-vt-name=view_transition_name('case-title', kase.slug)
+                  = link_to rich(kase.title, links: false), work_case_path(slug: kase.slug), class: 'wk-project__link'
+                button.wk-project__toggle[type="button" hidden=true data-card-collapse-target="toggle"
+                                          data-action="card-collapse#toggle" aria-expanded="true" aria-controls=details_id
+                                          aria-label=t('work.index.toggle', title: plain(kase.title))]
+                  span.wk-project__chevron aria-hidden="true"
+
+              .wk-project__details id=details_id data-card-collapse-target="panel"
+                .wk-project__details-inner
+                  p.wk-project__tagline= rich(kase.tagline, links: false)
+                  .wk-project__stack
+                    .rc-chips
+                      - kase.stack.first(TeamHelper::STACK_CHIPS).each do |item|
+                        span.rc-chip.rc-chip--sm= item
+                      - if kase.stack.size > TeamHelper::STACK_CHIPS
+                        span.wk-project__more= "+#{kase.stack.size - TeamHelper::STACK_CHIPS}"
+
+              .wk-project__foot
+                .wk-project__metric
+                  - headline = kase.headline_metric
+                  - if headline.present?
+                    .wk-project__metric-value.rc-figure.rc-figure--glow data-controller="count-up"= figure(headline[:value])
+                    .wk-project__metric-label= rich(headline[:label], links: false)
+                / A case can be added in the admin before anyone is credited for it in team.yml, and
+                / the card then said "0 contributors". Saying nothing is the honest version.
+                - if team.any?
+                  .wk-project__who
+                    .wk-project__faces
+                      - team.first(TeamHelper::FACES).each do |contribution|
+                        = render MonogramComponent.of(contribution.person, size: 26, ring: :paper)
+                    span.wk-project__count= team_size_label(team)

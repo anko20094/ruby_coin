@@ -1,61 +1,166 @@
-- provide(:title, full_title(t("titles.main")))
-.home__container
-  - if @main_post.present?
-    .intro-block
-      = link_to post_path(@main_post) do
-        .intro-block__img
-          - if @main_post.photo.present?
-            = image_tag(@main_post.photo.medium.url, class: "intro-block__main_img")
-          - else
-            = image_tag("intro-img.png", class: "intro-block__main_img")
-          .intro-block__content
-            .flex-admin
-              .admin = @main_post.user.nickname
-              .intro-block__date = l(@main_post.created_at, format: :default)
-            h1.intro-block__title = @main_post.title
-            h6.intro-block__subtitle = @main_post.subtitle
-            .tags-inner
-              - @main_post.tags.first(3).each do |tag|
-                .intro-block__tag = tag.title
+- content_for :title, full_title(t('home.index.tagline'))
+- page_meta description: t('home.index.meta_description')
+- humans = @people.count { |person| !person.machine? }
 
-  =turbo_frame_tag :home_posts do
-    .accordion-category
-      .accordion-item
-        h2#headingOne.accordion-header
-          button.accordion-button.collapsed[type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"]
-            = t("titles.filters")
+.hm-page
+  / Hero. The copy is the studio's, and every number on this scene is counted rather than typed:
+  / the projects come from the portfolio, the headcount from the roster, the year from the oldest
+  / case, the entries from the journal. The claims inside the lede are the owner's own aggregates.
+  section.hm-hero.rc-scene
+    .rc-glow.hm-hero__glow
+    = render HexRingsComponent.new(css: 'hm-hero__rings')
+    .rc-wrap.hm-hero__copy
+      / First in the copy: the stone leads the scene, and the headline follows it.
+      .hm-hero__gem
+        button.hm-hero__stone type="button" data-ruby-handle="" aria-label=t('home.index.gem_button')
+          = render GemComponent.new(uid: 'home-hero', variant: :hero)
+        p.hm-hero__caption= t('home.index.gem_hint')
+      p.rc-eyebrow
+        span.rc-eyebrow__badge RubyCoin
+        span= t('home.index.hero_pill', year: @first_year)
+      h1.hm-hero__title
+        = t('home.index.headline_lead')
+        / An authored line break: on a wide screen it ends the line, on a narrow one it is a space.
+        span.hero-br= ' '
+        - if t('home.index.headline_join').present?
+          = "#{t('home.index.headline_join')} "
+        span.rc-mark= "#{t('home.index.headline_mark')}."
+      p.hm-hero__lede= t('home.index.lede_1', count: @projects_count)
+      .hm-hero__actions
+        = link_to contact_path, class: 'rc-button rc-button--primary' do
+          = t('home.index.work_with_us')
+          span aria-hidden="true" →
+        = link_to t('home.index.see_work'), work_path, class: 'rc-button'
 
-        #collapseOne.accordion-collapse.collapse[aria-labelledby="headingOne" data-bs-parent="#accordionExample"]
-          .accordion-body
-            = form_with url: root_path(anchor: 'posts-list'), method: :get do |f|
-              .filter-container.first-container
-                .filter-block
-                  h4.heading-filter.d-inline-block.me-3
-                    = t(".show_first")
-                  .filter-inner.d-inline-block
-                    = link_to t(".new"), root_path(order: :new), class: "filter-item d-inline-block #{ 'active' if params[:order] == 'new' || params[:order].blank? }" 
-                    = link_to t(".best"), root_path(order: :best), class: "filter-item d-inline-block #{ 'active' if params[:order] == 'best' }"
+    .rc-wrap
+      / Term before value, as a <dl> wants; the CSS sets the figure above its words.
+      dl.hm-figures
+        .hm-figure data-reveal=""
+          dt.hm-figure__label= t('home.index.figures.products', count: @projects_count)
+          dd.hm-figure__value.rc-figure.rc-figure--glow data-controller="count-up"= @projects_count
+        .hm-figure data-reveal=""
+          dt.hm-figure__label= t('home.index.figures.people', count: humans)
+          dd.hm-figure__value.rc-figure data-controller="count-up"= humans
+        .hm-figure data-reveal=""
+          dt.hm-figure__label= t('home.index.figures.year')
+          dd.hm-figure__value.rc-figure= @first_year
+        .hm-figure data-reveal=""
+          dt.hm-figure__label= t('home.index.figures.entries', count: @entries_count)
+          dd.hm-figure__value.rc-figure data-controller="count-up"= @entries_count
 
-              .div
-                .filter-container.second-container.d-inline-block.me-3
-                  .form-inner
-                    .group
-                      = f.label :tags, t('.search_by_tag'), class: 'h5'
-                      = f.collection_select :tag_ids, (@tags || []), :id, :title, { selected: @active_tags },
-                        { multiple: true, class: 'standart-input js-multiple-select d-inline-block',
-                               data: { controller: :tomselect, ajax_url: '/api/tags' }, placeholder:  t('.placeholders.tags') }
+  / The journal: the featured entry (or simply the newest) as a dark panel, the next few beside it.
+  - if @latest.present?
+    section.hm-journal.rc-band.rc-section
+      .rc-wrap
+        .rc-sechead data-reveal=""
+          div
+            h2.rc-sechead__title
+              = "#{t('home.index.journal_lead')} "
+              span.rc-mark= t('home.index.journal_mark')
+            p.rc-sechead__lede= t('journal.index.lede')
+          = link_to journal_path, class: 'rc-more' do
+            = t('home.index.all_entries', entries: t('journal.index.entries', count: @entries_count))
+            span aria-hidden="true" →
 
-                .filter-container.d-inline-block
-                  .filter-block
-                    .filter-inner.d-inline-block.mt-2
-                      = f.submit t('buttons.apply'), class: 'filter-item active d-inline-block', name: nil
-                      = link_to t('.reset_filter'), root_path(anchor: 'posts-list'), class: 'filter-item d-inline-block'
+        .hm-journal__grid
+          = link_to post_path(@latest), class: 'hm-lead rc-panel', data: { reveal: '', glow_follow: '' } do
+            .hm-lead__top
+              - if @latest.recent?
+                span.hm-lead__new= t('home.index.new_entry')
+              span.hm-lead__meta= [@latest.created_at.strftime('%Y·%m·%d'), journal_byline(@latest, tags: false)].compact_blank.join(' · ')
+            .hm-lead__body
+              .hm-lead__cover
+                = render PostCoverComponent.new(post: @latest, version: :medium, uid: 'home-latest')
+              h3.hm-lead__title= @latest.title
+              .hm-lead__tags
+                - @latest.tags.first(3).each do |tag|
+                  span.hm-lead__tag= "##{tag.title}"
+              span.hm-lead__more
+                = "#{t('home.index.read_full')} "
+                span aria-hidden="true" →
 
-    .posts id="posts-list"
-    .posts__inner
-      - @posts.each do |post|
-        = render "home/post", post: post
-        
-      - if @pagy.pages > 1
-          .pagination__inner
-            == pagy_bootstrap_nav(@pagy)
+          - if @more_posts.any?
+            .hm-journal__list data-reveal=""
+              - @more_posts.each do |post|
+                = link_to post_path(post), class: 'hm-entry' do
+                  span.hm-entry__date= post.created_at.strftime('%Y·%m·%d')
+                  h3.hm-entry__title= post.title
+
+  / The portfolio: the first cases as full panels in their own shade of the stone, the figure
+  / /work closes on leading each one; the rest of the portfolio follows as small tiles.
+  - if @cases.any?
+    section.hm-work.rc-scene.rc-section
+      .rc-glow.hm-work__glow
+      .rc-wrap
+        .rc-sechead data-reveal=""
+          div
+            h2.rc-sechead__title
+              = "#{t('home.index.work_lead')} "
+              span.rc-mark= t('home.index.work_mark')
+            p.rc-sechead__lede= t('home.index.lede_2')
+          = link_to work_path, class: 'rc-more' do
+            = t('home.index.all_work', projects: t('counts.projects', count: @projects_count))
+            span aria-hidden="true" →
+
+        .hm-cases
+          - @cases.each_with_index do |kase, index|
+            - gem = GemComponent.new(uid: "home-case-#{kase.slug}", variant: :badge, tone: index)
+            - headline = kase.headline_metric
+            = link_to work_case_path(slug: kase.slug), class: 'hm-case rc-panel',
+              style: "--panel-glow: #{gem.glow_colour}", data: { reveal: '', glow_follow: '' } do
+              .hm-case__lead
+                - if headline
+                  div
+                    .hm-case__figure.rc-figure.rc-figure--glow data-controller="count-up"= figure(headline[:value])
+                    p.hm-case__caption= rich(headline[:label], links: false)
+                = render gem
+              .hm-case__body
+                p.hm-case__meta
+                  span= "#{kase.sector} · #{kase.year}"
+                  - if kase.own?
+                    span.hm-case__own= t('work.index.own')
+                h3.hm-case__title= rich(kase.title.to_s.gsub(' · ', '&nbsp;· '), links: false)
+                p.hm-case__tagline= rich(kase.tagline, links: false)
+                .hm-case__stack
+                  - kase.stack.first(3).each do |item|
+                    span= item
+                span.hm-case__go
+                  = "#{t('home.index.read_case')} "
+                  span aria-hidden="true" →
+
+        - if @other_cases.any?
+          .hm-minis
+            - @other_cases.each do |kase|
+              - headline = kase.headline_metric
+              = link_to work_case_path(slug: kase.slug), class: 'hm-mini', data: { reveal: '' } do
+                - if headline
+                  .hm-mini__figure.rc-figure.rc-figure--glow= figure(headline[:value])
+                  p.hm-mini__caption= rich(headline[:label], links: false)
+                h3.hm-mini__title= rich(kase.title, links: false)
+                p.hm-mini__meta= "#{kase.sector} · #{kase.year}"
+
+  / The third surface showing the roster, after /studio and /team, and it reads the same file
+  / as both — a new person is one YAML entry, not three edits.
+  section.hm-crew.rc-band.rc-section
+    .rc-wrap.hm-crew__grid
+      div data-reveal=""
+        p.hm-crew__quote= t('home.index.crew_quote')
+        p.hm-crew__note
+          = "#{t('home.index.crew_note', people: @people.size, humans: t('counts.humans', count: humans))} "
+          = link_to team_path, class: 'hm-crew__all' do
+            = t('home.index.crew_all')
+            span aria-hidden="true" →
+      .hm-crew__list data-reveal=""
+        - @people.each do |person|
+          = link_to person_path(person), class: 'hm-crew__row hover-row' do
+            = render MonogramComponent.of(person, size: 56, ring: :mute)
+            span.hm-crew__who
+              span.hm-crew__name= person.name
+              span.hm-crew__role= person.role
+
+/ Fades in once the hero has scrolled away, and takes you back to it.
+button.hm-top[data-controller="floating-ruby" data-action="floating-ruby#toTop" hidden=true aria-label=t('home.index.to_top')]
+  = render GemComponent.new(uid: 'home-top', variant: :anchor, size: 64)
+  span.hm-top__label
+    span aria-hidden="true" ↑
+    = " #{t('home.index.top')}"

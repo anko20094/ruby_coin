@@ -1,0 +1,453 @@
+@use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+
+// The list screen: filter rail, then a sortable table.
+.mg-rail {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--mg-ink-faint);
+  background: var(--paper);
+}
+
+.mg-filters {
+  display: flex;
+  gap: 6px;
+}
+
+.mg-filter {
+  @include controls.hit-row(32px);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+  color: var(--ink);
+  transition: background 120ms, border-color 120ms, color 120ms;
+
+  &:hover { border-color: var(--ink-mute); }
+
+  &.is-current {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+.mg-filter__count {
+  font-size: 9.5px;
+  opacity: 0.8;
+
+  .mg-filter.is-current & {
+    background: color-mix(in oklab, var(--paper) 15%, transparent);
+    padding: 1px 6px;
+    border-radius: 8px;
+  }
+}
+
+.mg-search {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+
+  // The input inside draws no outline of its own; the box it sits in carries the ring.
+  &:focus-within {
+    border-color: var(--ink);
+    @include controls.focus-ring(1px);
+  }
+}
+
+.mg-search__glyph {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.mg-search__input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.mg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.mg-table thead tr {
+  border-bottom: var(--rule-strong);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.mg-table th {
+  font-weight: 400;
+  text-align: left;
+  padding: 10px 14px;
+  white-space: nowrap;
+
+  &:first-child { padding-left: 22px; }
+  &:last-child { padding-right: 22px; }
+}
+
+.mg-table__sort {
+  @include controls.hit-row(32px);
+
+  // A header like "#" is seven pixels of text. The box is wider than the word; the word stays
+  // where the column puts it.
+  min-width: 32px;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+
+  &:hover { color: var(--ink); }
+
+  &.is-current { color: var(--ink); }
+}
+
+.mg-table__arrow { color: var(--ruby); }
+
+.mg-table tbody tr {
+  border-bottom: 1px solid var(--mg-ink-faint);
+  transition: background 120ms;
+
+  &:hover { background: var(--paper-warm); }
+}
+
+.mg-table td {
+  padding: 12px 14px;
+  vertical-align: top;
+
+  &:first-child { padding-left: 22px; }
+  &:last-child { padding-right: 22px; }
+}
+
+.mg-cell--mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.mg-cell--right { text-align: right; }
+
+.mg-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.mg-title__path {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+// Status. The model has two states, so there are two pills — never more labels than states.
+.mg-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--ink-mute);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.mg-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink-mute);
+}
+
+.mg-status--active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+
+  .mg-status__dot { background: var(--paper); }
+}
+
+.mg-status--inactive {
+  border-style: dashed;
+  opacity: 0.7;
+}
+
+// The language pair: which of uk/en this row actually has, filled when present — a missing
+// translation is visible from the list without opening the row.
+.mg-langs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.mg-lang {
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--mg-ink-faint);
+  color: var(--ink-quiet);
+
+  &.is-present {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+.mg-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.mg-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: 3px;
+  color: var(--ink-soft);
+}
+
+.mg-tags__more {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-quiet);
+}
+
+// The whole title block is the link to the editor, so the row has one obvious target instead
+// of a button hiding at the far edge.
+.mg-title-link {
+  display: block;
+  color: inherit;
+
+  &:hover .mg-title { color: var(--ruby); }
+}
+
+.mg-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+// Edit was bare text and delete was a bordered button, so the pair read as two different kinds
+// of thing and neither was a target you could hit: 26×23 and 56×23. They are one shape now,
+// and the shape is a button.
+.mg-action {
+  @include controls.hit-row(32px);
+
+  justify-content: center;
+  min-width: 62px;
+  padding-inline: 10px;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-chip);
+  transition: color 150ms, border-color 150ms, background 150ms;
+
+  &:hover {
+    color: var(--ruby);
+    border-color: var(--ruby);
+  }
+
+  &--danger:hover {
+    color: var(--paper);
+    background: var(--ruby);
+    border-color: var(--ruby);
+  }
+}
+
+.mg-empty {
+  padding: 60px 22px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.mg-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 22px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.mg-pager__step {
+  padding: 2px 8px;
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-chip);
+
+  &:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+}
+
+@include bp.below(1100px) {
+  .mg-table th:nth-child(5),
+  .mg-table td:nth-child(5),
+  .mg-table th:nth-child(6),
+  .mg-table td:nth-child(6) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-filter,
+  .mg-table tbody tr { transition: none; }
+}
+
+// The statistics screen.
+.mg-stats { display: flex; flex-direction: column; gap: 36px; }
+
+// Rows of a report are links across a whole line; the line is the target.
+.mg-stats a {
+  @include controls.hit-row(32px);
+
+  min-width: 32px;
+}
+
+.mg-stats__totals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--mg-ink-faint);
+  border: 1px solid var(--mg-ink-faint);
+}
+
+.mg-stat {
+  background: var(--paper);
+  padding: 18px 20px;
+}
+
+.mg-stat__value { font-size: 30px; letter-spacing: -0.02em; }
+
+.mg-stat__label {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.mg-stats__heading {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+
+@include bp.below(md) {
+  .mg-stats__totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+// The case list: the posts table's shape, with the case's own number as the first column.
+.mg-cases__mark {
+  width: 1%;
+  color: var(--ruby);
+}
+
+// The tag screen: the list beside the form that adds to it.
+.mg-tag-screen {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+  max-width: 1000px;
+}
+
+.mg-tag-list {
+  display: grid;
+  gap: 6px;
+}
+
+.mg-tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 6px 4px 14px;
+  border: 1px solid var(--mg-ink-faint);
+  border-radius: var(--radius-card);
+  background: var(--paper);
+}
+
+.mg-tag-row__title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.mg-tag-row__actions {
+  display: flex;
+  gap: 4px;
+}
+
+// The rename form sits inside the row's frame and takes the row's place.
+.mg-tag-editor {
+  position: relative;
+  width: 100%;
+
+  .mg-input { padding-right: 84px; }
+}
+
+.mg-tag-editor__actions {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  transform: translateY(-50%);
+}
+
+.mg-tag-create {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+@include bp.below(lg) {
+  .mg-tag-screen { grid-template-columns: minmax(0, 1fr); }
+
+  .mg-tag-screen__create { order: -1; }
+}

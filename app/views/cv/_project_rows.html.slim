@@ -1,0 +1,22 @@
+/ The compact project list, and the one place the mark belongs: beside a career it reads as an
+/ index, and on the /work cards it would have read as a rank.
+.cv-rows
+  - cases.each do |kase|
+    = link_to work_case_path(slug: kase.slug), class: 'cv-row hover-row' do
+      span.cv-row__mark= kase.mark
+      .cv-row__body
+        .cv-row__titles
+          h3.cv-row__title= rich(kase.title, links: false)
+          - if kase.own?
+            span.cv-row__own= t('work.index.own')
+          - if kase.is_this_site?
+            span.cv-row__here
+              span aria-hidden="true" ←
+              = " #{t('work.index.you_are_here')}"
+        .cv-row__tagline= rich(kase.tagline, links: false)
+        .cv-row__meta= "#{kase.year} · #{kase.sector}"
+      .cv-row__metric
+        - headline = kase.headline_metric
+        - if headline.present?
+          .cv-row__metric-value.rc-figure= figure(headline[:value])
+          .cv-row__metric-label= rich(headline[:label], links: false)

@@ -1,0 +1,334 @@
+@use 'controls';
+@use 'surfaces';
+@use 'breakpoints' as bp;
+
+// A profile — the document /cv and /team/:person both render. One set of rules, because they
+// are the same CV at two addresses: one aimed at a recruiter, one at a client asking who will
+// do the work. Let them diverge in CSS and they will diverge in content within a quarter.
+
+// The two-column shell. It is a class rather than an inline grid because the breakpoint has to
+// be able to win, and both tracks carry minmax(0, …) because a rigid 300px sidebar leaves the
+// content column no floor: measured at 640px, a case title collapsed to 0px wide against its
+// own 72px of text while the sidebar still held its full width.
+.split-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+  gap: 48px;
+  align-items: start;
+}
+
+.split-main { min-width: 0; }
+
+.split-aside {
+  position: sticky;
+  top: var(--nav-clear);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  // A pinned column taller than the window is a column whose bottom nobody can reach: it holds
+  // still while the page scrolls under it, so its last rows only appear once the whole grid has
+  // gone past — which on /cv meant the education line showed up at the very end of the page or
+  // not at all. Measured 761px against a 96px offset: it wants 857px of window, and a laptop
+  // with browser chrome does not have it.
+  //
+  // The cap only bites when it has to. Where the column fits there is no scroll container and
+  // no scrollbar; where it does not, the overflow is reachable instead of hidden below the fold.
+  max-height: calc(100dvh - var(--nav-clear) - 24px);
+  overflow-y: auto;
+
+  // Given a colour, because an overlay scrollbar that only appears once you already scrolled
+  // cannot tell anyone there is something to scroll to.
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--ink-mute) 70%, transparent) transparent;
+}
+
+@include bp.below(lg) {
+  .split-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  // Sticky is meaningless in one column, and so is the cap that goes with it: in one column the
+  // page scroll already reaches everything, and a height limit here would put a second scrollbar
+  // inside a phone screen.
+  .split-aside {
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .split-aside .rc-monogram { width: min(180px, 45%); }
+}
+
+.pf-block {
+  margin-top: 56px;
+
+  &--summary { margin-top: 40px; }
+  &--projects { margin-top: 48px; }
+  &--worked,
+  &--notwork { margin-top: 56px; }
+}
+
+// On /cv the summary opens the column and the grid's own margin is enough; on a person page it
+// follows the pinned contribution, or the placeholder banner, and needs the air.
+.split-main > .pf-block--summary:first-child { margin-top: 0; }
+
+.pf-summary {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.3;
+  margin-top: 18px;
+  max-width: 54ch;
+  text-wrap: pretty;
+}
+
+// ── career ─────────────────────────────────────────────────
+.pf-career { margin-top: 16px; }
+
+.pf-career__entry {
+  padding: 20px 0;
+  border-top: 1px solid var(--surface-line);
+}
+
+.pf-career__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: baseline;
+}
+
+.pf-career__org {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 27px;
+  line-height: 1.3;
+  min-width: 0;
+  margin: 0;
+}
+
+.pf-career__title {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.pf-career__when {
+  font-size: 13.5px;
+  color: var(--ink-quiet);
+  text-align: right;
+  line-height: 1.5;
+}
+
+.pf-career__note {
+  font-size: 13.5px;
+  color: var(--ink-quiet);
+  margin-top: 6px;
+}
+
+.pf-career__body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+  line-height: 1.6;
+  max-width: 70ch;
+}
+
+.pf-career__cases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+// ── stack + strengths ──────────────────────────────────────
+.pf-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.pf-stack__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-quiet);
+  margin-bottom: 8px;
+}
+
+.pf-strengths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.pf-strengths__item {
+  border-top: 1px solid var(--ink);
+  padding-top: 10px;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+// ── the sidebar panel ──────────────────────────────────────
+// How to answer the CV: a small dark panel, the one thing on the page lit like a scene.
+.pf-contact {
+  @include surfaces.scene;
+
+  padding: 20px 22px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--scene-raised), oklch(17.5% 0.01 28));
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--on-scene) 6%, transparent);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.7;
+
+  // With no CV there is nothing to print here, and a dashed box of em-dashes is the same
+  // shape as the filled one — which is the point: the page does not change when it arrives.
+  &--empty {
+    @include surfaces.paper;
+
+    background: none;
+    box-shadow: none;
+    border: 1px dashed var(--ink-mute);
+    color: var(--ink-quiet);
+  }
+}
+
+.pf-contact__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-quiet);
+  margin-top: 10px;
+
+  &.is-ruby {
+    color: var(--ruby);
+    margin-top: 0;
+  }
+}
+
+.pf-contact__row + .pf-contact__label { margin-top: 12px; }
+
+.pf-contact__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pf-contact__key { color: var(--ink-quiet); }
+
+.pf-contact__value {
+  @include controls.hit-row(32px);
+
+  color: var(--ink);
+  transition: color 150ms;
+
+  &:hover { color: var(--ruby); }
+}
+
+.pf-updated {
+  font-size: 13px;
+  color: var(--ink-quiet);
+  line-height: 1.65;
+}
+
+// ── the two states that announce themselves ────────────────
+// Dashed, both of them, and the same dashed line the draft chip uses: it means unfinished.
+.pf-placeholder {
+  border: 1px dashed var(--ruby);
+  border-radius: 14px;
+  background: var(--ruby-mute);
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--ruby);
+  line-height: 1.6;
+}
+
+.pf-pending {
+  border: 1px dashed var(--ink-mute);
+  border-radius: var(--radius-panel);
+  background: var(--paper-warm);
+  padding: 24px 26px;
+  margin-top: 34px;
+}
+
+.pf-pending__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.pf-pending__body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+  line-height: 1.6;
+  max-width: 66ch;
+  text-wrap: pretty;
+}
+
+// ── what someone did ───────────────────────────────────────
+// The markers are 8×1px ruby bars, not bullet glyphs — the same device the case page uses for
+// "what was mine", because it is the same kind of claim.
+.pf-did {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pf-did__item {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.68em;
+    width: 8px;
+    height: 1px;
+    background: var(--ruby);
+  }
+}
+
+.pf-did--dense {
+  gap: 6px;
+
+  .pf-did__item { font-size: 13.5px; }
+}
+
+// ── one project a person worked on ─────────────────────────
+.worked-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 18px;
+  padding: 18px 12px;
+  border-bottom: 1px solid var(--surface-line);
+  // Room for the nav pill, so the row reads as a row rather than as the top of the screen.
+  scroll-margin-top: var(--nav-clear);
+
+  // The project the reader came from.
+  &.is-here {
+    background: var(--ruby-mute);
+    box-shadow: inset 2px 0 0 var(--ruby);
+  }
+}
+
+// Below this the right-hand meta is crushed rather than aligned, so it left-aligns under the
+// title instead.
+@include bp.below(620px) {
+  .worked-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}

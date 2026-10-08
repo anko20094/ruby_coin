@@ -1,0 +1,5 @@
+/ A div, not an aside: Action Text's sanitiser drops tags outside its safelist, and the
+/ safelist is deliberately strict because it also governs whatever the author pastes.
+div class="jn-callout jn-callout--#{block.tone}"
+  .jn-callout__label= t("journal.blocks.callout.#{block.tone}")
+  .jn-callout__body= block.body

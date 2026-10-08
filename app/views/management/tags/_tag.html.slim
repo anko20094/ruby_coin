@@ -1,24 +1,12 @@
-= turbo_frame_tag tag, class: 'tag' do
-  h3.tag__title = tag.title
-  .tag__actions
-    .edit
-      = link_to image_tag("edit-icon.svg"), edit_management_tag_path(tag),
-              data: { turbo_frame: dom_id(tag) }
-    .delete
-      .[type="button" data-bs-toggle="modal" data-bs-target="#exampleModal#{tag.id}"]
-        = image_tag("delete-icon.svg")
-      .modal.fade[tabindex="-1" aria-labelledby="exampleModalLabel#{tag.id}" aria-hidden="true" id="exampleModal#{tag.id}"]
-        .modal-dialog.tags
-          .modal-content
-            .modal-header
-              h1#exampleModalLabel.modal-title.fs-5
-                = t('confirmations.action_confirmation')
-              button.btn-close[type="button" data-bs-dismiss="modal" aria-label="Close"]
-            .modal-body
-              = t('confirmations.delete', item: tag.title)
-            .modal-footer
-              button.main-btn[type="button" data-bs-dismiss="modal"]
-                = link_to t("buttons.yes_text"), management_tag_path(tag),
-                    data: { turbo_method: :delete }
-              button.main-btn.not_filled[type="button" data-bs-dismiss="modal"]
-                = t("buttons.no_text")
+/ One form, one button, one confirmation that works without Turbo Drive.
+= turbo_frame_tag tag, class: 'mg-tag-row' do
+  h3.mg-tag-row__title = tag.title
+  .mg-tag-row__actions
+    = link_to edit_management_tag_path(tag), class: 'mg-icon-btn', data: { turbo_frame: dom_id(tag) },
+      aria: { label: t('global.button.edit_item', item: tag.title) } do
+      = icon(:edit)
+    = button_to management_tag_path(tag), method: :delete, class: 'mg-icon-btn mg-icon-btn--danger',
+      aria: { label: t('global.button.delete_item', item: tag.title) },
+      form: { data: { controller: 'confirm', action: 'submit->confirm#guard',
+                      confirm_message_value: t('confirmations.delete', item: tag.title) } } do
+      = icon(:delete)

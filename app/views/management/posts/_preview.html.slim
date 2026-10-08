@@ -1,0 +1,22 @@
+/ The preview pane renders the article with the public page's own helper and classes, so what
+/ the editor shows is what the reader gets. It deliberately leaves out the site chrome —
+/ breadcrumb, footer, related row — which is page furniture, not content.
+/
+/ It shows the last saved state, in the language the editor's tab is on; the editor reloads
+/ this frame after every successful save and on every tab switch.
+- locale = local_assigns.fetch(:locale, I18n.locale)
+/ The locale marker goes on the article, not on the frame: Turbo replaces a frame's contents
+/ and keeps the frame element's own attributes, so one up there would still name the language
+/ the page was first rendered in.
+= turbo_frame_tag dom_id(post, :preview), class: 'mg-preview__frame' do
+  article.jn-post.mg-preview__article data-locale=locale lang=locale
+    h1.jn-post__title= post.title.presence || t('management.posts.editor.untitled')
+    .jn-post__byline= journal_byline(post)
+
+    - if post.photo.present?
+      .jn-post__cover= image_tag post.photo.medium.url, alt: '', loading: 'lazy'
+
+    .jn-body
+      - if post.subtitle.present?
+        p.jn-body__lede= post.subtitle
+      = journal_body(post, locale)

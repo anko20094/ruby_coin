@@ -1,0 +1,162 @@
+/ The title on its own is a mark ('DNA'), which says nothing in a search result or a tab —
+/ the sector is the shortest thing that makes it a sentence.
+- content_for :title, full_title([plain(@case.title), @case.sector].compact_blank.join(' · '))
+- title = plain(@case.title)
+- page_meta description: plain(@case.tagline), image: share_card(@case.slug), type: 'article', updated_at: @case.updated_at
+
+= render 'shared/reading_progress'
+
+article.wk-case data-controller="track-jump"
+  header.wk-case__header.rc-scene
+    .rc-glow.wk-case__glow
+    .rc-wrap.wk-case__intro
+      .wk-case__gem
+        = render HexRingsComponent.new(css: 'wk-case__rings')
+        = render GemComponent.new(uid: "case-#{@case.slug}", variant: :anchor, size: 190, tone: @tone)
+      p.rc-eyebrow.wk-case__breadcrumb
+        = link_to work_path, class: 'rc-eyebrow__link' do
+          span aria-hidden="true" ←
+          = t('work.case.back')
+        span= "#{@case.mark} / #{format('%02d', @total)} · #{@case.sector} · #{@case.year}"
+      h1.wk-case__title class=('is-long' if title.length > 14) style=view_transition_style('case-title', @case.slug)
+        = rich(@case.title)
+        = ' '
+        span.wk-case__title-mark.rc-mark= @case.mark
+      p.wk-case__tagline= rich(@case.tagline)
+      .wk-case__role= rich(@case.role)
+
+      / The link that makes the two-track shape mean something: one URL for the recruiter, this
+      / one for the CTO. Rendered as a real anchor so it works with JavaScript off and can be
+      / copied out of the context menu; the controller only upgrades the scroll and keeps the
+      / address bar honest.
+      = link_to '#engineers', class: 'wk-case__skip', data: { action: 'track-jump#jump' } do
+        span aria-hidden="true" ↓
+        = " #{t('work.case.skip')}"
+
+    section.rc-wrap.wk-case__strip
+      .wk-metrics
+        / Each figure is a button that copies "<value> — <label>": recruiters retype these into
+        / notes and messages by hand.
+        - @case.metrics.each do |metric|
+          / The accessible name says what pressing it does; the figure itself is the visible label.
+          button.wk-metric[type="button" data-controller="copy" data-action="copy#copy"
+                           data-copy-text-value="#{plain(metric[:value])} — #{plain(metric[:label])}"
+                           data-copy-done-value=t('work.case.copied')
+                           aria-label="#{t('work.case.copy')}: #{plain(metric[:value])} — #{plain(metric[:label])}"]
+            .wk-metric__value.rc-figure.rc-figure--glow data-controller="count-up"= figure(metric[:value])
+            .wk-metric__label= rich(metric[:label], links: false)
+            span.wk-metric__flash[aria-live="polite" data-copy-target="flash"]
+
+  / The two tracks, in one frame so the rail beside them can stick for as long as they last.
+  .wk-case__body
+    section#plain.wk-case__plain.rc-band
+      .wk-case__plain-inner
+        = render TrackTagComponent.new(label: t('work.case.plain'), tone: :ruby)
+        h2.wk-case__heading= rich(@case.plain_heading)
+        .wk-case__columns
+          .wk-prose
+            - @case.plain_body.each do |paragraph|
+              p= rich(paragraph)
+          aside.wk-case__panels
+            .wk-panel.wk-panel--mine
+              h3.wk-panel__label.is-ruby= t('work.case.mine')
+              ul.wk-mine
+                - @case.mine.each do |item|
+                  li.wk-mine__item= rich(item)
+            .wk-panel.wk-panel--facts
+              h3.wk-panel__label= t('work.case.facts')
+              div= "#{t('work.case.status')} · #{@case.status}"
+              .wk-panel__label= t('work.case.stack')
+              .rc-chips
+                - @case.stack.each do |item|
+                  span.rc-chip.rc-chip--sm= item
+
+    section#engineers.wk-case__band.rc-scene tabindex="-1"
+      .rc-glow.wk-case__band-glow
+      .wk-case__band-inner
+        = render TrackTagComponent.new(label: t('work.case.engineering'), tone: :soft)
+        h2.wk-case__heading.is-small= rich(@case.engineering_heading)
+        p.wk-case__sub= rich(@case.engineering_sub)
+        .wk-cards
+          - @case.engineering_items.each do |item|
+            .wk-card data-reveal=""
+              h3.wk-card__title= rich(item[:title])
+              .wk-card__body= rich(item[:body])
+        .wk-quality data-reveal=""
+          - @case.quality.each do |metric|
+            .wk-quality__cell
+              .wk-quality__value.rc-figure.rc-figure--glow data-controller="count-up"= figure(metric[:value])
+              .wk-quality__label= rich(metric[:label])
+        .wk-case__scope= rich(@case.scope_note)
+
+    / Wide screens only: the figures and the way round the page, pinned beside the two tracks
+    / (case_rail_controller). The figures are a quiet copy of the strip above and stay hidden
+    / until the strip has scrolled away, so the same numbers are never on screen twice; no
+    / count-up here, the strip already did that.
+    aside.wk-rail[aria-label=t('work.case.rail.label') data-controller="case-rail"]
+      .wk-rail__inner
+        dl.wk-rail__metrics[hidden=true aria-hidden="true" data-case-rail-target="metrics"]
+          - @case.metrics.each do |metric|
+            .wk-rail__metric
+              dt.wk-rail__label= rich(metric[:label], links: false)
+              dd.wk-rail__value.rc-figure= figure(metric[:value])
+        nav.wk-rail__toc aria-label=t('work.case.rail.contents')
+          .wk-rail__heading= t('work.case.rail.contents')
+          ol.wk-rail__list
+            - case_sections(team: @team.any?).each do |anchor, label|
+              li
+                a.wk-rail__link href="##{anchor}" data-case-rail-target="link"= label
+
+  / After the two tracks: who did it, what the journal says about it, and where to go next.
+  .wk-case__after.rc-band
+    - if @team.any?
+      = render CaseTeamComponent.new(team: @team, slug: @case.slug)
+
+    / Journal entries whose tags name this case's stack (Cases::Topics). Drawn only when there is
+    / one: a heading over nothing would promise a connection that is not there. The tags that made
+    / the match are in ruby, and the one most of them share leads on to the rest of the journal.
+    - if @topic_posts.any?
+      section.wk-case__journal.wk-entries
+        .wk-entries__head
+          = render TrackTagComponent.new(label: t('work.case.journal'), tone: :soft, heading: :h2)
+          - if @lead_tag
+            = link_to journal_path(tag_id: @lead_tag.id), class: 'wk-entries__all' do
+              = "#{t('work.case.journal_all', tag: @lead_tag.title)} "
+              span aria-hidden="true" →
+        .wk-entries__row
+          - @topic_posts.each do |post|
+            - shared = @shared_tags.fetch(post.id, [])
+            = link_to post_path(post), class: 'wk-entry' do
+              span.wk-entry__thumb
+                = render PostCoverComponent.new(post:, uid: "case-entry-#{post.id}")
+              span.wk-entry__body
+                span.wk-entry__meta
+                  span= post.entry_label
+                  span= post.created_at.strftime('%Y·%m·%d')
+                h3.wk-entry__title= post.title
+              span.wk-entry__tags
+                - (shared | post.tags).first(4).each do |tag|
+                  span class=(shared.include?(tag) ? 'wk-entry__tag is-shared' : 'wk-entry__tag') = "##{tag.title}"
+
+    / The page whose job is to convince someone ended at "here is the next case". A reader who
+    / has just read 2,000 words of evidence should not have to go looking for the way to say so.
+    section#contact.wk-case__cta
+      p.wk-case__cta-line= t('work.case.cta')
+      .wk-case__cta-links
+        = link_to t('work.case.cta_contact'), contact_path, class: 'rc-button rc-button--primary'
+        - if (email = Team.owner_cv.contact(:email))
+          = link_to email[0], email[1], class: 'rc-button'
+
+    nav.wk-case__pager
+      .wk-case__pager-label= t('work.case.pager')
+      .wk-case__pager-cards
+        = link_to work_case_path(slug: @previous_case.slug), class: 'wk-pager-card rc-panel', data: { glow_follow: '' } do
+          .wk-pager-card__eyebrow
+            span aria-hidden="true" ←
+            = " #{t('work.case.previous')}"
+          .wk-pager-card__title= rich(@previous_case.title, links: false)
+        = link_to work_case_path(slug: @next_case.slug), class: 'wk-pager-card wk-pager-card--next rc-panel', data: { glow_follow: '' } do
+          .wk-pager-card__eyebrow
+            = "#{t('work.case.next')} "
+            span aria-hidden="true" →
+          .wk-pager-card__title= rich(@next_case.title, links: false)

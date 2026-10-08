@@ -6,9 +6,12 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Capistrano links current/storage to shared/storage (see deploy.rb linked_dirs), so this is
+# the same path across releases. The previous ../../shared/storage resolved one level above
+# the deploy root; nothing had noticed because Active Storage was unused until Action Text.
 production:
   service: Disk
-  root: <%= Rails.root.join("../../shared/storage") %>
+  root: <%= Rails.root.join("storage") %>
 
 
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)

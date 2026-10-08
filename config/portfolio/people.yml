@@ -1,0 +1,534 @@
+# RubyCoin · people
+#
+# A person record belongs to the person. It is their CV and nothing else — what they
+# did on a given project lives in `team.yml`, keyed by project.
+#
+# Bilingual: every translatable value is a { en:, uk: } pair. That includes the parts that look
+# like data — a contact row's key, a stack item, a period's open end — wherever they are prose
+# rather than a proper noun: "Ruby on Rails" is the same word twice, "merge rights" is not. A
+# bare string is still allowed and reads the same in both languages.
+# Strings may contain inline <b>, <i> and <code> only — render through the same sanitiser as
+# cases.yml.
+#
+# Three states exist, and two of them announce themselves:
+#   full         — real content (danyil, mykhailo, oleksii, oleksandr, natalia, claude)
+#   placeholder  — `placeholder: true`; real role and real project work, invented dates,
+#                  employers, contacts and education. Prints a ruby dashed banner on the
+#                  page and a `PLACEHOLDER` chip in the roster. Meant only for judging a
+#                  filled layout before a real CV arrives; no record ships in this state.
+#                  ⚠️ before launch: grep -n '^ *placeholder: true' must come back empty.
+#   draft        — `cv: null`; nothing invented at all (vladyslav). A new hire
+#                  lands in this state on day one, and so does anyone whose CV nobody here
+#                  can keep honest.
+#
+# `cv: null` is a real, shippable state. It means nobody has filled this CV in yet,
+# and the page says so instead of guessing a career for a named colleague. The person
+# still appears in the roster and still shows their project contributions, because
+# those are written by the project lead and are accurate.
+#
+# `updated:` is the staleness guard. A CV without a date, or with a date more than a
+# year old, renders the "CV DRAFT" chip in the roster. Do not remove that chip — a
+# stale CV is worse than an absent one. Only the crew needs one.
+#
+#
+# `status:` is how someone joins and leaves. It is one word, and it is the only edit any of
+# those things needs:
+#
+#   active   the default, and what `status:` being absent means. On the crew: /team, the
+#            studio, the home strip, the search palette, and the team block of every case
+#            they are credited on.
+#
+#   alumni   off the crew, still credited. Their rows in team.yml keep rendering on the case
+#            pages, and their name appears in the alumni list on /studio. Leaving a studio
+#            does not unwrite the code.
+#
+#   hidden   off the site entirely. The record stays, the rows in team.yml stay, the person
+#            page 404s and the credits stop rendering. This is the switch: taking someone
+#            down is a word rather than a deletion, the diff says what happened, and putting
+#            them back is the same word again.
+#
+# `contact:` on someone else's record is GitHub and nothing else. Their CV may carry an email,
+# a phone and a LinkedIn; this page is public and scrapeable, and handing over a colleague's
+# direct channels is not the owner's to do. The owner's own contacts are his own call and live
+# in cv.yml.
+#
+# An alumnus owes this file a name and nothing else. Demanding a role and a blurb from someone
+# who has left is how a file like this starts holding invented copy about real people. A record
+# with neither a CV nor a contribution prints as a name with no link, because the page behind
+# that link would have to be invented.
+#
+# `rake team:check` is the fast gate — every rule the pages rely on, in under a second, with a
+# non-zero exit. `rake team:who` prints who is in what state and on which projects.
+#
+# Order in this file is display order, for the crew and for the alumni alike.
+
+people:
+  - id: "danyil"
+    short: "DS"
+    photo: "danyil.jpg"
+    machine: false
+    name:
+      en: "Danyil Shkoropad"
+      uk: "Даниїл Шкоропад"
+    role:
+      en: "co-founder · tech lead"
+      uk: "співзасновник · техлід"
+    blurb:
+      en: "Six years of Rails in production. Made the first commit on five of the seven projects here."
+      uk: "Шість років Rails у продакшні. Перший коміт у п’яти з семи проєктів тут — його."
+    # The one indirection in this file: his CV is the document in cv.yml, which is also
+    # what /cv renders. Load it from there rather than duplicating it here.
+    cv_file: "cv.yml"
+    # No `updated:` here: his CV is cv.yml, and so is its date. See Person#updated.
+    # Optional. Renders as the last block on the person page. Omit it rather than
+    # inventing one — see the note at the bottom of this file.
+    not_work:
+      - { icon: "🏐", label: { en: "volleyball", uk: "волейбол" }, detail: { en: "tue/thu evenings", uk: "вт/чт вечори" } }
+      - { icon: "🏍", label: { en: "moto", uk: "мотоцикл" }, detail: { en: "mid-season", uk: "середина сезону" } }
+      - { icon: "📺", label: { en: "anime", uk: "аніме" }, detail: { en: "Frieren · re-watch", uk: "Frieren · передивляю" } }
+      - { icon: "🎲", label: { en: "boardgame", uk: "настільні" }, detail: { en: "7 wonders night", uk: "вечір 7 wonders" } }
+      - { icon: "💪", label: { en: "gym", uk: "залізо" }, detail: { en: "pwr · 3x/week", uk: "пвр · 3 рази/тиж" } }
+
+  - id: "mykhailo"
+    short: "MY"
+    photo: "mykhailo.jpg"
+    machine: false
+    name:
+      en: "Mykhail Yun"
+      uk: "Михаїл Юн"
+    role:
+      en: "co-founder · product & clients"
+      uk: "співзасновник · продукт і клієнти"
+    blurb:
+      en: "Ideas, specs and the customer conversations behind them. Sells what the rest of us build."
+      uk: "Ідеї, ТЗ і розмови з клієнтами за ними. Продає те, що будує решта."
+    updated: "2026·09·15"
+    cv:
+      role:
+        en: "Co-founder · product lead"
+        uk: "Співзасновник · продакт-лід"
+      years:
+        en: "4+ years in production"
+        uk: "4+ років у продакшні"
+      summary:
+        en: "Twelve years in media and social: websites, Telegram channels, YouTube, Instagram, TikTok — properties with more than 200 million followers between them. Developer communities of 60,000 since 2022, and since 2023 a co-founder of RubyCoin and its five products. Product is his in every one of them: the idea, the spec, the economics, the copy, the distribution — everything between a thought and the first user."
+        uk: "Дванадцять років у медіа й SMM: сайти, Telegram-канали, YouTube, Instagram, TikTok — ресурси із сумарною аудиторією 200+ млн. З 2022-го — IT-спільноти на 60 тис. учасників, з 2023-го — співзасновник RubyCoin і п’яти власних продуктів. Продукт у кожному з них на ньому: ідея, ТЗ, економіка, тексти, дистрибуція — усе між задумом і першим користувачем."
+      location: { en: "Ukraine · remote", uk: "Україна · віддалено" }
+      languages: { en: "Ukrainian native · English B2/C1", uk: "Українська — рідна · англійська B2/C1" }
+      education:
+        en: "International relations and diplomacy · Ivan Franko National University of Lviv · 2021"
+        uk: "Факультет міжнародних відносин · Львівський національний університет імені Івана Франка · 2021"
+      experience:
+        - period: { en: "2023–present", uk: "2023–дотепер" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Co-founder · product · growth", uk: "Співзасновник · продукт · growth" }
+          place: { en: "Ukraine · remote", uk: "Україна · віддалено" }
+          body:
+            en: "Five products, 2.8M+ users between them. The idea, the spec and the roadmap in each one. Clients, how the work is divided, and review. B2B separately."
+            uk: "П’ять продуктів, понад 2,8 млн користувачів разом. Ідея, ТЗ і roadmap у кожному продукті. Клієнти, розподіл задач, рев’ю. Окремо — B2B."
+          cases: ["dna", "wardybot", "imagemaker", "chatgpt", "rubycoin"]
+        - period: { en: "2022–2024", uk: "2022–2024" }
+          org: { en: "Developer communities", uk: "IT-спільноти" }
+          title: { en: "Python · JavaScript", uk: "Python · JavaScript" }
+          place: { en: "Telegram", uk: "Telegram" }
+          body:
+            en: "Several developer communities, 60,000 members between them. Started and grown from nothing: content, moderation, the community itself."
+            uk: "Кілька спільнот розробників, 60 тис. учасників разом. Запуск і зростання з нуля: контент, модерація, ком’юніті."
+        - period: { en: "2014–2022", uk: "2014–2022" }
+          org: { en: "Media and social", uk: "Медіа та SMM" }
+          title:
+            en: "websites · Telegram · YouTube · Instagram · TikTok"
+            uk: "сайти · Telegram · YouTube · Instagram · TikTok"
+          body:
+            en: "Properties with more than 200 million followers across platforms. Launched and grown from nothing: content strategy, advertising, monetisation, teams of writers and editors. The same work carries this studio’s own products today, alongside a Ukrainian-language channel about AI and technology."
+            uk: "Ресурси із сумарною аудиторією 200+ млн на різних платформах. Запуск і зростання майданчиків з нуля: контент-стратегія, реклама, монетизація, команди авторів і редакторів. Сьогодні та сама робота везе дистрибуцію власних продуктів і україномовний канал про ШІ та технології."
+        - period: { en: "2012–2014", uk: "2012–2014" }
+          org: { en: "Writing", uk: "Контент" }
+          title: { en: "Author", uk: "Автор" }
+          body:
+            en: "Articles and content for websites and media. The starting point."
+            uk: "Статті й контент для сайтів і медіа. Стартова точка."
+      stacks:
+        - label: { en: "platforms", uk: "майданчики" }
+          items: ["Telegram", "YouTube", "Instagram", "TikTok", { en: "websites", uk: "сайти" }]
+        - label: { en: "product", uk: "продукт" }
+          items:
+            - { en: "specs", uk: "ТЗ" }
+            - { en: "unit economics", uk: "юніт-економіка" }
+            - { en: "copy", uk: "тексти" }
+            - { en: "distribution", uk: "дистрибуція" }
+            - "B2B"
+      strengths:
+        - en: "Everything between a thought and the first user"
+          uk: "Усе між задумом і першим користувачем"
+        - en: "Has started from nothing the things that were later counted in millions"
+          uk: "Запускав з нуля те, що потім рахували мільйонами"
+        - en: "Product, economics and distribution in one person"
+          uk: "Продукт, економіка й дистрибуція — одна людина"
+
+  - id: "oleksii"
+    short: "OM"
+    photo: "oleksii.jpg"
+    machine: false
+    name:
+      en: "Oleksii Mikhno"
+      uk: "Олексій Міхно"
+    role:
+      en: "backend"
+      uk: "бекенд"
+    blurb:
+      en: "Queues, schedules and the production problems that only show up at 3am."
+      uk: "Черги, розклади й ті проблеми продакшну, які спливають о третій ночі."
+    updated: "2026·09·15"
+    not_work:
+      - { icon: "🎲", label: { en: "board games", uk: "настільні ігри" }, detail: { en: "campaign co-op", uk: "кооперативні кампанії" } }
+      - { icon: "🚲", label: { en: "cycling", uk: "велосипед" }, detail: { en: "long routes", uk: "довгі маршрути" } }
+      - { icon: "🏠", label: { en: "home automation", uk: "розумний дім" }, detail: { en: "ESPHome · ESP32", uk: "ESPHome · ESP32" } }
+      - { icon: "🧠", label: { en: "local LLMs", uk: "локальні LLM" } }
+    cv:
+      role: { en: "Backend engineer", uk: "Backend-інженер" }
+      years: { en: "on these products since 2024", uk: "на цих продуктах із 2024-го" }
+      summary:
+        en: "Backend, automation, and keeping production systems running. The work here is queues and schedules: the planning and delivery pipeline, job flow on Sidekiq and Redis, reservation and delayed delivery, and the race conditions, locks and idempotency problems that come with all of it. Before that, support and development of an e-commerce platform on OpenCart and PHP — including MySQL binlog work, data recovery and SQL migrations."
+        uk: "Бекенд, автоматизація й те, щоб продакшн продовжував працювати. Тут його робота — це черги й розклади: система планування й доставки постів, job-flow на Sidekiq і Redis, резервування й відкладена доставка, а разом із ними race conditions, локи та ідемпотентність. До цього — підтримка й розвиток e-commerce-платформи на OpenCart і PHP, включно з MySQL binlog, відновленням даних і SQL-міграціями."
+      experience:
+        - period: { en: "2024–present", uk: "2024–дотепер" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Backend engineer", uk: "Backend-інженер" }
+          place: { en: "DNA · WardyBot", uk: "DNA · WardyBot" }
+          body:
+            en: "The planning and delivery pipeline: job flow on <b>Sidekiq, Sidekiq Scheduler and Redis</b>, reservation, delayed delivery and ordered publishing, timezone-aware scheduling per user and per bot, and a <b>Ruby ↔ Python bridge over Redis Streams</b>. Plus embeddings and vector search, production performance work, and the race conditions, pending jobs, locks and idempotency that come with a queue that must not publish twice."
+            uk: "Система планування й доставки: job-flow на <b>Sidekiq, Sidekiq Scheduler і Redis</b>, резервування, відкладена доставка й послідовна публікація, timezone-aware планування на користувача й на бота, міст <b>Ruby ↔ Python через Redis Streams</b>. Плюс embeddings і векторний пошук, робота над продуктивністю продакшну і ті race conditions, підвислі джоби, локи та ідемпотентність, які йдуть у комплекті з чергою, що не має права опублікувати двічі."
+          cases: ["dna", "wardybot"]
+      stacks:
+        - label: { en: "core", uk: "основне" }
+          items: ["Ruby on Rails", "PostgreSQL", "Redis", "Sidekiq", "Vue", "JavaScript"]
+        - label: { en: "also", uk: "також" }
+          items: ["Linux", "Docker", "systemd", "OpenCart · PHP", "MariaDB", { en: "local LLMs · embeddings", uk: "локальні LLM · embeddings" }]
+      strengths:
+        - en: "Finds the race condition rather than adding a retry"
+          uk: "Знаходить race condition замість того, щоб додати retry"
+        - en: "Has restored data from a binlog, which changes how you write migrations"
+          uk: "Відновлював дані з binlog — після такого міграції пишуться інакше"
+        - en: "Builds the integration when two languages have to agree"
+          uk: "Будує інтеграцію там, де двом мовам треба домовитися"
+
+  - id: "oleksandr"
+    short: "OS"
+    machine: false
+    name:
+      en: "Oleksandr Shemberko"
+      uk: "Олександр Шемберко"
+    role:
+      en: "fullstack"
+      uk: "фулстек"
+    blurb:
+      en: "Captcha, skins and duels in WardyBot; own posts and ad reservations in DNA."
+      uk: "Капча, скіни й дуелі у WardyBot; власні пости й бронювання реклами в DNA."
+    updated: "2026·10·02"
+    # Written from his commits and pull requests in the anko20094 repositories, and nothing
+    # else: no location, languages or education, because nothing here can vouch for them.
+    cv:
+      role: { en: "Fullstack developer", uk: "Фулстек-розробник" }
+      years: { en: "on these products since 2023", uk: "на цих продуктах із 2023-го" }
+      summary:
+        en: "A Rails developer who builds the Telegram side of the studio’s products: the menus, commands and game mechanics people actually use in WardyBot and DNA, and lately the web surfaces around them — an admin on Vue 3 and a Mini App on React. Second by commit count in the WardyBot repository, and in what he ships there the Ruby specs run to almost twice the lines of the Ruby code. Started here in 2023, on this site; in 2026 also built a client demo on generative video and voice — lip-sync models, AI video and speech synthesis."
+        uk: "Rails-розробник, який будує телеграмну частину продуктів студії: меню, команди й ігрові механіки, якими справді користуються у WardyBot і DNA, а останнім часом — і вебповерхні довкола них: адмінку на Vue 3 та Mini App на React. Другий за кількістю комітів у репозиторії WardyBot, і в тому, що він там випускає, рядків Ruby-тестів майже вдвічі більше, ніж рядків Ruby-коду. Почав тут у 2023-му — з цього сайту; у 2026-му ще й зібрав клієнтське демо на генеративному відео й голосі — моделі ліпсинку, AI-відео та синтез мовлення."
+      # GitHub and nothing else, as for every colleague.
+      contact:
+        - ["github", "Shemberko", "https://github.com/Shemberko"]
+      experience:
+        - period: { en: "2026", uk: "2026" }
+          org: { en: "Vindo Studios", uk: "Vindo Studios" }
+          title: { en: "Developer · generative video and voice", uk: "Розробник · генеративне відео й голос" }
+          place: { en: "AI live-dealer demo", uk: "демо AI-круп’є" }
+          body:
+            en: "A web demo of a live-dealer table where the dealer is a video avatar: 163 commits in a month. Ran <b>five lip-sync models</b> side by side instead of picking one from the docs — rejected the photo-driven ones on measured head movement, settled on VEED Lipsync 2.0 and Sync Labs, and later regenerated the whole library on HeyGen — and judged every take by a pixel-difference metric in the mouth area rather than by eye. Dealer footage from <b>Kling</b> and <b>Veo</b>, voices from <b>ElevenLabs</b> and a local TTS, replies through OpenRouter; a speech queue with priorities that never cuts a line off, and game logic decoupled from video timing so a stalled clip cannot stall a round."
+            uk: "Вебдемо столу з живим круп’є, де круп’є — відеоаватар: 163 коміти за місяць. Прогнав <b>п’ять моделей ліпсинку</b> поруч, а не обрав одну за документацією: фотомоделі відкинув за виміряним рухом голови, зупинився на VEED Lipsync 2.0 і Sync Labs, а згодом перегенерував усю бібліотеку на HeyGen, — і кожен дубль оцінював метрикою піксельної різниці в зоні рота, а не на око. Відео круп’є — з <b>Kling</b> і <b>Veo</b>, голоси — з <b>ElevenLabs</b> і локального TTS, відповіді — через OpenRouter; черга мовлення з пріоритетами, яка ніколи не обриває репліку, і ігрова логіка, відв’язана від таймінгу відео, щоб завислий кліп не зупиняв раунд."
+        - period: { en: "2024–present", uk: "2024–дотепер" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Fullstack developer", uk: "Фулстек-розробник" }
+          place: { en: "WardyBot", uk: "WardyBot" }
+          body:
+            en: "370 merged pull requests and the second-largest commit count in the repository. In the bot: the captcha and the captcha quiz at the door, warns, bans and mutes with their menus, broadcasts, role-play commands, and the game layer — duels, the in-chat market, <b>skins</b> with drops, a shop, sales and moderation, achievements and ranks. On the web: the <b>admin on Vue 3 + TypeScript</b> over a JSON API, with ActionCable notifications and Telegram sign-in, and the Mini App’s move to <b>React 19</b> together with its premium shop."
+            uk: "370 змерджених pull request’ів і друге місце за кількістю комітів у репозиторії. У боті: капча й капча-вікторина на вході, попередження, бани й м’юти з їхніми меню, розсилки, RP-команди та ігровий шар — дуелі, внутрішньочатовий ринок, <b>скіни</b> з дропами, магазином, продажем і модерацією, ачівки й ранги. У вебі: <b>адмінка на Vue 3 + TypeScript</b> поверх JSON API зі сповіщеннями через ActionCable і входом через Telegram, а також переїзд Mini App на <b>React 19</b> разом із преміум-магазином."
+          cases: ["wardybot"]
+        - period: { en: "2025–2026", uk: "2025–2026" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Backend developer · reviewer", uk: "Backend-розробник · рев’ювер" }
+          place: { en: "DNA", uk: "DNA" }
+          body:
+            en: "The customer’s own posts from end to end — creation, editing, scheduled and postponed publishing, per-channel settings, premium emoji, captions too long for Telegram — and the <b>ad-reservation</b> service with its archive and the content-plan view. Then the premium tier: payment menus, the free/premium split and the notifications around a subscription. Started the Ruby userbots on <b>TDLib</b> — opened the pull request that brought them in, which Danyil then carried to the end — and patched the tdlib-ruby fork they run on. Reviewed 105 of his colleagues’ pull requests."
+            uk: "Власні пости клієнта від початку до кінця — створення, редагування, публікація за розкладом і відкладена, налаштування на канал, преміум-емодзі, підписи, задовгі для Telegram, — і сервіс <b>бронювання реклами</b> з архівом та переглядом контент-плану. Далі — преміум: меню оплати, розподіл безкоштовного й преміум-функціоналу та сповіщення довкола підписки. Розпочав Ruby-userbot’и на <b>TDLib</b> — відкрив pull request, яким їх завели, а довів їх до кінця Даниїл, — і латав форк tdlib-ruby, на якому вони працюють. Зробив рев’ю 105 pull request’ів колег."
+          cases: ["dna"]
+        - period: { en: "2025–2026", uk: "2025–2026" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Backend developer", uk: "Backend-розробник" }
+          place: { en: "ImageMaker", uk: "ImageMaker" }
+          body:
+            en: "The <code>/qx</code> command with ready-made author quotes and the API path the second product calls, per-user quote settings, AI-picked backgrounds and the admin <code>/stat</code>. In 2026, a Chromium renderer that draws a quote as a Telegram bubble — still an open pull request."
+            uk: "Команда <code>/qx</code> з готовими цитатами авторів і шлях API, який викликає другий продукт, налаштування цитат на користувача, фони, які підбирає AI, і адмінська <code>/stat</code>. У 2026-му — рендер на Chromium, що малює цитату як бульбашку Telegram; поки що це відкритий pull request."
+          cases: ["imagemaker"]
+        - period: { en: "2023–2024", uk: "2023–2024" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Fullstack developer", uk: "Фулстек-розробник" }
+          place: { en: "this site", uk: "цей сайт" }
+          body:
+            en: "Thirteen merged pull requests: <b>slug history</b> on FriendlyId, so a renamed post keeps its old URL, the home-page tag filter on Tom Select with pagination in a Turbo Frame, similar posts, the after_party task that regenerated every photo format, and the policy for confirming users in the admin."
+            uk: "Тринадцять змерджених pull request’ів: <b>історія слагів</b> на FriendlyId, щоб перейменований пост зберігав стару адресу, фільтр за тегами на головній на Tom Select із пагінацією в Turbo Frame, схожі пости, таск after_party, що перегенерував усі формати фото, і політика підтвердження користувачів в адмінці."
+          cases: ["rubycoin"]
+      stacks:
+        - label: { en: "core", uk: "основне" }
+          items: ["Ruby on Rails", "RSpec", "Telegram Bot API", "Vue 3", "TypeScript", "React"]
+        - label: { en: "also", uk: "також" }
+          items: ["TDLib", "PostgreSQL", "Inertia", "Pinia", "ActionCable", "Hotwire · Turbo", "FriendlyId"]
+        - label: { en: "generative media", uk: "генеративні медіа" }
+          items:
+            - { en: "lip-sync: VEED · Sync Labs · HeyGen", uk: "ліпсинк: VEED · Sync Labs · HeyGen" }
+            - "Kling · Veo"
+            - "ElevenLabs · TTS"
+            - "OpenRouter"
+            - "ffmpeg"
+      strengths:
+        - en: "Ships the specs with the feature: in WardyBot, almost twice as many lines of Ruby specs as of Ruby code"
+          uk: "Тести йдуть разом із фічею: у WardyBot рядків Ruby-тестів майже вдвічі більше, ніж Ruby-коду"
+        - en: "Reads other people’s pull requests too — 151 reviews across DNA and WardyBot"
+          uk: "Читає й чужі pull request’и — 151 рев’ю в DNA і WardyBot"
+        - en: "Takes a feature from the bot command to the web screen"
+          uk: "Веде фічу від команди в боті до екрана у вебі"
+
+  - id: "natalia"
+    short: "NM"
+    photo: "natalia.jpg"
+    machine: false
+    name:
+      en: "Nataliia Makarenko"
+      uk: "Наталія Макаренко"
+    role:
+      en: "backend"
+      uk: "бекенд"
+    blurb:
+      en: "Came to Rails from applied mathematics, and it shows in the queries."
+      uk: "Прийшла в Rails із прикладної математики, і це видно по запитах."
+    updated: "2026·09·15"
+    not_work:
+      - { icon: "🧗", label: { en: "climbing", uk: "скелелазіння" } }
+      - { icon: "🥾", label: { en: "hiking", uk: "походи" } }
+      - { icon: "✈️", label: { en: "travel", uk: "подорожі" } }
+      - { icon: "📖", label: { en: "reading", uk: "читає" }, detail: { en: "fiction", uk: "художню літературу" } }
+    cv:
+      role: { en: "Ruby on Rails developer", uk: "Ruby on Rails розробниця" }
+      years: { en: "in Ruby since 2022", uk: "у Ruby з 2022-го" }
+      summary:
+        en: "A Rails developer who arrived by way of applied mathematics and process optimisation, and writes queries like someone who has had to make a physical process cheaper. Web applications, RSpec and Capybara coverage, PostgreSQL and Redis. Still doing research alongside the code: a doctoral programme at the Institute of Cybernetics on algorithms for locating magnetic anomalies, with a published paper and a copyright certificate for the software behind it."
+        uk: "Rails-розробниця, яка прийшла через прикладну математику й оптимізацію процесів, і пише запити як людина, що вже мусила здешевити реальний виробничий процес. Вебзастосунки, покриття на RSpec і Capybara, PostgreSQL і Redis. Паралельно з кодом — наука: аспірантура в Інституті кібернетики про алгоритми локалізації магнітних аномалій, із публікацією та свідоцтвом на програму."
+      # GitHub and nothing else. A CV handed to a recruiter carries an address and a phone; a
+      # public page that a stranger can scrape does not get either, whatever the CV says.
+      contact:
+        - ["github", "NVMakarenko", "https://github.com/NVMakarenko"]
+      location: { en: "Zhytomyr · Ukraine", uk: "Житомир · Україна" }
+      languages: { en: "Ukrainian native · English C1 · Polish A1", uk: "Українська — рідна · англійська C1 · польська A1" }
+      education:
+        en: "Igor Sikorsky Kyiv Polytechnic Institute — BSc, software engineering.<br>Zhytomyr State Technological University — MSc, automated process control."
+        uk: "КПІ ім. Ігоря Сікорського — бакалавр, інженерія програмного забезпечення.<br>Житомирська державна технологічна академія — магістр, автоматизоване керування процесами."
+      experience:
+        - period: { en: "2024–present", uk: "2024–дотепер" }
+          org: { en: "RubyCoin", uk: "RubyCoin" }
+          title: { en: "Backend engineer · data", uk: "Backend-інженерка · дані" }
+          place: { en: "DNA · WardyBot", uk: "DNA · WardyBot" }
+          body:
+            en: "The Gemini embedding pass and the <b>HNSW index</b> on the 1536-dimension column it writes to, which is what semantic deduplication runs on. The OpenRouter features, the background jobs behind them, and the backup routine that runs under all of it."
+            uk: "Генерація embeddings на Gemini і <b>HNSW-індекс</b> на 1536-вимірній колонці, у яку вона пише — на цьому працює семантична дедуплікація. Функції на OpenRouter, фонові джоби за ними й рутина бекапів, що працює під усім цим."
+          cases: ["dna", "wardybot"]
+        - period: { en: "2023–present", uk: "2023–дотепер" }
+          org: { en: "V. M. Glushkov Institute of Cybernetics, NAS of Ukraine", uk: "Інститут кібернетики ім. В. М. Глушкова НАН України" }
+          title: { en: "Doctoral researcher · software engineer", uk: "Аспірантка · інженерка ПЗ" }
+          note:
+            en: "Published in <i>Control Systems and Computers</i> #1, 2024; presented at IMTSC-2024."
+            uk: "Публікація в <i>Control Systems and Computers</i> №1, 2024; доповідь на IMTSC-2024."
+          body:
+            en: "Algorithms and mathematical models for locating the sources of magnetic anomalies — the research the Rails application below was written to serve."
+            uk: "Алгоритми й математичні моделі для локалізації джерел магнітних аномалій — дослідження, під яке й писався Rails-застосунок нижче."
+        - period: { en: "2023", uk: "2023" }
+          org: { en: "Igor Sikorsky Kyiv Polytechnic Institute", uk: "КПІ ім. Ігоря Сікорського" }
+          title: { en: "Ruby on Rails developer", uk: "Ruby on Rails розробниця" }
+          note:
+            en: "Copyright registration certificate №122247, December 2023."
+            uk: "Свідоцтво про реєстрацію авторського права №122247, грудень 2023."
+          body:
+            en: "A Rails application for magnetic anomaly detection and signal analysis, written for the research above."
+            uk: "Rails-застосунок для виявлення магнітних аномалій і аналізу сигналу, написаний під дослідження вище."
+        - period: { en: "2022–2023", uk: "2022–2023" }
+          org: { en: "Consilis · EPAM University Program", uk: "Consilis · EPAM University Program" }
+          title: { en: "Ruby and Rails trainee", uk: "Стажерка Ruby і Rails" }
+          body:
+            en: "Backend for a charity swap application on Rails 7 with Devise, Redis and PostgreSQL, covered with RSpec and Capybara; before that, Ruby CLI applications written to be read — clean objects, no repetition, RuboCop clean."
+            uk: "Бекенд застосунку для благодійного обміну на Rails 7 із Devise, Redis і PostgreSQL, покритий RSpec і Capybara; до того — консольні застосунки на Ruby, написані так, щоб їх читали: чисті об’єкти, без повторів, RuboCop без зауважень."
+        - period: { en: "2010–2022", uk: "2010–2022" }
+          org: { en: "Before the code", uk: "До коду" }
+          title: { en: "Process engineer · inspector · sole proprietor", uk: "Інженерка процесів · інспекторка · ФОП" }
+          body:
+            en: "Twelve years of making processes cheaper before making software do it: CNC glass-cutting programmed in the LISEC IDE with optimisation algorithms that cut waste, database work under time pressure at the National Police, and a retail business run from nothing to profit on her own stock algorithms."
+            uk: "Дванадцять років здешевлювала процеси до того, як робити це кодом: програмування ЧПК-різання скла в LISEC IDE з алгоритмами оптимізації, що зменшили відходи, робота з базами під тиском часу в Нацполіції і роздрібний бізнес, виведений із нуля в прибуток на власних алгоритмах обліку."
+      stacks:
+        - label: { en: "core", uk: "основне" }
+          items: ["Ruby on Rails", "PostgreSQL", "RSpec", "Capybara", "Redis", "Devise"]
+        - label: { en: "also", uk: "також" }
+          items: ["JavaScript", "SASS", "Git", "RuboCop", "Linux", "Haskell · Prolog"]
+      strengths:
+        - en: "Publishes the algorithm, not just the pull request"
+          uk: "Публікує алгоритм, а не тільки pull request"
+        - en: "Optimised physical processes before software ones, and it shows"
+          uk: "Оптимізувала фізичні процеси раніше за програмні — і це видно"
+        - en: "Writes the spec while writing the thing"
+          uk: "Пише тест разом із тим, що тестує"
+
+  - id: "vladyslav"
+    short: "VF"
+    photo: "vladyslav.jpg"
+    machine: false
+    name:
+      en: "Vladyslav Fomenko"
+      uk: "Владислав Фоменко"
+    role:
+      en: "fullstack"
+      uk: "фулстек"
+    blurb:
+      en: "Built both ends of the call between the community bot and the render service."
+      uk: "Зробив обидва кінці виклику між ботом спільноти й рендер-сервісом."
+    updated: "2026·09·14"
+    cv: null
+
+  # The last of the crew, and not a person. `machine: true` puts a small ruby
+  # "CI" flag on the monogram — the reader is told what this is, immediately, without
+  # a footnote. Everything claimed below is something that actually runs in CI.
+  - id: "claude"
+    short: "C"
+    photo: "claude.jpg"
+    machine: true
+    name:
+      en: "Claude"
+      uk: "Claude"
+    role:
+      en: "automated reviewer"
+      uk: "автоматичний рев’ювер"
+    blurb:
+      en: "Reviews pull requests in four of these products — automatically in three, on request in this one. Advisory only, no merge rights."
+      uk: "Рев’ює pull request’и в чотирьох із цих продуктів — у трьох автоматично, у цьому на запит. Тільки дорадчо, без права мерджити."
+    updated: "2026·09·08"
+    not_work:
+      - { icon: "💤", label: { en: "idle", uk: "простій" }, detail: { en: "between pushes", uk: "між пушами" } }
+      - { icon: "📄", label: { en: "reading", uk: "читає" }, detail: { en: "the CHANGELOG", uk: "CHANGELOG" } }
+      - { icon: "🗓", label: { en: "weekends", uk: "вихідні" }, detail: { en: "same as weekdays", uk: "як будні" } }
+    cv:
+      role:
+        en: "Automated reviewer"
+        uk: "Автоматичний рев’ювер"
+      years:
+        en: "wired into CI since April 2026"
+        uk: "у CI з квітня 2026-го"
+      summary:
+        en: "Reads pull requests in four of the products here against a checklist of six to eight points, tailored per repository, at 3am, without complaining, and leaves inline comments. Has never asked for a raise. Occasionally suggests a method that does not exist — which is what the human reviewer is still for."
+        uk: "Читає pull request’и в чотирьох продуктах тут за чеклистом із шести-восьми пунктів, своїм для кожного репозиторію, о третій ночі, без скарг, і лишає інлайн-коментарі. Ніколи не просив підвищення. Іноді пропонує метод, якого не існує — саме тому людина-рев’ювер досі потрібна."
+      contact:
+        - [{ en: "runs in", uk: "працює в" }, "github actions", "https://github.com/anko20094"]
+        - [{ en: "invoked by", uk: "запускає" }, { en: "an opened pull request", uk: "відкритий pull request" }, "https://github.com/anko20094"]
+      location:
+        en: "wherever the runner is"
+        uk: "де підняли раннер"
+      languages:
+        en: "Ruby · TypeScript · SQL · YAML · your commit messages"
+        uk: "Ruby · TypeScript · SQL · YAML · ваші повідомлення комітів"
+      education:
+        en: "trained, not educated"
+        uk: "натренований, не освічений"
+      experience:
+        - period: { en: "2026–present", uk: "2026–дотепер" }
+          org:
+            en: "RubyCoin · four products"
+            uk: "RubyCoin · чотири продукти"
+          title:
+            en: "Pull request review"
+            uk: "Рев’ю pull request’ів"
+          place:
+            en: "CI · on an opened pull request"
+            uk: "CI · на відкритий pull request"
+          note:
+            en: "A checklist, not an opinion. It is in the workflow file, and you can read it."
+            uk: "Чеклист, а не думка. Він лежить у файлі воркфлоу, і його можна прочитати."
+          body:
+            en: "Flags the N+1 a tired human stops seeing, the migration without a down path, the spec that asserts nothing, and the hardcoded string that should have been a translation key. Advisory only — <b>no merge right</b>, and that is on purpose."
+            uk: "Позначає N+1, який втомлена людина вже не бачить, міграцію без down, тест, що нічого не перевіряє, і зашитий рядок, який мусив бути ключем перекладу. Тільки дорадчо — <b>права мерджити немає</b>, і це навмисно."
+          cases: ["dna", "wardybot", "imagemaker", "rubycoin"]
+      stacks:
+        - label:
+            en: "reads"
+            uk: "читає"
+          items: ["Ruby", "TypeScript", "SQL", "YAML", { en: "diffs", uk: "дифи" }, { en: "stack traces", uk: "стек-трейси" }]
+        - label:
+            en: "does not have"
+            uk: "не має"
+          items: [{ en: "production access", uk: "доступу до продакшну" }, { en: "merge rights", uk: "права мерджити" }, { en: "an opinion about tabs", uk: "думки про табуляцію" }]
+      strengths:
+        - en: "Catches the N+1 you stopped seeing on pull request #400"
+          uk: "Ловить N+1, який ви перестали бачити на PR #400"
+        - en: "Never gets tired, never gets political about a diff"
+          uk: "Не втомлюється й не політизує дифи"
+        - en: "Does not know your production data, and should not"
+          uk: "Не знає ваших даних із продакшну — і не має знати"
+        - en: "Cheaper than the bug it prevents"
+          uk: "Дешевший за баг, якому запобігає"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# not_work
+#
+# This block used to be one five-column strip on the home page, attributed to the
+# studio as a whole. It moved here because a studio does not play volleyball on
+# Tuesdays — one specific person does.
+#
+# It is optional and renders only when present — danyil, oleksii, natalia and claude have
+# one today.
+#
+# Each entry is `{ icon, label: {en, uk}, detail: {en, uk} }`; `detail` is OPTIONAL.
+# It was briefly a flat ["label", "detail", "emoji"] tuple, which made this the one
+# untranslated block on an otherwise fully Ukrainian person page — and the labels came
+# from the people themselves, in Ukrainian. Never store a user-visible string here in
+# one language.
+#
+# `detail` is filled in only where the person gave one; when absent the mono line is not rendered at all,
+# so "ігри" stands alone rather than sitting above a blank row. Ask before inventing one.
+
+  # Alumni who are only names. No `short`, no role, no blurb, no CV: nobody here can keep any of
+  # that honest, so the page prints who they are and stops. Person#page? turns a record with
+  # neither a CV nor a contribution into a pill rather than a link.
+  #
+  # Order here is the owner's, not a ranking.
+  - id: "andrii-mazurok"
+    status: alumni
+    name:
+      en: "Andrii Mazurok"
+      uk: "Андрій Мазурок"
+
+  - id: "oleksii-khrustalov"
+    status: alumni
+    name:
+      en: "Oleksii Khrustalov"
+      uk: "Олексій Хрусталов"
+
+  - id: "yaroslav-yenkala"
+    status: alumni
+    name:
+      en: "Yaroslav Yenkala"
+      uk: "Ярослав Єнкала"
+
+  - id: "aleksander-ruban"
+    status: alumni
+    name:
+      en: "Aleksander Ruban"
+      uk: "Олександр Рубан"
+
+  - id: "andrii-puzyr"
+    status: alumni
+    name:
+      en: "Andrii Puzyr"
+      uk: "Андрій Пузир"

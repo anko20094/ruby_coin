@@ -1,0 +1,52 @@
+aside.mg-sidebar data-controller="sidebar"
+  .mg-sidebar__brand
+    / A link, not decoration. It reads like the way home on every other site and did nothing
+    / here, which is the worst of both.
+    = link_to helpers.management_root_path, class: 'mg-sidebar__home', title: t('.home'), data: { turbo: false } do
+      = render GemComponent.new(uid: 'mg-brand', size: 22)
+      div.mg-sidebar__name-block
+        .mg-sidebar__wordmark rubyco.in
+        .mg-sidebar__where= t('.where')
+
+    / Collapses the rail. aria-expanded rather than a pressed state: what the button controls
+    / is whether the navigation is showing, which is what a reader of the label wants to know.
+    button.mg-sidebar__toggle[type="button" data-action="sidebar#toggle"
+      data-sidebar-target="toggle"
+      aria-controls="mg-sidebar-nav"
+      aria-expanded=(collapsed? ? 'false' : 'true')
+      aria-label=(collapsed? ? t('.expand') : t('.collapse'))
+      title=(collapsed? ? t('.expand') : t('.collapse'))
+      data-label-collapse=t('.collapse')
+      data-label-expand=t('.expand')]
+      span aria-hidden="true" ⟨
+
+  / The rail clips the names rather than hiding them, so the accessible name of each link is
+    / the same whether the sidebar is open or shut.
+  nav#mg-sidebar-nav.mg-sidebar__models aria-label=t('.navigation')
+    .mg-sidebar__label= t('.models')
+    - models.each do |model|
+      = link_to model.path, **link_attributes(model) do
+        span.mg-model__dot
+        .mg-model__body
+          .mg-model__name= model.label
+          .mg-model__hint= model.hint
+        span.mg-model__count= model.total
+
+    .mg-sidebar__label= t('.system')
+    - system_entries.each do |entry|
+      = link_to entry.path, **link_attributes(entry) do
+        span.mg-model__dot
+        .mg-model__body
+          .mg-model__name= entry.label
+          .mg-model__hint= entry.hint
+
+  .mg-sidebar__user
+    .mg-avatar= initial
+    .mg-sidebar__who
+      .mg-sidebar__name= user&.nickname
+      .mg-sidebar__role= user&.role
+    / title alone is not an accessible name, so the icon-only button also gets aria-label.
+    = button_to destroy_user_session_path, method: :delete, class: 'mg-sidebar__out',
+      form: { data: { turbo: false } }, title: t('nav_item.sign_out'),
+      aria: { label: t('nav_item.sign_out') } do
+      span aria-hidden="true" ↪

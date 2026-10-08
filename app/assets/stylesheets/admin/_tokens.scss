@@ -1,0 +1,16 @@
+// /management adds four values to the site palette and nothing else: the same families, the
+// same paper and ink, plus the tones a working tool needs that a reading surface does not.
+:root {
+  --mg-ink-faint:  oklch(88% 0.005 30);
+  --mg-ok:         oklch(54% 0.12 145);
+  --mg-warn:       oklch(72% 0.13 75);
+
+  --mg-sidebar:    232px;
+  --mg-topbar:     52px;
+}
+
+// Instrument Serif has no Cyrillic. theme/_base.scss swaps the face per page and this bundle
+// skips that file; :lang rather than html[lang] lets the preview follow its own tab.
+:lang(uk) { --font-display: 'EB Garamond', Georgia, serif; }
+
+.mg-preview__article:lang(en) { --font-display: 'Instrument Serif', 'EB Garamond', Georgia, serif; }

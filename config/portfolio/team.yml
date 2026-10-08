@@ -1,0 +1,245 @@
+# RubyCoin · who worked on what
+#
+# A contribution belongs to the PROJECT, not to the person — that is why it lives here
+# and not in people.yml. The person page is composed by querying this file for their id,
+# so a contribution is written once and can never drift between two pages.
+#
+# Keys are case slugs from cases.yml. `person` is an id from people.yml.
+#
+# `solo: true` renders as a statement ("Solo — the whole stack"), never as an empty team
+# block. Only the two myHomeIQ cases are solo — everything else has a named team. `outside:` is the honest note for commercial work: the wider team existed but was
+# the client's, not this studio's. Do not drop it — on those two cases the case page itself
+# already prints its own — "9th of 34 contributors" on leads, "#2 / 14" on intelligence — and the team block must agree with it.
+#
+# `did:` is two lines. Not three, not a paragraph. Role + period + two lines is the whole
+# format, and it is what keeps six people on one screen without inflation.
+
+contributions:
+  intelligence:
+    - person: "danyil"
+      solo: true
+      role: { en: "Senior Backend Engineer", uk: "Senior Backend Engineer" }
+      period: "2023–2026"
+      did:
+        - en: "The service’s public API, Lost Deals, and three years of entity resolution."
+          uk: "Публічне API сервісу, Lost Deals і три роки entity resolution."
+        - en: "Partitioning and read/write splitting as history reached eight years."
+          uk: "Партиціювання й розведення читання/запису, коли історії стало вісім років."
+      outside:
+        en: "The other 13 contributors were the client’s own team — not people from this studio."
+        uk: "Решта 13 контриб’юторів — власна команда клієнта, не люди з цієї студії."
+
+  dna:
+    - person: "danyil"
+      role: { en: "tech lead · architect · PM", uk: "техлід · архітектор · PM" }
+      period: "2023–2026"
+      did:
+        - en: "Architecture, product decisions and 90% of merge commits."
+          uk: "Архітектура, продуктові рішення і 90 % merge-комітів."
+        - en: "Ran the Python→Ruby, Rails 7.2→8.1 and PostgreSQL 16→18 migrations personally."
+          uk: "Провів міграції Python→Ruby, Rails 7.2→8.1 і PostgreSQL 16→18 особисто."
+    - person: "mykhailo"
+      role: { en: "co-founder · product", uk: "співзасновник · продукт" }
+      period: "2023–2026"
+      did:
+        - en: "Found the customers first: dozens of channel owners interviewed before a line was written, then the spec."
+          uk: "Спершу знайшов клієнтів: десятки власників каналів опитано до першого рядка коду, далі — ТЗ."
+        - en: "Pricing and the ad campaigns behind ×20 customer growth in 14 months."
+          uk: "Ціноутворення й рекламні кампанії за зростанням клієнтів ×20 за 14 місяців."
+    - person: "natalia"
+      role: { en: "backend · data", uk: "бекенд · дані" }
+      period: "2025–2026"
+      did:
+        - en: "The Gemini embedding pass and the HNSW index on the 1536-dimension column it writes to."
+          uk: "Генерація embeddings на Gemini і HNSW-індекс на 1536-вимірній колонці, у яку вона пише."
+        - en: "Background jobs and the backup routine that runs behind all of it."
+          uk: "Фонові джоби й рутина бекапів, що працює за всім цим."
+    - person: "oleksii"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2025–2026"
+      did:
+        - en: "Panels inside the Telegram state machine — the product has five HTTP routes and no views."
+          uk: "Панелі всередині Telegram-стейт-машини — у продукту п’ять HTTP-роутів і жодного шаблону (views)."
+        - en: "Billing screens and the customer-facing bot factory flows."
+          uk: "Екрани білінгу й флоу фабрики ботів під клієнта."
+    - person: "oleksandr"
+      role: { en: "backend · reviewer", uk: "бекенд · рев’ювер" }
+      period: "2025–2026"
+      did:
+        - en: "The customer’s own posts — creation, schedule, per-channel settings — and the ad-reservation service."
+          uk: "Власні пости клієнта — створення, розклад, налаштування на канал — і сервіс бронювання реклами."
+        - en: "Premium payment menus and the free/premium split; reviewed 105 of his colleagues’ pull requests."
+          uk: "Меню оплати преміуму й розподіл безкоштовного та преміум-функціоналу; рев’ю 105 pull request’ів колег."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2026"
+      did:
+        - en: "Automated review of every pull request against an eight-point checklist, inline in the diff."
+          uk: "Автоматичне рев’ю кожного pull request за чеклистом із восьми пунктів, інлайн у дифі."
+        - en: "Advisory only. Two humans still have to approve before anything merges."
+          uk: "Тільки дорадчо. Перед мерджем усе одно потрібні два людських апрува."
+
+  wardybot:
+    - person: "danyil"
+      role: { en: "tech lead · architect · product owner", uk: "техлід · архітектор · product owner" }
+      period: "2023–2026"
+      did:
+        - en: "Product and architecture from a blank page; the immutable ledger and all 196 deploys."
+          uk: "Продукт і архітектура з чистого аркуша; незмінний леджер і всі 196 деплоїв."
+        - en: "Set the process ten developers work inside: ticket branches, review, CI, mandatory tests."
+          uk: "Поставив процес, у якому працюють десять розробників: тікет-бранчі, рев’ю, CI, обов’язкові тести."
+    - person: "oleksandr"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024–2026"
+      did:
+        - en: "Skins — the collectibles with their shop, drops, sales and moderation — plus duels and the captcha quiz at the door."
+          uk: "Скіни — колекційні предмети з магазином, дропами, продажем і модерацією, — а ще дуелі та капча-вікторина на вході."
+        - en: "The web admin on Vue 3 + TypeScript, and the Mini App’s move to React with its premium shop."
+          uk: "Веб-адмінка на Vue 3 + TypeScript і переїзд Mini App на React разом із преміум-магазином."
+    - person: "oleksii"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024–2025"
+      did:
+        - en: "The Mini App view layer and the donation flow behind it."
+          uk: "Шар інтерфейсу Mini App і флоу донатів за ним."
+        - en: "Worked on the giveaway and achievement mechanics."
+          uk: "Працював над механіками розіграшів і ачівок."
+    - person: "vladyslav"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024–2025"
+      did:
+        - en: "The quotes surface — menu, categories, backgrounds — and the API endpoint that hands a quote to the render service."
+          uk: "Поверхня цитат — меню, категорії, фони — і API-ендпоінт, який віддає цитату в рендер-сервіс."
+        - en: "Hardened the error paths: Telegram client failures, AI-filter job errors, Rollbar under rate limiting."
+          uk: "Зміцнив шляхи помилок: збої Telegram-клієнта, падіння джоби AI-фільтрів, Rollbar під рейт-лімітом."
+    - person: "natalia"
+      role: { en: "backend · data", uk: "бекенд · дані" }
+      period: "2024–2026"
+      did:
+        - en: "The OpenRouter features, the background jobs behind them, and the backup routine."
+          uk: "Функції на OpenRouter, фонові джоби за ними і рутина бекапів."
+        - en: "Kept both languages of the interface in step as the command surface grew."
+          uk: "Тримала обидві мови інтерфейсу в синхроні, поки росла поверхня команд."
+    - person: "mykhailo"
+      role: { en: "co-founder · product", uk: "співзасновник · продукт" }
+      period: "2023–2026"
+      did:
+        - en: "Turns chat owners’ complaints into tickets — most of the moderation rules started as a customer call."
+          uk: "Перетворює скарги власників чатів на тікети — більшість правил модерації почалися з дзвінка клієнта."
+        - en: "Sold and onboarded the 17 white-label bots that ran on the shared core."
+          uk: "Продав і завів 17 white-label ботів, які працювали на спільному ядрі."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2026"
+      did:
+        - en: "Review the moment a pull request opens for review — never on a draft, never twice on the same push."
+          uk: "Рев’ю в момент, коли pull request відкривається на рев’ю — ніколи на драфті й ніколи двічі на той самий пуш."
+        - en: "Most useful on the ledger: flags any migration that could mutate a transaction."
+          uk: "Найкорисніший на леджері: позначає будь-яку міграцію, що може змінити транзакцію."
+
+  leads:
+    - person: "danyil"
+      solo: true
+      role: { en: "Senior Backend Engineer", uk: "Senior Backend Engineer" }
+      period: "2022–2025"
+      did:
+        - en: "Stripe billing, the 9×12 permission matrix, and both sides of the cross-service integration."
+          uk: "Білінг Stripe, матриця прав 9×12 і обидві сторони міжсервісної інтеграції."
+        - en: "Whole product verticals from controller to documented endpoint."
+          uk: "Цілі продуктові вертикалі від контролера до документованого ендпоінта."
+      outside:
+        en: "A codebase with 34 contributors; the other 33 were the client’s own team. I am the 9th by volume."
+        uk: "Кодова база з 34 контриб’юторами; решта 33 — власна команда клієнта. Я 9-й за обсягом."
+
+  imagemaker:
+    - person: "danyil"
+      role: { en: "tech lead · architect · devops", uk: "техлід · архітектор · devops" }
+      period: "2022–2026"
+      did:
+        - en: "The dual-mode runtime, and the decision to make it the shared render engine for a second product."
+          uk: "Дворежимний рантайм і рішення зробити з нього спільний рендер-рушій для другого продукту."
+        - en: "Drove peak render to 586 MB on a 1.9 GB box, and the web process stopped being killed at all."
+          uk: "Звів піковий рендер до 586 МБ на 1,9 ГБ, і веб-процес перестало вбивати зовсім."
+    - person: "vladyslav"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2024–2025"
+      did:
+        - en: "Moved the quote rendering into this service and built the API endpoint the second product calls."
+          uk: "Переніс рендер цитат у цей сервіс і зробив API-ендпоінт, який викликає другий продукт."
+        - en: "Part of the type measurement and the text formatting the rendered image depends on."
+          uk: "Частина вимірів кегля й форматування тексту, на яких тримається зображення."
+    - person: "oleksandr"
+      role: { en: "backend", uk: "бекенд" }
+      period: "2025–2026"
+      did:
+        - en: "The <code>/qx</code> command — ready-made author quotes, which is the half of the service the second product calls."
+          uk: "Команда <code>/qx</code> — готові цитати авторів, тобто та половина сервісу, яку викликає другий продукт."
+        - en: "Per-user quote settings, AI-picked backgrounds and the admin <code>/stat</code> command."
+          uk: "Налаштування цитат на користувача, фони, які підбирає AI, і адмінська команда <code>/stat</code>."
+    - person: "mykhailo"
+      role: { en: "co-founder · product", uk: "співзасновник · продукт" }
+      period: "2022–2026"
+      did:
+        - en: "The conversation that turned a standalone toy into the shared render engine for a second product."
+          uk: "Розмова, що перетворила окрему іграшку на спільний рендер-рушій для другого продукту."
+        - en: "Positioning and the requirements for what a quote card has to contain."
+          uk: "Позиціювання й вимоги до того, що має бути на картці цитати."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2026"
+      did:
+        - en: "Reviews the render path, where a leak shows up as an OOM two days later."
+          uk: "Рев’ює шлях рендеру, де витік пам’яті проявляється як OOM через два дні."
+        - en: "Checks every image object is destroyed in an ensure block."
+          uk: "Перевіряє, що кожен об’єкт зображення знищено в блоці ensure."
+
+  chatgpt:
+    - person: "danyil"
+      role: { en: "tech lead & co-founder", uk: "техлід і співзасновник" }
+      period: "2023–2026"
+      did:
+        - en: "Whole application: recurring payments, freemium mechanics, referral accounting, the admin panel."
+          uk: "Увесь застосунок: регулярні платежі, freemium-механіки, реферальний облік, адмінка."
+        - en: "The threaded typing-indicator pattern — perceived latency solved in the product layer."
+          uk: "Патерн індикатора набору на потоках — відчуття затримки вирішене на продуктовому шарі."
+    - person: "mykhailo"
+      role: { en: "co-founder · product & growth", uk: "співзасновник · продукт і зростання" }
+      period: "2023–2026"
+      did:
+        - en: "Spotted the 2023 gap — Ukrainians could not sign up for Western AI services — and wrote the spec that week."
+          uk: "Побачив вікно 2023-го — українці не могли зареєструватися в західних AI-сервісах — і написав ТЗ того ж тижня."
+        - en: "Four price tiers, the 15% referral scheme, and the campaigns behind 289k users."
+          uk: "Чотири тарифи, реферальна схема на 15 % і кампанії за 289 тис. користувачів."
+  rubycoin:
+    - person: "danyil"
+      role: { en: "tech lead · architect · reviewer", uk: "техлід · архітектор · рев’ювер" }
+      period: "2022–2026"
+      did:
+        - en: "Set the tasks and reviewed the pull requests of ten contributors, mostly interns."
+          uk: "Ставив задачі й рев’ював pull request’и десяти контриб’юторів, переважно інтернів."
+        - en: "Carried the upgrades live: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
+          uk: "Провів апгрейди живими: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
+    - person: "oleksandr"
+      role: { en: "fullstack", uk: "фулстек" }
+      period: "2023–2024"
+      did:
+        - en: "Slug history on FriendlyId — a renamed post keeps answering at its old URL."
+          uk: "Історія слагів на FriendlyId — перейменований пост і далі відповідає за старою адресою."
+        - en: "The home-page tag filter on Tom Select, and the after_party task that regenerated every photo format."
+          uk: "Фільтр за тегами на головній на Tom Select і таск after_party, що перегенерував усі формати фото."
+    - person: "mykhailo"
+      role: { en: "co-founder · product", uk: "співзасновник · продукт" }
+      period: "2022–2026"
+      did:
+        - en: "Recruited the contributors and ran the intake — the school side of the project is his."
+          uk: "Набрав контриб’юторів і вів відбір — шкільна частина проєкту на ньому."
+        - en: "Editorial plan and distribution, back when articles were still being published."
+          uk: "Редакційний план і дистрибуція — ще коли статті публікувалися."
+    - person: "claude"
+      role: { en: "pull request review", uk: "рев’ю pull request’ів" }
+      period: "2026"
+      did:
+        - en: "Inline comments on request — an intern types <code>review</code> on the pull request and gets one before a human spends time."
+          uk: "Інлайн-коментарі на запит — інтерн пише <code>review</code> у pull request і отримує рев’ю до того, як людина витратить час."
+        - en: "On this page too: the section you are reading was reviewed the same way."
+          uk: "І на цій сторінці теж: розділ, який ви читаєте, проходив те саме рев’ю."

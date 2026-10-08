@@ -27,7 +27,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = 'foo@bar.com'
+  config.mailer_sender = ENV['MAILER_FROM'].presence || 'no-reply@rubyco.in'
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
@@ -93,7 +93,7 @@ Devise.setup do |config|
   # It will change confirmation, password recovery and other workflows
   # to behave the same regardless if the e-mail provided was right or wrong.
   # Does not affect registerable.
-  # config.paranoid = true
+  config.paranoid = true
 
   # By default Devise will store the user in session. You can skip storage for
   # particular strategies by setting this option.
@@ -310,3 +310,12 @@ Devise.setup do |config|
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
 end
+
+# Devise refuses a non-HTML format only after the action has run: a JSON sign-in would still
+# check the password and a JSON account update would still apply. The form is the only way in.
+ActiveSupport.on_load(:devise_controller) do
+  prepend_before_action { raise ActionController::UnknownFormat unless request.negotiate_mime([Mime[:html]]) }
+end
+
+# deliver_later carries the raw reset token in the job's arguments, and the job log prints them.
+ActionMailer::MailDeliveryJob.log_arguments = false

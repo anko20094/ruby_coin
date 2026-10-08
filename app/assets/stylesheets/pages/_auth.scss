@@ -1,0 +1,199 @@
+@use '../theme/controls';
+@use '../theme/breakpoints' as bp;
+
+// The sign-in and password screens.
+//
+// They were the last public pages on the old Bootstrap layout, which meant every visitor who
+// reached one downloaded a second stylesheet and a second bundle — and read a second footer
+// with a different Telegram handle, a different copyright holder and a dead YouTube link.
+// One layout now, one identity, one set of type.
+.au-page {
+  display: grid;
+  place-items: center;
+  padding: calc(var(--nav-clear) + 48px) var(--page-pad) clamp(80px, 10vw, 140px);
+}
+
+.au-page__glow {
+  --glow-y: -200px;
+  --glow-h: 1000px;
+}
+
+.au-page__rings {
+  left: 50%;
+  top: 46%;
+  width: 1000px;
+  height: 1000px;
+  max-width: 220vw;
+  transform: translate(-50%, -50%);
+}
+
+// A sheet of paper on the scene.
+.au-card {
+  width: 100%;
+  max-width: 480px;
+  padding: clamp(28px, 4vw, 44px);
+  border-radius: 24px;
+  box-shadow: 0 40px 90px -30px oklch(0% 0 0 / 0.75), 0 0 0 1px oklch(58% 0.22 18 / 0.18);
+}
+
+.au-page__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(38px, 4vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin: 0 0 30px;
+}
+
+.au-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.au-field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.au-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.au-hint {
+  font-size: 13px;
+  color: var(--ink-quiet);
+}
+
+.au-input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 16px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  border-radius: 14px;
+  transition: border-color 150ms, box-shadow 150ms;
+
+  &:hover { border-color: color-mix(in oklab, var(--ink) 32%, transparent); }
+
+  // A field is focus-visible whenever it has focus: its own edge turns ruby with a soft ring.
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: var(--ruby);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ruby) 22%, transparent);
+  }
+
+  // Chrome paints autofilled fields light blue; keep them on the page's paper like the rest.
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--ink);
+    caret-color: var(--ink);
+    box-shadow: 0 0 0 1000px var(--paper) inset;
+    transition: background-color 600000s 0s;
+  }
+}
+
+// The reveal button lives inside the field, so the field's underline and focus ring take it in.
+.au-input-row {
+  position: relative;
+  width: 100%;
+}
+
+.au-input--with-reveal { padding-right: 52px; }
+
+.au-reveal {
+  position: absolute;
+  top: 50%;
+  right: 3px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-quiet);
+
+  &:hover,
+  &.is-active { color: var(--ruby); }
+
+  &:focus-visible {
+    outline: 2px solid var(--ruby);
+    outline-offset: -4px;
+    border-radius: 10px;
+  }
+}
+
+.au-reveal__icon { display: block; }
+.au-reveal__icon--hide { display: none; }
+.au-reveal.is-active .au-reveal__icon--show { display: none; }
+.au-reveal.is-active .au-reveal__icon--hide { display: block; }
+
+.au-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.au-actions__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 14px;
+
+  .au-check { min-height: 36px; }
+  .hover-link { @include controls.hit-row(32px); }
+}
+
+.au-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+
+  input { accent-color: var(--ruby); }
+}
+
+.au-errors {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  border: 1px solid var(--ruby);
+  border-left-width: 3px;
+  border-radius: 12px;
+  background: var(--ruby-mute);
+  font-size: 15px;
+
+  ul { margin: 0; padding-left: 18px; }
+}
+
+.au-aside {
+  margin-top: 26px;
+  font-size: 15px;
+
+  a { color: var(--ruby); }
+}
+
+@include bp.below(sm) {
+  .au-page { padding-inline: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .au-input { transition: none; }
+}

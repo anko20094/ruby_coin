@@ -1,0 +1,101 @@
+@use '../theme/breakpoints' as bp;
+
+// /contact. There is no form (docs/decisions.md), so the channel list is the page and gets
+// the room a form would have had. The head is a scene; the channels are rows on paper.
+.ct-page__band { padding: clamp(48px, 5vw, 72px) 0 clamp(72px, 8vw, 112px); }
+
+.ct-channels { border-top: 1px solid var(--ink); }
+
+.ct-channel {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 18px;
+  padding: 26px 14px;
+  border-bottom: 1px solid var(--surface-line);
+  transition: background 150ms, padding 200ms;
+
+  &:hover {
+    padding-left: 22px;
+    background: var(--paper-warm);
+
+    .ct-channel__arrow {
+      color: #fff;
+      background: var(--ruby-fire);
+      border-color: transparent;
+    }
+  }
+}
+
+.ct-channel__key {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-quiet);
+}
+
+.ct-channel__value {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.6vw, 36px);
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.ct-channel__arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--surface-line);
+  border-radius: 50%;
+  font-size: 16px;
+  color: var(--ink-soft);
+  transition: color 180ms, background 180ms, border-color 180ms;
+}
+
+.ct-where {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 40px;
+  margin-top: 32px;
+}
+
+.ct-where__row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.ct-where__key {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-quiet);
+
+  &::first-letter { text-transform: uppercase; }
+}
+
+.ct-where__value {
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+@include bp.below(sm) {
+  .ct-channel {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'key   arrow'
+      'value arrow';
+    row-gap: 4px;
+    padding: 20px 4px;
+
+    &:hover { padding-left: 10px; }
+  }
+
+  .ct-channel__key { grid-area: key; }
+  .ct-channel__value { grid-area: value; }
+  .ct-channel__arrow { grid-area: arrow; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-channel,
+  .ct-channel__arrow { transition: none; }
+}

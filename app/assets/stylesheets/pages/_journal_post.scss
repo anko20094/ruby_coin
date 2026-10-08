@@ -1,0 +1,384 @@
+@use '../theme/breakpoints' as bp;
+
+// Also answer to a size container (the admin's mobile preview), not only the viewport.
+$narrow-container: false !default;
+
+// /post/:slug — one column at 760px. The measure is the design; do not widen it.
+$post-max: 760px;
+
+.jn-post {
+  max-width: $post-max;
+  margin: 0 auto;
+  padding: 60px var(--page-pad);
+}
+
+.jn-post__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 14px 0 6px;
+}
+
+.jn-post__byline {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+
+.jn-post__cover img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  border-radius: var(--radius-card);
+}
+
+// The body. Every block kind below is also what the admin editor can make — its block menu
+// and its toolbar — so these rules are the single implementation: public page, admin preview,
+// the editor's own iframe (it loads this stylesheet) and mobile all read them.
+.jn-body {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-top: 28px;
+  overflow-wrap: break-word;
+
+  p { margin: 0 0 18px; }
+
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1;
+    margin: 36px 0 12px;
+  }
+
+  blockquote {
+    background: var(--ruby-mute);
+    border-left: 3px solid var(--ruby);
+    padding: 18px 22px;
+    margin: 24px 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 24px;
+    line-height: 1.4;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    background: var(--paper-warm);
+    padding: 2px 6px;
+    border-radius: var(--radius-chip);
+  }
+
+  a {
+    color: var(--ruby);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 18px;
+    padding-left: 22px;
+  }
+
+  ul { list-style: disc; }
+
+  ol { list-style: decimal; }
+
+  li { margin-bottom: 6px; }
+
+  // height: auto is not decoration here, it is the whole rule. The editor writes an image's
+  // real pixel size onto the tag — <img width="2208" height="2944"> — which is right, because
+  // that is what lets the browser reserve the space before the file arrives. But max-width
+  // alone only constrains the width: a 3:4 photo came out 688×2944, squashed to a third of its
+  // proportions. With this, the two attributes become an aspect ratio instead of a size.
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-card);
+    margin: 24px 0;
+  }
+
+  figure {
+    margin: 24px 0;
+
+    img { margin: 0; }
+  }
+
+  figcaption {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--ink-quiet);
+  }
+
+  // h4 exists in the editor's block list, so it has to exist here. A step down from h3
+  // rather than a fourth display size: the measure is 760px and three is already generous.
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.2;
+    margin: 28px 0 10px;
+  }
+
+  hr {
+    border: 0;
+    border-top: var(--rule-row);
+    margin: 36px 0;
+  }
+
+  sub,
+  sup { font-size: 0.72em; }
+
+  // TinyMCE's own code sample block. The journal's `code` block (Rouge, server-side) is the
+  // one to reach for, but the toolbar offers this too and a listing that arrives unstyled
+  // reads as a bug.
+  pre {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.55;
+    background: var(--paper-warm);
+    border-radius: var(--radius-card);
+    padding: 18px 20px;
+    margin: 24px 0;
+    overflow-x: auto;
+
+    code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+  }
+
+  // Alignment arrives as a class, not a style attribute — config/initializers/action_text.rb
+  // says why. These four are the whole contract between the toolbar and the page.
+  .align-left { text-align: left; }
+  .align-center { text-align: center; }
+  .align-right { text-align: right; }
+  .align-justify { text-align: justify; }
+
+  // …except on an image, where text-align does nothing at all: it aligns the inline content
+  // *inside* an element, and a replaced element has none. Centring a photo put the class on
+  // the <img>, the rule did nothing, and the picture stayed left. A block box with automatic
+  // margins is what actually moves it.
+  img,
+  figure {
+    &.align-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    &.align-left {
+      display: block;
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    &.align-right {
+      display: block;
+      margin-left: auto;
+      margin-right: 0;
+    }
+  }
+
+  // A table on a 760px measure will not always fit, so it scrolls inside its own box rather
+  // than pushing the article sideways.
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 15px;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--ink-mute);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    font-weight: 500;
+    background: var(--paper-warm);
+  }
+
+  caption {
+    caption-side: bottom;
+    padding-top: 8px;
+    font-size: 14px;
+    color: var(--ink-quiet);
+  }
+}
+
+.jn-body__lede {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1.3;
+  margin: 0 0 24px;
+}
+
+// Code blocks are highlighted server-side by Rouge; nothing ships to the browser.
+.jn-code {
+  position: relative;
+  background: var(--paper-warm);
+  border-radius: var(--radius-card);
+  margin: 24px 0;
+}
+
+.jn-code__lang {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-quiet);
+}
+
+.jn-code__body {
+  margin: 0;
+  padding: 20px 20px 20px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+
+  code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  // Rouge token classes, mapped onto the shared code palette in theme/_tokens.scss.
+  //
+  // This used to be three lines: keywords ruby, strings ruby, numbers ruby. Three kinds of
+  // token in one colour reads as less than it knows, and the editor — which highlights with
+  // Prism — was visibly more useful than the page it was previewing. Both map onto the same
+  // eight roles now.
+  .c, .c1, .cm, .cs, .cp, .cpf { color: var(--code-comment); font-style: italic; }
+  .k, .kd, .kn, .kp, .kr, .kt, .kv { color: var(--code-keyword); }
+  .s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sx, .sr, .ss, .dl { color: var(--code-string); }
+  .m, .mf, .mh, .mi, .mo, .il, .kc { color: var(--code-number); }
+  .nc, .nn, .no, .ne, .nl { color: var(--code-type); }
+  .nf, .nb, .fm, .nd { color: var(--code-name); }
+  .nv, .vc, .vg, .vi, .na, .py { color: var(--code-var); }
+  .o, .ow, .p, .pi { color: var(--code-punct); }
+  .err { color: var(--ruby-bright); }
+  .gd { color: var(--ruby); }
+  .gi { color: var(--code-string); }
+}
+
+// Callouts. Two tones: note carries the ink rule, warn the ruby one.
+.jn-callout {
+  margin: 24px 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--ink-mute);
+  background: var(--paper-warm);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+
+  &--warn {
+    border-left-color: var(--ruby);
+    background: var(--ruby-mute);
+  }
+}
+
+.jn-callout__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+
+  .jn-callout--warn & { color: var(--ruby); }
+}
+
+.jn-callout__body {
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+// Embeds load nothing until clicked, so the facade is what most readers ever see.
+.jn-embed {
+  margin: 24px 0;
+}
+
+.jn-embed__facade {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 24px;
+  background: var(--paper-warm);
+  border: 1px solid var(--ink-mute);
+  border-radius: var(--radius-card);
+  transition: border-color 180ms, background 180ms;
+
+  &:hover {
+    border-color: var(--ruby);
+    background: var(--ruby-mute);
+  }
+}
+
+.jn-embed__play {
+  font-size: 13px;
+  color: var(--ruby);
+}
+
+.jn-embed__host {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+}
+
+.jn-embed__caption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+}
+
+// Swapped in by the embed controller once the reader has asked for it.
+.jn-embed__frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jn-embed__facade { transition: none; }
+}
+
+// Narrow screens. admin.scss sets $narrow-container so the editor's mobile preview, a 390px
+// container on a wide screen, gets these rules as well.
+@include bp.below(lg, $container: $narrow-container) {
+  .jn-post__title { font-size: 44px; }
+}
+
+@include bp.below(sm, $container: $narrow-container) {
+  .jn-post { padding: 40px 20px; }
+
+  .jn-post__title { font-size: 34px; }
+
+  .jn-post__cover img { height: 220px; }
+
+  .jn-body { font-size: 17px; }
+
+  .jn-body__lede { font-size: 24px; }
+
+  .jn-body h2,
+  .jn-body h3 { font-size: 26px; }
+}

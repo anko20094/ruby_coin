@@ -1,0 +1,76 @@
+// What TinyMCE loads inside its editing iframe, and the only sheet it loads there.
+//
+// Self-contained: the site's tokens, faces and reset, the article's rules (.jn-body) and the
+// case text's (.wk-prose), so what the author sees is set the way the page will be — without
+// shipping the whole of theme.css into every editor.
+//
+// Prism highlights in the editor and Rouge on the page; both map onto the eight code roles in
+// theme/_tokens.scss, so a listing reads the same in both places.
+@use 'theme/tokens';
+@use 'theme/fonts';
+@use 'theme/base';
+@use 'pages/journal_post';
+@use 'pages/work_prose';
+
+// The code-sample block itself, so it reads as the same object it will be on the page.
+pre[class*='language-'] {
+  background: var(--paper-warm);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  overflow-x: auto;
+}
+
+code[class*='language-'] {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.token {
+  &.comment,
+  &.prolog,
+  &.cdata,
+  &.doctype {
+    color: var(--code-comment);
+    font-style: italic;
+  }
+
+  &.keyword,
+  &.atrule,
+  &.important,
+  &.selector { color: var(--code-keyword); }
+
+  &.string,
+  &.char,
+  &.regex,
+  &.attr-value,
+  &.inserted { color: var(--code-string); }
+
+  &.number,
+  &.boolean { color: var(--code-number); }
+
+  &.class-name,
+  &.constant,
+  &.symbol,
+  &.tag,
+  &.property { color: var(--code-type); }
+
+  &.function,
+  &.builtin { color: var(--code-name); }
+
+  &.variable,
+  &.attr-name { color: var(--code-var); }
+
+  &.operator,
+  &.punctuation,
+  &.entity,
+  &.url { color: var(--code-punct); }
+
+  &.deleted { color: var(--ruby-bright); }
+  &.bold { font-weight: 600; }
+  &.italic { font-style: italic; }
+  &.namespace { opacity: 0.7; }
+}
