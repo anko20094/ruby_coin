@@ -5,8 +5,8 @@ en:
     edit: Edit
     new: New
     tags: Tags
-    faq_title: Frequently Asked Questions
-    faq_description: Frequently asked questions about RubyCoin — who we are, how to join our projects for practice, how to get mentoring and what it costs.
+    faq_title: Frequently asked questions
+    faq_description: Frequently asked questions about RubyCoin — who we are, what we build on Rails, the technologies we use, how to start working together and what it costs.
   buttons:
     remember_me: Remember me
     forgot_password: Forgot password?
@@ -28,8 +28,8 @@ en:
     index:
       meta_description: "RubyCoin is a Rails studio: we build Ruby on Rails products and run them for years. Telegram platforms, proptech and AI services, figures from production."
       tagline: Rails products, built and run for years
-      eyebrow: RubyCoin · Rails studio · Kyiv
-      hero_pill: "Rails studio · Kyiv · since %{year}"
+      eyebrow: RubyCoin · Rails studio · Lviv
+      hero_pill: "Rails studio · Lviv · since %{year}"
       headline_lead: We build Rails products,
       headline_join: then
       headline_mark: run them for years
@@ -66,32 +66,32 @@ en:
       top: Top
   faq:
     who_am_i:
-      question1: Who are you and what services do you provide?
-      answer1_1: We are RubyCoin, a small studio that builds products on Ruby on Rails and runs them for years.
-      answer1_2: We also write learning material in Ukrainian — tutorials and lessons, programming among them.
-      answer1_3: And we build websites for hands-on learning and for keeping that material — this one included.
-      more_info1_html: You can get to know us better in our <a href="https://t.me/rubychatua" target="_blank" rel="noreferrer">Telegram chat</a>.
+      question1: Who are you?
+      answer1_1: We are RubyCoin, a Rails studio from Lviv. Since 2022 we have been building products on Ruby on Rails and running them for years.
+      answer1_2_html: Seven of them are described in the <a href="/en/work">portfolio</a> — with production figures and the names of the people who worked on them.
     services:
-      question2: What services do you offer for beginners?
-      answer2_1: Learning material on Ruby and Ruby on Rails — lessons we write ourselves, and the sources we learned from.
-      more_info2: Our goal is to help beginners learn the basics of these technologies and get practical experience.
-    collaboration:
-      question3: Can I join your projects for practice?
-      answer3_1: Yes.
-      more_info3: If you have the drive and the determination, we will be glad to help.
-    consultation:
-      question4: Do you provide mentoring or consulting services?
-      answer4_1: Yes, we offer mentoring and consulting once we have got acquainted — on Discord.
-      answer4_2_1_html: We answer questions about Ruby and Ruby on Rails and help with tasks as time allows, in our <a href="https://t.me/rubychatua" target="_blank" rel="noreferrer">Telegram group</a>.
-      more_info4: Those who complete the internship successfully are offered a first job in the field.
-    communication:
-      question5: How can I contact you for more information or a consultation?
-      answer5_1: You can contact us through LinkedIn or Telegram.
-      more_info5: You will find the links at the bottom of the page.
+      question2: What do you do?
+      answer2_1: Web products and back ends on Rails from scratch — from the architecture to production.
+      answer2_2: Support and development of existing Rails projects, including codebases with a long history.
+      answer2_3: Upgrades of Rails, Ruby and PostgreSQL, and moves to Rails from other stacks.
+      answer2_4: Telegram bots and the platforms around them.
+    stack:
+      question3: What technologies do you work with?
+      answer3_1: Ruby on Rails, PostgreSQL, Sidekiq and Redis, Hotwire. When a product needs it — Vue or React on the front end.
+      answer3_2: Also payments through Stripe, background queues, integrations with external APIs, and Telegram through both the Bot API and TDLib.
+    existing_project:
+      question4: Do you take on an existing project, not just a new one?
+      answer4_1: Yes. We have worked in an eight-year-old Rails codebase with 34 contributors behind it, and moved a live product from Python to Ruby, from Rails 7.2 to 8.1 and from PostgreSQL 16 to 18.
+    start:
+      question5: How do we start working together?
+      answer5_1_html: Write to us by email, on Telegram or on LinkedIn — every channel is on the <a href="/en/contact">Contact</a> page.
+      answer5_2: Tell us briefly about the product and the task. After a conversation we will propose a plan of work and an estimate.
     price:
-      question6: Is there a cost for your services?
-      answer6_1: Our learning materials on this site are available for free.
-      more_info6: We provide mentoring for free too, as time allows.
+      question6: How much does it cost?
+      answer6_1: It depends on the scope and the format of the work, so we name a price after talking the task through, not up front.
+    journal:
+      question7: Do you write anything besides code?
+      answer7_1_html: 'Yes — the <a href="/en/journal">journal</a>: notes from the work, stories from the projects, decisions and code fragments. It is free to read.'
 
   datetime: &datetime
     month_names:
@@ -408,7 +408,7 @@ en:
     products:
       one: "%{count} product"
       other: "%{count} products"
-    # Not "people": one of the six on the roster is a machine, and it is credited on four of the
+    # Not "people": one of the seven on the roster is a machine, and it is credited on four of the
     # seven projects. The home page counts the humans separately for the same reason.
     contributors:
       one: "%{count} contributor"
@@ -475,8 +475,8 @@ en:
       content_type_allowlist_error: "Not an image: %{content_type} files cannot be uploaded."
       max_size_error: "The file is too large: it must be no more than %{max_size}."
       min_size_error: "The file is too small: it must be at least %{min_size}."
-      extension_allowlist_error: "You are not allowed to upload %{extension} files, allowed types: %{allowed_types}"
-      extension_denylist_error: "You are not allowed to upload %{extension} files, prohibited types: %{prohibited_types}"
+      extension_allowlist_error: "You are not allowed to upload %{extension} files. Allowed types: %{allowed_types}."
+      extension_denylist_error: "You are not allowed to upload %{extension} files. Prohibited types: %{prohibited_types}."
 
   work:
     nav:
@@ -527,7 +527,7 @@ en:
       cta: Read to the end and want to talk it over?
       cta_contact: Get in touch
       team: Who worked on it
-      team_solo: Solo — the whole stack
+      team_solo: Solo — the studio’s only person on it
       open_cv: Open CV
       journal: Entries on this topic
       journal_all: 'Every entry tagged #%{tag}'
@@ -551,11 +551,11 @@ en:
     solo_project: solo project
     pending:
       title: This CV is not filled in yet
-      body: The contributions above are written by the project lead and are accurate. The career, stack and education sections are the person's own to write — until they do, this page shows nothing rather than guessing.
+      body: The project contributions on this page are written by the project lead and are accurate. The career, stack and education sections are the person’s own to write — until they do, this page shows nothing rather than guessing.
 
   cv:
     show:
-      meta_description: "CV of a Senior Ruby on Rails engineer: commercial services, own products, stack and projects — figures checked against production, git and trackers."
+      meta_description: "CV of a senior Ruby on Rails engineer: commercial services, own products, stack and projects — figures checked against production, git and trackers."
       title: Curriculum vitae
       lede: Commercial services and products of my own. Every figure checked against production, git and trackers — not memory.
       projects: the projects
@@ -575,6 +575,8 @@ en:
       on_case: "on"
 
   studio:
+    # The studio's own city, for the footer and /contact — not any one person's CV location.
+    location: Lviv, Ukraine
     show:
       meta_description: "RubyCoin is a small Rails studio. The people behind the projects in the portfolio, their CVs, and those who worked with us before."
       title: The studio

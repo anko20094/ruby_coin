@@ -7,7 +7,7 @@
 # like data — a contact row's key, a stack item, a period's open end — wherever they are prose
 # rather than a proper noun: "Ruby on Rails" is the same word twice, "merge rights" is not. A
 # bare string is still allowed and reads the same in both languages.
-# Strings may contain inline <b>, <i> and <code> only — render through the same sanitiser as
+# Strings may contain inline <b>, <i>, <code> and <br> only — render through the same sanitiser as
 # cases.yml.
 #
 # Three states exist, and two of them announce themselves:
@@ -86,7 +86,7 @@ people:
       - { icon: "🏐", label: { en: "volleyball", uk: "волейбол" }, detail: { en: "tue/thu evenings", uk: "вт/чт вечори" } }
       - { icon: "🏍", label: { en: "moto", uk: "мотоцикл" }, detail: { en: "mid-season", uk: "середина сезону" } }
       - { icon: "📺", label: { en: "anime", uk: "аніме" }, detail: { en: "Frieren · re-watch", uk: "Frieren · передивляю" } }
-      - { icon: "🎲", label: { en: "boardgame", uk: "настільні" }, detail: { en: "7 wonders night", uk: "вечір 7 wonders" } }
+      - { icon: "🎲", label: { en: "board games", uk: "настільні" }, detail: { en: "7 Wonders night", uk: "вечір 7 Wonders" } }
       - { icon: "💪", label: { en: "gym", uk: "залізо" }, detail: { en: "pwr · 3x/week", uk: "пвр · 3 рази/тиж" } }
 
   - id: "mykhailo"
@@ -121,7 +121,7 @@ people:
       experience:
         - period: { en: "2023–present", uk: "2023–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
-          title: { en: "Co-founder · product · growth", uk: "Співзасновник · продукт · growth" }
+          title: { en: "Co-founder · product · growth", uk: "Співзасновник · продукт · зростання" }
           place: { en: "Ukraine · remote", uk: "Україна · віддалено" }
           body:
             en: "Five products, 2.8M+ users between them. The idea, the spec and the roadmap in each one. Clients, how the work is divided, and review. B2B separately."
@@ -198,7 +198,7 @@ people:
           place: { en: "DNA · WardyBot", uk: "DNA · WardyBot" }
           body:
             en: "The planning and delivery pipeline: job flow on <b>Sidekiq, Sidekiq Scheduler and Redis</b>, reservation, delayed delivery and ordered publishing, timezone-aware scheduling per user and per bot, and a <b>Ruby ↔ Python bridge over Redis Streams</b>. Plus embeddings and vector search, production performance work, and the race conditions, pending jobs, locks and idempotency that come with a queue that must not publish twice."
-            uk: "Система планування й доставки: job-flow на <b>Sidekiq, Sidekiq Scheduler і Redis</b>, резервування, відкладена доставка й послідовна публікація, timezone-aware планування на користувача й на бота, міст <b>Ruby ↔ Python через Redis Streams</b>. Плюс embeddings і векторний пошук, робота над продуктивністю продакшну і ті race conditions, підвислі джоби, локи та ідемпотентність, які йдуть у комплекті з чергою, що не має права опублікувати двічі."
+            uk: "Система планування й доставки: job-flow на <b>Sidekiq, Sidekiq Scheduler і Redis</b>, резервування, відкладена доставка й послідовна публікація, планування з урахуванням часового поясу користувача й бота, міст <b>Ruby ↔ Python через Redis Streams</b>. Плюс embeddings і векторний пошук, робота над продуктивністю продакшну і ті race conditions, підвислі джоби, локи та ідемпотентність, які йдуть у комплекті з чергою, що не має права опублікувати двічі."
           cases: ["dna", "wardybot"]
       stacks:
         - label: { en: "core", uk: "основне" }
@@ -233,7 +233,7 @@ people:
       years: { en: "on these products since 2023", uk: "на цих продуктах із 2023-го" }
       summary:
         en: "A Rails developer who builds the Telegram side of the studio’s products: the menus, commands and game mechanics people actually use in WardyBot and DNA, and lately the web surfaces around them — an admin on Vue 3 and a Mini App on React. Second by commit count in the WardyBot repository, and in what he ships there the Ruby specs run to almost twice the lines of the Ruby code. Started here in 2023, on this site; in 2026 also built a client demo on generative video and voice — lip-sync models, AI video and speech synthesis."
-        uk: "Rails-розробник, який будує телеграмну частину продуктів студії: меню, команди й ігрові механіки, якими справді користуються у WardyBot і DNA, а останнім часом — і вебповерхні довкола них: адмінку на Vue 3 та Mini App на React. Другий за кількістю комітів у репозиторії WardyBot, і в тому, що він там випускає, рядків Ruby-тестів майже вдвічі більше, ніж рядків Ruby-коду. Почав тут у 2023-му — з цього сайту; у 2026-му ще й зібрав клієнтське демо на генеративному відео й голосі — моделі ліпсинку, AI-відео та синтез мовлення."
+        uk: "Rails-розробник, який будує телеграмну частину продуктів студії: меню, команди й ігрові механіки, якими справді користуються у WardyBot і DNA, а останнім часом — і вебчастину довкола них: адмінку на Vue 3 та Mini App на React. Другий за кількістю комітів у репозиторії WardyBot, і в тому, що він там випускає, рядків Ruby-тестів майже вдвічі більше, ніж рядків Ruby-коду. Почав тут у 2023-му — з цього сайту; у 2026-му ще й зібрав клієнтське демо на генеративному відео й голосі — моделі ліпсинку, AI-відео та синтез мовлення."
       # GitHub and nothing else, as for every colleague.
       contact:
         - ["github", "Shemberko", "https://github.com/Shemberko"]
@@ -244,7 +244,7 @@ people:
           place: { en: "AI live-dealer demo", uk: "демо AI-круп’є" }
           body:
             en: "A web demo of a live-dealer table where the dealer is a video avatar: 163 commits in a month. Ran <b>five lip-sync models</b> side by side instead of picking one from the docs — rejected the photo-driven ones on measured head movement, settled on VEED Lipsync 2.0 and Sync Labs, and later regenerated the whole library on HeyGen — and judged every take by a pixel-difference metric in the mouth area rather than by eye. Dealer footage from <b>Kling</b> and <b>Veo</b>, voices from <b>ElevenLabs</b> and a local TTS, replies through OpenRouter; a speech queue with priorities that never cuts a line off, and game logic decoupled from video timing so a stalled clip cannot stall a round."
-            uk: "Вебдемо столу з живим круп’є, де круп’є — відеоаватар: 163 коміти за місяць. Прогнав <b>п’ять моделей ліпсинку</b> поруч, а не обрав одну за документацією: фотомоделі відкинув за виміряним рухом голови, зупинився на VEED Lipsync 2.0 і Sync Labs, а згодом перегенерував усю бібліотеку на HeyGen, — і кожен дубль оцінював метрикою піксельної різниці в зоні рота, а не на око. Відео круп’є — з <b>Kling</b> і <b>Veo</b>, голоси — з <b>ElevenLabs</b> і локального TTS, відповіді — через OpenRouter; черга мовлення з пріоритетами, яка ніколи не обриває репліку, і ігрова логіка, відв’язана від таймінгу відео, щоб завислий кліп не зупиняв раунд."
+            uk: "Вебдемо столу з живим круп’є, де круп’є — відеоаватар: 163 коміти за місяць. Порівняв між собою <b>п’ять моделей ліпсинку</b>, а не обрав одну за документацією: моделі, що працюють із фото, відкинув за виміряним рухом голови, зупинився на VEED Lipsync 2.0 і Sync Labs, а згодом перегенерував усю бібліотеку на HeyGen, — і кожен дубль оцінював метрикою піксельної різниці в зоні рота, а не на око. Відео круп’є — з <b>Kling</b> і <b>Veo</b>, голоси — з <b>ElevenLabs</b> і локального TTS, відповіді — через OpenRouter; черга мовлення з пріоритетами, яка ніколи не обриває репліку, і ігрова логіка, відв’язана від таймінгу відео, щоб завислий кліп не зупиняв раунд."
         - period: { en: "2024–present", uk: "2024–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
           title: { en: "Fullstack developer", uk: "Фулстек-розробник" }
@@ -309,7 +309,7 @@ people:
       uk: "бекенд"
     blurb:
       en: "Came to Rails from applied mathematics, and it shows in the queries."
-      uk: "Прийшла в Rails із прикладної математики, і це видно по запитах."
+      uk: "Прийшла в Rails із прикладної математики, і це видно з її запитів."
     updated: "2026·09·15"
     not_work:
       - { icon: "🧗", label: { en: "climbing", uk: "скелелазіння" } }
@@ -321,7 +321,7 @@ people:
       years: { en: "in Ruby since 2022", uk: "у Ruby з 2022-го" }
       summary:
         en: "A Rails developer who arrived by way of applied mathematics and process optimisation, and writes queries like someone who has had to make a physical process cheaper. Web applications, RSpec and Capybara coverage, PostgreSQL and Redis. Still doing research alongside the code: a doctoral programme at the Institute of Cybernetics on algorithms for locating magnetic anomalies, with a published paper and a copyright certificate for the software behind it."
-        uk: "Rails-розробниця, яка прийшла через прикладну математику й оптимізацію процесів, і пише запити як людина, що вже мусила здешевити реальний виробничий процес. Вебзастосунки, покриття на RSpec і Capybara, PostgreSQL і Redis. Паралельно з кодом — наука: аспірантура в Інституті кібернетики про алгоритми локалізації магнітних аномалій, із публікацією та свідоцтвом на програму."
+        uk: "Rails-розробниця, яка прийшла через прикладну математику й оптимізацію процесів і пише запити як людина, що вже мусила здешевити реальний виробничий процес. Вебзастосунки, покриття на RSpec і Capybara, PostgreSQL і Redis. Паралельно з кодом — наука: аспірантура в Інституті кібернетики про алгоритми локалізації магнітних аномалій, із публікацією та свідоцтвом на програму."
       # GitHub and nothing else. A CV handed to a recruiter carries an address and a phone; a
       # public page that a stranger can scrape does not get either, whatever the CV says.
       contact:
@@ -338,7 +338,7 @@ people:
           place: { en: "DNA · WardyBot", uk: "DNA · WardyBot" }
           body:
             en: "The Gemini embedding pass and the <b>HNSW index</b> on the 1536-dimension column it writes to, which is what semantic deduplication runs on. The OpenRouter features, the background jobs behind them, and the backup routine that runs under all of it."
-            uk: "Генерація embeddings на Gemini і <b>HNSW-індекс</b> на 1536-вимірній колонці, у яку вона пише — на цьому працює семантична дедуплікація. Функції на OpenRouter, фонові джоби за ними й рутина бекапів, що працює під усім цим."
+            uk: "Генерація embeddings на Gemini і <b>HNSW-індекс</b> на 1536-вимірній колонці, у яку вона пише, — на цьому працює семантична дедуплікація. Функції на OpenRouter, фонові джоби за ними й рутина бекапів, що працює під усім цим."
           cases: ["dna", "wardybot"]
         - period: { en: "2023–present", uk: "2023–дотепер" }
           org: { en: "V. M. Glushkov Institute of Cybernetics, NAS of Ukraine", uk: "Інститут кібернетики ім. В. М. Глушкова НАН України" }
@@ -353,7 +353,7 @@ people:
           org: { en: "Igor Sikorsky Kyiv Polytechnic Institute", uk: "КПІ ім. Ігоря Сікорського" }
           title: { en: "Ruby on Rails developer", uk: "Ruby on Rails розробниця" }
           note:
-            en: "Copyright registration certificate №122247, December 2023."
+            en: "Copyright registration certificate No. 122247, December 2023."
             uk: "Свідоцтво про реєстрацію авторського права №122247, грудень 2023."
           body:
             en: "A Rails application for magnetic anomaly detection and signal analysis, written for the research above."
@@ -374,7 +374,7 @@ people:
         - label: { en: "core", uk: "основне" }
           items: ["Ruby on Rails", "PostgreSQL", "RSpec", "Capybara", "Redis", "Devise"]
         - label: { en: "also", uk: "також" }
-          items: ["JavaScript", "SASS", "Git", "RuboCop", "Linux", "Haskell · Prolog"]
+          items: ["JavaScript", "Sass", "Git", "RuboCop", "Linux", "Haskell · Prolog"]
       strengths:
         - en: "Publishes the algorithm, not just the pull request"
           uk: "Публікує алгоритм, а не тільки pull request"
@@ -431,7 +431,7 @@ people:
         en: "Reads pull requests in four of the products here against a checklist of six to eight points, tailored per repository, at 3am, without complaining, and leaves inline comments. Has never asked for a raise. Occasionally suggests a method that does not exist — which is what the human reviewer is still for."
         uk: "Читає pull request’и в чотирьох продуктах тут за чеклистом із шести-восьми пунктів, своїм для кожного репозиторію, о третій ночі, без скарг, і лишає інлайн-коментарі. Ніколи не просив підвищення. Іноді пропонує метод, якого не існує — саме тому людина-рев’ювер досі потрібна."
       contact:
-        - [{ en: "runs in", uk: "працює в" }, "github actions", "https://github.com/anko20094"]
+        - [{ en: "runs in", uk: "працює в" }, "GitHub Actions", "https://github.com/anko20094"]
         - [{ en: "invoked by", uk: "запускає" }, { en: "an opened pull request", uk: "відкритий pull request" }, "https://github.com/anko20094"]
       location:
         en: "wherever the runner is"
@@ -457,7 +457,7 @@ people:
             en: "A checklist, not an opinion. It is in the workflow file, and you can read it."
             uk: "Чеклист, а не думка. Він лежить у файлі воркфлоу, і його можна прочитати."
           body:
-            en: "Flags the N+1 a tired human stops seeing, the migration without a down path, the spec that asserts nothing, and the hardcoded string that should have been a translation key. Advisory only — <b>no merge right</b>, and that is on purpose."
+            en: "Flags the N+1 a tired human stops seeing, the migration without a down path, the spec that asserts nothing, and the hardcoded string that should have been a translation key. Advisory only — <b>no merge rights</b>, and that is on purpose."
             uk: "Позначає N+1, який втомлена людина вже не бачить, міграцію без down, тест, що нічого не перевіряє, і зашитий рядок, який мусив бути ключем перекладу. Тільки дорадчо — <b>права мерджити немає</b>, і це навмисно."
           cases: ["dna", "wardybot", "imagemaker", "rubycoin"]
       stacks:

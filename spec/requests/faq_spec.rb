@@ -11,10 +11,21 @@ describe 'the FAQ', type: :request do
     expect(response.body).to include('rc-footer')
   end
 
-  it 'renders a link inside an answer as a link' do
+  it 'renders a link inside an answer as a link, in the page’s locale' do
     get faq_path(locale: 'en')
 
-    expect(response.body).to include('rel="noreferrer">Telegram chat</a>')
+    expect(response.body).to include('<a href="/en/contact">Contact</a>')
+  end
+
+  # The old copy described a volunteer learning hub; the studio sells Rails work.
+  it 'speaks for a commercial studio, with no mentoring or Discord left over' do
+    %w[en uk].each do |locale|
+      get faq_path(locale: locale)
+
+      text = response.body.downcase
+      expect(text).not_to include('discord')
+      expect(text).not_to include(locale == 'en' ? 'mentoring' : 'менторств')
+    end
   end
 
   it 'reads the Ukrainian copy under the uk locale' do
