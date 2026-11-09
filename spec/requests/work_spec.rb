@@ -283,7 +283,7 @@ describe 'the work pages', type: :request do
     it 'states solo work instead of drawing a team of one' do
       get work_case_path(slug: 'intelligence', locale: 'en')
 
-      expect(response.body).to include('Solo — the whole stack')
+      expect(response.body).to include(I18n.t('work.case.team_solo', locale: :en))
       expect(response.body).not_to include('wk-teammate')
     end
 

@@ -20,37 +20,38 @@ describe FooterComponent, type: :component do
     expect(page).to have_css("a[href='/en/faq']")
   end
 
-  it 'shows github, telegram and email in the design order' do
+  it 'shows github, telegram, email and linkedin in the design order' do
     with_request_url '/en/work' do
       render_inline(described_class.new)
     end
 
     expect(page.all('.rc-footer__contacts a').map(&:text))
-      .to eq(['github.com/anko20094', '@anko20094', 'anko20094@gmail.com'])
+      .to eq(['github.com/anko20094', '@anko20094', 'anko20094@gmail.com', 'linkedin.com/in/danyils'])
   end
 
-  # The name is localised now, so the copyright line reads in whichever language the page is.
-  it 'carries the real identity, never the prototype placeholders' do
+  # The site is the studio's, so the copyright is the studio's, not one person's.
+  it 'carries the studio as the copyright holder, never the prototype placeholders' do
     I18n.with_locale(:en) do
       with_request_url '/en/work' do
         render_inline(described_class.new)
       end
     end
 
-    expect(page).to have_text('Danyil Shkoropad')
+    expect(page).to have_css('.rc-footer__meta', text: "© #{Time.current.year} RubyCoin")
+    expect(page).to have_no_text('Danyil Shkoropad')
     expect(page).to have_no_text('RubyCoin LLC')
     expect(page).to have_no_text('ronico-ua')
   end
 
-  it 'localises the location line' do
+  it 'names the studio’s city, in the page’s language' do
     I18n.with_locale(:uk) do
       with_request_url '/uk/work' do
         render_inline(described_class.new)
       end
     end
 
-    expect(page).to have_text('Україна · віддалено')
-    expect(page).to have_text('Даниїл Шкоропад')
+    expect(page).to have_css('.rc-footer__meta', text: 'Львів, Україна')
+    expect(page).to have_no_text('Київ')
   end
 
   it 'closes on the call, with the owner’s address as its button' do

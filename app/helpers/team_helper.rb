@@ -7,7 +7,7 @@ module TeamHelper
   FACES = 4
 
   # The contribution to print as a statement instead of a grid. A team block holding one lonely
-  # card reads as an unfinished page; "Solo — the whole stack" reads as a claim, which is what
+  # card reads as an unfinished page; "Solo — the studio’s only person on it" reads as a claim, which is what
   # it is. This is the whole reason `solo` exists in team.yml.
   def solo_contribution(team)
     team.first if team.one? && team.first.solo?

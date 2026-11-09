@@ -30,4 +30,12 @@ describe 'the contact page', type: :request do
     expect(response.body).to include(I18n.t('contact.show.title', locale: :uk))
     expect(response.body).to include(I18n.t('contact.show.lede', locale: :uk))
   end
+
+  # "Where" is the studio's city, not the owner's CV line.
+  it 'places the studio in Lviv' do
+    get contact_path(locale: 'en')
+
+    expect(response.body).to include('Lviv, Ukraine')
+    expect(response.body).not_to include('Kyiv')
+  end
 end
