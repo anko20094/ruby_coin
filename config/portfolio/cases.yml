@@ -56,8 +56,8 @@ cases:
           en: "20.5%"
           uk: "20,5 %"
         label:
-          en: "of the live application code is still mine"
-          uk: "живого коду застосунку досі мій"
+          en: "of the live application code is still ours"
+          uk: "живого коду застосунку досі наш"
     plain:
       heading:
         en: "A realtor’s whole business is people who forgot them"
@@ -75,9 +75,9 @@ cases:
       - en: "<b>Lost Deals</b>: the product that shows an agent the clients who sold or refinanced without them. Money they did not earn — and the strongest argument for renewing a subscription."
         uk: "<b>Lost Deals</b>: продукт, який показує агенту клієнтів, що продали або рефінансувалися повз нього. Прямі недоотримані гроші — і найсильніший аргумент платити далі."
       - en: "<b>Three years teaching it that two “John Smiths” are one person.</b> A wrong merge makes every ranking lie, so this was the highest-stakes work in the domain."
-        uk: "<b>Три роки вчив систему, що двоє «Джонів Смітів» — одна людина.</b> Неправильне склеювання ламає всі рейтинги, тож ціна помилки тут найвища в домені."
+        uk: "<b>Три роки вчили систему, що двоє «Джонів Смітів» — одна людина.</b> Неправильне склеювання ламає всі рейтинги, тож ціна помилки тут найвища в домені."
       - en: "<b>Kept it fast as history reached eight years:</b> partitioned the largest tables, split reads from writes in live traffic. Users noticed nothing, which was the point."
-        uk: "<b>Тримав швидкість, коли історії стало вісім років:</b> партиціював найбільші таблиці, розвів читання й запис у живому трафіку. Користувачі не помітили нічого — у цьому й був сенс."
+        uk: "<b>Тримали швидкість, коли історії стало вісім років:</b> партиціювали найбільші таблиці, розвели читання й запис у живому трафіку. Користувачі не помітили нічого — у цьому й був сенс."
     engineering:
       heading:
         en: "Entity resolution, ETL, and PostgreSQL that had to stop growing sideways"
@@ -96,8 +96,8 @@ cases:
             en: "Then the same problem, vectorised"
             uk: "Та сама задача, але у векторах"
           body:
-            en: "My largest pull request here — 3,645 hand-written lines — replaced an LLM-per-request approach with <b>768-dimension embeddings on pgvector + HNSW</b>, building a “profile sentence” per realtor out of names, companies, cities and ZIPs. <b>Stated honestly:</b> merged behind a feature flag, then reworked and dropped from the schema in September 2025 — it never carried production load."
-            uk: "Мій найбільший PR у проєкті — 3 645 рукописних рядків — замінив підхід «LLM на кожен запит» на <b>768-вимірні embeddings на pgvector + HNSW</b>, із генерацією «профільного речення» ріелтора з імен, компаній, міст і ZIP. <b>Чесно:</b> змерджено за feature-флагом, а у вересні 2025 переписано інакше й прибрано зі схеми — це рішення так і не витримало продакшн-навантаження."
+            en: "Our largest pull request here — 3,645 hand-written lines — replaced an LLM-per-request approach with <b>768-dimension embeddings on pgvector + HNSW</b>, building a “profile sentence” per realtor out of names, companies, cities and ZIPs. <b>Stated honestly:</b> merged behind a feature flag, then reworked and dropped from the schema in September 2025 — it never carried production load."
+            uk: "Наш найбільший PR у проєкті — 3 645 рукописних рядків — замінив підхід «LLM на кожен запит» на <b>768-вимірні embeddings на pgvector + HNSW</b>, із генерацією «профільного речення» ріелтора з імен, компаній, міст і ZIP. <b>Чесно:</b> змерджено за feature-флагом, а у вересні 2025 переписано інакше й прибрано зі схеми — це рішення так і не витримало продакшн-навантаження."
         - title:
             en: "PostgreSQL under load"
             uk: "PostgreSQL під навантаженням"
@@ -120,7 +120,7 @@ cases:
             en: "Scoring, and knowing when not to pay for it"
             uk: "Скоринг — і коли за нього не платити"
           body:
-            en: "External move-probability scoring behind my own <code>Pipelines / Providers / Sources</code> abstraction, backfilled in the background, then exposed as dashboard filters and sorting. Outside production the provider is swapped for a random one, so the paid quota is never burned by a test run."
+            en: "External move-probability scoring behind our own <code>Pipelines / Providers / Sources</code> abstraction, backfilled in the background, then exposed as dashboard filters and sorting. Outside production the provider is swapped for a random one, so the paid quota is never burned by a test run."
             uk: "Зовнішній скоринг імовірності переїзду за власною абстракцією <code>Pipelines / Providers / Sources</code>, фонове довантаження, далі — фільтри й сортування в дашборді. Поза продакшном провайдер підмінений на випадковий, тож платна квота не згорає на тестових прогонах."
     quality:
       - value:
@@ -139,8 +139,8 @@ cases:
           en: "91.9%"
           uk: "91,9 %"
         label:
-          en: "of my PRs touch specs"
-          uk: "моїх PR чіпають тести"
+          en: "of our PRs touch specs"
+          uk: "наших PR чіпають тести"
       - value:
           en: "62"
           uk: "62"
@@ -148,8 +148,8 @@ cases:
           en: "documented API operations"
           uk: "документованих API-операцій"
     scope_note:
-      en: "<b>Scope, honestly.</b> Helm charts, Dockerfiles and CI pipelines were owned by dedicated people on this platform — I worked inside a Kubernetes/CircleCI environment rather than building it. My contribution is applied backend and data work. Every number here is counted from git history, at my last commit in February 2026."
-      uk: "<b>Про межі — чесно.</b> Helm-чарти, Dockerfile і CI-пайплайни на цій платформі належали окремим людям — я працював у Kubernetes/CircleCI-оточенні, а не будував його. Мій внесок — прикладний бекенд і робота з даними. Усі цифри порахувані з git-історії станом на мій останній коміт у лютому 2026-го."
+      en: "<b>Scope, honestly.</b> Helm charts, Dockerfiles and CI pipelines were owned by dedicated people on this platform — we worked inside a Kubernetes/CircleCI environment rather than building it. Our contribution is applied backend and data work. Every number here is counted from git history, at our last commit in February 2026."
+      uk: "<b>Про межі — чесно.</b> Helm-чарти, Dockerfile і CI-пайплайни на цій платформі належали окремим людям — ми працювали в Kubernetes/CircleCI-оточенні, а не будували його. Наш внесок — прикладний бекенд і робота з даними. Усі цифри порахувані з git-історії станом на наш останній коміт у лютому 2026-го."
   - slug: "dna"
     mark: "02"
     own: true
@@ -217,13 +217,13 @@ cases:
           uk: "<b>Чому це справді складно.</b> В Telegram немає офіційного API для такого. Платформа тримає парк із 61 живого акаунта на низькорівневому протоколі — і Telegram може забанити будь-який за дивну поведінку. Тож більшість інженерії тут — не «зробити фічу», а «не зламатися»: бюджети частоти, розділення відбитків, обробка банів, відновлення сесій — система лікує себе, поки власник спить."
     mine:
       - en: "<b>Designed and built the platform from zero</b> — architecture, product decisions, the roadmap, and 90% of merge commits."
-        uk: "<b>Спроєктував і побудував платформу з нуля</b> — архітектура, продуктові рішення, роадмап і 90 % merge-комітів."
+        uk: "<b>Спроєктували й побудували платформу з нуля</b> — архітектура, продуктові рішення, роадмап і 90 % merge-комітів."
       - en: "<b>Led a team of up to six</b> and owned 93% of production releases — 429 deploys."
-        uk: "<b>Вів команду до шести людей</b> і випустив 93 % релізів у продакшн — 429 деплоїв."
-      - en: "<b>Ran the platform migrations personally:</b> Python/Pyrogram → Ruby/TDLib, Rails 7.2 → 8.1, PostgreSQL 16 → 18."
-        uk: "<b>Провів платформні міграції особисто:</b> Python/Pyrogram → Ruby/TDLib, Rails 7.2 → 8.1, PostgreSQL 16 → 18."
+        uk: "<b>Вели команду до шести людей</b> і випустили 93 % релізів у продакшн — 429 деплоїв."
+      - en: "<b>Ran the platform migrations ourselves:</b> Python/Pyrogram → Ruby/TDLib, Rails 7.2 → 8.1, PostgreSQL 16 → 18."
+        uk: "<b>Провели платформні міграції самі:</b> Python/Pyrogram → Ruby/TDLib, Rails 7.2 → 8.1, PostgreSQL 16 → 18."
       - en: "<b>Built the billing and the per-customer bot factory</b> — the part that turns a tool into a business."
-        uk: "<b>Зробив білінг і фабрику ботів під кожного клієнта</b> — те, що перетворює інструмент на бізнес."
+        uk: "<b>Зробили білінг і фабрику ботів під кожного клієнта</b> — те, що перетворює інструмент на бізнес."
     engineering:
       heading:
         en: "A headless monolith with five routes and a self-healing userbot fleet"
@@ -294,8 +294,8 @@ cases:
           en: "custom monitoring checks"
           uk: "власних перевірок моніторингу"
     scope_note:
-      en: "<b>On the reach figure:</b> 33M+ is the sum of subscriber counts across managed channels, not unique people — around 7M distinct Telegram accounts have passed through the platform. I state both because the first number flatters and the second is true."
-      uk: "<b>Про цифру охоплення:</b> 33 млн+ — це сума підписників керованих каналів, а не унікальні люди — через платформу пройшло близько 7 млн різних Telegram-акаунтів. Наводжу обидві, бо перша лестить, а друга правдива."
+      en: "<b>On the reach figure:</b> 33M+ is the sum of subscriber counts across managed channels, not unique people — around 7M distinct Telegram accounts have passed through the platform. We state both because the first number flatters and the second is true."
+      uk: "<b>Про цифру охоплення:</b> 33 млн+ — це сума підписників керованих каналів, а не унікальні люди — через платформу пройшло близько 7 млн різних Telegram-акаунтів. Наводимо обидві, бо перша лестить, а друга правдива."
   - slug: "wardybot"
     mark: "03"
     own: true
@@ -358,17 +358,17 @@ cases:
           uk: "Уявіть Telegram-чат на 28 000 людей. Хтось спамить рекламою, хтось лізе в конфлікт, хтось запускає ботів. Людина-адмін фізично не встигає."
         - en: "WardyBot takes that job: it catches spam, screens bots at the door, moderates toxicity and keeps the statistics. Then it does the other half — keeping people there. An in-chat currency, reputation, achievements, collectibles with a marketplace, duels, giveaways and an AI assistant give a community reasons to come back, and give its owner something to sell."
           uk: "WardyBot забирає цю роботу: ловить спам, фільтрує ботів на вході, модерує токсичність і веде статистику. А далі — друга половина продукту: втримати людей. Внутрішня валюта, репутація, ачівки, колекційні предмети з маркетплейсом, дуелі, розіграші й AI-асистент дають спільноті причини повертатися, а її власнику — що продавати."
-        - en: "The number I care about is the ratio: two million users, one $24 virtual machine, a thousand days without a break. Not because cheap hosting is a virtue in itself — because every architectural decision below was made under that constraint, and the constraint is what makes them interesting."
-          uk: "Цифра, яка мені важлива, — це співвідношення: два мільйони користувачів, одна віртуалка за $24, тисяча днів без перерви. Не тому, що дешевий хостинг сам собою чеснота, — а тому, що кожне архітектурне рішення нижче ухвалене під цим обмеженням, і саме обмеження робить їх цікавими."
+        - en: "The number we care about is the ratio: two million users, one $24 virtual machine, a thousand days without a break. Not because cheap hosting is a virtue in itself — because every architectural decision below was made under that constraint, and the constraint is what makes them interesting."
+          uk: "Цифра, яка нам важлива, — це співвідношення: два мільйони користувачів, одна віртуалка за $24, тисяча днів без перерви. Не тому, що дешевий хостинг сам собою чеснота, — а тому, що кожне архітектурне рішення нижче ухвалене під цим обмеженням, і саме обмеження робить їх цікавими."
     mine:
       - en: "<b>Designed the product and the architecture from a blank page</b> and made the first commit."
-        uk: "<b>Спроєктував продукт і архітектуру з чистого аркуша</b> й зробив перший коміт."
+        uk: "<b>Спроєктували продукт і архітектуру з чистого аркуша</b> й зробили перший коміт."
       - en: "<b>Assembled and led a team of up to ten developers</b> — and set the process they work in: ticket branches, review, CI, mandatory tests."
-        uk: "<b>Зібрав і вів команду до десяти розробників</b> — і поставив процес, у якому вони працюють: тікет-бранчі, рев’ю, CI, обов’язкові тести."
-      - en: "<b>Owned production alone:</b> all 196 deploys, the runbooks, the incident response."
-        uk: "<b>Продакшн вів сам:</b> усі 196 деплоїв, ранбуки, реакція на інциденти."
+        uk: "<b>Зібрали й вели команду до десяти розробників</b> — і поставили процес, у якому вони працюють: тікет-бранчі, рев’ю, CI, обов’язкові тести."
+      - en: "<b>Ran production ourselves:</b> all 196 deploys, the runbooks, the incident response."
+        uk: "<b>Продакшн вели самі:</b> усі 196 деплоїв, ранбуки, реакція на інциденти."
       - en: "<b>Owned the business model:</b> subscriptions, two internal currencies, Telegram Stars payments with refunds — and, while the multi-tenant core ran, <b>17 white-label bots</b> on it."
-        uk: "<b>Відповідав за бізнес-модель:</b> підписки, дві внутрішні валюти, оплати Telegram Stars із поверненнями — і, поки працювало мультитенантне ядро, <b>17 white-label ботів</b> на ньому."
+        uk: "<b>Відповідали за бізнес-модель:</b> підписки, дві внутрішні валюти, оплати Telegram Stars із поверненнями — і, поки працювало мультитенантне ядро, <b>17 white-label ботів</b> на ньому."
     engineering:
       heading:
         en: "One Rails process, N bots, four currencies and a ledger that cannot drift"
@@ -439,8 +439,8 @@ cases:
           en: "vCPU / GB — the whole box"
           uk: "vCPU / ГБ — увесь сервер"
     scope_note:
-      en: "<b>Engineering culture, since it is mine to answer for:</b> 110k lines of tests against 52k of code, no RuboCop todo file, a pre-commit gate on Ruby and TypeScript, CI on every push, AI review on every pull request. 196 zero-downtime deploys, all of them mine."
-      uk: "<b>Інженерна культура — бо відповідати за неї мені:</b> 110 тис. рядків тестів проти 52 тис. коду, жодного RuboCop todo, pre-commit гейт на Ruby і TypeScript, CI на кожен пуш, AI-рев’ю на кожен pull request. 196 деплоїв без простою — усі мої."
+      en: "<b>Engineering culture, since it is ours to answer for:</b> 110k lines of tests against 52k of code, no RuboCop todo file, a pre-commit gate on Ruby and TypeScript, CI on every push, AI review on every pull request. 196 zero-downtime deploys, all of them ours."
+      uk: "<b>Інженерна культура — бо відповідати за неї нам:</b> 110 тис. рядків тестів проти 52 тис. коду, жодного RuboCop todo, pre-commit гейт на Ruby і TypeScript, CI на кожен пуш, AI-рев’ю на кожен pull request. 196 деплоїв без простою — усі наші."
   - slug: "leads"
     mark: "04"
     own: false
@@ -457,8 +457,8 @@ cases:
       en: "myHomeIQ · Leads"
       uk: "myHomeIQ · Leads"
     tagline:
-      en: "The product customers log into and pay for — an eight-year Rails codebase where I owned the money, the permissions and the seam to the other service."
-      uk: "Продукт, у який клієнти входять і за який платять — восьмирічна Rails-кодова база, де моїми були гроші, права доступу і стик між двома сервісами."
+      en: "The product customers log into and pay for — an eight-year Rails codebase where we owned the money, the permissions and the seam to the other service."
+      uk: "Продукт, у який клієнти входять і за який платять — восьмирічна Rails-кодова база, де нашими були гроші, права доступу і стик між двома сервісами."
     role:
       en: "Senior Backend Engineer · 9th of 34 contributors"
       uk: "Senior Backend Engineer · 9-й з 34 контриб’юторів"
@@ -497,15 +497,15 @@ cases:
           uk: "ролей × планів у матриці прав"
     plain:
       heading:
-        en: "I worked on the two places where a bug shows up on someone’s bank statement"
-        uk: "Я працював у двох місцях, де баг видно у виписці з банку"
+        en: "We worked on the two places where a bug shows up on someone’s bank statement"
+        uk: "Ми працювали у двох місцях, де баг видно у виписці з банку"
       body:
         - en: "This is the half of myHomeIQ that has customers in it. An agent uploads their past clients, and the platform sends every homeowner a monthly branded report — what the house is worth now, how much of the mortgage is paid off, what refinancing would save, what they could buy if they sold. The agent stays visible for years without lifting a finger."
           uk: "Це та половина myHomeIQ, у якій є клієнти. Агент завантажує своїх колишніх клієнтів, і платформа щомісяця надсилає кожному власнику будинку брендований звіт — скільки будинок коштує зараз, скільки іпотеки виплачено, що дало б рефінансування, що можна купити, якщо продати. Агент лишається на очах роками, не роблячи нічого."
         - en: "<b>Billing errors show up on a customer’s bank statement.</b> Subscriptions, plan upgrades, refunds, lockout for non-payment — there is no “almost right” here. <b>Permissions are a matrix, not a flag:</b> nine roles against twelve plans, plus enterprise and white-label, down to rights on a single lead."
           uk: "<b>Помилки білінгу видно у виписці клієнта.</b> Підписки, апгрейди планів, повернення, блокування за неоплату — тут не буває «майже правильно». <b>Права — це матриця, а не прапорець:</b> дев’ять ролей проти дванадцяти планів, плюс enterprise і white-label, аж до прав на конкретний лід."
-        - en: "And the two services share no database and no message broker, so consistency had to be designed rather than assumed. I wrote both sides of that integration — which is what someone does when they can see the whole system, not just their slice of it."
-          uk: "А два сервіси не мають ні спільної бази, ні спільного брокера — тож консистентність треба було спроєктувати, а не припустити. Я написав обидві сторони цієї інтеграції: так робить той, хто бачить систему цілком, а не лише свою ділянку."
+        - en: "And the two services share no database and no message broker, so consistency had to be designed rather than assumed. We wrote both sides of that integration — which is what someone does when they can see the whole system, not just their slice of it."
+          uk: "А два сервіси не мають ні спільної бази, ні спільного брокера — тож консистентність треба було спроєктувати, а не припустити. Ми написали обидві сторони цієї інтеграції: так робить той, хто бачить систему цілком, а не лише свою ділянку."
     mine:
       - en: "<b>Stripe billing</b> — charge-day logic, lockout and automatic unlock on payment, duplicate invoice suppression on upgrade."
         uk: "<b>Білінг на Stripe</b> — логіка дня списання, блокування й автоматичне розблокування після оплати, гасіння дублікатів інвойсів при апгрейді."
@@ -539,8 +539,8 @@ cases:
             en: "Client-base imports · 6,256 lines"
             uk: "Імпорт клієнтських баз · 6 256 рядків"
           body:
-            en: "My largest single commit in the repository split a monolithic CSV importer into <b>two inheritance hierarchies</b> — plain homeowners, and rows that already carry agent and lender emails — with separate validators, jobs and about 30 fixtures. Customer data arrives however the previous CRM exported it, so robustness beats elegance here."
-            uk: "Мій найбільший одиничний коміт у репозиторії розділив монолітний CSV-імпортер на <b>дві ієрархії наслідування</b> — прості власники будинків і рядки, що вже несуть емейли агента й лендера — з окремими валідаторами, джобами і ~30 фікстурами. Дані приходять у тому вигляді, у якому їх експортувала попередня CRM, тож надійність важливіша за елегантність."
+            en: "Our largest single commit in the repository split a monolithic CSV importer into <b>two inheritance hierarchies</b> — plain homeowners, and rows that already carry agent and lender emails — with separate validators, jobs and about 30 fixtures. Customer data arrives however the previous CRM exported it, so robustness beats elegance here."
+            uk: "Наш найбільший одиничний коміт у репозиторії розділив монолітний CSV-імпортер на <b>дві ієрархії наслідування</b> — прості власники будинків і рядки, що вже несуть емейли агента й лендера — з окремими валідаторами, джобами і ~30 фікстурами. Дані приходять у тому вигляді, у якому їх експортувала попередня CRM, тож надійність важливіша за елегантність."
         - title:
             en: "Cross-service integration, both sides"
             uk: "Міжсервісна інтеграція, обидві сторони"
@@ -557,8 +557,8 @@ cases:
             en: "Product verticals, whole slices"
             uk: "Продуктові вертикалі цілими шматками"
           body:
-            en: "Affordability calculator and seller-commission APIs taken through <code>controller → interactor → service → serializer → validator → Swagger → five to seven spec files</code>. Combined partnerships with a custom query object; HELOC/HELOAN loan types; round-robin lead distribution for agent + lender pairs. rswag generates the spec from request specs, so no endpoint of mine shipped undocumented."
-            uk: "API калькулятора доступності й комісії продавця, зроблені як <code>контролер → інтерактор → сервіс → серіалізатор → валідатор → Swagger → п’ять-сім файлів тестів</code>. Комбіновані партнерства з власним query-об’єктом; типи позик HELOC/HELOAN; round-robin розподіл лідів для пар агент + лендер. rswag генерує специфікацію з request-тестів, тож жоден мій ендпоінт не пішов без документації."
+            en: "Affordability calculator and seller-commission APIs taken through <code>controller → interactor → service → serializer → validator → Swagger → five to seven spec files</code>. Combined partnerships with a custom query object; HELOC/HELOAN loan types; round-robin lead distribution for agent + lender pairs. rswag generates the spec from request specs, so no endpoint of ours shipped undocumented."
+            uk: "API калькулятора доступності й комісії продавця, зроблені як <code>контролер → інтерактор → сервіс → серіалізатор → валідатор → Swagger → п’ять-сім файлів тестів</code>. Комбіновані партнерства з власним query-об’єктом; типи позик HELOC/HELOAN; round-robin розподіл лідів для пар агент + лендер. rswag генерує специфікацію з request-тестів, тож жоден наш ендпоінт не пішов без документації."
     quality:
       - value:
           en: "2,324"
@@ -576,17 +576,17 @@ cases:
           en: "6,256"
           uk: "6 256"
         label:
-          en: "lines · my largest commit"
-          uk: "рядків · мій найбільший коміт"
+          en: "lines · our largest commit"
+          uk: "рядків · наш найбільший коміт"
       - value:
           en: "100%"
           uk: "100 %"
         label:
-          en: "of my public API endpoints documented"
-          uk: "моїх публічних API-ендпоінтів з документацією"
+          en: "of our public API endpoints documented"
+          uk: "наших публічних API-ендпоінтів з документацією"
     scope_note:
-      en: "<b>Scope, honestly.</b> This is a codebase from 2018 with 34 contributors — I am the 9th by volume and did not architect it. What I can claim is ownership of specific high-risk areas inside it, and that every endpoint I added is documented and specced."
-      uk: "<b>Про межі — чесно.</b> Це кодова база з 2018 року з 34 контриб’юторами — я 9-й за обсягом і не проєктував її. Що я справді можу заявити — відповідальність за конкретні високоризикові зони всередині й те, що кожен доданий мною ендпоінт задокументований і покритий тестами."
+      en: "<b>Scope, honestly.</b> This is a codebase from 2018 with 34 contributors — our share is the 9th by volume, and we did not architect it. What we can claim is ownership of specific high-risk areas inside it, and that every endpoint we added is documented and specced."
+      uk: "<b>Про межі — чесно.</b> Це кодова база з 2018 року з 34 контриб’юторами — наш внесок 9-й за обсягом, і проєктували її не ми. Що ми справді можемо заявити — відповідальність за конкретні високоризикові зони всередині й те, що кожен доданий нами ендпоінт задокументований і покритий тестами."
   - slug: "imagemaker"
     mark: "05"
     own: true
@@ -647,10 +647,10 @@ cases:
       body:
         - en: "In group chats people quote each other with screenshots — ugly, unreadable, and impossible to share outside the app. ImageMaker replaces that with one word: reply “quote” to any message and the bot returns a typeset image with the text, the author’s avatar, their name and the date on a matching background."
           uk: "У групових чатах люди цитують одне одного скриншотами — некрасиво, нечитабельно, і поза застосунком таким не поділишся. ImageMaker замінює це одним словом: відповідаєте «цитата» на будь-яке повідомлення, і бот повертає верстане зображення з текстом, аватаром автора, його ім’ям і датою на підібраному тлі."
-        - en: "<b>The decision that doubled its value.</b> Instead of leaving it a standalone toy, I turned it into the shared rendering engine for the company’s other product. The same service now answers its own audience and three environments of a different bot on another physical server — one codebase, one team, two product lines."
-          uk: "<b>Рішення, яке подвоїло цінність.</b> Замість того щоб лишити це окремою іграшкою, я зробив із нього спільний рендер-рушій для другого продукту компанії. Той самий сервіс тепер обслуговує власну аудиторію і три оточення іншого бота на іншому фізичному сервері — одна кодова база, одна команда, дві продуктові лінійки."
-        - en: "In production since December 2022, 118 thousand new users in the last year alone, and the entire hosting bill is twelve dollars a month. That number is not a brag about frugality; it is the reason half the engineering below exists."
-          uk: "У продакшні з грудня 2022-го, 118 тисяч нових користувачів лише за останній рік, і весь рахунок за хостинг — дванадцять доларів на місяць. Ця цифра не про хвастощі економністю; вона про те, чому існує половина інженерії нижче."
+        - en: "<b>The decision that doubled its value.</b> Instead of leaving it a standalone toy, we turned it into the shared rendering engine for the company’s other product. The same service now answers its own audience and three environments of a different bot on another physical server — one codebase, one team, two product lines."
+          uk: "<b>Рішення, яке подвоїло цінність.</b> Замість того щоб лишити це окремою іграшкою, ми зробили з нього спільний рендер-рушій для другого продукту компанії. Той самий сервіс тепер обслуговує власну аудиторію і три оточення іншого бота на іншому фізичному сервері — одна кодова база, одна команда, дві продуктові лінійки."
+        - en: "In production since December 2022, 118 thousand new users in 2026 alone, and the entire hosting bill is twelve dollars a month. That number is not a brag about frugality; it is the reason half the engineering below exists."
+          uk: "У продакшні з грудня 2022-го, 118 тисяч нових користувачів лише за 2026 рік, і весь рахунок за хостинг — дванадцять доларів на місяць. Ця цифра не про хвастощі економністю; вона про те, чому існує половина інженерії нижче."
     mine:
       - en: "<b>Text has to fit, always.</b> Any language, any length, an emoji-only message, one word 40 characters long — the layout can never overflow or look cramped."
         uk: "<b>Текст мусить вміститися завжди.</b> Будь-яка мова, будь-яка довжина, повідомлення з одних емодзі, одне слово на 40 символів — верстка не має права ні виїхати, ні виглядати затісною."
@@ -709,8 +709,8 @@ cases:
           en: "+118k"
           uk: "+118 тис."
         label:
-          en: "users in the last year"
-          uk: "користувачів за рік"
+          en: "users in 2026"
+          uk: "користувачів за 2026 рік"
       - value:
           en: "0"
           uk: "0"
@@ -792,10 +792,10 @@ cases:
       body:
         - en: "Cards were declined, phone numbers rejected, the interface was in English. This bot removed all of that: open Telegram, ask a question in Ukrainian, get an answer. Free to start, topped up over the first week, paid if you need more."
           uk: "Картки не проходили, номери телефонів не приймалися, інтерфейс був англійською. Цей бот прибрав усе це: відкрив Telegram, спитав українською, отримав відповідь. Безкоштовно на старті, з доливками за перший тиждень, платно — якщо треба більше."
-        - en: "It is deliberately a small product with one job, and it is the clearest commercial proof I can show: <b>289,000 people used it, the product has taken 15,000 paid orders, and the money keeps arriving through automatic renewals.</b> Nobody sends an invoice, nobody reconciles a spreadsheet — the product bills itself."
-          uk: "Це свідомо маленький продукт з однією задачею, і це найясніший комерційний доказ, який я можу показати: <b>289 000 людей ним скористалися, продукт прийняв 15 000 платних замовлень, і гроші продовжують приходити через автоматичні продовження.</b> Ніхто не виставляє інвойси, ніхто не зводить таблиці — продукт сам виставляє рахунки."
-        - en: "<b>A detail I like.</b> AI answers are slow, and silence feels broken. So the bot keeps typing — literally: a parallel thread pings the “typing” indicator every seven seconds for the whole duration of the response, so the chat never looks dead."
-          uk: "<b>Деталь, яка мені подобається.</b> AI-відповіді повільні, а тишу користувач читає як «зламалося». Тому бот увесь час «друкує» — буквально: паралельний потік пінгує індикатор набору кожні сім секунд протягом усієї відповіді, тож чат ніколи не виглядає мертвим."
+        - en: "It is deliberately a small product with one job, and it is the clearest commercial proof we can show: <b>289,000 people used it, the product has taken 15,000 paid orders, and the money keeps arriving through automatic renewals.</b> Nobody sends an invoice, nobody reconciles a spreadsheet — the product bills itself."
+          uk: "Це свідомо маленький продукт з однією задачею, і це найясніший комерційний доказ, який ми можемо показати: <b>289 000 людей ним скористалися, продукт прийняв 15 000 платних замовлень, і гроші продовжують приходити через автоматичні продовження.</b> Ніхто не виставляє інвойси, ніхто не зводить таблиці — продукт сам виставляє рахунки."
+        - en: "<b>A detail we like.</b> AI answers are slow, and silence feels broken. So the bot keeps typing — literally: a parallel thread pings the “typing” indicator every seven seconds for the whole duration of the response, so the chat never looks dead."
+          uk: "<b>Деталь, яка нам подобається.</b> AI-відповіді повільні, а тишу користувач читає як «зламалося». Тому бот увесь час «друкує» — буквально: паралельний потік пінгує індикатор набору кожні сім секунд протягом усієї відповіді, тож чат ніколи не виглядає мертвим."
     mine:
       - en: "<b>Recurring payments end to end</b> — payment-token storage, a daily autopay worker, callback handling with status verification before anything is credited."
         uk: "<b>Регулярні платежі наскрізно</b> — зберігання платіжного токена, щоденний autopay-воркер, обробка колбеків із перевіркою статусу перед зарахуванням."
@@ -875,8 +875,8 @@ cases:
           en: "years in production"
           uk: "роки в продакшні"
     scope_note:
-      en: "<b>Stated plainly:</b> this is the least architecturally ambitious project here and the most commercially direct one. I include it because “I have shipped a product that takes money from strangers and renews it automatically” is a different claim from “I have shipped a product”."
-      uk: "<b>Скажу прямо:</b> це найменш архітектурно амбітний проєкт тут і найпряміший комерційно. Я включаю його, бо «я зробив продукт, який бере гроші в незнайомців і продовжує підписку сам» — це інша заява, ніж «я зробив продукт»."
+      en: "<b>Stated plainly:</b> this is the least architecturally ambitious project here and the most commercially direct one. We include it because “we have shipped a product that takes money from strangers and renews it automatically” is a different claim from “we have shipped a product”."
+      uk: "<b>Скажемо прямо:</b> це найменш архітектурно амбітний проєкт тут і найпряміший комерційно. Ми включаємо його, бо «ми зробили продукт, який бере гроші в незнайомців і продовжує підписку сам» — це інша заява, ніж «ми зробили продукт»."
   - slug: "rubycoin"
     mark: "07"
     own: true
@@ -884,8 +884,8 @@ cases:
       en: "2022–present"
       uk: "2022–дотепер"
     sector:
-      en: "publishing · education"
-      uk: "видання · освіта"
+      en: "studio site · publishing"
+      uk: "сайт студії · видання"
     status:
       en: "built from zero · 10 contributors"
       uk: "з нуля · 10 контриб’юторів"
@@ -893,8 +893,8 @@ cases:
       en: "RubyCoin"
       uk: "RubyCoin"
     tagline:
-      en: "Free Rails lessons in Ukrainian, on a CMS I wrote — and the training ground where ten contributors learned to ship reviewed code. You are on it right now."
-      uk: "Безкоштовні уроки Rails українською на CMS, яку я написав, — і полігон, де десять контриб’юторів навчилися здавати код через рев’ю. Ви зараз на ньому."
+      en: "Rails articles in Ukrainian, on a CMS we wrote — ten contributors, every change through review. You are on it right now."
+      uk: "Статті про Rails українською на CMS, яку ми написали, — десять контриб’юторів, кожна зміна через рев’ю. Ви зараз на ньому."
     role:
       en: "Tech lead · architect · devops · rubyco.in"
       uk: "Техлід · архітектор · devops · rubyco.in"
@@ -922,8 +922,8 @@ cases:
           en: "10"
           uk: "10"
         label:
-          en: "contributors led through review"
-          uk: "контриб’юторів проведено через рев’ю"
+          en: "contributors shipping through review"
+          uk: "контриб’юторів здавали код через рев’ю"
       - value:
           en: "76 ms"
           uk: "76 мс"
@@ -935,21 +935,17 @@ cases:
         en: "No new article since February 2024 — and the traffic is still growing"
         uk: "Жодної нової статті з лютого 2024-го — а трафік досі росте"
       body:
-        - en: "<b>You are reading this on it.</b> Good programming material in Ukrainian barely existed — beginners had to learn in someone else’s language. RubyCoin is a free bilingual platform of Rails lessons with its own publishing system, search and analytics, and this portfolio is a section of it."
-          uk: "<b>Ви читаєте це на ньому.</b> Гарних матеріалів з програмування українською майже не існувало — початківцям доводилося вчитися чужою мовою. RubyCoin — це безкоштовна двомовна платформа уроків Rails із власною системою публікації, пошуком і аналітикою, а це портфоліо — її розділ."
-        - en: "The number I am proudest of is not the traffic, it is the shape of it: <b>no new article has been published since February 2024, and visits are still growing</b> — 31,000 from January to mid-August 2026 against 24,800 in the whole of 2025, almost entirely organic from Google. That is content quality and technical work compounding, not promotion."
-          uk: "Цифра, якою я найбільше гордий, — не трафік, а його форма: <b>жодної нової статті не публікувалося з лютого 2024-го, а візити досі зростають</b> — 31 000 із січня до середини серпня 2026-го проти 24 800 за весь 2025-й, майже повністю органіка з Google. Це накопичувальний ефект якості контенту й технічної роботи, а не промо."
-        - en: "<b>The project as a school.</b> Ten contributors — mostly interns — passed through this codebase. I set the tasks, reviewed the pull requests and owned what reached production. The skill on display is not “wrote code”, it is “built a process in which other people write the code and it doesn’t fall apart”."
-          uk: "<b>Проєкт як школа.</b> Десять контриб’юторів — переважно стажистів — пройшли через цю кодову базу. Я ставив задачі, рев’ював pull request’и і відповідав за те, що дійшло до продакшну. Навичка, яку тут видно, — не «писав код», а «побудував процес, у якому код пишуть інші й це не розвалюється»."
+        - en: "<b>You are reading this on it.</b> rubyco.in is our studio’s own site: a bilingual Rails publication with its own publishing system, search and analytics, and this portfolio is one of its sections."
+          uk: "<b>Ви читаєте це на ньому.</b> rubyco.in — сайт нашої студії: двомовне видання про Rails із власною системою публікації, пошуком і аналітикою, а це портфоліо — один із його розділів."
+        - en: "The number we are proudest of is not the traffic, it is the shape of it: <b>no new article has been published since February 2024, and visits are still growing</b> — 31,000 from January to mid-August 2026 against 24,800 in the whole of 2025, almost entirely organic from Google. That is content quality and technical work compounding, not promotion."
+          uk: "Цифра, якою ми найбільше пишаємося, — не трафік, а його форма: <b>жодної нової статті не публікувалося з лютого 2024-го, а візити досі зростають</b> — 31 000 із січня до середини серпня 2026-го проти 24 800 за весь 2025-й, майже повністю органіка з Google. Це накопичувальний ефект якості контенту й технічної роботи, а не промо."
+        - en: "<b>The process.</b> Ten contributors have worked in this codebase. We set the tasks, reviewed the pull requests and owned what reached production. The skill on display is not “wrote code”, it is “built a process in which ten people write the code and it doesn’t fall apart”."
+          uk: "<b>Процес.</b> Десять контриб’юторів працювали в цій кодовій базі. Ми ставили задачі, рев’ювали pull request’и і відповідали за те, що дійшло до продакшну. Навичка, яку тут видно, — не «писали код», а «побудували процес, у якому код пишуть десять людей і це не розвалюється»."
     mine:
-      - en: "<b>It is the only project here with no commercial pressure</b> — which makes it the honest sample of how I build when nobody is asking for a deadline."
-        uk: "<b>Це єдиний проєкт тут без комерційного тиску</b> — тому він і є чесним зразком того, як я будую, коли ніхто не просить дедлайн."
-      - en: "<b>It is the mentoring evidence.</b> Ten people, every pull request reviewed, production owned by me."
-        uk: "<b>Це доказ менторства.</b> Десять людей, я переглядав кожен PR, продакшн — на мені."
       - en: "<b>It is the Rails-craft sample:</b> Hotwire used where it earns its place, Turbo Drive deliberately off, upgrades carried live from Rails 7.0 to 8.1."
         uk: "<b>Це зразок Rails-ремесла:</b> Hotwire там, де він виправданий, Turbo Drive свідомо вимкнений, оновлення проведені на живому сайті з Rails 7.0 до 8.1."
-      - en: "<b>It compounds without me.</b> No new article since February 2024, and the traffic curve is still going up."
-        uk: "<b>Він росте й без мене.</b> З лютого 2024-го не вийшло жодної нової статті, а крива трафіку досі йде вгору."
+      - en: "<b>It compounds without us.</b> No new article since February 2024, and the traffic curve is still going up."
+        uk: "<b>Він росте й без нас.</b> З лютого 2024-го не вийшло жодної нової статті, а крива трафіку досі йде вгору."
     engineering:
       heading:
         en: "AI translation that keeps the markup, and analytics with no counter to drift"
@@ -980,8 +976,8 @@ cases:
             en: "Search and statistics as objects"
             uk: "Пошук і статистика як об’єкти"
           body:
-            en: "Statistics isolated as <b>six independently tested query objects</b>, and two-level authorisation with a separate management policy namespace for admin versus moderator. When interns are writing the features, the seams have to be obvious."
-            uk: "Статистика виділена у <b>шість незалежно протестованих query-об’єктів</b>, авторизація дворівнева з окремим неймспейсом політик управління для адміна й модератора. Коли фічі пишуть стажисти, шви мусять бути очевидними."
+            en: "Statistics isolated as <b>six independently tested query objects</b>, and two-level authorisation with a separate management policy namespace for admin versus moderator. When ten people are writing the features, the seams have to be obvious."
+            uk: "Статистика виділена у <b>шість незалежно протестованих query-об’єктів</b>, авторизація дворівнева з окремим неймспейсом політик управління для адміна й модератора. Коли фічі пишуть десять людей, шви мусять бути очевидними."
         - title:
             en: "Two image versions per upload, down from five"
             uk: "Дві версії зображення на завантаження — було п’ять"

@@ -148,8 +148,8 @@ contributions:
         - en: "Whole product verticals from controller to documented endpoint."
           uk: "Цілі продуктові вертикалі від контролера до документованого ендпоінта."
       outside:
-        en: "A codebase with 34 contributors; the other 33 were the client’s own team. I am the 9th by volume."
-        uk: "Кодова база з 34 контриб’юторами; решта 33 — власна команда клієнта. Я 9-й за обсягом."
+        en: "A codebase with 34 contributors; the other 33 were the client’s own team. Our share is the 9th by volume."
+        uk: "Кодова база з 34 контриб’юторами; решта 33 — власна команда клієнта. Наш внесок — 9-й за обсягом."
 
   imagemaker:
     - person: "danyil"
@@ -215,8 +215,8 @@ contributions:
       role: { en: "tech lead · architect · reviewer", uk: "техлід · архітектор · рев’ювер" }
       period: "2022–2026"
       did:
-        - en: "Set the tasks and reviewed the pull requests of ten contributors, mostly interns."
-          uk: "Ставив задачі й рев’ював pull request’и десяти контриб’юторів, переважно стажистів."
+        - en: "Set the tasks and reviewed the pull requests of ten contributors."
+          uk: "Ставив задачі й рев’ював pull request’и десяти контриб’юторів."
         - en: "Carried the upgrades live: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
           uk: "Провів оновлення на живому продукті: Rails 7.0→8.1, Sprockets→Propshaft + esbuild."
     - person: "oleksandr"
@@ -231,15 +231,15 @@ contributions:
       role: { en: "co-founder · product", uk: "співзасновник · продукт" }
       period: "2022–2026"
       did:
-        - en: "Recruited the contributors and ran the intake — the school side of the project is his."
-          uk: "Набрав контриб’юторів і вів відбір — шкільна частина проєкту на ньому."
+        - en: "Recruited the contributors and ran the intake."
+          uk: "Набрав контриб’юторів і вів відбір."
         - en: "Editorial plan and distribution, back when articles were still being published."
           uk: "Редакційний план і дистрибуція — ще коли статті публікувалися."
     - person: "claude"
       role: { en: "pull request review", uk: "рев’ю pull request’ів" }
       period: "2026"
       did:
-        - en: "Inline comments on request — an intern types <code>review</code> on the pull request and gets one before a human spends time."
-          uk: "Інлайн-коментарі на запит — стажист пише <code>review</code> у pull request і отримує рев’ю до того, як людина витратить час."
+        - en: "Inline comments on request — a developer types <code>review</code> on the pull request and gets one before a human spends time."
+          uk: "Інлайн-коментарі на запит — розробник пише <code>review</code> у pull request і отримує рев’ю до того, як людина витратить час."
         - en: "On this page too: the section you are reading was reviewed the same way."
           uk: "І на цій сторінці теж: розділ, який ви читаєте, проходив те саме рев’ю."

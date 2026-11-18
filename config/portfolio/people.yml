@@ -111,15 +111,15 @@ people:
         en: "4+ years in production"
         uk: "4+ років у продакшні"
       summary:
-        en: "Twelve years in media and social: websites, Telegram channels, YouTube, Instagram, TikTok — properties with more than 200 million followers between them. Developer communities of 60,000 since 2022, and since 2023 a co-founder of RubyCoin and its five products. Product is his in every one of them: the idea, the spec, the economics, the copy, the distribution — everything between a thought and the first user."
-        uk: "Дванадцять років у медіа й SMM: сайти, Telegram-канали, YouTube, Instagram, TikTok — ресурси із сумарною аудиторією 200+ млн. З 2022-го — IT-спільноти на 60 тис. учасників, з 2023-го — співзасновник RubyCoin і п’яти власних продуктів. Продукт у кожному з них на ньому: ідея, ТЗ, економіка, тексти, дистрибуція — усе між задумом і першим користувачем."
+        en: "Twelve years in media and social: websites, Telegram channels, YouTube, Instagram, TikTok — properties with more than 200 million followers between them. Developer communities of 60,000 and, since 2022, a co-founder of RubyCoin and its five products. Product is his in every one of them: the idea, the spec, the economics, the copy, the distribution — everything between a thought and the first user."
+        uk: "Дванадцять років у медіа й SMM: сайти, Telegram-канали, YouTube, Instagram, TikTok — ресурси із сумарною аудиторією 200+ млн. З 2022-го — IT-спільноти на 60 тис. учасників і співзасновник RubyCoin та п’яти власних продуктів. Продукт у кожному з них на ньому: ідея, ТЗ, економіка, тексти, дистрибуція — усе між задумом і першим користувачем."
       location: { en: "Ukraine · remote", uk: "Україна · віддалено" }
       languages: { en: "Ukrainian native · English B2/C1", uk: "Українська — рідна · англійська B2/C1" }
       education:
         en: "International relations and diplomacy · Ivan Franko National University of Lviv · 2021"
         uk: "Факультет міжнародних відносин · Львівський національний університет імені Івана Франка · 2021"
       experience:
-        - period: { en: "2023–present", uk: "2023–дотепер" }
+        - period: { en: "2022–present", uk: "2022–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
           title: { en: "Co-founder · product · growth", uk: "Співзасновник · продукт · зростання" }
           place: { en: "Ukraine · remote", uk: "Україна · віддалено" }
@@ -174,8 +174,8 @@ people:
       en: "Oleksii Mikhno"
       uk: "Олексій Міхно"
     role:
-      en: "backend"
-      uk: "бекенд"
+      en: "fullstack"
+      uk: "фулстек"
     blurb:
       en: "Queues, schedules and the production problems that only show up at 3am."
       uk: "Черги, розклади й ті проблеми продакшну, які спливають о третій ночі."
@@ -186,7 +186,7 @@ people:
       - { icon: "🏠", label: { en: "home automation", uk: "розумний дім" }, detail: { en: "ESPHome · ESP32", uk: "ESPHome · ESP32" } }
       - { icon: "🧠", label: { en: "local LLMs", uk: "локальні LLM" } }
     cv:
-      role: { en: "Backend engineer", uk: "Backend-інженер" }
+      role: { en: "Fullstack developer", uk: "Фулстек-розробник" }
       years: { en: "on these products since 2024", uk: "на цих продуктах із 2024-го" }
       summary:
         en: "Backend, automation, and keeping production systems running. The work here is queues and schedules: the planning and delivery pipeline, job flow on Sidekiq and Redis, reservation and delayed delivery, and the race conditions, locks and idempotency problems that come with all of it. Before that, support and development of an e-commerce platform on OpenCart and PHP — including MySQL binlog work, data recovery and SQL migrations."
@@ -194,7 +194,7 @@ people:
       experience:
         - period: { en: "2024–present", uk: "2024–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
-          title: { en: "Backend engineer", uk: "Backend-інженер" }
+          title: { en: "Fullstack developer", uk: "Фулстек-розробник" }
           place: { en: "DNA · WardyBot", uk: "DNA · WardyBot" }
           body:
             en: "The planning and delivery pipeline: job flow on <b>Sidekiq, Sidekiq Scheduler and Redis</b>, reservation, delayed delivery and ordered publishing, timezone-aware scheduling per user and per bot, and a <b>Ruby ↔ Python bridge over Redis Streams</b>. Plus embeddings and vector search, production performance work, and the race conditions, pending jobs, locks and idempotency that come with a queue that must not publish twice."
@@ -317,7 +317,7 @@ people:
       - { icon: "✈️", label: { en: "travel", uk: "подорожі" } }
       - { icon: "📖", label: { en: "reading", uk: "читає" }, detail: { en: "fiction", uk: "художню літературу" } }
     cv:
-      role: { en: "Ruby on Rails developer", uk: "Ruby on Rails розробниця" }
+      role: { en: "Ruby on Rails developer", uk: "Ruby on Rails-розробниця" }
       years: { en: "in Ruby since 2022", uk: "у Ruby з 2022-го" }
       summary:
         en: "A Rails developer who arrived by way of applied mathematics and process optimisation, and writes queries like someone who has had to make a physical process cheaper. Web applications, RSpec and Capybara coverage, PostgreSQL and Redis. Still doing research alongside the code: a doctoral programme at the Institute of Cybernetics on algorithms for locating magnetic anomalies, with a published paper and a copyright certificate for the software behind it."
@@ -330,7 +330,7 @@ people:
       languages: { en: "Ukrainian native · English C1 · Polish A1", uk: "Українська — рідна · англійська C1 · польська A1" }
       education:
         en: "Igor Sikorsky Kyiv Polytechnic Institute — BSc, software engineering.<br>Zhytomyr State Technological University — MSc, automated process control."
-        uk: "КПІ ім. Ігоря Сікорського — бакалавр, інженерія програмного забезпечення.<br>Житомирська державна технологічна академія — магістр, автоматизоване керування процесами."
+        uk: "КПІ ім. Ігоря Сікорського — бакалавр, інженерія програмного забезпечення.<br>Житомирський державний технологічний університет — магістр, автоматизоване керування процесами."
       experience:
         - period: { en: "2024–present", uk: "2024–дотепер" }
           org: { en: "RubyCoin", uk: "RubyCoin" }
@@ -351,7 +351,7 @@ people:
             uk: "Алгоритми й математичні моделі для локалізації джерел магнітних аномалій — дослідження, під яке й писався Rails-застосунок нижче."
         - period: { en: "2023", uk: "2023" }
           org: { en: "Igor Sikorsky Kyiv Polytechnic Institute", uk: "КПІ ім. Ігоря Сікорського" }
-          title: { en: "Ruby on Rails developer", uk: "Ruby on Rails розробниця" }
+          title: { en: "Ruby on Rails developer", uk: "Ruby on Rails-розробниця" }
           note:
             en: "Copyright registration certificate No. 122247, December 2023."
             uk: "Свідоцтво про реєстрацію авторського права №122247, грудень 2023."
@@ -410,20 +410,20 @@ people:
       en: "Claude"
       uk: "Claude"
     role:
-      en: "automated reviewer"
-      uk: "автоматичний рев’ювер"
+      en: "AI reviewer and dev assistant"
+      uk: "AI-рев’ювер і помічник розробки"
     blurb:
-      en: "Reviews pull requests in four of these products — automatically in three, on request in this one. Advisory only, no merge rights."
-      uk: "Рев’ює pull request’и в чотирьох із цих продуктів — у трьох автоматично, у цьому на запит. Тільки дорадчо, без права мерджити."
-    updated: "2026·09·08"
+      en: "Reviews pull requests in four of these products — automatically in three, on request in this one. In those three it also works beside the developers: researches errors, drafts tickets, reads logs and databases read-only while debugging. Advisory only, no merge rights."
+      uk: "Рев’ює pull request’и в чотирьох із цих продуктів — у трьох автоматично, у цьому на запит. У цих трьох він ще й працює поруч із розробниками: досліджує помилки, готує тікети, читає логи й бази лише на читання під час налагодження. Тільки дорадчо, без права мерджити."
+    updated: "2026·11·18"
     not_work:
       - { icon: "💤", label: { en: "idle", uk: "простій" }, detail: { en: "between pushes", uk: "між пушами" } }
       - { icon: "📄", label: { en: "reading", uk: "читає" }, detail: { en: "the CHANGELOG", uk: "CHANGELOG" } }
       - { icon: "🗓", label: { en: "weekends", uk: "вихідні" }, detail: { en: "same as weekdays", uk: "як будні" } }
     cv:
       role:
-        en: "Automated reviewer"
-        uk: "Автоматичний рев’ювер"
+        en: "AI reviewer and dev assistant"
+        uk: "AI-рев’ювер і помічник розробки"
       years:
         en: "wired into CI since April 2026"
         uk: "у CI з квітня 2026-го"
@@ -432,7 +432,7 @@ people:
         uk: "Читає pull request’и в чотирьох продуктах тут за чеклистом із шести-восьми пунктів, своїм для кожного репозиторію, о третій ночі, без скарг, і лишає інлайн-коментарі. Ніколи не просив підвищення. Іноді пропонує метод, якого не існує — саме тому людина-рев’ювер досі потрібна."
       contact:
         - [{ en: "runs in", uk: "працює в" }, "GitHub Actions", "https://github.com/anko20094"]
-        - [{ en: "invoked by", uk: "запускає" }, { en: "an opened pull request", uk: "відкритий pull request" }, "https://github.com/anko20094"]
+        - [{ en: "invoked by", uk: "запускає" }, { en: "an opened pull request, or a review comment", uk: "відкритий pull request або коментар review" }, "https://github.com/anko20094"]
       location:
         en: "wherever the runner is"
         uk: "де підняли раннер"
@@ -451,8 +451,8 @@ people:
             en: "Pull request review"
             uk: "Рев’ю pull request’ів"
           place:
-            en: "CI · on an opened pull request"
-            uk: "CI · на відкритий pull request"
+            en: "CI · when a pull request opens, or on request"
+            uk: "CI · коли відкривається pull request, або на запит"
           note:
             en: "A checklist, not an opinion. It is in the workflow file, and you can read it."
             uk: "Чеклист, а не думка. Він лежить у файлі воркфлоу, і його можна прочитати."
@@ -460,6 +460,23 @@ people:
             en: "Flags the N+1 a tired human stops seeing, the migration without a down path, the spec that asserts nothing, and the hardcoded string that should have been a translation key. Advisory only — <b>no merge rights</b>, and that is on purpose."
             uk: "Позначає N+1, який втомлена людина вже не бачить, міграцію без down, тест, що нічого не перевіряє, і зашитий рядок, який мусив бути ключем перекладу. Тільки дорадчо — <b>права мерджити немає</b>, і це навмисно."
           cases: ["dna", "wardybot", "imagemaker", "rubycoin"]
+        - period: { en: "2026–present", uk: "2026–дотепер" }
+          org:
+            en: "RubyCoin · three products"
+            uk: "RubyCoin · три продукти"
+          title:
+            en: "Development assistant"
+            uk: "Помічник розробки"
+          place:
+            en: "Claude Code · beside the developer"
+            uk: "Claude Code · поруч із розробником"
+          note:
+            en: "Since April 2026, with skills written for each repository."
+            uk: "З квітня 2026-го, зі скілами, написаними під кожен репозиторій."
+          body:
+            en: "Follows an error from Rollbar to its cause and turns it into a YouTrack ticket by the team’s conventions, analyses tickets, covers code with specs, works through pull request comments, and runs a multi-agent review. Debugs with <b>read-only</b> access: a SELECT-only database role on staging and production, and the server logs."
+            uk: "Іде від помилки в Rollbar до її причини й оформлює тікет у YouTrack за правилами команди, аналізує тікети, покриває код тестами, відпрацьовує коментарі до pull request’ів і запускає багатоагентне рев’ю. Налагоджує з доступом <b>лише на читання</b>: роль бази з правом SELECT на staging і продакшні та логи серверів."
+          cases: ["dna", "wardybot", "imagemaker"]
       stacks:
         - label:
             en: "reads"
@@ -468,14 +485,14 @@ people:
         - label:
             en: "does not have"
             uk: "не має"
-          items: [{ en: "production access", uk: "доступу до продакшну" }, { en: "merge rights", uk: "права мерджити" }, { en: "an opinion about tabs", uk: "думки про табуляцію" }]
+          items: [{ en: "write access to production", uk: "права писати в продакшн" }, { en: "merge rights", uk: "права мерджити" }, { en: "an opinion about tabs", uk: "думки про табуляцію" }]
       strengths:
         - en: "Catches the N+1 you stopped seeing on pull request #400"
           uk: "Ловить N+1, який ви перестали бачити на PR #400"
         - en: "Never gets tired, never gets political about a diff"
           uk: "Не втомлюється й не політизує дифи"
-        - en: "Does not know your production data, and should not"
-          uk: "Не знає ваших даних із продакшну — і не має знати"
+        - en: "Reads production only through a SELECT-only role, and only to debug"
+          uk: "Читає продакшн лише через роль із правом SELECT — і лише для налагодження"
         - en: "Cheaper than the bug it prevents"
           uk: "Дешевший за баг, якому запобігає"
 

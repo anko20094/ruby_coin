@@ -108,8 +108,8 @@ RSpec.describe Case do
         I18n.with_locale(locale) { kase.tap(&:valid?).errors.full_messages.to_sentence }
       end
 
-      expect(messages).to eq(en: 'What was mine has a row written in one language only',
-                             uk: 'Що було моїм має рядок, написаний лише однією мовою')
+      expect(messages).to eq(en: 'What we did has a row written in one language only',
+                             uk: 'Що ми зробили має рядок, написаний лише однією мовою')
     end
   end
 

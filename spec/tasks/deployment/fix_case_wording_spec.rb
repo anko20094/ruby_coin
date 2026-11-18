@@ -2,66 +2,62 @@
 
 require 'rails_helper'
 
-RSpec::Matchers.define_negated_matcher :not_include, :include
-
 RSpec.describe 'after_party:fix_case_wording' do
   let(:task) { 'after_party:fix_case_wording' }
+  let(:changes) { YAML.load_file(Rails.root.join('lib', 'tasks', 'deployment', '20261109120000_fix_case_wording.yml')) }
 
-  def json_columns = Case.columns.select { |column| column.type == :jsonb }.map(&:name)
+  def typed(column, value) = Case.new(column => value)[column]
 
-  def stored_json(kase, name)
-    raw = kase.read_attribute_before_type_cast(name)
-    raw.is_a?(String) ? raw : raw.to_json
+  # The yaml as the importer stores it, column by column.
+  def source
+    importer = Cases::Importer.new
+    YAML.load_file(Cases::Importer::SOURCE)['cases'].each_with_index.to_h do |entry, index|
+      [entry['slug'], importer.__send__(:attributes_for, entry, index).transform_keys(&:to_s)]
+    end
   end
 
-  # Every JSON field of a case as one string, both languages.
-  def text_of(slug)
-    kase = Case.find_by!(slug: slug)
-    json_columns.map { |name| stored_json(kase, name) }.join
-  end
-
-  # Swaps a phrase in every JSON field of a case, straight in the table.
-  def swap(slug, from, to)
-    kase = Case.find_by!(slug: slug)
-    kase.update_columns(json_columns.index_with { |name| JSON.parse(stored_json(kase, name).gsub(from, to)) })
-  end
-
-  # The table as production holds it: imported before the wording was fixed in the yaml.
+  # The table as production holds it: every changed column still at its imported value.
   before do
     Cases::Importer.call(force: false)
-    swap('intelligence', 'що ви існуєте.', 'що ти існуєш.')
-    swap('intelligence', 'connects_to</code>: ролі,', 'connects_to</code>: роли,')
-    swap('wardybot', 'мультитенантність не звели', 'модель оренди не звели')
-    swap('rubycoin', '53 МБ резидентної пам’яті', '53 МБ resident')
-    swap('rubycoin', 'резидентна пам’ять', 'resident-пам’ять')
-    swap('intelligence', 'then reworked and dropped', 'then reworked out and dropped')
-    swap('wardybot', '"1,000+"', '"1000+"')
-    swap('wardybot', '"1 000+"', '"1000+"')
+    changes.each do |slug, columns|
+      Case.find_by!(slug: slug).update_columns(columns.to_h do |column, change|
+        [column, typed(column, change['from'])]
+      end)
+    end
   end
 
-  it 'replaces the old phrases where they are, and records itself' do
+  it 'agrees with cases.yml: every target is what the yaml now says' do
+    changes.each do |slug, columns|
+      columns.each do |column, change|
+        expect(typed(column, change['to'])).to eq(typed(column, source.dig(slug, column))), "#{slug}.#{column}"
+      end
+    end
+  end
+
+  it 'brings every changed column to the yaml, and records itself' do
     run = run_task(task)
 
-    expect(run.stdout).to include('case wording fixed in:', 'intelligence', 'wardybot', 'rubycoin')
-    expect(text_of('intelligence')).to include('що ви існуєте.', 'ролі,').and not_include('роли,')
-    expect(text_of('wardybot')).to include('мультитенантність').and not_include('модель оренди')
-    expect(text_of('rubycoin')).to include('53 МБ резидентної пам’яті')
-      .and not_include('МБ resident', 'resident-пам’ять')
+    expect(run.stdout).to include('case wording fixed in:')
+    changes.each do |slug, columns|
+      kase = Case.find_by!(slug: slug)
+      columns.each_key do |column|
+        expect(kase[column]).to eq(typed(column, source.dig(slug, column))), "#{slug}.#{column}"
+      end
+    end
     expect(AfterParty::TaskRecord.where(version: '20261109120000').count).to eq(1)
   end
 
-  it 'fixes English phrases too, and a metric value in each language’s own format' do
-    run_task(task)
+  it 'leaves a column the admin has edited, names it, and finds nothing on a second pass' do
+    # A column holding one { en:, uk: } pair, which the admin rewrote in English.
+    slug, column = changes.flat_map { |s, columns| columns.keys.map { |c| [s, c] } }
+                          .find { |s, c| typed(c, changes.dig(s, c, 'to')).is_a?(Hash) }
+    edited = typed(column, changes.dig(slug, column, 'to')).merge('en' => 'Owner text.')
+    Case.find_by!(slug: slug).update_columns(column => edited)
 
-    expect(text_of('intelligence')).to include('then reworked and dropped')
-    expect(text_of('wardybot')).to include('"1,000+"', '"1 000+"').and not_include('"1000+"')
-  end
+    run = run_task(task)
 
-  it 'leaves a phrase the admin has already rewritten, and finds nothing on a second pass' do
-    swap('wardybot', 'модель оренди', 'модель власника')
-
-    run_task(task)
-    expect(text_of('wardybot')).to include('модель власника').and not_include('мультитенантність')
+    expect(Case.find_by!(slug: slug)[column]).to eq(edited)
+    expect(run.stdout).to include("left for a person: #{slug}.#{column}")
 
     AfterParty::TaskRecord.delete_all
     expect(run_task(task).stdout).to include('case wording fixed in: none')

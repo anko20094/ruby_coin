@@ -132,7 +132,7 @@ en:
         quality: Quality figures
         engineering_items: Engineering cards
         plain_body: Plain-words paragraphs
-        mine: What was mine
+        mine: What we did
         mark: Mark
         position: Position
         title: Title
@@ -344,7 +344,7 @@ en:
         quality: Quality figures
         engineering_items: Engineering cards
         plain_body: Plain-words paragraphs
-        mine: What was mine
+        mine: What we did
       create:
         success: Case successfully created
       update:
@@ -509,7 +509,7 @@ en:
     case:
       back: Projects
       plain: In plain words
-      mine: What was mine
+      mine: What we did
       engineering: For engineers
       facts: Facts
       status: status

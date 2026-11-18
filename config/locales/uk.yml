@@ -137,7 +137,7 @@ uk:
         quality: Показники якості
         engineering_items: Інженерні картки
         plain_body: Абзаци «простими словами»
-        mine: Що було моїм
+        mine: Що ми зробили
         mark: Номер
         position: Позиція
         title: Назва
@@ -349,7 +349,7 @@ uk:
         quality: Показники якості
         engineering_items: Інженерні картки
         plain_body: Абзаци «простими словами»
-        mine: Що було моїм
+        mine: Що ми зробили
       create:
         success: Кейс створено
       update:
@@ -524,7 +524,7 @@ uk:
     case:
       back: Проєкти
       plain: Простими словами
-      mine: Що було моїм
+      mine: Що ми зробили
       engineering: Для інженерів
       facts: Факти
       status: статус
