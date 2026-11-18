@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class FooterComponent < ViewComponent::Base
-  # Three of the contact rows, in the design's order.
-  CONTACT_KEYS = %w[github telegram email].freeze
+  # The contact rows the footer carries, in the design's order. LinkedIn is one of the channels the
+  # FAQ names for starting a project, so it is on every page.
+  CONTACT_KEYS = %w[github telegram email linkedin].freeze
 
   # cta: false on a page that is itself the way to get in touch — /contact — where the closing
   # call would only repeat it.

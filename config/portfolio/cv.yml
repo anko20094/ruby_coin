@@ -47,7 +47,7 @@ cv:
         uk: "США · віддалено"
       note:
         en: "Two services, overlapping: Leads API (Nov 2022 – Oct 2025) and Intelligence API (May 2023 – Feb 2026)."
-        uk: "Два сервіси, що перетинались: Leads API (лист. 2022 – жовт. 2025) та Intelligence API (трав. 2023 – лют. 2026)."
+        uk: "Два сервіси, що перетинались: Leads API (листоп. 2022 – жовт. 2025) та Intelligence API (трав. 2023 – лют. 2026)."
       body:
         en: "On <b>Intelligence</b>: #2 of 14 contributors — entity resolution across dozens of dirty sources, the Zebra ETL pipeline, RANGE partitioning and read/write splitting in production traffic. On <b>Leads</b>: owned Stripe billing and access control on an eight-year, 486-operation API, plus both sides of the integration between the two services."
         uk: "На <b>Intelligence</b>: #2 з 14 контриб’юторів — entity resolution по десятках брудних джерел, ETL-пайплайн Zebra, RANGE-партиціювання й розведення читання/запису в робочому трафіку. На <b>Leads</b>: відповідав за білінг Stripe і контроль доступу на восьмирічному API з 486 операцій, плюс обидві сторони інтеграції між сервісами."

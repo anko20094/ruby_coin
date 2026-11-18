@@ -17,9 +17,9 @@ footer.rc-footer.rc-scene class=('rc-footer--quiet' unless cta?)
         = render GemComponent.new(uid: 'footer', variant: :badge)
         span.rc-footer__wordmark rubyco.in
       .rc-footer__meta
-        = "© #{Time.current.year} #{profile.name}"
+        = "© #{Time.current.year} RubyCoin"
         br
-        = profile.location
+        = t('studio.location')
 
     .rc-footer__sections
       - links.each do |label, path|

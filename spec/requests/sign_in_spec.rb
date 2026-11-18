@@ -16,7 +16,7 @@ describe 'the way in', :jobs, type: :request do
     end
 
     it 'carries the identity the rest of the site carries' do
-      expect(response.body).to include(I18n.with_locale(:en) { Team.owner_cv.name })
+      expect(response.body).to include("© #{Time.current.year} RubyCoin")
       expect(response.body).not_to include('t.me/ruby4you')
       expect(response.body).not_to include('javascript:void(0)')
     end
